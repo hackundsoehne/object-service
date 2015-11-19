@@ -16,7 +16,16 @@ public class ExperimentController {
         this.create = create;
     }
 
-    public Response createExperiment(Request request) {
+    public Response createExperiment(Request request, Response response) {
+        String actualContentType = request.headers("Content-Type");
+        if (actualContentType == null || !actualContentType.equals("application/json")) {
+            response.body("Content-Type must be 'application/json'!");
+            response.status(400);
+            response.type("text/plain");
+            return response;
+        }
+
+        String id = request.params("expID");
 
     }
 }
