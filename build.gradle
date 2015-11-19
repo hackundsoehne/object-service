@@ -37,7 +37,7 @@ jooq {
         url 'jdbc:mysql://localhost:8888'
         driver 'com.mysql.jdbc.Driver'
         user 'LeanderK'
-        password ''
+        password 'y560'
     }
     generator {
         database {
@@ -46,7 +46,7 @@ jooq {
             includes '.*'
         }
         target {
-            packageName "edu.kit.ipd.crowdcontrol.databasemodel"
+            packageName "edu.ipd.kit.crowdcontrol.proto.databasemodel"
             directory 'src/main/java'
         }
     }
