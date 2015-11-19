@@ -1,0 +1,53 @@
+group 'CoolCrowd'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'jooq'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.11'
+    compile 'org.jooq:jooq:3.7.1'
+    compile 'org.jooq:jooq-meta:3.7.1'
+    compile 'com.sparkjava:spark-core:2.3'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'mysql:mysql-connector-java:5.1.37'
+        classpath 'com.github.ben-manes:gradle-jooq-plugin:+'
+    }
+}
+
+jooq {
+    jdbc {
+        url 'jdbc:mysql://localhost:8888'
+        driver 'com.mysql.jdbc.Driver'
+        user 'LeanderK'
+        password ''
+    }
+    generator {
+        database {
+            name 'org.jooq.util.mysql.MySQLDatabase'
+            inputSchema 'crowdcontrolproto'
+            includes '.*'
+        }
+        target {
+            packageName "edu.kit.ipd.crowdcontrol.databasemodel"
+            directory 'src/main/java'
+        }
+    }
+}
