@@ -8,14 +8,14 @@ import java.util.concurrent.CompletableFuture;
 public interface CrowdPlatform {
     /**
      * publish a task on the given CrowdPlatform. A worker can now access the Task and do answers.
-     * @return true if successful, false if not
+     * @return on success the id of the hit or failer null
      */
-    CompletableFuture<Boolean> publishTask(Hit hit);
+    CompletableFuture<String> publishTask(Hit hit);
 
     /**
      * @return true if successful, false if not
      */
-    CompletableFuture<Boolean> updateTask(Hit hit);
+    CompletableFuture<String> updateTask(Hit hit);
 
     /**
      * unpublish the task, after this call no answers can be sent for this task

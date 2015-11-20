@@ -3,6 +3,7 @@ package edu.ipd.kit.crowdcontrol.proto.crowdplatform;
 import com.amazonaws.mturk.addon.BatchItemCallback;
 import com.amazonaws.mturk.requester.HIT;
 import com.amazonaws.mturk.service.axis.RequesterService;
+import com.amazonaws.mturk.service.exception.ServiceException;
 import com.amazonaws.mturk.util.ClientConfig;
 
 import java.util.concurrent.CompletableFuture;
@@ -33,7 +34,7 @@ public class MTurkPlatform implements CrowdPlatform {
     }
 
     @Override
-    public CompletableFuture<Boolean> publishTask(Hit hit) {
+    public CompletableFuture<String> publishTask(Hit hit) {
         String keywords = hit.getTags().stream()
                 .collect(Collectors.joining(","));
 
@@ -47,28 +48,36 @@ public class MTurkPlatform implements CrowdPlatform {
                 "</ExternalQuestion>";
 
         return CompletableFuture.supplyAsync(() -> {
-            HIT hit1 = service.createHIT(hit.getTitle(), hit.getTitle(), hit.getDescription(), keywords, question, hit.getPayment(), hit.getAssignmentDuration(), assignment, hit.getHitDuration(), hit.getAmount(), null, null, null);
-            return hit1 != null;
+            try {
+                HIT hit1 = service.createHIT(null, hit.getTitle(), hit.getDescription(), keywords, question, hit.getPayment(), hit.getAssignmentDuration(), assignment, hit.getHitDuration(), hit.getAmount(), null, null, null);
+                return (hit1 != null) ? hit1.getHITId() : null;
+            } catch (ServiceException e) {
+                e.printStackTrace();
+                return null;
+            }
         });
     }
 
     @Override
-    public CompletableFuture<Boolean> updateTask(Hit hit) {
+    public CompletableFuture<String> updateTask(Hit hit) {
         int assignmentIncrement = (int) (hit.getAssignmentDuration() - mhit.getAssignmentDurationInSeconds());
 
         if (increment < 0) {
             System.err.println("Assignment duration has to be bigger");
-            return CompletableFuture.completedFuture(false);
+            return CompletableFuture.completedFuture(null);
         }
 
         String keywords = hit.getTags().stream()
                 .collect(Collectors.joining(","));
 
         return CompletableFuture.supplyAsync(() -> {
-            service.extendHIT(hit.getId(), assignmentIncrement, 0);
-            //FIXME newhit
-            service.updateHIT(hit.getId(), hit.getTitle(), hit.getDescription(), keywords, hit.getPayment());
-            return true;
+            try {
+                service.extendHIT(hit.getId(), assignmentIncrement, 0);
+                return service.updateHIT(hit.getId(), hit.getTitle(), hit.getDescription(), keywords, hit.getPayment());
+            } catch (ServiceException e) {
+                e.printStackTrace();
+                return null;
+            }
         });
     }
 
@@ -93,6 +102,6 @@ public class MTurkPlatform implements CrowdPlatform {
 
     @Override
     public String getName() {
-        return null;
+        return "mturk";
     }
 }
