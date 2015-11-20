@@ -32,6 +32,18 @@ public class Hit {
     private long hitDuration;
     private String url;
 
+    /**
+     *
+     * @param id id of the HIT
+     * @param title Title
+     * @param description Description which should declare the task before the worker accepts the HIT
+     * @param tags The tags where the HIT should be listet at
+     * @param amount number how often the hit can be accepted
+     * @param payment the payment per hit
+     * @param assignmentDuration the duration a worker has to complete a assignment
+     * @param hitDuration the duration a hit is running
+     * @param url the url to open when the hit is accepted
+     */
     public Hit(String id, String title, String description, List<String> tags, int amount, double payment, long assignmentDuration, long hitDuration, String url) {
         this.id = id;
         this.title = title;
