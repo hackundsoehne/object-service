@@ -2,6 +2,7 @@ package edu.ipd.kit.crowdcontrol.proto;
 
 import edu.ipd.kit.crowdcontrol.proto.controller.CrowdComputingController;
 import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
+import edu.ipd.kit.crowdcontrol.proto.controller.TaskController;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.CrowdPlatformManager;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.MTurkPlatform;
 
@@ -37,7 +38,8 @@ public class Main {
     private Router initRouter() {
         ExperimentController experimentController = new ExperimentController(databaseManager.getContext());
         CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext(), crowdPlatformManager);
-        Router router = new Router(experimentController, crowdComputingController);
+        TaskController taskController = new TaskController(databaseManager.getContext());
+        Router router = new Router(experimentController, crowdComputingController, taskController);
         router.init();
         return router;
     }
