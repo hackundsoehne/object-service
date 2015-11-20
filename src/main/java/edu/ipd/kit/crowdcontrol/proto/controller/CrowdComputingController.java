@@ -45,10 +45,15 @@ public class CrowdComputingController implements ControllerHelper {
                 && experimentRecord.getBudget() != null
                 && !experimentRecord.getRunning()) {
             experimentRecord.setRunning(true);
-            int i = create.executeUpdate(experimentRecord);
+            int i = create.update(experiment)
+                    .set(experimentRecord)
+                    .where(experiment.RUNNING.eq(false))
+                    .execute();
             if (i == 1) {
                 response.body("experiment " + expID + " started");
                 //TODO: connect with mTurk
+            } else {
+                response.body("experiment " + expID + " is already running");
             }
         } else if (experimentRecord != null &&experimentRecord.getRunning()) {
             response.body("experiment " + expID + " is already running");
