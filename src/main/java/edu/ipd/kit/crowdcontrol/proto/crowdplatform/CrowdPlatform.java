@@ -23,4 +23,6 @@ public interface CrowdPlatform {
      * Pay Task
      */
     void payTask(String id, int payment);
+
+    String getName();
 }

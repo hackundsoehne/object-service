@@ -30,6 +30,7 @@ public class Router implements SparkApplication {
             System.err.println("Bad Request! " + request.toString() + " error: " + e.getMessage());
         });
 
+        //experiemtn/<id>/start
         get("/experiments/delete", experimentController::deleteExperiment);
 
         post("/experiments/create", experimentController::createExperiment);
