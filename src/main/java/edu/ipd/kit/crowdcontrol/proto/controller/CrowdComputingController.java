@@ -42,13 +42,19 @@ public class CrowdComputingController implements ControllerHelper {
                 && experimentRecord.getBonuspayment() != null
                 && experimentRecord.getMaxanswersperassignment() != null
                 && experimentRecord.getMaxratingsperassignment() != null
-                && experimentRecord.getBudget() != null) {
-            //TODO: connect with mTurk
+                && experimentRecord.getBudget() != null
+                && !experimentRecord.getRunning()) {
             experimentRecord.setRunning(true);
             int i = create.executeUpdate(experimentRecord);
-            response.body("experiment " + expID + " started if not running");
+            if (i == 1) {
+                response.body("experiment " + expID + " started");
+                //TODO: connect with mTurk
+            }
+        } else if (experimentRecord != null &&experimentRecord.getRunning()) {
+            response.body("experiment " + expID + " is already running");
+        } else {
+            response.body("experiment " + expID + " does not fulfill requirements");
         }
-        response.body("experiment " + expID + " does not fulfill requirements");
         return response;
     }
 
