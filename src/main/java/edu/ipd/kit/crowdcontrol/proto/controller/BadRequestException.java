@@ -1,6 +1,7 @@
 package edu.ipd.kit.crowdcontrol.proto.controller;
 
 /**
+ * represents a 400 BAD REQUEST return code.
  * @author LeanderK
  * @version 1.0
  */

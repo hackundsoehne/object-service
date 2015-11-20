@@ -10,7 +10,7 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 
 /**
- *
+ * The Router routes and is responsible for the routing.
  * @author LeanderK
  * @version 1.0
  */

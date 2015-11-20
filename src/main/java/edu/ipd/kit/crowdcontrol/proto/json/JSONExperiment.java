@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * This class does not represent the Experiment stored in the Database. It models the JSON-Representation of an Experiment.
  * @author LeanderK
  * @version 1.0
  */

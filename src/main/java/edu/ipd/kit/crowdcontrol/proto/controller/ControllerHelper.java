@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
+ * Contains various helper-methods useful to the Controllers.
  * @author LeanderK
  * @version 1.0
  */

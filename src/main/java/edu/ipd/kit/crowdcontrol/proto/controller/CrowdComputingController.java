@@ -12,6 +12,7 @@ import spark.Response;
 import java.util.List;
 
 /**
+ * manages all the requests which interact with a Crowd-Computing Platform.
  * @author LeanderK
  * @version 1.0
  */
