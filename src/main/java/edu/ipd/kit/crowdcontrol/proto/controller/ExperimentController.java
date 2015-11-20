@@ -8,6 +8,7 @@ import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRec
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.QualificationsRecord;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.TagsRecord;
 import edu.ipd.kit.crowdcontrol.proto.json.JSONExperiment;
+import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
@@ -15,6 +16,7 @@ import spark.Request;
 import spark.Response;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -32,65 +34,65 @@ public class ExperimentController implements ControllerHelper {
     }
 
     public Response createExperiment(Request request, Response response) {
-        assertJson(request);
-        String json = request.body();
-        Gson gson = gsonBuilder.create();
-        JSONExperiment jsonExperiment = gson.fromJson(json, JSONExperiment.class);
-        ExperimentRecord expRecord = jsonExperiment.createRecord();
-        response.body("error: experiment is already existing");
-        create.transaction(config -> {
+        return processJsonWithTransaction(request, response, (json, config) -> {
+            response.body("error: experiment is already existing");
+            response.type("text/plain");
+            ExperimentRecord expRecord = json.createRecord();
             int execute = DSL.using(config)
-                            .insertInto(experiment)
-                            .set(expRecord)
-                            .execute();
+                    .insertInto(experiment)
+                    .set(expRecord)
+                    .execute();
             if (execute != 0) {
                 DSL.using(config)
-                        .batchInsert(jsonExperiment.getQualifications())
+                        .batchInsert(json.getQualifications())
                         .execute();
                 DSL.using(config)
-                        .batchInsert(jsonExperiment.getTags())
+                        .batchInsert(json.getTags())
                         .execute();
                 response.body("success");
             }
         });
-        response.status(200);
-        response.type("text/plain");
-        return response;
     }
 
     public Response updateExperiment(Request request, Response response) {
-        assertJson(request);
-        String json = request.body();
-        Gson gson = gsonBuilder.create();
-        JSONExperiment jsonExperiment = gson.fromJson(json, JSONExperiment.class);
-        ExperimentRecord expRecord = jsonExperiment.createRecord();
-        response.body("error: experiment is already existing");
-        create.transaction(config -> {
-            DSL.using(config)
+        return processJsonWithTransaction(request, response, (json, conf) -> {
+            ExperimentRecord expRecord = json.createRecord();
+            ExperimentRecord existing = create.selectFrom(experiment)
+                    .where(experiment.TITEL.eq(expRecord.getTitel()))
+                    .fetchOne();
+            response.body("error: experiment is already existing");
+            DSL.using(conf)
                     .update(experiment)
                     .set(expRecord)
                     .execute();
-            Record1<String> existing = create.select(experiment.TITEL)
+            Record1<String> existingTitle = create.select(experiment.TITEL)
                     .where(experiment.TITEL.eq(expRecord.getTitel()))
                     .fetchOne();
-            if (existing != null) {
+            if (existingTitle != null) {
                 DSL.deleteFrom(Tables.TAGS)
                         .where(Tables.TAGS.EXPERIMENT_T.eq(expRecord.getIdexperiment()))
                         .execute();
                 DSL.deleteFrom(Tables.TAGS)
                         .where(Tables.TAGS.EXPERIMENT_T.eq(expRecord.getIdexperiment()))
                         .execute();
-                DSL.using(config)
-                        .batchInsert(jsonExperiment.getTags())
+                DSL.using(conf)
+                        .batchInsert(json.getTags())
                         .execute();
-                DSL.using(config)
-                        .batchInsert(jsonExperiment.getQualifications())
+                DSL.using(conf)
+                        .batchInsert(json.getQualifications())
                         .execute();
                 response.body("success");
             }
         });
+    }
+
+    private Response processJsonWithTransaction(Request request, Response response, BiConsumer<JSONExperiment, Configuration> consumer) {
+        assertJson(request);
+        String json = request.body();
+        Gson gson = gsonBuilder.create();
+        JSONExperiment jsonExperiment = gson.fromJson(json, JSONExperiment.class);
         response.status(200);
-        response.type("text/plain");
+        create.transaction(config -> consumer.accept(jsonExperiment, config));
         return response;
     }
 

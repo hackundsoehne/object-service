@@ -26,34 +26,10 @@ public class CrowdComputingController implements ControllerHelper {
     }
 
     public Response startExperiment(Request request, Response response) {
-        String expID = assertParameter(request, "expID");
+        int expID = assertParameterInt(request, "expID");
         response.status(200);
         response.type("text/plain");
-        ExperimentRecord experimentRecord = new ExperimentRecord();
-        experimentRecord.setTitel(expID);
-        experimentRecord.setRunning(true);
-        int i = create.update(experiment)
-                .set(experimentRecord)
-                .where(experiment.QUESTION.isNotNull())
-                .and(experiment.TASKQUESTION.isNotNull())
-                .and(experiment.TASK_DESCRIPTION.isNotNull())
-                .and(experiment.HIT_TITLE.isNotNull())
-                .and(experiment.HIT_DESCRIPTION.isNotNull())
-                .and(experiment.BASICPAYMENTHIT.isNotNull())
-                .and(experiment.BASICPAYMENTANSWER.isNotNull())
-                .and(experiment.BASICPAYMENTRATING.isNotNull())
-                .and(experiment.BONUSPAYMENT.isNotNull())
-                .and(experiment.MAXANSWERSPERASSIGNMENT.isNotNull())
-                .and(experiment.MAXRATINGSPERASSIGNMENT.isNotNull())
-                .and(experiment.BUDGET.isNotNull())
-                .and(experiment.RUNNING.eq(false))
-                .execute();
-        if (i == 1) {
-            response.body("experiment " + expID + " started");
-            //TODO: connect with mTurk
-        } else {
-            response.body("experiment " + expID + " is already or does not fulfill requirements");
-        }
+
         return response;
     }
 
