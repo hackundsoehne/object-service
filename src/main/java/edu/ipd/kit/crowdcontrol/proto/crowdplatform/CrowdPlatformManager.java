@@ -1,19 +1,19 @@
 package edu.ipd.kit.crowdcontrol.proto.crowdplatform;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * Created by marcel on 20.11.15.
  */
-public class CrowdPlatformFactory {
+public class CrowdPlatformManager {
     private final Map<String, CrowdPlatform> platforms;
 
-    public CrowdPlatformFactory(List<CrowdPlatform> crowdPlatforms) {
+    public CrowdPlatformManager(List<CrowdPlatform> crowdPlatforms) {
         platforms = crowdPlatforms.stream()
-                .collect(Collectors.toMap(CrowdPlatform::getName, crowdPlatform1 -> crowdPlatform1));
+                .collect(Collectors.toMap(CrowdPlatform::getName, Function.identity()));
     }
 
     /**

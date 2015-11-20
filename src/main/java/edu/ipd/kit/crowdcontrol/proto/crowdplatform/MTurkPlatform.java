@@ -8,29 +8,34 @@ public class MTurkPlatform implements CrowdPlatform {
     private final String username;
     private final String url;
 
-    public MTurkPlatform(String password, String username, String url) {
+    public MTurkPlatform(String username, String password, String url) {
         this.password = password;
         this.username = username;
         this.url = url;
     }
 
     @Override
-    public void publishTask(String id, String name, String url, int amount) {
-        Main
-    }
-
-    @Override
-    public void updateTask(String id, String name, String url, int amount) {
+    public boolean publishTask(String id, String name, String url, int amount) {
 
     }
 
     @Override
-    public void unpublishTask(String id) {
+    public boolean updateTask(String id, String name, String url, int amount) {
 
     }
 
     @Override
-    public void payTask(String id, int payment) {
+    public boolean unpublishTask(String id) {
 
+    }
+
+    @Override
+    public boolean payTask(String id, int payment) {
+
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }

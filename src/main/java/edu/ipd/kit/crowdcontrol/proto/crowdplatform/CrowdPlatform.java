@@ -5,24 +5,31 @@ package edu.ipd.kit.crowdcontrol.proto.crowdplatform;
  */
 public interface CrowdPlatform {
     /**
-     * publish a task on the given CrowdPlatform. A worker can now access the Task and do answers
+     * publish a task on the given CrowdPlatform. A worker can now access the Task and do answers.
+     * @return true if successful, false if not
      */
-    void publishTask(String id, String name, String url, int amount);
+    boolean publishTask(String id, String name, String url, int amount);
 
     /**
-     *
+     * @return true if successful, false if not
      */
-    void updateTask(String id, String name, String url, int amount);
+    boolean updateTask(String id, String name, String url, int amount);
 
     /**
      * unpublish the task, after this call no answers can be sent for this task
+     * @return true if successful, false if not
      */
-    void unpublishTask(String id);
+    boolean unpublishTask(String id);
 
     /**
      * Pay Task
+     * @return true if successful, false if not
      */
-    void payTask(String id, int payment);
+    boolean payTask(String id, int payment);
 
+    /**
+     * the name of the CrowdPlatform
+     * @return true if successful, false if not
+     */
     String getName();
 }
