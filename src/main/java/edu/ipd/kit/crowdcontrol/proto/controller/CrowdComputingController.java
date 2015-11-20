@@ -29,37 +29,30 @@ public class CrowdComputingController implements ControllerHelper {
         String expID = assertParameter(request, "expID");
         response.status(200);
         response.type("text/plain");
-        ExperimentRecord experimentRecord = create.selectFrom(experiment)
-                .where(experiment.TITEL.eq(expID))
-                .fetchOne();
-        if (experimentRecord != null && experimentRecord.getQuestion() != null
-                && experimentRecord.getTaskquestion() != null
-                && experimentRecord.getTaskDescription() != null
-                && experimentRecord.getHitTitle() != null
-                && experimentRecord.getHitDescription() != null
-                && experimentRecord.getBasicpaymenthit() != null
-                && experimentRecord.getBasicpaymentanswer() != null
-                && experimentRecord.getBasicpaymentrating() != null
-                && experimentRecord.getBonuspayment() != null
-                && experimentRecord.getMaxanswersperassignment() != null
-                && experimentRecord.getMaxratingsperassignment() != null
-                && experimentRecord.getBudget() != null
-                && !experimentRecord.getRunning()) {
-            experimentRecord.setRunning(true);
-            int i = create.update(experiment)
-                    .set(experimentRecord)
-                    .where(experiment.RUNNING.eq(false))
-                    .execute();
-            if (i == 1) {
-                response.body("experiment " + expID + " started");
-                //TODO: connect with mTurk
-            } else {
-                response.body("experiment " + expID + " is already running");
-            }
-        } else if (experimentRecord != null &&experimentRecord.getRunning()) {
-            response.body("experiment " + expID + " is already running");
+        ExperimentRecord experimentRecord = new ExperimentRecord();
+        experimentRecord.setTitel(expID);
+        experimentRecord.setRunning(true);
+        int i = create.update(experiment)
+                .set(experimentRecord)
+                .where(experiment.QUESTION.isNotNull())
+                .and(experiment.TASKQUESTION.isNotNull())
+                .and(experiment.TASK_DESCRIPTION.isNotNull())
+                .and(experiment.HIT_TITLE.isNotNull())
+                .and(experiment.HIT_DESCRIPTION.isNotNull())
+                .and(experiment.BASICPAYMENTHIT.isNotNull())
+                .and(experiment.BASICPAYMENTANSWER.isNotNull())
+                .and(experiment.BASICPAYMENTRATING.isNotNull())
+                .and(experiment.BONUSPAYMENT.isNotNull())
+                .and(experiment.MAXANSWERSPERASSIGNMENT.isNotNull())
+                .and(experiment.MAXRATINGSPERASSIGNMENT.isNotNull())
+                .and(experiment.BUDGET.isNotNull())
+                .and(experiment.RUNNING.eq(false))
+                .execute();
+        if (i == 1) {
+            response.body("experiment " + expID + " started");
+            //TODO: connect with mTurk
         } else {
-            response.body("experiment " + expID + " does not fulfill requirements");
+            response.body("experiment " + expID + " is already or does not fulfill requirements");
         }
         return response;
     }
