@@ -1,6 +1,5 @@
 package edu.ipd.kit.crowdcontrol.proto;
 
-import com.sun.tools.internal.ws.processor.model.ModelException;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -20,7 +19,7 @@ public class DatabaseManager {
     private final DSLContext context;
 
 
-    public DatabaseManager(String userName, String password, String url) throws SQLException, ModelException {
+    public DatabaseManager(String userName, String password, String url) throws SQLException {
         connection = DriverManager.getConnection(url, userName, password);
         context = DSL.using(connection, SQLDialect.MYSQL);
         initDatabase();

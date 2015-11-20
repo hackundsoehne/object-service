@@ -1,5 +1,5 @@
 # Welcome to the Prototype for CrowdControl
-you can start the Prototype with: `you cannot start the prototype yet ;)`
+you can start the Prototype with the following commands: `java -jar JARNAME USERNAME PASSWORD DATABASEURL`
 
 #### to build this project you need:
 - java 8

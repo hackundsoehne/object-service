@@ -12,9 +12,16 @@ import java.sql.SQLException;
  */
 public class Main {
     public static void main(String[] args) {
+        if (args.length != 3) {
+            System.err.println("start crowdControl with: username password databaseURL");
+        }
         String username = args[0];
         String password = args[1];
         String databaseURL =  args[2];
+        if (username.isEmpty() || password.isEmpty() || databaseURL.isEmpty()) {
+            System.err.println("start crowdControl with: username password databaseURL");
+        }
+
         DatabaseManager databaseManager = null;
         try {
             databaseManager = new DatabaseManager(username, password, databaseURL);
