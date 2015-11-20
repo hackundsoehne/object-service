@@ -57,18 +57,18 @@ public class MTurkPlatform implements CrowdPlatform {
 
         if (increment < 0) {
             System.err.println("Assignment duration has to be bigger");
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
 
-        String keywords = "";
-        for(String keyword : hit.getTags()) {
-            keywords += keyword;
-        }
+        String keywords = hit.getTags().stream()
+                .collect(Collectors.joining(","));
 
-        service.extendHIT(hit.getId(), assignmentIncrement, 0);
-        service.updateHIT(hit.getId(), hit.getTitle(), hit.getDescription(), keywords, hit.getPayment());
-
-        return true;
+        return CompletableFuture.supplyAsync(() -> {
+            service.extendHIT(hit.getId(), assignmentIncrement, 0);
+            //FIXME newhit
+            service.updateHIT(hit.getId(), hit.getTitle(), hit.getDescription(), keywords, hit.getPayment());
+            return true;
+        });
     }
 
     @Override
@@ -86,6 +86,7 @@ public class MTurkPlatform implements CrowdPlatform {
 
     @Override
     public CompletableFuture<Boolean> payTask(Hit hit) {
+        //
         return false;
     }
 

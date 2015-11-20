@@ -86,7 +86,6 @@ public class DatabaseManager {
                 "-- -----------------------------------------------------\n" +
                 "-- Table `crowdcontrolproto`.`HIT`\n" +
                 "-- -----------------------------------------------------\n" +
-<<<<<<< HEAD
                 "CREATE TABLE `HIT` (\n" +
                 "  `idHIT` int(11) NOT NULL,\n" +
                 "  `experiment_h` int(11) NOT NULL,\n" +
@@ -100,25 +99,6 @@ public class DatabaseManager {
                 "  KEY `idexperiment_idx` (`experiment_h`),\n" +
                 "  CONSTRAINT `idexperimenthit` FOREIGN KEY (`experiment_h`) REFERENCES `Experiment` (`idexperiment`)\n" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n" +
-=======
-                "CREATE TABLE IF NOT EXISTS `crowdcontrolproto`.`HIT` (\n" +
-                "  `idHIT` INT NOT NULL,\n" +
-                "  `experiment_h` INT NOT NULL,\n" +
-                "  `type` VARCHAR(45) NOT NULL,\n" +
-                "  `running` BIT(1) NOT NULL,\n" +
-                "  `current_amount` INT NOT NULL,\n" +
-                "  `max_amount` INT NOT NULL,\n" +
-                "  `payment` INT NOT NULL,\n" +
-                "  `bonus` INT NULL DEFAULT 0,\n" +
-                "  PRIMARY KEY (`idHIT`),\n" +
-                "  INDEX `idexperiment_idx` (`experiment_h` ASC),\n" +
-                "  CONSTRAINT `idexperimenthit`\n" +
-                "    FOREIGN KEY (`experiment_h`)\n" +
-                "    REFERENCES `crowdcontrolproto`.`Experiment` (`idexperiment`)\n" +
-                "    ON DELETE CASCADE\n" +
-                "    ON UPDATE CASCADE)\n" +
-                "ENGINE = InnoDB;\n" +
->>>>>>> improved the CrowdPlataformManager, reworked the initialization. Have fun Marcel!
                 "\n" +
                 "\n" +
                 "-- -----------------------------------------------------\n" +
