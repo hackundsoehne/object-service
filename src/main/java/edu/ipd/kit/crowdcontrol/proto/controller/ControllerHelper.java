@@ -1,13 +1,7 @@
 package edu.ipd.kit.crowdcontrol.proto.controller;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.jooq.TableRecord;
 import spark.Request;
 
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -31,12 +25,5 @@ public interface ControllerHelper {
     default String assertParameter(Request request, String parameter) {
         assertRequest(request, request1 -> request1.params(parameter) != null, "Request needs Parameter:" + parameter);
         return request.params(parameter);
-    }
-
-    default <T extends TableRecord<T>> T createRecord(T t, BiFunction<T, Map.Entry<String, JsonElement>, T> modifier, JsonObject jsonObject) {
-        return jsonObject.entrySet().stream()
-                .map(entry -> (Function<T, T>) step -> modifier.apply(step, entry))
-                .reduce(Function.identity(), (f1, f2) -> f1.andThen(f2))
-                .apply(t);
     }
 }

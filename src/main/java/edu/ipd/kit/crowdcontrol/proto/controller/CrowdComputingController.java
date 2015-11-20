@@ -69,7 +69,6 @@ public class CrowdComputingController implements ControllerHelper {
                 .where(experiment.RUNNING.eq(true))
                 .fetch()
                 .map(Record1::value1);
-
         String json = gsonBuilder.create().toJson(running);
         response.status(200);
         response.body(json);
