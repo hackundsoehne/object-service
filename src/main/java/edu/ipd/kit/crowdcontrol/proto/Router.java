@@ -1,8 +1,11 @@
 package edu.ipd.kit.crowdcontrol.proto;
 
+import edu.ipd.kit.crowdcontrol.proto.controller.BadRequestException;
+import edu.ipd.kit.crowdcontrol.proto.controller.CrowdComputingController;
 import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
 import spark.servlet.SparkApplication;
 
+import static spark.Spark.exception;
 import static spark.Spark.get;
 import static spark.Spark.post;
 
@@ -13,23 +16,30 @@ import static spark.Spark.post;
  */
 public class Router implements SparkApplication {
     private final ExperimentController experimentController;
+    private final CrowdComputingController crowdComputingController;
 
-    public Router(ExperimentController experimentController) {
+    public Router(ExperimentController experimentController, CrowdComputingController crowdComputingController) {
         this.experimentController = experimentController;
+        this.crowdComputingController = crowdComputingController;
     }
 
     public void init() {
-        get("/experiments/delete/:expID", (request, response) -> {
-            //delete exp
-            return null;
+        exception(BadRequestException.class, (e, request, response) -> {
+            response.status(400);
+            response.body(e.getMessage());
+            System.err.println("Bad Request! " + request.toString() + " error: " + e.getMessage());
         });
 
-        post("/experiments/create/:expID", experimentController::createExperiment);
+        get("/experiments/delete", experimentController::deleteExperiment);
 
-        get("/experiments/:expID", (request, response) -> {
-            //get exp
-            return null;
-        });
+        post("/experiments/create", experimentController::createOrUpdateExperiment);
 
+        get("/experiments", experimentController::getExperiment);
+
+        get("/crowd/start", crowdComputingController::startExperiment);
+
+        get("/crowd/running", crowdComputingController::getRunning);
+
+        get("/crowd/stop", crowdComputingController::stopExperiment);
     }
 }

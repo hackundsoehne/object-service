@@ -25,12 +25,14 @@ public class Keys {
 
 	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_PRIMARY = UniqueKeys0.KEY_EXPERIMENT_PRIMARY;
 	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_ID_UNIQUE = UniqueKeys0.KEY_EXPERIMENT_ID_UNIQUE;
+	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_TITEL_UNIQUE = UniqueKeys0.KEY_EXPERIMENT_TITEL_UNIQUE;
 	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord> KEY_RATINGOPTIONS_PRIMARY = UniqueKeys0.KEY_RATINGOPTIONS_PRIMARY;
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
+	public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> EXPERIMENT = ForeignKeys0.EXPERIMENT;
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
@@ -39,6 +41,11 @@ public class Keys {
 	private static class UniqueKeys0 extends org.jooq.impl.AbstractKeys {
 		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.ID);
 		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_ID_UNIQUE = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.ID);
+		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_TITEL_UNIQUE = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.TITEL);
 		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord> KEY_RATINGOPTIONS_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions.RATINGOPTIONS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions.RATINGOPTIONS.IDRATINGOPTIONS);
+	}
+
+	private static class ForeignKeys0 extends org.jooq.impl.AbstractKeys {
+		public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> EXPERIMENT = createForeignKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_EXPERIMENT_PRIMARY, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions.RATINGOPTIONS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions.RATINGOPTIONS.EXPERIMENT);
 	}
 }

@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Ratingoptions extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord> {
 
-	private static final long serialVersionUID = 147782052;
+	private static final long serialVersionUID = 1088738817;
 
 	/**
 	 * The singleton instance of <code>crowdcontrolproto.RatingOptions</code>
@@ -74,6 +74,14 @@ public class Ratingoptions extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcont
 	@Override
 	public java.util.List<org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord>> getKeys() {
 		return java.util.Arrays.<org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord>>asList(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_RATINGOPTIONS_PRIMARY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public java.util.List<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord, ?>> getReferences() {
+		return java.util.Arrays.<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord, ?>>asList(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.EXPERIMENT);
 	}
 
 	/**

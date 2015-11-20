@@ -1,5 +1,6 @@
 package edu.ipd.kit.crowdcontrol.proto;
 
+import edu.ipd.kit.crowdcontrol.proto.controller.CrowdComputingController;
 import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
 
 import java.sql.SQLException;
@@ -23,7 +24,8 @@ public class Main {
             System.exit(-1);
         }
         ExperimentController experimentController = new ExperimentController(databaseManager.getContext());
-        Router router = new Router(experimentController);
+        CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext());
+        Router router = new Router(experimentController, crowdComputingController);
         router.init();
     }
 }
