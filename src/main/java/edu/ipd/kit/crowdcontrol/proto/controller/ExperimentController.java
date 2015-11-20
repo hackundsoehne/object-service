@@ -9,6 +9,7 @@ import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRec
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord;
 import edu.ipd.kit.crowdcontrol.proto.json.JSONExperiment;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import spark.Request;
 import spark.Response;
 
@@ -24,47 +25,30 @@ import java.util.Map;
 public class ExperimentController implements ControllerHelper {
     private final DSLContext create;
     private final Experiment experiment = Tables.EXPERIMENT;
-    private final Ratingoptions ratingOptions = Tables.RATINGOPTIONS;
     private final GsonBuilder gsonBuilder =  new GsonBuilder();
 
     public ExperimentController(DSLContext create) {
         this.create = create;
     }
 
-    public Response createOrUpdateExperiment(Request request, Response response) {
+    public Response createExperiment(Request request, Response response) {
         assertJson(request);
-        String expID = assertParameter(request, "expID");
-
         String json = request.body();
         Gson gson = gsonBuilder.create();
         JSONExperiment jsonExperiment = gson.fromJson(json, JSONExperiment.class);
         ExperimentRecord expRecord = jsonExperiment.createRecord();
-        expRecord.setTitel(request.params(expID));
-
-        int affectedExp = create.insertInto(experiment)
-                .set(expRecord)
-                .onDuplicateKeyUpdate()
-                .set(expRecord)
-                .execute();
-
-        List<RatingoptionsRecord> ratingOptionsRecords = jsonExperiment.createRatingOptionsRecord();
-        int id = create.select(experiment.ID)
-                .where(experiment.TITEL.eq(expID))
-                .fetchOne()
-                .value1();
-
-        ratingOptionsRecords.forEach(option -> option.setExperiment(id));
-
-        create.deleteFrom(ratingOptions)
-                .where(ratingOptions.EXPERIMENT.eq(id))
-                .execute();
-
-        int[] affectedRatingsArr = create.batchInsert(ratingOptionsRecords)
-                .execute();
-
-        int affectedRatings = Arrays.stream(affectedRatingsArr)
-                .sum();
-
+        create.transaction(config -> {
+            int execute = DSL.using(config)
+                            .insertInto(experiment)
+                            .set(expRecord)
+                            .execute();
+            if (execute == 1) {
+                DSL.using(config)
+                        .batchInsert(jsonExperiment.getQualifications());
+                DSL.using(config)
+                        .batchInsert(jsonExperiment.getTags());
+            }
+        });
 
         response.status(200);
         response.body("affected=" + (affectedExp + affectedRatings));
