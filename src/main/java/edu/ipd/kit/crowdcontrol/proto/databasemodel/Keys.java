@@ -23,29 +23,43 @@ public class Keys {
 	// UNIQUE and PRIMARY KEY definitions
 	// -------------------------------------------------------------------------
 
+	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord> KEY_ANSWERS_PRIMARY = UniqueKeys0.KEY_ANSWERS_PRIMARY;
 	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_PRIMARY = UniqueKeys0.KEY_EXPERIMENT_PRIMARY;
-	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_ID_UNIQUE = UniqueKeys0.KEY_EXPERIMENT_ID_UNIQUE;
-	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_TITEL_UNIQUE = UniqueKeys0.KEY_EXPERIMENT_TITEL_UNIQUE;
-	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord> KEY_RATINGOPTIONS_PRIMARY = UniqueKeys0.KEY_RATINGOPTIONS_PRIMARY;
+	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord> KEY_HIT_PRIMARY = UniqueKeys0.KEY_HIT_PRIMARY;
+	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.QualificationsRecord> KEY_QUALIFICATIONS_PRIMARY = UniqueKeys0.KEY_QUALIFICATIONS_PRIMARY;
+	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord> KEY_RATINGS_PRIMARY = UniqueKeys0.KEY_RATINGS_PRIMARY;
+	public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.TagsRecord> KEY_TAGS_PRIMARY = UniqueKeys0.KEY_TAGS_PRIMARY;
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
-	public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> EXPERIMENT = ForeignKeys0.EXPERIMENT;
+	public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord> IDHITANSWERS = ForeignKeys0.IDHITANSWERS;
+	public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> IDEXPERIMENTHIT = ForeignKeys0.IDEXPERIMENTHIT;
+	public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.QualificationsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> IDEXPERIMENTQUAL = ForeignKeys0.IDEXPERIMENTQUAL;
+	public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord> IDHITRATING = ForeignKeys0.IDHITRATING;
+	public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord> IDANSWERSRATINS = ForeignKeys0.IDANSWERSRATINS;
+	public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.TagsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> IDEXPERIMENTTAGS = ForeignKeys0.IDEXPERIMENTTAGS;
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
 	// -------------------------------------------------------------------------
 
 	private static class UniqueKeys0 extends org.jooq.impl.AbstractKeys {
-		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.ID);
-		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_ID_UNIQUE = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.ID);
-		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_TITEL_UNIQUE = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.TITEL);
-		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord> KEY_RATINGOPTIONS_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions.RATINGOPTIONS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions.RATINGOPTIONS.IDRATINGOPTIONS);
+		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord> KEY_ANSWERS_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Answers.ANSWERS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Answers.ANSWERS.IDANSWERS);
+		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> KEY_EXPERIMENT_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.IDEXPERIMENT);
+		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord> KEY_HIT_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit.HIT, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit.HIT.IDHIT);
+		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.QualificationsRecord> KEY_QUALIFICATIONS_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Qualifications.QUALIFICATIONS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Qualifications.QUALIFICATIONS.IDQUALIFICATIONS);
+		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord> KEY_RATINGS_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings.RATINGS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings.RATINGS.IDRATINGS);
+		public static final org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.TagsRecord> KEY_TAGS_PRIMARY = createUniqueKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Tags.TAGS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Tags.TAGS.IDTAGS);
 	}
 
 	private static class ForeignKeys0 extends org.jooq.impl.AbstractKeys {
-		public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> EXPERIMENT = createForeignKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_EXPERIMENT_PRIMARY, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions.RATINGOPTIONS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions.RATINGOPTIONS.EXPERIMENT);
+		public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord> IDHITANSWERS = createForeignKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_HIT_PRIMARY, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Answers.ANSWERS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Answers.ANSWERS.HIT_A);
+		public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> IDEXPERIMENTHIT = createForeignKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_EXPERIMENT_PRIMARY, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit.HIT, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit.HIT.EXPERIMENT_H);
+		public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.QualificationsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> IDEXPERIMENTQUAL = createForeignKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_EXPERIMENT_PRIMARY, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Qualifications.QUALIFICATIONS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Qualifications.QUALIFICATIONS.EXPERIMENT_Q);
+		public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord> IDHITRATING = createForeignKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_HIT_PRIMARY, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings.RATINGS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings.RATINGS.HIT_R);
+		public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord> IDANSWERSRATINS = createForeignKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_ANSWERS_PRIMARY, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings.RATINGS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings.RATINGS.ANSWER_R);
+		public static final org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.TagsRecord, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> IDEXPERIMENTTAGS = createForeignKey(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_EXPERIMENT_PRIMARY, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Tags.TAGS, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Tags.TAGS.EXPERIMENT_T);
 	}
 }

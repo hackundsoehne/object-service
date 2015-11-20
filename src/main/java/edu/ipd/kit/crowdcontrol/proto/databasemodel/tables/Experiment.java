@@ -11,10 +11,10 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> {
 
-	private static final long serialVersionUID = 491090968;
+	private static final long serialVersionUID = -315209636;
 
 	/**
-	 * The singleton instance of <code>crowdcontrolproto.experiment</code>
+	 * The singleton instance of <code>crowdcontrolproto.Experiment</code>
 	 */
 	public static final edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment EXPERIMENT = new edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment();
 
@@ -27,99 +27,54 @@ public class Experiment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol
 	}
 
 	/**
-	 * The column <code>crowdcontrolproto.experiment.id</code>.
+	 * The column <code>crowdcontrolproto.Experiment.idexperiment</code>.
 	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> IDEXPERIMENT = createField("idexperiment", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>crowdcontrolproto.experiment.question</code>.
+	 * The column <code>crowdcontrolproto.Experiment.picture_url</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> PICTURE_URL = createField("picture_url", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
+
+	/**
+	 * The column <code>crowdcontrolproto.Experiment.picture_license_url</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> PICTURE_LICENSE_URL = createField("picture_license_url", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
+
+	/**
+	 * The column <code>crowdcontrolproto.Experiment.question</code>.
 	 */
 	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> QUESTION = createField("question", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
 
 	/**
-	 * The column <code>crowdcontrolproto.experiment.taskQuestion</code>.
+	 * The column <code>crowdcontrolproto.Experiment.rating_options</code>.
 	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> TASKQUESTION = createField("taskQuestion", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> RATING_OPTIONS = createField("rating_options", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
 
 	/**
-	 * The column <code>crowdcontrolproto.experiment.task_picture_url</code>.
+	 * The column <code>crowdcontrolproto.Experiment.titel</code>.
 	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> TASK_PICTURE_URL = createField("task_picture_url", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> TITEL = createField("titel", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
 
 	/**
-	 * The column <code>crowdcontrolproto.experiment.task_picture_license_url</code>.
+	 * The column <code>crowdcontrolproto.Experiment.max_ratings_per_assignment</code>.
 	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> TASK_PICTURE_LICENSE_URL = createField("task_picture_license_url", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> MAX_RATINGS_PER_ASSIGNMENT = createField("max_ratings_per_assignment", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
-	 * The column <code>crowdcontrolproto.experiment.task_description</code>.
+	 * The column <code>crowdcontrolproto.Experiment.max_answers_per_assignment</code>.
 	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> TASK_DESCRIPTION = createField("task_description", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> MAX_ANSWERS_PER_ASSIGNMENT = createField("max_answers_per_assignment", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
-	 * The column <code>crowdcontrolproto.experiment.hit_title</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> HIT_TITLE = createField("hit_title", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.hit_description</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> HIT_DESCRIPTION = createField("hit_description", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.basicPaymentHIT</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> BASICPAYMENTHIT = createField("basicPaymentHIT", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.basicPaymentAnswer</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> BASICPAYMENTANSWER = createField("basicPaymentAnswer", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.basicPaymentRating</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> BASICPAYMENTRATING = createField("basicPaymentRating", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.bonusPayment</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> BONUSPAYMENT = createField("bonusPayment", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.maxAnswersPerAssignment</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> MAXANSWERSPERASSIGNMENT = createField("maxAnswersPerAssignment", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.maxRatingsPerAssignment</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> MAXRATINGSPERASSIGNMENT = createField("maxRatingsPerAssignment", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.titel</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> TITEL = createField("titel", org.jooq.impl.SQLDataType.VARCHAR.length(45).nullable(false), this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.budget</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> BUDGET = createField("budget", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.experiment.running</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Boolean> RUNNING = createField("running", org.jooq.impl.SQLDataType.BIT.defaulted(true), this, "");
-
-	/**
-	 * Create a <code>crowdcontrolproto.experiment</code> table reference
+	 * Create a <code>crowdcontrolproto.Experiment</code> table reference
 	 */
 	public Experiment() {
-		this("experiment", null);
+		this("Experiment", null);
 	}
 
 	/**
-	 * Create an aliased <code>crowdcontrolproto.experiment</code> table reference
+	 * Create an aliased <code>crowdcontrolproto.Experiment</code> table reference
 	 */
 	public Experiment(java.lang.String alias) {
 		this(alias, edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT);
@@ -146,7 +101,7 @@ public class Experiment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord>>asList(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_EXPERIMENT_PRIMARY, edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_EXPERIMENT_ID_UNIQUE, edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_EXPERIMENT_TITEL_UNIQUE);
+		return java.util.Arrays.<org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord>>asList(edu.ipd.kit.crowdcontrol.proto.databasemodel.Keys.KEY_EXPERIMENT_PRIMARY);
 	}
 
 	/**

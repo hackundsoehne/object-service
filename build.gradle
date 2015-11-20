@@ -51,7 +51,7 @@ jar {
 jooq {
     sample(sourceSets.main) {
         jdbc {
-            url = 'jdbc:mysql://localhost:8888/crowdcontrolproto'
+            url = 'jdbc:mysql://localhost:8888'
             driver = 'com.mysql.jdbc.Driver'
             user = 'LeanderK'
             password = ''

@@ -14,12 +14,32 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel;
 public class Tables {
 
 	/**
-	 * The table crowdcontrolproto.experiment
+	 * The table crowdcontrolproto.Answers
+	 */
+	public static final edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Answers ANSWERS = edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Answers.ANSWERS;
+
+	/**
+	 * The table crowdcontrolproto.Experiment
 	 */
 	public static final edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment EXPERIMENT = edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT;
 
 	/**
-	 * The table crowdcontrolproto.RatingOptions
+	 * The table crowdcontrolproto.HIT
 	 */
-	public static final edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions RATINGOPTIONS = edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions.RATINGOPTIONS;
+	public static final edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit HIT = edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit.HIT;
+
+	/**
+	 * The table crowdcontrolproto.Qualifications
+	 */
+	public static final edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Qualifications QUALIFICATIONS = edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Qualifications.QUALIFICATIONS;
+
+	/**
+	 * The table crowdcontrolproto.Ratings
+	 */
+	public static final edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings RATINGS = edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings.RATINGS;
+
+	/**
+	 * The table crowdcontrolproto.Tags
+	 */
+	public static final edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Tags TAGS = edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Tags.TAGS;
 }
