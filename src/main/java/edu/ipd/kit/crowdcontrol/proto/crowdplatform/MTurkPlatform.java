@@ -5,6 +5,7 @@ import com.amazonaws.mturk.requester.HIT;
 import com.amazonaws.mturk.service.axis.RequesterService;
 import com.amazonaws.mturk.util.ClientConfig;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -30,7 +31,7 @@ public class MTurkPlatform implements CrowdPlatform {
     }
 
     @Override
-    public boolean publishTask(Hit hit) {
+    public CompletableFuture<Boolean> publishTask(Hit hit) {
         String keywords = "";
         for(String keyword : hit.getTags()) {
             keywords += keyword;
@@ -45,15 +46,14 @@ public class MTurkPlatform implements CrowdPlatform {
                 "<FrameHeight>200</FrameHeight>" +
                 "</ExternalQuestion>";
 
-        HIT mhit = service.createHIT(hit.getTitle(), hit.getTitle(), hit.getDescription(), keywords, question, hit.getPayment(), hit.getAssignmentDuration(), assignment, hit.getHitDuration(), hit.getAmount(), null, null, null);
-
-        if (mhit == NULL)
-            return false;
-        return true;
+        return CompletableFuture.supplyAsync(() -> {
+            HIT hit1 = service.createHIT(hit.getTitle(), hit.getTitle(), hit.getDescription(), keywords, question, hit.getPayment(), hit.getAssignmentDuration(), assignment, hit.getHitDuration(), hit.getAmount(), null, null, null);
+            return hit1 != null;
+        });
     }
 
     @Override
-    public boolean updateTask(Hit hit) {
+    public CompletableFuture<Boolean> updateTask(Hit hit) {
         int assignmentIncrement = (int) (hit.getAssignmentDuration() - mhit.getAssignmentDurationInSeconds());
 
         if (increment < 0) {
@@ -73,23 +73,20 @@ public class MTurkPlatform implements CrowdPlatform {
     }
 
     @Override
-    public boolean unpublishTask(Hit hit) {
+    public CompletableFuture<Boolean> unpublishTask(Hit hit) {
         HIT mhit = service.getHIT(hit.getId());
 
-        if (mhit == null) return false;
+        if (mhit == null) return CompletableFuture.completedFuture(false);
 
         String[] hitids = {hit.getId()};
 
-        service.deleteHITs(hitids, false, true, new BatchItemCallback() {
-            @Override
-            public void processItemResult(Object o, boolean b, Object o1, Exception e) {
-
-            }
-        });
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        service.deleteHITs(hitids, false, true, (o, b, o1, e) -> result.complete(b));
+        return result;
     }
 
     @Override
-    public boolean payTask(Hit hit) {
+    public CompletableFuture<Boolean> payTask(Hit hit) {
         return false;
     }
 
