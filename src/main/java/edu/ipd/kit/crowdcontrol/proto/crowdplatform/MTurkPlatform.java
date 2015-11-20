@@ -7,6 +7,7 @@ import com.amazonaws.mturk.util.ClientConfig;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Created by marcel on 20.11.15.
@@ -32,10 +33,8 @@ public class MTurkPlatform implements CrowdPlatform {
 
     @Override
     public CompletableFuture<Boolean> publishTask(Hit hit) {
-        String keywords = "";
-        for(String keyword : hit.getTags()) {
-            keywords += keyword;
-        }
+        String keywords = hit.getTags().stream()
+                .collect(Collectors.joining(","));
 
         //30 days in seconds
         long assignment = 30*24*60*60;
