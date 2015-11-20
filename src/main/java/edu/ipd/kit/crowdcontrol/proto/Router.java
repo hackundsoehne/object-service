@@ -32,7 +32,9 @@ public class Router implements SparkApplication {
 
         get("/experiments/delete", experimentController::deleteExperiment);
 
-        post("/experiments/create", experimentController::createOrUpdateExperiment);
+        post("/experiments/create", experimentController::createExperiment);
+
+        post("/experiments/update", experimentController::updateExperiment);
 
         get("/experiments", experimentController::getExperiment);
 

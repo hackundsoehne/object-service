@@ -26,4 +26,13 @@ public interface ControllerHelper {
         assertRequest(request, request1 -> request1.params(parameter) != null, "Request needs Parameter:" + parameter);
         return request.params(parameter);
     }
+
+    default int assertParameterInt(Request request, String parameter) {
+        assertRequest(request, request1 -> request1.params(parameter) != null, "Request needs Parameter:" + parameter);
+        try {
+            return Integer.parseInt(request.params(parameter));
+        } catch (NumberFormatException e) {
+            throw new BadRequestException("Request needs Parameter: " + parameter + " as an Integer");
+        }
+    }
 }

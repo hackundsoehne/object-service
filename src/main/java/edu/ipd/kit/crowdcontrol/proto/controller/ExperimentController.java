@@ -4,18 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.Tables;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment;
-import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratingoptions;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord;
-import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingoptionsRecord;
+import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.QualificationsRecord;
+import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.TagsRecord;
 import edu.ipd.kit.crowdcontrol.proto.json.JSONExperiment;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
 import org.jooq.impl.DSL;
 import spark.Request;
 import spark.Response;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * manages all the requests which are used to specify an experiment.
@@ -37,49 +37,106 @@ public class ExperimentController implements ControllerHelper {
         Gson gson = gsonBuilder.create();
         JSONExperiment jsonExperiment = gson.fromJson(json, JSONExperiment.class);
         ExperimentRecord expRecord = jsonExperiment.createRecord();
+        response.body("error: experiment is already existing");
         create.transaction(config -> {
             int execute = DSL.using(config)
                             .insertInto(experiment)
                             .set(expRecord)
                             .execute();
-            if (execute == 1) {
+            if (execute != 0) {
                 DSL.using(config)
-                        .batchInsert(jsonExperiment.getQualifications());
+                        .batchInsert(jsonExperiment.getQualifications())
+                        .execute();
                 DSL.using(config)
-                        .batchInsert(jsonExperiment.getTags());
+                        .batchInsert(jsonExperiment.getTags())
+                        .execute();
+                response.body("success");
             }
         });
-
         response.status(200);
-        response.body("affected=" + (affectedExp + affectedRatings));
+        response.type("text/plain");
+        return response;
+    }
+
+    public Response updateExperiment(Request request, Response response) {
+        assertJson(request);
+        String json = request.body();
+        Gson gson = gsonBuilder.create();
+        JSONExperiment jsonExperiment = gson.fromJson(json, JSONExperiment.class);
+        ExperimentRecord expRecord = jsonExperiment.createRecord();
+        response.body("error: experiment is already existing");
+        create.transaction(config -> {
+            DSL.using(config)
+                    .update(experiment)
+                    .set(expRecord)
+                    .execute();
+            Record1<String> existing = create.select(experiment.TITEL)
+                    .where(experiment.TITEL.eq(expRecord.getTitel()))
+                    .fetchOne();
+            if (existing != null) {
+                DSL.deleteFrom(Tables.TAGS)
+                        .where(Tables.TAGS.EXPERIMENT_T.eq(expRecord.getIdexperiment()))
+                        .execute();
+                DSL.deleteFrom(Tables.TAGS)
+                        .where(Tables.TAGS.EXPERIMENT_T.eq(expRecord.getIdexperiment()))
+                        .execute();
+                DSL.using(config)
+                        .batchInsert(jsonExperiment.getTags())
+                        .execute();
+                DSL.using(config)
+                        .batchInsert(jsonExperiment.getQualifications())
+                        .execute();
+                response.body("success");
+            }
+        });
+        response.status(200);
         response.type("text/plain");
         return response;
     }
 
     public Response deleteExperiment(Request request, Response response) {
-        String expID = assertParameter(request, "expID");
+        int expID = assertParameterInt(request, "expID");
         int affected = create.deleteFrom(experiment)
-                .where(experiment.TITEL.eq(request.params(expID)))
-                .and(experiment.RUNNING.eq(false))
+                .where(experiment.IDEXPERIMENT.eq(expID))
                 .execute();
         response.status(200);
-        response.body("deleted=" + affected);
+        if (affected != 0) {
+            response.body("success");
+        } else {
+            response.body("error");
+        }
         response.type("text/plain");
         return response;
     }
 
     public Response getExperiment(Request request, Response response) {
-        String expID = assertParameter(request, "expID");
+        int expID = assertParameterInt(request, "expID");
         ExperimentRecord experimentRecord = create.selectFrom(experiment)
-                .where(experiment.TITEL.eq(expID))
+                .where(experiment.IDEXPERIMENT.eq(expID))
                 .fetchOne();
-        Map<String, Double> ratingOptionsM = create.select(ratingOptions.KEY, ratingOptions.VALUE)
-                .where(ratingOptions.EXPERIMENT.eq(experimentRecord.getId()))
-                .fetch()
-                .intoMap(ratingOptions.KEY, ratingOptions.VALUE);
 
-        JSONExperiment experiment = new JSONExperiment(experimentRecord, ratingOptionsM);
-        String json = gsonBuilder.create().toJson(experiment);
+        if (experimentRecord == null) {
+            response.body("error");
+            response.type("text/plain");
+            return response;
+        }
+
+        List<String> qualifications = create.selectFrom(Tables.QUALIFICATIONS)
+                .where(Tables.QUALIFICATIONS.EXPERIMENT_Q.eq(expID))
+                .fetch()
+                .stream()
+                .map(QualificationsRecord::getText)
+                .collect(Collectors.toList());
+
+        List<String> tags = create.selectFrom(Tables.TAGS)
+                .where(Tables.TAGS.EXPERIMENT_T.eq(expID))
+                .fetch()
+                .stream()
+                .map(TagsRecord::getTag)
+                .collect(Collectors.toList());
+
+
+        String json = gsonBuilder.create().toJson(new JSONExperiment(experimentRecord, tags, qualifications));
         response.status(200);
         response.body(json);
         response.type("application/json");
