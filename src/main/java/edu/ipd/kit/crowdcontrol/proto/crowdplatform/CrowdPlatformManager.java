@@ -2,6 +2,7 @@ package edu.ipd.kit.crowdcontrol.proto.crowdplatform;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,18 +20,9 @@ public class CrowdPlatformManager {
     /**
      * Will get you the instance of a crowd platform, this instance is the same for all calls
      * @param name The name of the instance to use
-     * @return The crowd platform instance
-     * @throws CrowdPlatformNotFoundException If the name is unknown this exception will be thrown
+     * @return The optional crowd platform instance
      */
-    public CrowdPlatform getCrowdplatform(String name) throws CrowdPlatformNotFoundException {
-        CrowdPlatform searched;
-
-        //first check the cache
-        searched = platforms.get(name);
-
-        if (searched != null)
-            return searched;
-        //fail if it is still not found
-        throw new CrowdPlatformNotFoundException(name+"Could not be found");
+    public Optional<CrowdPlatform> getCrowdplatform(String name) {
+        return Optional.ofNullable(platforms.get(name));
     }
 }

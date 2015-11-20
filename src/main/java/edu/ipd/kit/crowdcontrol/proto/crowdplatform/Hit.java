@@ -1,26 +1,10 @@
 package edu.ipd.kit.crowdcontrol.proto.crowdplatform;
 
-import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord;
-
 import java.util.List;
 
 /**
  * Created by marcel on 20.11.15.
  */
-//public HIT createHIT(String hitTypeId, String title, String description, String keywords,
-// Double reward,
-// Long assignmentDurationInSeconds,
-// Long autoApprovalDelayInSeconds,
-// Long lifetimeInSeconds,
-// Integer maxAssignments,
-// String requesterAnnotation,
-// QualificationRequirement[] qualificationRequirements,
-// String[] responseGroup,
-// String uniqueRequestToken,
-// ReviewPolicy assignmentReviewPolicy,
-// ReviewPolicy hitReviewPolicy,
-// String hitLayoutId,
-// HITLayoutParameter[] hitLayoutParameters)
 public class Hit {
     private String id;
     private String title;
@@ -33,7 +17,6 @@ public class Hit {
     private String url;
 
     /**
-     *
      * @param id id of the HIT
      * @param title Title
      * @param description Description which should declare the task before the worker accepts the HIT
@@ -90,5 +73,20 @@ public class Hit {
 
     public String getUrl() {
         return url;
+    }
+
+    @Override
+    public String toString() {
+        return "Hit{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", tags=" + tags +
+                ", amount=" + amount +
+                ", payment=" + payment +
+                ", assignmentDuration=" + assignmentDuration +
+                ", hitDuration=" + hitDuration +
+                ", url='" + url + '\'' +
+                '}';
     }
 }

@@ -36,7 +36,7 @@ public class Main {
 
     private Router initRouter() {
         ExperimentController experimentController = new ExperimentController(databaseManager.getContext());
-        CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext());
+        CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext(), crowdPlatformManager);
         Router router = new Router(experimentController, crowdComputingController);
         router.init();
         return router;

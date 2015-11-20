@@ -1,8 +1,10 @@
 package edu.ipd.kit.crowdcontrol.proto.controller;
 
 import spark.Request;
+import spark.Response;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Contains various helper-methods useful to the Controllers.
@@ -34,5 +36,14 @@ public interface ControllerHelper {
         } catch (NumberFormatException e) {
             throw new BadRequestException("Request needs Parameter: " + parameter + " as an Integer");
         }
+    }
+
+    default  Response createJson(Request request, Response response, Supplier<String> createJSON) {
+        assertJson(request);
+        String json = createJSON.get();
+        response.body(json);
+        response.status(200);
+        response.type("application/json");
+        return response;
     }
 }

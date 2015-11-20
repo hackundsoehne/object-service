@@ -18,6 +18,7 @@ public class MTurkPlatform implements CrowdPlatform {
     private final String url;
     private ClientConfig config;
     private RequesterService service;
+
     public MTurkPlatform(String username, String password, String url) {
         this.password = password;
         this.username = username;
@@ -87,7 +88,7 @@ public class MTurkPlatform implements CrowdPlatform {
     @Override
     public CompletableFuture<Boolean> payTask(Hit hit) {
         //
-        return false;
+        return CompletableFuture.completedFuture(false);
     }
 
     @Override

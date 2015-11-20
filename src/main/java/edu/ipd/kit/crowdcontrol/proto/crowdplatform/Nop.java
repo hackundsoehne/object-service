@@ -6,27 +6,50 @@ import java.util.concurrent.CompletableFuture;
  * Created by marcel on 20.11.15.
  */
 public class Nop implements CrowdPlatform {
+
+    /**
+     * publish a task on the given CrowdPlatform. A worker can now access the Task and do answers.
+     *
+     * @param hit
+     * @return true if successful, false if not
+     */
     @Override
-    public CompletableFuture<Boolean> publishTask(String id, String name, String url, int amount) {
-        System.out.println("Publish "+id+" name:"+name+" url:"+url+" amount:"+amount);
+    public CompletableFuture<Boolean> publishTask(Hit hit) {
+        System.out.println("pay task: " + hit);
         return CompletableFuture.completedFuture(true);
     }
 
+    /**
+     * @param hit
+     * @return true if successful, false if not
+     */
     @Override
-    public CompletableFuture<Boolean> updateTask(String id, String name, String url, int amount) {
-        System.out.println("Update "+id+" name:"+name+" url:"+url+" amount:"+amount);
+    public CompletableFuture<Boolean> updateTask(Hit hit) {
+        System.out.println("updateTask" + hit);
         return CompletableFuture.completedFuture(true);
     }
 
+    /**
+     * unpublish the task, after this call no answers can be sent for this task
+     *
+     * @param hit
+     * @return true if successful, false if not
+     */
     @Override
-    public CompletableFuture<Boolean> unpublishTask(String id) {
-        System.out.println("Unpublish "+id);
+    public CompletableFuture<Boolean> unpublishTask(Hit hit) {
+        System.out.println("unpublishTask: " + hit);
         return CompletableFuture.completedFuture(true);
     }
 
+    /**
+     * Pay Task
+     *
+     * @param hit
+     * @return true if successful, false if not
+     */
     @Override
-    public CompletableFuture<Boolean> payTask(String answer_id, int payment) {
-        System.out.println("Pay "+answer_id+" with "+payment);
+    public CompletableFuture<Boolean> payTask(Hit hit) {
+        System.out.println("payTask: " + hit);
         return CompletableFuture.completedFuture(true);
     }
 
