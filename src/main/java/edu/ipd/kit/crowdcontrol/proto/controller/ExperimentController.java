@@ -60,6 +60,7 @@ public class ExperimentController implements ControllerHelper {
     public Response updateExperiment(Request request, Response response) {
         return processJsonWithTransaction(request, response, (json, conf) -> {
             ExperimentRecord expRecord = json.createRecord();
+            //TODO: update current HIT!
             ExperimentRecord existing = create.selectFrom(experiment)
                     .where(experiment.IDEXPERIMENT.eq(expRecord.getIdexperiment()))
                     .fetchOptional()
