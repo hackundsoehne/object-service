@@ -67,4 +67,11 @@ public class AnswersDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontrol.p
 	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Answers> fetchByTimestamp(java.sql.Timestamp... values) {
 		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Answers.ANSWERS.TIMESTAMP, values);
 	}
+
+	/**
+	 * Fetch records that have <code>workerID IN (values)</code>
+	 */
+	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Answers> fetchByWorkerid(java.lang.String... values) {
+		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Answers.ANSWERS.WORKERID, values);
+	}
 }
