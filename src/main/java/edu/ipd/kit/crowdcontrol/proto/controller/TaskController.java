@@ -21,10 +21,15 @@ public class TaskController implements ControllerHelper {
 
     public ModelAndView renderTask(Request request, Response response) {
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("message", "Hello World!");
+        attributes.put("task", "The Task");
+        attributes.put("pic", "");
+        attributes.put("exdesc", "The experiment description");
+        attributes.put("expid", "The experiment id");
+        attributes.put("iframe", "");
+        attributes.put("next", "");
+        attributes.put("again", "");
+        attributes.put("sub", "");
 
-        // The hello.ftl file is located in directory:
-        // src/test/resources/spark/template/freemarker
-        return new ModelAndView(attributes, "hello.ftl");
+        return new ModelAndView(attributes, "creativetask.ftl");
     }
 }

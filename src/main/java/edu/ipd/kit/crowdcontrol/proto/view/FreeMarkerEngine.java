@@ -16,14 +16,14 @@
  */
 package edu.ipd.kit.crowdcontrol.proto.view;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import spark.ModelAndView;
+import spark.TemplateEngine;
+
 import java.io.IOException;
 import java.io.StringWriter;
-
-import freemarker.template.Configuration;
-        import freemarker.template.Template;
-        import freemarker.template.TemplateException;
-        import spark.ModelAndView;
-        import spark.TemplateEngine;
 
 /**
  * Renders HTML from Route output using FreeMarker.
@@ -89,8 +89,8 @@ public class FreeMarkerEngine extends TemplateEngine {
     }
 
     private Configuration createDefaultConfiguration() {
-        Configuration configuration = new Configuration();
-        configuration.setClassForTemplateLoading(FreeMarkerEngine.class, "");
+        Configuration configuration = new Configuration(Configuration.VERSION_2_3_21);
+        configuration.setClassForTemplateLoading(FreeMarkerEngine.class, "/templates/");
         return configuration;
     }
 
