@@ -51,6 +51,7 @@ public class Router implements SparkApplication {
 
         get("/crowd/stop", crowdComputingController::stopExperiment);
 
-        get("/tasks/render", taskController::renderTask, new FreeMarkerEngine());
+        get("/tasks/answer/render", taskController::renderAnswerTask, new FreeMarkerEngine());
+        get("/tasks/rating/render", taskController::renderRatingTask, new FreeMarkerEngine());
     }
 }

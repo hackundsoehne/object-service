@@ -11,8 +11,8 @@ import java.util.Map;
  * Created by skorz on 21.11.15.
  */
 public class CreativeTaskView implements TaskView {
-    Hit task = null;
-    Experiment experiment = null;
+    private final Hit task;
+    private final Experiment experiment;
 
     public CreativeTaskView(Hit task, Experiment experiment) {
         this.task = task;
@@ -23,7 +23,7 @@ public class CreativeTaskView implements TaskView {
     public ModelAndView render() {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("task", experiment.getQuestion());
-        attributes.put("pic", "");
+        attributes.put("pic", experiment.getPictureUrl());
         attributes.put("exdesc", experiment.getDescription());
         attributes.put("expid", experiment.getIdexperiment());
         attributes.put("iframe", "");
