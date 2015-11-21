@@ -8,6 +8,7 @@ import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRec
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.QualificationsRecord;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.TagsRecord;
 import edu.ipd.kit.crowdcontrol.proto.json.JSONExperiment;
+import edu.ipd.kit.crowdcontrol.proto.json.JSONRequestChecker;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -27,7 +28,9 @@ import java.util.stream.Collectors;
 public class ExperimentController implements ControllerHelper {
     private final DSLContext create;
     private final Experiment experiment = Tables.EXPERIMENT;
-    private final GsonBuilder gsonBuilder =  new GsonBuilder();
+    private final Gson gson =  new GsonBuilder()
+            .registerTypeAdapter(JSONExperiment.class, new JSONRequestChecker<>())
+            .create();
 
     public ExperimentController(DSLContext create) {
         this.create = create;
@@ -58,9 +61,9 @@ public class ExperimentController implements ControllerHelper {
         return processJsonWithTransaction(request, response, (json, conf) -> {
             ExperimentRecord expRecord = json.createRecord();
             ExperimentRecord existing = create.selectFrom(experiment)
-                    .where(experiment.TITEL.eq(expRecord.getTitel()))
-                    .fetchOne();
-            response.body("error: experiment is already existing");
+                    .where(experiment.IDEXPERIMENT.eq(expRecord.getIdexperiment()))
+                    .fetchOptional()
+                    .orElseThrow(() -> new ResourceNotFoundExcpetion("Table " + expRecord.getIdexperiment() + "is not existing yet."));
             DSL.using(conf)
                     .update(experiment)
                     .set(expRecord)
@@ -69,10 +72,12 @@ public class ExperimentController implements ControllerHelper {
                     .where(experiment.TITEL.eq(expRecord.getTitel()))
                     .fetchOne();
             if (existingTitle != null) {
-                DSL.deleteFrom(Tables.TAGS)
+                DSL.using(conf)
+                        .deleteFrom(Tables.TAGS)
                         .where(Tables.TAGS.EXPERIMENT_T.eq(expRecord.getIdexperiment()))
                         .execute();
-                DSL.deleteFrom(Tables.TAGS)
+                DSL.using(conf)
+                        .deleteFrom(Tables.TAGS)
                         .where(Tables.TAGS.EXPERIMENT_T.eq(expRecord.getIdexperiment()))
                         .execute();
                 DSL.using(conf)
@@ -89,7 +94,6 @@ public class ExperimentController implements ControllerHelper {
     private Response processJsonWithTransaction(Request request, Response response, BiConsumer<JSONExperiment, Configuration> consumer) {
         assertJson(request);
         String json = request.body();
-        Gson gson = gsonBuilder.create();
         JSONExperiment jsonExperiment = gson.fromJson(json, JSONExperiment.class);
         response.status(200);
         create.transaction(config -> consumer.accept(jsonExperiment, config));
@@ -115,7 +119,8 @@ public class ExperimentController implements ControllerHelper {
         int expID = assertParameterInt(request, "expID");
         ExperimentRecord experimentRecord = create.selectFrom(experiment)
                 .where(experiment.IDEXPERIMENT.eq(expID))
-                .fetchOne();
+                .fetchOptional()
+                .orElseThrow(() -> new BadRequestException("experiment not found"));
 
         if (experimentRecord == null) {
             response.body("error");
@@ -138,11 +143,10 @@ public class ExperimentController implements ControllerHelper {
                 .collect(Collectors.toList());
 
 
-        String json = gsonBuilder.create().toJson(new JSONExperiment(experimentRecord, tags, qualifications));
+        String json = gson.toJson(new JSONExperiment(experimentRecord, tags, qualifications));
         response.status(200);
         response.body(json);
         response.type("application/json");
         return response;
     }
-
 }

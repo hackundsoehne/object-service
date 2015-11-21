@@ -3,27 +3,25 @@ package edu.ipd.kit.crowdcontrol.proto;
 import edu.ipd.kit.crowdcontrol.proto.controller.BadRequestException;
 import edu.ipd.kit.crowdcontrol.proto.controller.CrowdComputingController;
 import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
-import edu.ipd.kit.crowdcontrol.proto.controller.TaskController;
-import edu.ipd.kit.crowdcontrol.proto.view.FreeMarkerEngine;
+import edu.ipd.kit.crowdcontrol.proto.controller.ResourceNotFoundExcpetion;
 import spark.servlet.SparkApplication;
 
-import static spark.Spark.*;
+import static spark.Spark.exception;
+import static spark.Spark.get;
+import static spark.Spark.post;
 
 /**
  * The Router routes and is responsible for the routing.
- *
  * @author LeanderK
  * @version 1.0
  */
 public class Router implements SparkApplication {
     private final ExperimentController experimentController;
     private final CrowdComputingController crowdComputingController;
-    private final TaskController taskController;
 
-    public Router(ExperimentController experimentController, CrowdComputingController crowdComputingController, TaskController taskController) {
+    public Router(ExperimentController experimentController, CrowdComputingController crowdComputingController) {
         this.experimentController = experimentController;
         this.crowdComputingController = crowdComputingController;
-        this.taskController = taskController;
     }
 
     public void init() {
@@ -31,6 +29,12 @@ public class Router implements SparkApplication {
             response.status(400);
             response.body(e.getMessage());
             System.err.println("Bad Request! " + request.toString() + " error: " + e.getMessage());
+        });
+
+        exception(ResourceNotFoundExcpetion.class, (e, request, response) -> {
+            response.status(404);
+            response.body(e.getMessage());
+            System.err.println("Resource not found! " + request.toString() + " error: " + e.getMessage());
         });
 
         //experiemtn/<id>/start
@@ -47,7 +51,5 @@ public class Router implements SparkApplication {
         get("/crowd/running", crowdComputingController::getRunning);
 
         get("/crowd/stop", crowdComputingController::stopExperiment);
-
-        get("/tasks/render", taskController::renderTask, new FreeMarkerEngine());
     }
 }
