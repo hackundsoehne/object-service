@@ -33,6 +33,9 @@ public class Router implements SparkApplication {
             System.err.println("Bad Request! " + request.toString() + " error: " + e.getMessage());
         });
 
+        // Serve static files from src/main/resources/public
+        staticFileLocation("/public");
+
         //experiemtn/<id>/start
         get("/experiments/delete", experimentController::deleteExperiment);
 
