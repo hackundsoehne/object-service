@@ -46,10 +46,10 @@ public class Router implements SparkApplication {
 
         get("/experiments", experimentController::getExperiment);
 
-        get("/crowd/start", crowdComputingController::startExperiment);
+        get("/crowd/start", crowdComputingController::startHIT);
 
         get("/crowd/running", crowdComputingController::getRunning);
 
-        get("/crowd/stop", crowdComputingController::stopExperiment);
+        get("/crowd/stop", crowdComputingController::startHIT);
     }
 }

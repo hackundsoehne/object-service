@@ -89,6 +89,29 @@ public class MTurkPlatform implements CrowdPlatform {
         return result;
     }
 
+    /**
+     * unpublish the task, after this call no answers can be sent for this task
+     *
+     * @param id
+     * @return true if successful, false if not
+     */
+    @Override
+    public CompletableFuture<String> unpublishTask(String id) {
+        HIT mhit = service.getHIT(id);
+
+        if (mhit == null) {
+            //TODO: MARCEL: this is right?
+            System.err.println("Hit is not published!");
+            return CompletableFuture.completedFuture(id);
+        }
+
+        String[] hitids = {id};
+
+        CompletableFuture<String> result = new CompletableFuture<>();
+        service.deleteHITs(hitids, false, true, (o, b, o1, e) -> result.complete(id));
+        return result;
+    }
+
     @Override
     public CompletableFuture<Hit> payTask(Hit hit) {
         //

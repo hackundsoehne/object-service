@@ -8,6 +8,7 @@ import java.util.Optional;
 /**
  * Created by marcel on 20.11.15.
  */
+//TODO: Marcel...what about the bonus?
 public class Hit {
     private final String id;
     private final String title;
