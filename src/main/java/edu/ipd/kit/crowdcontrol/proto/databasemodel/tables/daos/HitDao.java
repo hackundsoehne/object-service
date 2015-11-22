@@ -95,4 +95,18 @@ public class HitDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontrol.proto
 	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit> fetchByBonus(java.lang.Integer... values) {
 		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit.HIT.BONUS, values);
 	}
+
+	/**
+	 * Fetch records that have <code>id_crowd_platform IN (values)</code>
+	 */
+	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit> fetchByIdCrowdPlatform(java.lang.String... values) {
+		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit.HIT.ID_CROWD_PLATFORM, values);
+	}
+
+	/**
+	 * Fetch records that have <code>crowd_platform IN (values)</code>
+	 */
+	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit> fetchByCrowdPlatform(java.lang.String... values) {
+		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit.HIT.CROWD_PLATFORM, values);
+	}
 }
