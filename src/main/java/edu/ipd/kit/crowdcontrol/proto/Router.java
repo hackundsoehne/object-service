@@ -19,11 +19,13 @@ public class Router implements SparkApplication {
     private final ExperimentController experimentController;
     private final CrowdComputingController crowdComputingController;
     private final TaskController taskController;
+    private final FreeMarkerEngine freeMarkerEngine;
 
-    public Router(ExperimentController experimentController, CrowdComputingController crowdComputingController, TaskController taskController) {
+    public Router(ExperimentController experimentController, CrowdComputingController crowdComputingController, TaskController taskController, FreeMarkerEngine freeMarkerEngine) {
         this.experimentController = experimentController;
         this.crowdComputingController = crowdComputingController;
         this.taskController = taskController;
+        this.freeMarkerEngine = freeMarkerEngine;
     }
 
     public void init() {
@@ -51,9 +53,9 @@ public class Router implements SparkApplication {
 
         get("/crowd/stop", crowdComputingController::stopExperiment);
 
-        get("/tasks/answer/render", taskController::renderAnswerTask, new FreeMarkerEngine());
+        get("/tasks/answer/render", taskController::renderAnswerTask, freeMarkerEngine);
 
-        get("/tasks/rating/render", taskController::renderRatingTask, new FreeMarkerEngine());
+        get("/tasks/rating/render", taskController::renderRatingTask, freeMarkerEngine);
 
         post("/tasks/rating/submit", taskController::submitRatingTask);
 
