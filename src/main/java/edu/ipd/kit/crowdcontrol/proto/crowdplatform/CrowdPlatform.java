@@ -26,6 +26,7 @@ public interface CrowdPlatform {
 
     /**
      * unpublish the task, after this call no answers can be sent for this task
+     * @param id the crowd-platform id of the hit
      * @return true if successful, false if not
      */
     CompletableFuture<String> unpublishTask(String id);
