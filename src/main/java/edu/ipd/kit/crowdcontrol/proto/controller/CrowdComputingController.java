@@ -1,6 +1,8 @@
 package edu.ipd.kit.crowdcontrol.proto.controller;
 
 import com.google.gson.GsonBuilder;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.CrowdPlatformManager;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.Hit;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.HitType;
@@ -15,6 +17,7 @@ import org.jooq.impl.DSL;
 import spark.Request;
 import spark.Response;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,10 +39,12 @@ public class CrowdComputingController implements ControllerHelper {
     private final Experiment experiment = Tables.EXPERIMENT;
     private final GsonBuilder gsonBuilder =  new GsonBuilder();
     private final CrowdPlatformManager crowdPlatformManager;
+    private final URL baseURL;
 
-    public CrowdComputingController(DSLContext create, CrowdPlatformManager crowdPlatformManager) {
+    public CrowdComputingController(DSLContext create, CrowdPlatformManager crowdPlatformManager, URL baseURL) {
         this.create = create;
         this.crowdPlatformManager = crowdPlatformManager;
+        this.baseURL = baseURL;
     }
 
     //TODO: pretty shitty method, needs refacturing
@@ -83,9 +88,8 @@ public class CrowdComputingController implements ControllerHelper {
                 .where(Tables.TAGS.EXPERIMENT_T.eq(expID))
                 .fetch(Record1::value1);
 
-        //TODO: connect with webview!
         Function<ExperimentRecord, Stream<Hit>> expRecordToHit = record -> Stream.of(HitType.ANSWER, HitType.RATING)
-                .map(type -> new Hit(record, type, tags, type.getAmount(amount, ratingToAnswer), payment, 24*60*60, 30*24*60*60, ""));
+                .map(type -> new Hit(record, type, tags, type.getAmount(amount, ratingToAnswer), payment, 24*60*60, 30*24*60*60, getExternalURL(inserted, type)));
 
 
         List<CompletableFuture<Hit>> publishingHits = create.selectFrom(Tables.EXPERIMENT)
@@ -109,6 +113,24 @@ public class CrowdComputingController implements ControllerHelper {
         response.status(200);
         response.type("text/plain");
         return response;
+    }
+
+    private String getExternalURL(Map<String, HitRecord> inserted, HitType type) {
+        String route = null;
+        if (type == HitType.ANSWER) {
+            route = "answer";
+        } else {
+            route = "rating";
+        }
+        try {
+            return Unirest.get(baseURL.toExternalForm()+"/{type}/render")
+                    .routeParam("type", route)
+                    .header("accept", "text/html")
+                    .queryString("hitID", inserted.get(type.name()).getIdhit())
+                    .asString().getBody();
+        } catch (UnirestException e) {
+            throw new InternalServerErrorException("unable to build hit url", e);
+        }
     }
 
     private void storeOrDelete(Map<String, HitRecord> inserted, Hit hit, Throwable ex) {

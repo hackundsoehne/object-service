@@ -6,9 +6,7 @@ import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
 import edu.ipd.kit.crowdcontrol.proto.controller.ResourceNotFoundExcpetion;
 import spark.servlet.SparkApplication;
 
-import static spark.Spark.exception;
-import static spark.Spark.get;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 /**
  * The Router routes and is responsible for the routing.
@@ -51,5 +49,7 @@ public class Router implements SparkApplication {
         get("/crowd/running", crowdComputingController::getRunning);
 
         get("/crowd/stop", crowdComputingController::startHIT);
+
+        //TODO: shutdown and calling Unirest.shutdown();
     }
 }

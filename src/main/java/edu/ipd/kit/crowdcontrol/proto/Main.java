@@ -7,6 +7,8 @@ import edu.ipd.kit.crowdcontrol.proto.crowdplatform.MTurkPlatform;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
@@ -27,16 +29,29 @@ public class Main {
             config.load(new FileInputStream(configFile));
         } catch (IOException e) {
             System.err.println("unable to open file: " + configFile);
+            System.exit(-1);
         }
 
         databaseManager = initDatabase(config);
         crowdPlatformManager = initCrowdPlatform(config);
-        router = initRouter();
+        router = initRouter(config);
     }
 
-    private Router initRouter() {
+    private Router initRouter(Properties config) {
         ExperimentController experimentController = new ExperimentController(databaseManager.getContext());
-        CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext(), crowdPlatformManager);
+        String urlString = config.getProperty("url");
+        if (urlString == null) {
+            System.err.println("missing url property");
+            System.exit(-1);
+        }
+        URL url = null;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            System.err.println("url is malformed");
+            System.exit(-1);
+        }
+        CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext(), crowdPlatformManager, url);
         Router router = new Router(experimentController, crowdComputingController);
         router.init();
         return router;
