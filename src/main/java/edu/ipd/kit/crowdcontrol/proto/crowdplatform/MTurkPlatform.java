@@ -100,8 +100,7 @@ public class MTurkPlatform implements CrowdPlatform {
         HIT mhit = service.getHIT(id);
 
         if (mhit == null) {
-            //TODO: MARCEL: this is right?
-            System.err.println("Hit is not published!");
+            System.err.println("Hit is not found!");
             return CompletableFuture.completedFuture(id);
         }
 
