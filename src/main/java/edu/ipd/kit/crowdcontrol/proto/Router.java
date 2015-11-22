@@ -50,7 +50,7 @@ public class Router implements SparkApplication {
 
         get("/crowd/stop", crowdComputingController::stopHIT);
 
-        get("/crowd/update", crowdComputingController::updateHIT);
+        put("/crowd/update", crowdComputingController::updateHIT);
 
         //TODO: shutdown and calling Unirest.shutdown();
     }
