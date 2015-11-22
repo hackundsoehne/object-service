@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 /**
  * initializes the database.
- * @author LeanderK
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class DatabaseManager {

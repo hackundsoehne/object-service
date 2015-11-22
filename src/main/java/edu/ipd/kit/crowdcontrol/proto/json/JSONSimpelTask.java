@@ -4,7 +4,8 @@ import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord;
 
 /**
- * @author LeanderK
+ *
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class JSONSimpelTask {

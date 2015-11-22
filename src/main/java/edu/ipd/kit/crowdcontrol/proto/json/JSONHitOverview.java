@@ -3,7 +3,8 @@ package edu.ipd.kit.crowdcontrol.proto.json;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit;
 
 /**
- * @author LeanderK
+ *
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class JSONHitOverview {

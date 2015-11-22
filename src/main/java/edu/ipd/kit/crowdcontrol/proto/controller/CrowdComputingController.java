@@ -9,7 +9,7 @@ import spark.Response;
 
 /**
  * manages all the requests which interact with a Crowd-Computing Platform.
- * @author LeanderK
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class CrowdComputingController implements ControllerHelper {

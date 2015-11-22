@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 
 /**
  * Contains various helper-methods useful to the Controllers.
- * @author LeanderK
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public interface ControllerHelper {

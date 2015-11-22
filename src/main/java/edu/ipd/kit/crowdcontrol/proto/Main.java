@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 /**
  * starts everything in the correct order.
- * @author LeanderK
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class Main {

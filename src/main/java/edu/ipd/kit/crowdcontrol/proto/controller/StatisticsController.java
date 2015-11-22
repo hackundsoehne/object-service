@@ -20,8 +20,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ *
  * this controller is responsible for all rest-calls regarding statistics.
- * @author LeanderK
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class StatisticsController implements ControllerHelper {

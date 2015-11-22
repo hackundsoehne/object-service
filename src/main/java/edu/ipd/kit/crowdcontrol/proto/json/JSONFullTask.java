@@ -5,7 +5,8 @@ import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Ratings;
 
 /**
- * @author LeanderK
+ *
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class JSONFullTask {
