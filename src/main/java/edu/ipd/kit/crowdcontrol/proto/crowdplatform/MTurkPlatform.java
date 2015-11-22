@@ -49,7 +49,7 @@ public class MTurkPlatform implements CrowdPlatform {
         return CompletableFuture.supplyAsync(() -> {
             HIT hit1 = service.createHIT(hit.getTitle(), hit.getTitle(), hit.getDescription(), keywords, question, hit.getPayment(), hit.getAssignmentDuration(), assignment, hit.getHitDuration(), hit.getAmount(), null, null, null);
             Objects.requireNonNull(hit1);
-            return hit;
+            return new Hit(hit1.getHITId(), hit.getTitle(), hit.getDescription(), hit.getTags(), hit.getAmount(), hit.getPayment(), hit.getAssignmentDuration(), hit.getHitDuration(), hit.getUrl());
         });
     }
 
