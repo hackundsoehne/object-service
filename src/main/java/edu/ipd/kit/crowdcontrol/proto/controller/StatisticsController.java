@@ -96,6 +96,7 @@ public class StatisticsController extends Controller {
         } else {
             timestamp = new Timestamp(0);
         }
+
         List<JSONSimpelTask> answers = create.selectFrom(Tables.ANSWERS)
                 .where(Tables.ANSWERS.TIMESTAMP.greaterOrEqual(timestamp))
                 .and(Tables.ANSWERS.HIT_A.eq(hit))
@@ -134,7 +135,7 @@ public class StatisticsController extends Controller {
                     .map(gson::toJson)
                     .orElseThrow(() -> new ResourceNotFoundExcpetion("hit " + ratings.getHitR() + " not found"));
         } else {
-            throw new RuntimeException("resource not found: type="+type);
+            throw new ResourceNotFoundExcpetion("type not found for: "+type);
         }
         response.status(200);
         response.body(json);
@@ -143,14 +144,12 @@ public class StatisticsController extends Controller {
     }
 
     public Response getAllHitsOverview(Request request, Response response) {
-        List<JSONHitOverview> hits = create.selectFrom(Tables.HIT)
+        String json = create.selectFrom(Tables.HIT)
                 .fetch()
                 .map(hitDao.mapper())
                 .stream()
                 .map(JSONHitOverview::new)
-                .collect(Collectors.toList());
-
-        String json = gson.toJson(hits);
+                .collect(Collectors.collectingAndThen(Collectors.toList(), gson::toJson));
 
         response.status(200);
         response.body(json);

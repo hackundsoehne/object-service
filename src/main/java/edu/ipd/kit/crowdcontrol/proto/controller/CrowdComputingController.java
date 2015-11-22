@@ -187,7 +187,7 @@ public class CrowdComputingController extends Controller {
             response.body("success");
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
-            throw new InternalServerErrorException("an error occurred");
+            throw new InternalServerErrorException("an error occurred", e);
         }
 
         response.status(200);
