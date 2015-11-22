@@ -14,9 +14,27 @@ public interface CrowdPlatform {
     CompletableFuture<Hit> publishTask(Hit hit);
 
     /**
-     * @return true if successful, false if not
+     * to update a hit simply pass an hit-object with the id of the hit you want to update and
+     * the new values.
+     * <p>
+     * The id has to be the id of the hit you want to update! Updatable are:
+     * <ul>
+     *      <li>the title
+     *      <li>the description
+     *      <li>the payment
+     * </ul>
+     * </p>
+     * @param hit the hit to update
+     * @return a future which may contains the resulting hit object
      */
     CompletableFuture<Hit> updateTask(Hit hit);
+
+    /**
+     * unpublish the task, after this call no answers can be sent for this task
+     * @param hit the hit to delete
+     * @return a future which may contains the deleted hit object
+     */
+    CompletableFuture<Hit> unpublishTask(Hit hit);
 
     /**
      * unpublish the task, after this call no answers can be sent for this task
@@ -27,6 +45,7 @@ public interface CrowdPlatform {
 
     /**
      * Pay Task
+     * @param hit the hit to pay
      * @return true if successful, false if not
      */
     CompletableFuture<Hit> payTask(Hit hit);
