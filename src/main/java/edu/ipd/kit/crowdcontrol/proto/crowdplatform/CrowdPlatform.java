@@ -31,13 +31,6 @@ public interface CrowdPlatform {
 
     /**
      * unpublish the task, after this call no answers can be sent for this task
-     * @param hit the hit to delete
-     * @return a future which may contains the deleted hit object
-     */
-    CompletableFuture<Hit> unpublishTask(Hit hit);
-
-    /**
-     * unpublish the task, after this call no answers can be sent for this task
      * @param id the crowd-platform id of the hit
      * @return true if successful, false if not
      */
