@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Answers extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord> {
 
-	private static final long serialVersionUID = -1860830967;
+	private static final long serialVersionUID = -2051452729;
 
 	/**
 	 * The singleton instance of <code>crowdcontrolproto.Answers</code>
@@ -45,6 +45,11 @@ public class Answers extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.pr
 	 * The column <code>crowdcontrolproto.Answers.timestamp</code>.
 	 */
 	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord, java.sql.Timestamp> TIMESTAMP = createField("timestamp", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaulted(true), this, "");
+
+	/**
+	 * The column <code>crowdcontrolproto.Answers.workerID</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord, java.lang.String> WORKERID = createField("workerID", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
 
 	/**
 	 * Create a <code>crowdcontrolproto.Answers</code> table reference

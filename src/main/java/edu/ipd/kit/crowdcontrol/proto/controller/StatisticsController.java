@@ -1,7 +1,5 @@
 package edu.ipd.kit.crowdcontrol.proto.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.Tables;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.daos.AnswersDao;
@@ -25,15 +23,12 @@ import java.util.stream.Collectors;
  * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
-public class StatisticsController implements ControllerHelper {
-    private final DSLContext create;
+public class StatisticsController extends Controller {
     private final AnswersDao answersDao;
     private final HitDao hitDao;
-    private final Gson gson;
 
     public StatisticsController(DSLContext create) {
-        this.create = create;
-        gson = new GsonBuilder().create();
+        super(create);
         answersDao = new AnswersDao(create.configuration());
         hitDao = new HitDao(create.configuration());
     }
