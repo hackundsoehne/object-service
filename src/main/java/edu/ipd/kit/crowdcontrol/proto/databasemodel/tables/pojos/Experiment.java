@@ -11,13 +11,13 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment implements java.io.Serializable {
 
-	private static final long serialVersionUID = 304978895;
+	private static final long serialVersionUID = 1885636715;
 
 	private java.lang.Integer idexperiment;
 	private java.lang.String  pictureUrl;
 	private java.lang.String  pictureLicenseUrl;
 	private java.lang.String  question;
-	private java.lang.Object  ratingOptions;
+	private java.lang.String  ratingOptions;
 	private java.lang.String  titel;
 	private java.lang.Integer maxRatingsPerAssignment;
 	private java.lang.Integer maxAnswersPerAssignment;
@@ -29,7 +29,7 @@ public class Experiment implements java.io.Serializable {
 		java.lang.String  pictureUrl,
 		java.lang.String  pictureLicenseUrl,
 		java.lang.String  question,
-		java.lang.Object  ratingOptions,
+		java.lang.String  ratingOptions,
 		java.lang.String  titel,
 		java.lang.Integer maxRatingsPerAssignment,
 		java.lang.Integer maxAnswersPerAssignment
@@ -76,11 +76,11 @@ public class Experiment implements java.io.Serializable {
 		this.question = question;
 	}
 
-	public java.lang.Object getRatingOptions() {
+	public java.lang.String getRatingOptions() {
 		return this.ratingOptions;
 	}
 
-	public void setRatingOptions(java.lang.Object ratingOptions) {
+	public void setRatingOptions(java.lang.String ratingOptions) {
 		this.ratingOptions = ratingOptions;
 	}
 

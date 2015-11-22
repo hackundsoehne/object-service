@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Hit implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1947099077;
+	private static final long serialVersionUID = 2122592503;
 
 	private java.lang.Integer idhit;
 	private java.lang.Integer experimentH;
@@ -21,8 +21,6 @@ public class Hit implements java.io.Serializable {
 	private java.lang.Integer maxAmount;
 	private java.lang.Integer payment;
 	private java.lang.Integer bonus;
-	private java.lang.String  idCrowdPlatform;
-	private java.lang.String  crowdPlatform;
 
 	public Hit() {}
 
@@ -34,9 +32,7 @@ public class Hit implements java.io.Serializable {
 		java.lang.Integer currentAmount,
 		java.lang.Integer maxAmount,
 		java.lang.Integer payment,
-		java.lang.Integer bonus,
-		java.lang.String  idCrowdPlatform,
-		java.lang.String  crowdPlatform
+		java.lang.Integer bonus
 	) {
 		this.idhit = idhit;
 		this.experimentH = experimentH;
@@ -46,8 +42,6 @@ public class Hit implements java.io.Serializable {
 		this.maxAmount = maxAmount;
 		this.payment = payment;
 		this.bonus = bonus;
-		this.idCrowdPlatform = idCrowdPlatform;
-		this.crowdPlatform = crowdPlatform;
 	}
 
 	public java.lang.Integer getIdhit() {
@@ -112,21 +106,5 @@ public class Hit implements java.io.Serializable {
 
 	public void setBonus(java.lang.Integer bonus) {
 		this.bonus = bonus;
-	}
-
-	public java.lang.String getIdCrowdPlatform() {
-		return this.idCrowdPlatform;
-	}
-
-	public void setIdCrowdPlatform(java.lang.String idCrowdPlatform) {
-		this.idCrowdPlatform = idCrowdPlatform;
-	}
-
-	public java.lang.String getCrowdPlatform() {
-		return this.crowdPlatform;
-	}
-
-	public void setCrowdPlatform(java.lang.String crowdPlatform) {
-		this.crowdPlatform = crowdPlatform;
 	}
 }
