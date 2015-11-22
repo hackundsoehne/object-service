@@ -17,7 +17,8 @@ public class JSONExperiment {
     private final String picture_url;
     private final String picture_license_url;
     private final String question;
-    private final String titel;
+    @JSONRequired
+    private final String title;
     private final Integer max_ratings_per_assignment;
     private final Integer max_answers_per_assignment;
     private final List<String> tags;
@@ -29,12 +30,12 @@ public class JSONExperiment {
         picture_url = experimentRecord.getPictureUrl();
         picture_license_url = experimentRecord.getPictureLicenseUrl();
         question = experimentRecord.getQuestion();
-        titel = experimentRecord.getTitel();
+        title = experimentRecord.getTitel();
         max_answers_per_assignment = experimentRecord.getMaxAnswersPerAssignment();
         max_ratings_per_assignment = experimentRecord.getMaxRatingsPerAssignment();
         this.tags = tags;
         this.qualifications = qualifications;
-        ratingOptions = experimentRecord.getRatingOptions();
+        ratingOptions = experimentRecord.getRatingOptions().toString();
     }
 
     public ExperimentRecord createRecord() {
@@ -42,7 +43,7 @@ public class JSONExperiment {
         experimentRecord.setPictureUrl(picture_url);
         experimentRecord.setPictureLicenseUrl(picture_license_url);
         experimentRecord.setQuestion(question);
-        experimentRecord.setTitel(titel);
+        experimentRecord.setTitel(title);
         experimentRecord.setMaxAnswersPerAssignment(max_answers_per_assignment);
         experimentRecord.setMaxRatingsPerAssignment(max_ratings_per_assignment);
         experimentRecord.setRatingOptions(ratingOptions);

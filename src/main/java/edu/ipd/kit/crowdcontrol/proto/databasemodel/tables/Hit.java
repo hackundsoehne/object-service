@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Hit extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord> {
 
-	private static final long serialVersionUID = 893784773;
+	private static final long serialVersionUID = 2089877641;
 
 	/**
 	 * The singleton instance of <code>crowdcontrolproto.HIT</code>
@@ -64,7 +64,17 @@ public class Hit extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.proto.
 	/**
 	 * The column <code>crowdcontrolproto.HIT.bonus</code>.
 	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord, java.lang.Integer> BONUS = createField("bonus", org.jooq.impl.SQLDataType.INTEGER.defaulted(true), this, "");
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord, java.lang.Integer> BONUS = createField("bonus", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "");
+
+	/**
+	 * The column <code>crowdcontrolproto.HIT.id_crowd_platform</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord, java.lang.String> ID_CROWD_PLATFORM = createField("id_crowd_platform", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
+
+	/**
+	 * The column <code>crowdcontrolproto.HIT.crowd_platform</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord, java.lang.String> CROWD_PLATFORM = createField("crowd_platform", org.jooq.impl.SQLDataType.VARCHAR.length(45).nullable(false), this, "");
 
 	/**
 	 * Create a <code>crowdcontrolproto.HIT</code> table reference
