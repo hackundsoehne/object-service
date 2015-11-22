@@ -32,7 +32,7 @@ public class Main {
         }
         ExperimentController experimentController = new ExperimentController(databaseManager.getContext());
         CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext());
-        Router router = new Router(experimentController, crowdComputingController, statisticsController);
+        Router router = new Router(experimentController, crowdComputingController);
         router.init();
     }
 }

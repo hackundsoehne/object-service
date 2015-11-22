@@ -71,7 +71,7 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontro
 	/**
 	 * Fetch records that have <code>rating_options IN (values)</code>
 	 */
-	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Experiment> fetchByRatingOptions(java.lang.Object... values) {
+	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Experiment> fetchByRatingOptions(java.lang.String... values) {
 		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.RATING_OPTIONS, values);
 	}
 

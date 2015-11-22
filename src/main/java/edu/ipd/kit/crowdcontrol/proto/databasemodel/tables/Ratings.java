@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Ratings extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord> {
 
-	private static final long serialVersionUID = -925713895;
+	private static final long serialVersionUID = -476696231;
 
 	/**
 	 * The singleton instance of <code>crowdcontrolproto.Ratings</code>
@@ -50,11 +50,6 @@ public class Ratings extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.pr
 	 * The column <code>crowdcontrolproto.Ratings.rating</code>.
 	 */
 	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord, java.lang.Integer> RATING = createField("rating", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
-
-	/**
-	 * The column <code>crowdcontrolproto.Ratings.workerID</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord, java.lang.String> WORKERID = createField("workerID", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
 
 	/**
 	 * Create a <code>crowdcontrolproto.Ratings</code> table reference
