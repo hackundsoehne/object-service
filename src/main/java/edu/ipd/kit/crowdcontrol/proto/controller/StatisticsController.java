@@ -1,11 +1,16 @@
 package edu.ipd.kit.crowdcontrol.proto.controller;
 
+import edu.ipd.kit.crowdcontrol.proto.crowdplatform.HitType;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.Tables;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Hit;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.daos.AnswersDao;
+import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.daos.ExperimentDao;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.daos.HitDao;
+import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.daos.RatingsDao;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Answers;
+import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Ratings;
 import edu.ipd.kit.crowdcontrol.proto.json.JSONFullTask;
+import edu.ipd.kit.crowdcontrol.proto.json.JSONHit;
 import edu.ipd.kit.crowdcontrol.proto.json.JSONHitOverview;
 import edu.ipd.kit.crowdcontrol.proto.json.JSONSimpelTask;
 import org.jooq.DSLContext;
@@ -25,12 +30,16 @@ import java.util.stream.Collectors;
  */
 public class StatisticsController extends Controller {
     private final AnswersDao answersDao;
+    private final RatingsDao ratingsDao;
+    private final ExperimentDao experimentDao;
     private final HitDao hitDao;
 
     public StatisticsController(DSLContext create) {
         super(create);
         answersDao = new AnswersDao(create.configuration());
         hitDao = new HitDao(create.configuration());
+        ratingsDao = new RatingsDao(create.configuration());
+        experimentDao = new ExperimentDao(create.configuration());
     }
 
     public Response getAnswersCSV(Request request, Response response) {
@@ -109,23 +118,21 @@ public class StatisticsController extends Controller {
     public Response getFullTaskJSON(Request request, Response response) {
         int id = assertParameterInt(request, "id");
         String type = assertParameter(request, "type");
-        String json = null;
-        //TODO: replace with enum after merge with database branch
-        //TODO: replace after merge with right exception
-        if (type.equals("ANSWERS")) {
+        String json;
+        if (type.equals(HitType.ANSWER.name())) {
             Answers answers = answersDao.fetchOptional(Tables.ANSWERS.IDANSWERS, id)
-                    .orElseThrow(() -> new RuntimeException("answer " + id + " not found"));
+                    .orElseThrow(() -> new ResourceNotFoundExcpetion("answer " + id + " not found"));
             json = hitDao.fetchOptional(Tables.HIT.IDHIT, answers.getHitA())
                     .map(hit -> new JSONFullTask(hit, answers))
                     .map(gson::toJson)
-                    .orElseThrow(() -> new RuntimeException("hit " + answers.getHitA() + " not found"));
+                    .orElseThrow(() -> new ResourceNotFoundExcpetion("hit " + answers.getHitA() + " not found"));
         } else if (type.equals("QUESTIONS")) {
-            Answers answers = answersDao.fetchOptional(Tables.ANSWERS.IDANSWERS, id)
-                    .orElseThrow(() -> new RuntimeException("answer " + id + " not found"));
-            json = hitDao.fetchOptional(Tables.HIT.IDHIT, answers.getHitA())
-                    .map(hit -> new JSONFullTask(hit, answers))
+            Ratings ratings = ratingsDao.fetchOptional(Tables.RATINGS.IDRATINGS, id)
+                    .orElseThrow(() -> new ResourceNotFoundExcpetion("answer " + id + " not found"));
+            json = hitDao.fetchOptional(Tables.HIT.IDHIT, ratings.getHitR())
+                    .map(hit -> new JSONFullTask(hit, ratings))
                     .map(gson::toJson)
-                    .orElseThrow(() -> new RuntimeException("hit " + answers.getHitA() + " not found"));
+                    .orElseThrow(() -> new ResourceNotFoundExcpetion("hit " + ratings.getHitR() + " not found"));
         } else {
             throw new RuntimeException("resource not found: type="+type);
         }
@@ -153,13 +160,10 @@ public class StatisticsController extends Controller {
 
     public Response getHit(Request request, Response response) {
         int hitID = assertParameterInt(request, "hit");
-        //TODO: replace after merge with database right exception, JSONHit Class
         String json = hitDao.fetchOptional(Tables.HIT.IDHIT, hitID)
-                //a map should occur here, into JSONHitAnswer
-                .map(Function.identity())
+                .map(hit -> new JSONHit(experimentDao.fetchOneByIdexperiment(hit.getExperimentH()).getTitel(), hit))
                 .map(gson::toJson)
-                .orElseThrow(() -> new RuntimeException("hit " + hitID + " not found"));
-
+                .orElseThrow(() -> new ResourceNotFoundExcpetion("hit " + hitID + " not found"));
         response.status(200);
         response.body(json);
         response.type("application/json");

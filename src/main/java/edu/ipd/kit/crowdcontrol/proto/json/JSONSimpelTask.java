@@ -1,5 +1,6 @@
 package edu.ipd.kit.crowdcontrol.proto.json;
 
+import edu.ipd.kit.crowdcontrol.proto.crowdplatform.HitType;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord;
 
@@ -22,14 +23,12 @@ public class JSONSimpelTask {
     public JSONSimpelTask(AnswersRecord answersRecord) {
         this.id = answersRecord.getIdanswers();
         this.timestamp = answersRecord.getTimestamp().toString();
-        //TODO: after merging with mTurkBranch change to enum
-        this.type = "ANSWERS";
+        this.type = HitType.ANSWER.name();
     }
 
     public JSONSimpelTask(RatingsRecord ratingsRecord) {
         this.id = ratingsRecord.getIdratings();
         this.timestamp = ratingsRecord.getTimestamp().toString();
-        //TODO: after merging with mTurkBranch change to enum
-        this.type = "RATINGS";
+        this.type = HitType.RATING.name();
     }
 }

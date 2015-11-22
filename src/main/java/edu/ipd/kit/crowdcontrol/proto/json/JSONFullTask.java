@@ -1,5 +1,6 @@
 package edu.ipd.kit.crowdcontrol.proto.json;
 
+import edu.ipd.kit.crowdcontrol.proto.crowdplatform.HitType;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Answers;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Ratings;
@@ -31,8 +32,7 @@ public class JSONFullTask {
     public JSONFullTask(Hit hit, Answers answers){
         this.id = answers.getIdanswers();
         this.timestamp = answers.getTimestamp().toString();
-        //TODO: after merge with database replace with enum
-        this.type = "ANSWERS";
+        this.type = HitType.ANSWER.name();
         this.payment = hit.getPayment();
         this.bonus = hit.getBonus();
         this.rating = null;
@@ -42,8 +42,7 @@ public class JSONFullTask {
     public JSONFullTask(Hit hit, Ratings ratings) {
         this.id = ratings.getIdratings();
         this.timestamp = ratings.getTimestamp().toString();
-        //TODO: after merge with database replace with enum
-        this.type = "RATINGS";
+        this.type = HitType.RATING.name();
         this.payment = hit.getPayment();
         this.bonus = hit.getBonus();
         this.rating = ratings.getRating();

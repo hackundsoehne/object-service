@@ -1,5 +1,6 @@
 package edu.ipd.kit.crowdcontrol.proto.json;
 
+import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord;
 
 /**
@@ -26,6 +27,17 @@ public class JSONHit {
         max_amount = hitRecord.getMaxAmount();
         payment = hitRecord.getPayment();
         bonus = hitRecord.getBonus();
+    }
+
+    public JSONHit(String experimentTitel, Hit hit) {
+        this.experimentTitel = experimentTitel;
+        idHit = hit.getIdhit();
+        experimentID = hit.getExperimentH();
+        type = hit.getType();
+        current_amount = hit.getCurrentAmount();
+        max_amount = hit.getMaxAmount();
+        payment = hit.getPayment();
+        bonus = hit.getBonus();
     }
 
     public HitRecord getRecord() {
