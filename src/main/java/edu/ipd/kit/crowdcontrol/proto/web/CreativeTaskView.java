@@ -1,4 +1,4 @@
-package edu.ipd.kit.crowdcontrol.proto.view;
+package edu.ipd.kit.crowdcontrol.proto.web;
 
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Experiment;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit;

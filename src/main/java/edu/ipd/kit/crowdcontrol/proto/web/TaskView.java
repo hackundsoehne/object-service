@@ -1,4 +1,4 @@
-package edu.ipd.kit.crowdcontrol.proto.view;
+package edu.ipd.kit.crowdcontrol.proto.web;
 
 import spark.ModelAndView;
 

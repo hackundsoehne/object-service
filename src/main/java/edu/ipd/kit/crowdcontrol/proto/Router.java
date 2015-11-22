@@ -4,7 +4,7 @@ import edu.ipd.kit.crowdcontrol.proto.controller.BadRequestException;
 import edu.ipd.kit.crowdcontrol.proto.controller.CrowdComputingController;
 import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
 import edu.ipd.kit.crowdcontrol.proto.controller.TaskController;
-import edu.ipd.kit.crowdcontrol.proto.view.FreeMarkerEngine;
+import edu.ipd.kit.crowdcontrol.proto.web.FreeMarkerEngine;
 import spark.servlet.SparkApplication;
 
 import static spark.Spark.*;
