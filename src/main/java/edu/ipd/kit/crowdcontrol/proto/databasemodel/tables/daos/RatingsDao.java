@@ -74,4 +74,11 @@ public class RatingsDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontrol.p
 	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Ratings> fetchByRating(java.lang.Integer... values) {
 		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings.RATINGS.RATING, values);
 	}
+
+	/**
+	 * Fetch records that have <code>workerID IN (values)</code>
+	 */
+	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Ratings> fetchByWorkerid(java.lang.String... values) {
+		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Ratings.RATINGS.WORKERID, values);
+	}
 }

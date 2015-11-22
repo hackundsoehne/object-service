@@ -35,7 +35,7 @@ public class JSONExperiment {
         max_ratings_per_assignment = experimentRecord.getMaxRatingsPerAssignment();
         this.tags = tags;
         this.qualifications = qualifications;
-        ratingOptions = experimentRecord.getRatingOptions();
+        ratingOptions = experimentRecord.getRatingOptions().toString();
     }
 
     public ExperimentRecord createRecord() {

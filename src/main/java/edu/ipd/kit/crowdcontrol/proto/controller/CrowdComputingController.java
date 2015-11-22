@@ -1,13 +1,11 @@
 package edu.ipd.kit.crowdcontrol.proto.controller;
 
-import com.google.gson.GsonBuilder;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.CrowdPlatformManager;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.Hit;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.HitType;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.Tables;
-import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.daos.ExperimentDao;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord;
@@ -16,7 +14,6 @@ import edu.ipd.kit.crowdcontrol.proto.json.JSONHit;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
-import org.jooq.TableLike;
 import org.jooq.impl.DSL;
 import spark.Request;
 import spark.Response;
@@ -199,7 +196,7 @@ public class CrowdComputingController extends Controller {
     }
 
     public Response updateHIT(Request request, Response response) {
-        processJson(request, response, raw -> {
+        return processJson(request, response, raw -> {
             JSONHit jsonHit = gson.fromJson(raw, JSONHit.class);
             HitRecord old = create.selectFrom(Tables.HIT)
                     .where(Tables.HIT.IDHIT.eq(jsonHit.getIdHit()))
