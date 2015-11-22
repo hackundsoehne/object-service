@@ -2,7 +2,7 @@ package edu.ipd.kit.crowdcontrol.proto.controller;
 
 /**
  * represents a 400 BAD REQUEST return code.
- * @author LeanderK
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class BadRequestException extends RuntimeException {
