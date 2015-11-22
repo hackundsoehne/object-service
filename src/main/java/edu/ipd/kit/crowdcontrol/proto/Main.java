@@ -38,7 +38,7 @@ public class Main {
     }
 
     private Router initRouter(Properties config) {
-        ExperimentController experimentController = new ExperimentController(databaseManager.getContext());
+        ExperimentController experimentController = new ExperimentController(databaseManager.getContext(), crowdPlatformManager);
         String urlString = config.getProperty("url");
         if (urlString == null) {
             System.err.println("missing url property");

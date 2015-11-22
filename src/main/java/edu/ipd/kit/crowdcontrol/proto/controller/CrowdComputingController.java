@@ -8,11 +8,15 @@ import edu.ipd.kit.crowdcontrol.proto.crowdplatform.Hit;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.HitType;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.Tables;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment;
+import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.daos.ExperimentDao;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord;
-import edu.ipd.kit.crowdcontrol.proto.json.JSONHitAnswer;
+import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.TagsRecord;
+import edu.ipd.kit.crowdcontrol.proto.json.JSONHit;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
+import org.jooq.Result;
+import org.jooq.TableLike;
 import org.jooq.impl.DSL;
 import spark.Request;
 import spark.Response;
@@ -21,6 +25,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -34,17 +39,16 @@ import java.util.stream.Stream;
  * @author LeanderK
  * @version 1.0
  */
-public class CrowdComputingController implements ControllerHelper {
-    private final DSLContext create;
-    private final Experiment experiment = Tables.EXPERIMENT;
-    private final GsonBuilder gsonBuilder =  new GsonBuilder();
+public class CrowdComputingController extends Controller {
+    private final ExperimentDao experimentDao;
     private final CrowdPlatformManager crowdPlatformManager;
     private final URL baseURL;
 
     public CrowdComputingController(DSLContext create, CrowdPlatformManager crowdPlatformManager, URL baseURL) {
-        this.create = create;
+        super(create);
         this.crowdPlatformManager = crowdPlatformManager;
         this.baseURL = baseURL;
+        experimentDao = new ExperimentDao(create.configuration());
     }
 
     //TODO: pretty shitty method, needs refacturing
@@ -89,7 +93,8 @@ public class CrowdComputingController implements ControllerHelper {
                 .fetch(Record1::value1);
 
         Function<ExperimentRecord, Stream<Hit>> expRecordToHit = record -> Stream.of(HitType.ANSWER, HitType.RATING)
-                .map(type -> new Hit(record, type, tags, type.getAmount(amount, ratingToAnswer), payment, 24*60*60, 30*24*60*60, getExternalURL(inserted, type)));
+                .map(type -> new Hit(record, type, tags, type.getAmount(amount, ratingToAnswer), payment, 24*60*60, 30*24*60*60,
+                        getExternalURL(inserted, type), type.getPlatform(platformAnswer, platformRating)));
 
 
         List<CompletableFuture<Hit>> publishingHits = create.selectFrom(Tables.EXPERIMENT)
@@ -97,7 +102,7 @@ public class CrowdComputingController implements ControllerHelper {
                 .fetchOptional()
                 .map(expRecordToHit::apply)
                 .orElseThrow(() -> new ResourceNotFoundExcpetion("ExperimentTable " + expID + " not found"))
-                .map(hit -> crowdPlatformManager.publishHit(hit, platformAnswer, platformRating, (hitR, ex) -> storeOrDelete(inserted, hit, ex)))
+                .map(hit -> crowdPlatformManager.publishHit(hit, (hitR, ex) -> storeOrDelete(inserted, hit, ex)))
                 .collect(Collectors.toList());
 
         try {
@@ -114,6 +119,19 @@ public class CrowdComputingController implements ControllerHelper {
         response.type("text/plain");
         return response;
     }
+
+    public Response getRunning(Request request, Response response) {
+        return createJson(request, response, () -> {
+            List<JSONHit> map = create.select()
+                    .from(Tables.HIT)
+                    .join(Tables.EXPERIMENT).onKey()
+                    .where(Tables.HIT.RUNNING.eq(true))
+                    .fetch()
+                    .map(record -> new JSONHit(record.getValue(Tables.EXPERIMENT.TITEL), record.into(Tables.HIT)));
+            return gson.toJson(map);
+        });
+    }
+
 
     private String getExternalURL(Map<String, HitRecord> inserted, HitType type) {
         String route = null;
@@ -139,18 +157,6 @@ public class CrowdComputingController implements ControllerHelper {
         } else {
             create.executeDelete(inserted.get(hit.getHitType().get().name()));
         }
-    }
-
-    public Response getRunning(Request request, Response response) {
-        return createJson(request, response, () -> {
-            List<JSONHitAnswer> map = create.select()
-                    .from(Tables.HIT)
-                    .join(Tables.EXPERIMENT).onKey()
-                    .where(Tables.HIT.RUNNING.eq(true))
-                    .fetch()
-                    .map(record -> new JSONHitAnswer(record.getValue(Tables.EXPERIMENT.TITEL), record.into(Tables.HIT)));
-            return gsonBuilder.create().toJson(map);
-        });
     }
 
     public Response stopHIT(Request request, Response response) {
@@ -190,5 +196,42 @@ public class CrowdComputingController implements ControllerHelper {
         response.status(200);
         response.type("text/plain");
         return response;
+    }
+
+    public Response updateHIT(Request request, Response response) {
+        processJson(request, response, raw -> {
+            JSONHit jsonHit = gson.fromJson(raw, JSONHit.class);
+            HitRecord old = create.selectFrom(Tables.HIT)
+                    .where(Tables.HIT.IDHIT.eq(jsonHit.getIdHit()))
+                    .fetchOptional()
+                    .orElseThrow(() -> new ResourceNotFoundExcpetion("hit " + jsonHit.getIdHit() + " not found."));
+
+            HitRecord newRecord = create.update(Tables.HIT)
+                    .set(jsonHit.getRecord())
+                    .returning()
+                    .fetchOptional()
+                    .orElseThrow(() -> new InternalServerErrorException("hit " + jsonHit.getIdHit() + " could not be updated"));
+
+            response.status(200);
+            response.type("text/plain");
+            response.body("success");
+            if ((!Objects.equals(newRecord.getPayment(), old.getPayment()))) {
+                ExperimentRecord experimentRecord = create.selectFrom(Tables.EXPERIMENT)
+                        .where(Tables.EXPERIMENT.IDEXPERIMENT.eq(newRecord.getExperimentH()))
+                        .fetchOne();
+
+                Result<TagsRecord> tags = create.selectFrom(Tables.TAGS)
+                        .where(Tables.TAGS.EXPERIMENT_T.eq(newRecord.getExperimentH()))
+                        .fetch();
+
+                Hit update = new Hit(experimentRecord, newRecord, tags);
+                crowdPlatformManager.updateHit(update)
+                        .exceptionally(fail -> {
+                            fail.printStackTrace();
+                            response.body("error: unable to update hit");
+                            return null;
+                        }).join();
+            }
+        });
     }
 }

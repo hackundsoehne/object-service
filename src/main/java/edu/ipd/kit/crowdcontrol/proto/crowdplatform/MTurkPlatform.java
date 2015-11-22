@@ -49,7 +49,7 @@ public class MTurkPlatform implements CrowdPlatform {
         return CompletableFuture.supplyAsync(() -> {
             HIT hit1 = service.createHIT(hit.getTitle(), hit.getTitle(), hit.getDescription(), keywords, question, hit.getPayment(), hit.getAssignmentDuration(), assignment, hit.getHitDuration(), hit.getAmount(), null, null, null);
             Objects.requireNonNull(hit1);
-            return new Hit(hit1.getHITId(), hit.getTitle(), hit.getDescription(), hit.getTags(), hit.getAmount(), hit.getPayment(), hit.getAssignmentDuration(), hit.getHitDuration(), hit.getUrl());
+            return hit.setID(hit1.getHITId());
         });
     }
 
@@ -60,32 +60,32 @@ public class MTurkPlatform implements CrowdPlatform {
 
             if (mhit == null) return null;
 
-            int assignmentIncrement = (int) (hit.getAssignmentDuration() - mhit.getAssignmentDurationInSeconds());
+            if (hit.getAssignmentDuration() != -1) {
+                int assignmentIncrement = (int) (hit.getAssignmentDuration() - mhit.getAssignmentDurationInSeconds());
 
-            if (assignmentIncrement < 0) {
-                System.err.println("Assignment duration has to be bigger");
-                throw new IllegalStateException("something wrong");
+                if (assignmentIncrement < 0) {
+                    System.err.println("Assignment duration has to be bigger");
+                    throw new IllegalStateException("something wrong");
+                }
+
+                try {
+                    service.extendHIT(hit.getId(), assignmentIncrement, (long) 0);
+                } catch (ServiceException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             String keywords = hit.getTags().stream()
                     .collect(Collectors.joining(","));
 
-            try {
-                service.extendHIT(hit.getId(), assignmentIncrement, (long) 0);
-            } catch (ServiceException e) {
-                e.printStackTrace();
-                return null;
-            }
-
             String id = null;
             try {
                 id = service.updateHIT(hit.getId(), hit.getTitle(), hit.getDescription(), keywords, hit.getPayment());
             } catch (ServiceException e) {
-                e.printStackTrace();
-                return null;
+                throw new RuntimeException(e);
             }
 
-            return new Hit(id, hit.getTitle(), hit.getDescription(), hit.getTags(), hit.getAmount(), hit.getPayment(), hit.getAssignmentDuration(), hit.getHitDuration(), hit.getUrl());
+            return hit.setID(id);
         });
     }
 

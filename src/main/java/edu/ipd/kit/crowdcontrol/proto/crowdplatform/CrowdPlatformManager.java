@@ -30,15 +30,19 @@ public class CrowdPlatformManager {
         return Optional.ofNullable(platforms.get(name));
     }
 
-    public CompletableFuture<Hit> publishHit(Hit hit, String platformAnswer, String platformRating, BiConsumer<Hit, Throwable> callback) {
-        return hit.getHitType()
-                .map(type -> type.getPlatform(platformAnswer, platformRating))
-                .flatMap(this::getCrowdPlatform)
+    public CompletableFuture<Hit> publishHit(Hit hit, BiConsumer<Hit, Throwable> callback) {
+        return getCrowdPlatform(hit.getPlatform())
                 .map(platform -> platform.publishTask(hit))
                 .orElseThrow(() -> new InternalServerErrorException("platform for hit " + hit + " is not available"))
                 .handle((hitR, ex) -> {
                     callback.accept(hit, ex);
                     return hit;
                 });
+    }
+
+    public CompletableFuture<Hit> updateHit(Hit hit) {
+        return getCrowdPlatform(hit.getPlatform())
+                .map(platform -> platform.updateTask(hit))
+                .orElseThrow(() -> new InternalServerErrorException("platform for hit " + hit + " is not available"));
     }
 }
