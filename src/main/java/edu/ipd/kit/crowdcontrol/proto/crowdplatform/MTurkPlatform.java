@@ -107,7 +107,7 @@ public class MTurkPlatform implements CrowdPlatform {
         String[] hitids = {id};
 
         CompletableFuture<String> result = new CompletableFuture<>();
-        service.deleteHITs(hitids, false, true, (o, b, o1, e) -> result.complete(id));
+        service.deleteHITs(hitids, false, true, (o, b, o1, e) -> result.complete(b ? id : null));
         return result;
     }
 
