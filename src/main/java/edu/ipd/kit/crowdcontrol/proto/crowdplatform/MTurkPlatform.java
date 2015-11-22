@@ -2,6 +2,7 @@ package edu.ipd.kit.crowdcontrol.proto.crowdplatform;
 
 import com.amazonaws.mturk.requester.HIT;
 import com.amazonaws.mturk.service.axis.RequesterService;
+import com.amazonaws.mturk.service.exception.ServiceException;
 import com.amazonaws.mturk.util.ClientConfig;
 
 import java.util.Objects;
@@ -55,9 +56,13 @@ public class MTurkPlatform implements CrowdPlatform {
     @Override
     public CompletableFuture<Hit> updateTask(Hit hit) {
         return CompletableFuture.supplyAsync(() -> {
+            HIT mhit = service.getHIT(hit.getId());
+
+            if (mhit == null) return null;
+
             int assignmentIncrement = (int) (hit.getAssignmentDuration() - mhit.getAssignmentDurationInSeconds());
 
-            if (increment < 0) {
+            if (assignmentIncrement < 0) {
                 System.err.println("Assignment duration has to be bigger");
                 throw new IllegalStateException("something wrong");
             }
@@ -65,16 +70,23 @@ public class MTurkPlatform implements CrowdPlatform {
             String keywords = hit.getTags().stream()
                     .collect(Collectors.joining(","));
 
-            service.extendHIT(hit.getId(), assignmentIncrement, 0);
-            //FIXME newhit
-            service.updateHIT(hit.getId(), hit.getTitle(), hit.getDescription(), keywords, hit.getPayment());
-            return hit;
-        });
-    }
+            try {
+                service.extendHIT(hit.getId(), assignmentIncrement, (long) 0);
+            } catch (ServiceException e) {
+                e.printStackTrace();
+                return null;
+            }
 
-    @Override
-    public CompletableFuture<Hit> unpublishTask(Hit hit) {
-        return unpublishTask(hit.getId()).thenApply(ignore -> hit);
+            String id = null;
+            try {
+                id = service.updateHIT(hit.getId(), hit.getTitle(), hit.getDescription(), keywords, hit.getPayment());
+            } catch (ServiceException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            return new Hit(id, hit.getTitle(), hit.getDescription(), hit.getTags(), hit.getAmount(), hit.getPayment(), hit.getAssignmentDuration(), hit.getHitDuration(), hit.getUrl());
+        });
     }
 
     /**
