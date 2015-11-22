@@ -14,9 +14,9 @@ public class Nop implements CrowdPlatform {
      * @return true if successful, false if not
      */
     @Override
-    public CompletableFuture<Boolean> publishTask(Hit hit) {
+    public CompletableFuture<Hit> publishTask(Hit hit) {
         System.out.println("pay task: " + hit);
-        return CompletableFuture.completedFuture(true);
+        return CompletableFuture.completedFuture(hit);
     }
 
     /**
@@ -24,9 +24,9 @@ public class Nop implements CrowdPlatform {
      * @return true if successful, false if not
      */
     @Override
-    public CompletableFuture<Boolean> updateTask(Hit hit) {
+    public CompletableFuture<Hit> updateTask(Hit hit) {
         System.out.println("updateTask" + hit);
-        return CompletableFuture.completedFuture(true);
+        return CompletableFuture.completedFuture(hit);
     }
 
     /**
@@ -36,9 +36,9 @@ public class Nop implements CrowdPlatform {
      * @return true if successful, false if not
      */
     @Override
-    public CompletableFuture<Boolean> unpublishTask(Hit hit) {
-        System.out.println("unpublishTask: " + hit);
-        return CompletableFuture.completedFuture(true);
+    public CompletableFuture<String> unpublishTask(String id) {
+        System.out.println("unpublishTask: " + id);
+        return CompletableFuture.completedFuture(id);
     }
 
     /**
@@ -48,9 +48,9 @@ public class Nop implements CrowdPlatform {
      * @return true if successful, false if not
      */
     @Override
-    public CompletableFuture<Boolean> payTask(Hit hit) {
+    public CompletableFuture<Hit> payTask(Hit hit) {
         System.out.println("payTask: " + hit);
-        return CompletableFuture.completedFuture(true);
+        return CompletableFuture.completedFuture(hit);
     }
 
     /**
