@@ -8,6 +8,7 @@ import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit;
  * @version 1.0
  */
 public class JSONHitOverview {
+    @JSONRequired
     private final int id;
     private final String type;
     private final boolean running;

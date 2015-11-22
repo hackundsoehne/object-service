@@ -35,7 +35,12 @@ public class Router implements SparkApplication {
             System.err.println("Resource not found! " + request.toString() + " error: " + e.getMessage());
         });
 
-        //experiemtn/<id>/start
+        exception(InternalServerErrorException.class, (e, request, response) -> {
+            response.status(500);
+            response.body(e.getMessage());
+            System.err.println("Internal server error for: " + request.toString() + " error: " + e.getMessage());
+        });
+
         get("/experiments/delete", experimentController::deleteExperiment);
 
         post("/experiments/create", experimentController::createExperiment);

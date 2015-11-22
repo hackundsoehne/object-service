@@ -10,6 +10,7 @@ import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord
  * @version 1.0
  */
 public class JSONSimpelTask {
+    @JSONRequired
     private final int id;
     private final String timestamp;
     private final String type;

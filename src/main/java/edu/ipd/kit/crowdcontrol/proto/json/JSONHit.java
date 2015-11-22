@@ -10,6 +10,7 @@ import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.HitRecord;
  */
 public class JSONHit {
     private final String experimentTitel;
+    @JSONRequired
     private final int idHit;
     private final int experimentID;
     private final String type;
