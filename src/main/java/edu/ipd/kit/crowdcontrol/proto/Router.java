@@ -10,7 +10,8 @@ import static spark.Spark.*;
 
 /**
  * The Router routes and is responsible for the routing.
- * @author LeanderK
+ *
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class Router implements SparkApplication {

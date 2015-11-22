@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * manages all the requests which are used to specify an experiment.
- * @author LeanderK
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class ExperimentController extends Controller {

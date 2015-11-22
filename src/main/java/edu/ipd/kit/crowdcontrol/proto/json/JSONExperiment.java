@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class does not represent the Experiment stored in the Database. It models the JSON-Representation of an Experiment.
- * @author LeanderK
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class JSONExperiment {
