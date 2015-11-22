@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ * this controller is responsible for all rest-calls regarding statistics.
  * @author LeanderK
  * @version 1.0
  */
