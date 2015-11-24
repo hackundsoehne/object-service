@@ -2,20 +2,22 @@ package edu.ipd.kit.crowdcontrol.proto;
 
 import edu.ipd.kit.crowdcontrol.proto.controller.CrowdComputingController;
 import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
-import edu.ipd.kit.crowdcontrol.proto.controller.TaskController;
+import edu.ipd.kit.crowdcontrol.proto.controller.StatisticsController;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.CrowdPlatformManager;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.MTurkPlatform;
 import edu.ipd.kit.crowdcontrol.proto.web.FreeMarkerEngine;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
 
 /**
  * starts everything in the correct order.
- * @author LeanderK
+ * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
  * @version 1.0
  */
 public class Main {
@@ -29,19 +31,33 @@ public class Main {
             config.load(new FileInputStream(configFile));
         } catch (IOException e) {
             System.err.println("unable to open file: " + configFile);
+            System.exit(-1);
         }
 
         databaseManager = initDatabase(config);
         crowdPlatformManager = initCrowdPlatform(config);
-        router = initRouter();
+        router = initRouter(config);
     }
 
-    private Router initRouter() {
-        ExperimentController experimentController = new ExperimentController(databaseManager.getContext());
-        CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext(), crowdPlatformManager);
+    private Router initRouter(Properties config) {
+        ExperimentController experimentController = new ExperimentController(databaseManager.getContext(), crowdPlatformManager);
+        String urlString = config.getProperty("url");
+        if (urlString == null) {
+            System.err.println("missing url property");
+            System.exit(-1);
+        }
+        URL url = null;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            System.err.println("url is malformed");
+            System.exit(-1);
+        }
+        CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext(), crowdPlatformManager, url);
+        StatisticsController statisticsController = new StatisticsController(databaseManager.getContext());
         TaskController taskController = new TaskController(databaseManager.getContext());
         FreeMarkerEngine freeMarkerEngine = new FreeMarkerEngine();
-        Router router = new Router(experimentController, crowdComputingController, taskController, freeMarkerEngine);
+        Router router = new Router(experimentController, crowdComputingController, taskController, statisticsController);
         router.init();
         return router;
     }

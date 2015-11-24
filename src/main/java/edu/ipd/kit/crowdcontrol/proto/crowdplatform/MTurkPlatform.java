@@ -1,13 +1,12 @@
 package edu.ipd.kit.crowdcontrol.proto.crowdplatform;
 
-import com.amazonaws.mturk.addon.BatchItemCallback;
 import com.amazonaws.mturk.requester.HIT;
 import com.amazonaws.mturk.service.axis.RequesterService;
 import com.amazonaws.mturk.service.exception.ServiceException;
 import com.amazonaws.mturk.util.ClientConfig;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +33,7 @@ public class MTurkPlatform implements CrowdPlatform {
     }
 
     @Override
-    public CompletableFuture<String> publishTask(Hit hit) {
+    public CompletableFuture<Hit> publishTask(Hit hit) {
         String keywords = hit.getTags().stream()
                 .collect(Collectors.joining(","));
 
@@ -48,60 +47,78 @@ public class MTurkPlatform implements CrowdPlatform {
                 "</ExternalQuestion>";
 
         return CompletableFuture.supplyAsync(() -> {
-            try {
-                HIT hit1 = service.createHIT(null, hit.getTitle(), hit.getDescription(), keywords, question, hit.getPayment(), hit.getAssignmentDuration(), assignment, hit.getHitDuration(), hit.getAmount(), null, null, null);
-                return (hit1 != null) ? hit1.getHITId() : null;
-            } catch (ServiceException e) {
-                e.printStackTrace();
-                return null;
-            }
+            HIT hit1 = service.createHIT(hit.getTitle(), hit.getTitle(), hit.getDescription(), keywords, question, hit.getPayment(), hit.getAssignmentDuration(), assignment, hit.getHitDuration(), hit.getAmount(), null, null, null);
+            Objects.requireNonNull(hit1);
+            return hit.setID(hit1.getHITId());
         });
     }
 
     @Override
-    public CompletableFuture<String> updateTask(Hit hit) {
-        int assignmentIncrement = (int) (hit.getAssignmentDuration() - mhit.getAssignmentDurationInSeconds());
+    public CompletableFuture<Hit> updateTask(Hit hit) {
+        return CompletableFuture.supplyAsync(() -> {
+            HIT mhit = service.getHIT(hit.getId());
 
-        if (increment < 0) {
-            System.err.println("Assignment duration has to be bigger");
-            return CompletableFuture.completedFuture(null);
+            if (mhit == null) return null;
+
+            if (hit.getAssignmentDuration() != -1) {
+                int assignmentIncrement = (int) (hit.getAssignmentDuration() - mhit.getAssignmentDurationInSeconds());
+
+                if (assignmentIncrement < 0) {
+                    System.err.println("Assignment duration has to be bigger");
+                    throw new IllegalStateException("something wrong");
+                }
+
+                try {
+                    service.extendHIT(hit.getId(), assignmentIncrement, (long) 0);
+                } catch (ServiceException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            String keywords = hit.getTags().stream()
+                    .collect(Collectors.joining(","));
+
+            String id = null;
+            try {
+                id = service.updateHIT(hit.getId(), hit.getTitle(), hit.getDescription(), keywords, hit.getPayment());
+            } catch (ServiceException e) {
+                throw new RuntimeException(e);
+            }
+
+            return hit.setID(id);
+        });
+    }
+
+    /**
+     * unpublish the task, after this call no answers can be sent for this task
+     *
+     * @param id
+     * @return true if successful, false if not
+     */
+    @Override
+    public CompletableFuture<String> unpublishTask(String id) {
+        HIT mhit = service.getHIT(id);
+
+        if (mhit == null) {
+            System.err.println("Hit is not found!");
+            return CompletableFuture.completedFuture(id);
         }
 
-        String keywords = hit.getTags().stream()
-                .collect(Collectors.joining(","));
+        String[] hitids = {id};
 
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                service.extendHIT(hit.getId(), assignmentIncrement, 0);
-                return service.updateHIT(hit.getId(), hit.getTitle(), hit.getDescription(), keywords, hit.getPayment());
-            } catch (ServiceException e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
-    }
-
-    @Override
-    public CompletableFuture<Boolean> unpublishTask(Hit hit) {
-        HIT mhit = service.getHIT(hit.getId());
-
-        if (mhit == null) return CompletableFuture.completedFuture(false);
-
-        String[] hitids = {hit.getId()};
-
-        CompletableFuture<Boolean> result = new CompletableFuture<>();
-        service.deleteHITs(hitids, false, true, (o, b, o1, e) -> result.complete(b));
+        CompletableFuture<String> result = new CompletableFuture<>();
+        service.deleteHITs(hitids, false, true, (o, b, o1, e) -> result.complete(b ? id : null));
         return result;
     }
 
     @Override
-    public CompletableFuture<Boolean> payTask(Hit hit) {
+    public CompletableFuture<Hit> payTask(Hit hit) {
         //
-        return CompletableFuture.completedFuture(false);
+        return CompletableFuture.completedFuture(hit);
     }
 
     @Override
     public String getName() {
-        return "mturk";
+        return null;
     }
 }

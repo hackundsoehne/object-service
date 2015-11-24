@@ -1,28 +1,28 @@
 package edu.ipd.kit.crowdcontrol.proto.controller;
 
 /**
- * represents a 400 BAD REQUEST return code.
- * @author Leander Kurscheidt (Leander.Kurscheidt@gmx.de)
+ * Represents a 404 Resource Not Found Exception.
+ * @author LeanderK
  * @version 1.0
  */
-public class BadRequestException extends RuntimeException {
+public class ResourceNotFoundExcpetion extends RuntimeException {
     /**
-     * Constructs a new exception with the specified detail message.  The
-     * cause is not initialized, and may subsequently be initialized by
-     * a call to {@link #initCause}.
+     * Constructs a new runtime exception with the specified detail message.
+     * The cause is not initialized, and may subsequently be initialized by a
+     * call to {@link #initCause}.
      *
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public BadRequestException(String message) {
+    public ResourceNotFoundExcpetion(String message) {
         super(message);
     }
 
     /**
-     * Constructs a new exception with the specified detail message and
+     * Constructs a new runtime exception with the specified detail message and
      * cause.  <p>Note that the detail message associated with
      * {@code cause} is <i>not</i> automatically incorporated in
-     * this exception's detail message.
+     * this runtime exception's detail message.
      *
      * @param message the detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).
@@ -32,7 +32,7 @@ public class BadRequestException extends RuntimeException {
      *                unknown.)
      * @since 1.4
      */
-    public BadRequestException(String message, Throwable cause) {
+    public ResourceNotFoundExcpetion(String message, Throwable cause) {
         super(message, cause);
     }
 }
