@@ -84,7 +84,7 @@ public class Router implements SparkApplication {
 
         get("/tasks/rating/render", taskController::renderRatingTask, freeMarkerEngine);
 
-        post("/tasks/rating/submit", taskController::submitRatingTask);
+        post("/tasks/rating/submit/", taskController::submitRatingTask);
 
         post("/tasks/answer/submit", taskController::submitAnswerTask);
 
