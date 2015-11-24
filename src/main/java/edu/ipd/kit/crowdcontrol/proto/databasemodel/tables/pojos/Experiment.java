@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment implements java.io.Serializable {
 
-	private static final long serialVersionUID = 304978895;
+	private static final long serialVersionUID = -1884726881;
 
 	private java.lang.Integer idexperiment;
 	private java.lang.String  pictureUrl;
@@ -21,6 +21,7 @@ public class Experiment implements java.io.Serializable {
 	private java.lang.String  titel;
 	private java.lang.Integer maxRatingsPerAssignment;
 	private java.lang.Integer maxAnswersPerAssignment;
+	private java.lang.String  description;
 
 	public Experiment() {}
 
@@ -32,7 +33,8 @@ public class Experiment implements java.io.Serializable {
 		java.lang.Object  ratingOptions,
 		java.lang.String  titel,
 		java.lang.Integer maxRatingsPerAssignment,
-		java.lang.Integer maxAnswersPerAssignment
+		java.lang.Integer maxAnswersPerAssignment,
+		java.lang.String  description
 	) {
 		this.idexperiment = idexperiment;
 		this.pictureUrl = pictureUrl;
@@ -42,6 +44,7 @@ public class Experiment implements java.io.Serializable {
 		this.titel = titel;
 		this.maxRatingsPerAssignment = maxRatingsPerAssignment;
 		this.maxAnswersPerAssignment = maxAnswersPerAssignment;
+		this.description = description;
 	}
 
 	public java.lang.Integer getIdexperiment() {
@@ -106,5 +109,13 @@ public class Experiment implements java.io.Serializable {
 
 	public void setMaxAnswersPerAssignment(java.lang.Integer maxAnswersPerAssignment) {
 		this.maxAnswersPerAssignment = maxAnswersPerAssignment;
+	}
+
+	public java.lang.String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(java.lang.String description) {
+		this.description = description;
 	}
 }
