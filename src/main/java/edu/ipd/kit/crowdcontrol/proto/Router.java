@@ -1,9 +1,6 @@
 package edu.ipd.kit.crowdcontrol.proto;
 
-import edu.ipd.kit.crowdcontrol.proto.controller.BadRequestException;
-import edu.ipd.kit.crowdcontrol.proto.controller.CrowdComputingController;
-import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
-import edu.ipd.kit.crowdcontrol.proto.controller.TaskController;
+import edu.ipd.kit.crowdcontrol.proto.controller.*;
 import edu.ipd.kit.crowdcontrol.proto.web.FreeMarkerEngine;
 import spark.servlet.SparkApplication;
 
@@ -67,7 +64,7 @@ public class Router implements SparkApplication {
 
         get("/crowd/stop", crowdComputingController::stopHIT);
 
-        ("/crowd/update", crowdComputingController::updateHIT);
+        get("/crowd/update", crowdComputingController::updateHIT);
 
         get("/statistics/hits", statisticsController::getAllHitsOverview);
 

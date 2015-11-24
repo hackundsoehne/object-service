@@ -3,6 +3,7 @@ package edu.ipd.kit.crowdcontrol.proto;
 import edu.ipd.kit.crowdcontrol.proto.controller.CrowdComputingController;
 import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
 import edu.ipd.kit.crowdcontrol.proto.controller.StatisticsController;
+import edu.ipd.kit.crowdcontrol.proto.controller.TaskController;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.CrowdPlatformManager;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.MTurkPlatform;
 import edu.ipd.kit.crowdcontrol.proto.web.FreeMarkerEngine;
@@ -57,7 +58,7 @@ public class Main {
         StatisticsController statisticsController = new StatisticsController(databaseManager.getContext());
         TaskController taskController = new TaskController(databaseManager.getContext());
         FreeMarkerEngine freeMarkerEngine = new FreeMarkerEngine();
-        Router router = new Router(experimentController, crowdComputingController, taskController, statisticsController);
+        Router router = new Router(experimentController, crowdComputingController, taskController, freeMarkerEngine, statisticsController);
         router.init();
         return router;
     }

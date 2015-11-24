@@ -1,7 +1,5 @@
 package edu.ipd.kit.crowdcontrol.proto.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.Tables;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.daos.AnswersDao;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.daos.ExperimentDao;
@@ -28,20 +26,16 @@ import java.util.function.BiFunction;
  * Webview of tasks
  * Created by skorz on 20.11.15.
  */
-public class TaskController implements ControllerHelper {
-    private final DSLContext create;
+public class TaskController extends Controller {
     private final HitDao hitDAO;
     private final ExperimentDao expDAO;
     private final AnswersDao answersDao;
-    private final Gson gson;
 
     public TaskController(DSLContext create) {
-        this.create = create;
+        super(create);
         hitDAO = new HitDao(create.configuration());
         expDAO = new ExperimentDao(create.configuration());
         answersDao = new AnswersDao(create.configuration());
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gson = gsonBuilder.create();
     }
 
     public ModelAndView renderAnswerTask(Request request, Response response) {
