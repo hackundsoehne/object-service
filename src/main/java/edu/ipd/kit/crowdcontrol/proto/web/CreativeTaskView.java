@@ -12,10 +12,12 @@ import java.util.Map;
 public class CreativeTaskView implements TaskView {
     private final Experiment experiment;
     private final boolean again;
+    private final String workerID;
 
-    public CreativeTaskView(Experiment experiment, boolean again) {
+    public CreativeTaskView(Experiment experiment, boolean again, String workerID) {
         this.experiment = experiment;
         this.again = again;
+        this.workerID = workerID;
     }
 
     @Override
@@ -33,13 +35,14 @@ public class CreativeTaskView implements TaskView {
         if (pictureLicenseUrl == null) pictureLicenseUrl = "";
         attributes.put("iframe", pictureLicenseUrl);
         if (again) {
-            attributes.put("next", "n");
+            attributes.put("again", "a");
             attributes.put("sub", "s");
         } else {
-            attributes.put("next", "");
+            attributes.put("again", "");
             attributes.put("sub", "only");
         }
-        attributes.put("again", "");
+        attributes.put("next", "");
+        attributes.put("workID", workerID);
         return new ModelAndView(attributes, "creativeTask.ftl");
     }
 }

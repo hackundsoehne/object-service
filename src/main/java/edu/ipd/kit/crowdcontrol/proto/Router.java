@@ -80,13 +80,13 @@ public class Router implements SparkApplication {
 
         get("/statistics/detail/task", statisticsController::getFullTaskJSON);
 
-        get("/tasks/answer/render", taskController::renderAnswerTask, freeMarkerEngine);
+        get("/tasks/answer/render", taskController::processRenderCreativeRequest, freeMarkerEngine);
 
-        get("/tasks/rating/render", taskController::renderRatingTask, freeMarkerEngine);
+        get("/tasks/rating/render", taskController::processRenderRatingRequest, freeMarkerEngine);
 
-        post("/tasks/rating/submit/", taskController::submitRatingTask);
+        post("/tasks/rating/:expID/:workID", taskController::submitRatingTask);
 
-        post("/tasks/answer/submit", taskController::submitAnswerTask);
+        post("/tasks/answer/:expID/:workID", taskController::submitAnswerTask);
 
         //TODO: shutdown and calling Unirest.shutdown();
     }
