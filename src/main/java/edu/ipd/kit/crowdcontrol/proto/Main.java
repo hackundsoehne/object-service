@@ -56,7 +56,7 @@ public class Main {
         }
         CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext(), crowdPlatformManager, url);
         StatisticsController statisticsController = new StatisticsController(databaseManager.getContext());
-        TaskController taskController = new TaskController(databaseManager.getContext());
+        TaskController taskController = new TaskController(databaseManager.getContext(), crowdPlatformManager);
         FreeMarkerEngine freeMarkerEngine = new FreeMarkerEngine();
         Router router = new Router(experimentController, crowdComputingController, taskController, freeMarkerEngine, statisticsController);
         router.init();

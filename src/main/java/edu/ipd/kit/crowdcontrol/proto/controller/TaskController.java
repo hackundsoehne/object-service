@@ -10,13 +10,11 @@ import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Experiment;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.AnswersRecord;
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.RatingsRecord;
-import edu.ipd.kit.crowdcontrol.proto.json.JSONRating;
 import edu.ipd.kit.crowdcontrol.proto.web.CreativeTaskView;
 import edu.ipd.kit.crowdcontrol.proto.web.RatingTaskView;
 import edu.ipd.kit.crowdcontrol.proto.web.TaskView;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import spark.ModelAndView;
@@ -67,7 +65,31 @@ public class TaskController extends Controller {
         });
     }
 
-    public Optional<RatingTaskView> getRatingTaskView(Experiment experiment, String wokerID, Hit hit) {
+    public ModelAndView submitAnswerTask(Request request, Response response) {
+        return renderTask(request, response, (hit, workerID) -> {
+            /*
+            assertParameter(request, "")
+            Answers answers = new Answers(null, hit.getIdhit(), request.body(), null, workerID);
+            answersDao.insert(answers);
+            response.body("success");
+            return response;*/
+            return null;
+        });
+    }
+
+    public ModelAndView submitRatingTask(Request request, Response response) {
+        return renderTask(request, response, (ratingHit, workerID) -> {
+            /*
+            assertParameter(request, "")
+            Answers answers = new Answers(null, hit.getIdhit(), request.body(), null, workerID);
+            answersDao.insert(answers);
+            response.body("success");
+            return response;*/
+            return null;
+        });
+    }
+
+    private Optional<RatingTaskView> getRatingTaskView(Experiment experiment, String wokerID, Hit hit) {
         SelectConditionStep<RatingsRecord> select = DSL.selectFrom(Tables.RATINGS)
                 .where(Tables.RATINGS.HIT_R.eq(hit.getIdhit()))
                 .and(Tables.RATINGS.RATING.isNotNull())
@@ -109,7 +131,7 @@ public class TaskController extends Controller {
         }
     }
 
-    public Optional<CreativeTaskView> getCreativeTaskView(Experiment experiment, String wokerID, Hit hit) {
+    private Optional<CreativeTaskView> getCreativeTaskView(Experiment experiment, String wokerID, Hit hit) {
         SelectConditionStep<AnswersRecord> select = DSL.selectFrom(Tables.ANSWERS)
                 .where(Tables.ANSWERS.WORKERID.eq(wokerID))
                 .and(Tables.ANSWERS.HIT_A.eq(hit.getIdhit()));
@@ -122,39 +144,6 @@ public class TaskController extends Controller {
         } else {
             return Optional.empty();
         }
-    }
-
-    public Response submitAnswerTask(Request request, Response response) {
-        return submitTask(request, response, (hit, workerID) -> {
-            Answers answers = new Answers(null, hit.getIdhit(), request.body(), null, workerID);
-            answersDao.insert(answers);
-            response.body("success");
-            return response;
-        });
-    }
-
-    public Response submitRatingTask(Request request, Response response) {
-        return submitTask(request, response, (ratingHit, workerID) -> {
-            assertJson(request);
-            JSONRating jsonRating = gson.fromJson(request.body(), JSONRating.class);
-            RatingsRecord ratings = new RatingsRecord(null, ratingHit.getIdhit(), jsonRating.getAnswerID(), null, jsonRating.getRating(), workerID);
-            Answers answers = answersDao.fetchOneByIdanswers(jsonRating.getAnswerID());
-            Hit answerHit = hitDAO.fetchOneByIdhit(answers.getHitA());
-            int ratingPerAnswer = ratingHit.getMaxAmount() / answerHit.getMaxAmount();
-            create.transaction(configuration -> {
-                DSL.using(configuration).executeInsert(ratings);
-                List<Integer> map = DSL.using(configuration)
-                        .select(Tables.RATINGS.RATING)
-                        .where(Tables.RATINGS.ANSWER_R.eq(jsonRating.getAnswerID()))
-                        .fetch()
-                        .map(Record1::value1);
-                if (map.size() == ratingPerAnswer) {
-                    //TODO: do Bonus/Pay here!
-                }
-            });
-            response.body("success");
-            return response;
-        });
     }
 
     private ModelAndView renderTask(Request request, Response response, BiFunction<Hit, Experiment, Optional<? extends TaskView>> func) {
