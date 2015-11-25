@@ -19,7 +19,7 @@
 		<#if pic != ""><div id="pic"><img src=${pic}></div></#if>
 
 		<div id="form">
-			<form id="hallo" action="/tasks/rating/${expid}/${workID}" onSubmit="return validate()" method="POST" name="answerform">
+			<form id="hallo" action="/tasks/answer/${expid}/${workID}" onSubmit="return validate()" method="POST" name="answerform">
 			<div id="wrapper">
 			<div id="errorview"></div>
 				<textarea type="text" id="answertext" placeholder="Type your answer here" name="answer"></textarea><br />

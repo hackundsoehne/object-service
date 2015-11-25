@@ -35,13 +35,14 @@ public class RouterRatingWebTest implements SparkApplication {
                     3,3,
                     "answerDescripton",
                     "raingDescription");
-            Answers answers = new Answers(1, 1, "wow! so great!", null, "1234");
-            Answers answers2 = new Answers(2, 1, "much beautiful", null, "1235");
+            Answers answers = new Answers(11, 1, "wow! so great!", null, "1234");
+            Answers answers2 = new Answers(22, 1, "much beautiful", null, "1235");
             RatingTaskView ratingTaskView = new RatingTaskView(experiment, Arrays.asList(answers, answers2), "13");
             return ratingTaskView.render();
         }), engine);
 
         post("/tasks/rating/:exID/:workID", ((request, response) -> {
+            Map<String, String[]> parameterMap = request.raw().getParameterMap();
             String view = "";
             // wat
             // TODO

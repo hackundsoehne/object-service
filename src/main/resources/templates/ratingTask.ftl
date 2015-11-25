@@ -9,7 +9,7 @@
 		<h1><#if desc!="">${desc}</#if></h1>
 		<h2>The question was: </h2><br /><h1>${task}</h1>
 		<#if pic != ""><div id="pic"><img src=${pic}></div></#if>
-		<form name='ratings' action="/tasks/answer/${expId}/${workID}" method="POST">
+		<form name='ratings' action="/tasks/rating/${expId}/${workID}" method="POST">
 		${ratingTable}
 		<div id="buttons">
 				<#if again!=""><button type="submit" value="Again" id="subagain" class="but" name="button">Again</button></#if>

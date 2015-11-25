@@ -40,7 +40,7 @@ public class RouterAnswerWebTest implements SparkApplication {
             return creativeTaskView.render();
         }), engine);
 
-        post("/tasks/answer/:expID", ((request, response) -> {
+        post("/tasks/answer/:expID/:workID", ((request, response) -> {
             Map<String, String[]> parameterMap = request.raw().getParameterMap();
             Map<String, Object> attributes = new HashMap<>();
             attributes.put("task", "hagia sophia!");

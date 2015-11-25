@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Webview of tasks
@@ -66,26 +67,59 @@ public class TaskController extends Controller {
     }
 
     public ModelAndView submitAnswerTask(Request request, Response response) {
-        return renderTask(request, response, (hit, workerID) -> {
-            /*
-            assertParameter(request, "")
-            Answers answers = new Answers(null, hit.getIdhit(), request.body(), null, workerID);
-            answersDao.insert(answers);
-            response.body("success");
-            return response;*/
-            return null;
+        return renderTask(request, response, (hit, exp) -> {
+            String workerID = assertParameter(request, "workID");
+            String[] answersParam = request.raw().getParameterMap().get("answer");
+            if (answersParam == null || answersParam.length == 0)
+                throw new BadRequestException("need parameter answer with the answer");
+            String answer = answersParam[0];
+            AnswersRecord record =  new AnswersRecord(null, hit.getIdhit(), answer, null, workerID);
+            int i = create.executeInsert(record);
+            if (i == 0) {
+                System.err.println("unable to insert AnswersRecord: " + answer);
+                return Optional.empty();
+            }
+            return getCreativeTaskView(exp, workerID, hit);
         });
     }
 
     public ModelAndView submitRatingTask(Request request, Response response) {
-        return renderTask(request, response, (ratingHit, workerID) -> {
-            /*
-            assertParameter(request, "")
-            Answers answers = new Answers(null, hit.getIdhit(), request.body(), null, workerID);
-            answersDao.insert(answers);
-            response.body("success");
-            return response;*/
-            return null;
+        return renderTask(request, response, (hit, exp) -> {
+            String workerID = assertParameter(request, "workID");
+            String[] ratingsParam = request.raw().getParameterMap().get("ratingtext");
+            if (ratingsParam == null || ratingsParam.length == 0)
+                throw new BadRequestException("need parameter ratingtext with the rating");
+            String[] idParam = request.raw().getParameterMap().get("ratingansid");
+            if (idParam == null || idParam.length == 0)
+                throw new BadRequestException("need parameter idParam with the ids");
+            List<RatingsRecord> toInsert = IntStream.range(0, ratingsParam.length)
+                    .filter(index -> !ratingsParam[index].isEmpty())
+                    .mapToObj(index -> new RatingsRecord(null, hit.getIdhit(),
+                            Integer.parseInt(idParam[index]), null, Integer.parseInt(ratingsParam[index]), workerID))
+                    .collect(Collectors.toList());
+            List<Integer> answerIDsToDelete = toInsert.stream()
+                    .map(RatingsRecord::getAnswerR)
+                    .collect(Collectors.toList());
+            create.transaction(configuration -> {
+                int execute = DSL.using(configuration)
+                        .deleteFrom(Tables.RATINGS)
+                        .where(Tables.RATINGS.WORKERID.eq(workerID))
+                        .and(Tables.RATINGS.HIT_R.eq(hit.getIdhit()))
+                        .and(Tables.RATINGS.ANSWER_R.in(answerIDsToDelete))
+                        .execute();
+
+                if (execute != toInsert.size()) {
+                    System.err.println("not all Ratings deleted, toInsert: " + toInsert);
+                }
+
+                DSL.using(configuration)
+                        .batchInsert(toInsert);
+            });
+            Optional<RatingTaskView> ratingTaskView = getRatingTaskView(exp, workerID, hit);
+            if (!ratingTaskView.isPresent()) {
+                //TODO: pay bonus?!
+            }
+            return ratingTaskView;
         });
     }
 
@@ -97,11 +131,11 @@ public class TaskController extends Controller {
         int ratingsGiven = create.fetchCount(select);
         int amountToRate = experiment.getMaxRatingsPerAssignment() - ratingsGiven;
         if (amountToRate > 1) {
-            return create.transactionResult(config -> {
+            List<Answers> answersToRate = create.transactionResult(config -> {
                 Field<Integer> count = DSL.selectCount().from(Tables.RATINGS).asField();
                 //Connect with max in CrowdPlatform
                 LocalDateTime limit = LocalDateTime.now().minus(2, ChronoUnit.HOURS);
-                Timestamp timestamp =  Timestamp.valueOf(limit);
+                Timestamp timestamp = Timestamp.valueOf(limit);
                 List<Answers> toRate = DSL.using(config).select()
                         .select(Tables.ANSWERS.fields())
                         .select(count)
@@ -123,9 +157,9 @@ public class TaskController extends Controller {
 
                 DSL.using(config).batchInsert(emptyRatings);
 
-                return Optional.of(new RatingTaskView(experiment, toRate, wokerID));
+                return toRate;
             });
-
+            return Optional.of(new RatingTaskView(experiment, answersToRate, wokerID));
         } else {
             return Optional.empty();
         }
