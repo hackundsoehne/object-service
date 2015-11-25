@@ -1,7 +1,6 @@
 package edu.ipd.kit.crowdcontrol.proto.web;
 
 import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Experiment;
-import edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Hit;
 import spark.ModelAndView;
 
 import java.util.HashMap;
@@ -11,32 +10,36 @@ import java.util.Map;
  * Created by skorz on 21.11.15.
  */
 public class CreativeTaskView implements TaskView {
-    private final Hit task;
     private final Experiment experiment;
+    private final boolean again;
 
-    public CreativeTaskView(Hit task, Experiment experiment) {
-        this.task = task;
+    public CreativeTaskView(Experiment experiment, boolean again) {
         this.experiment = experiment;
+        this.again = again;
     }
-
-    public static ModelAndView doRender(Hit task, Experiment experiment) {
-        return new CreativeTaskView(task, experiment).render();
-    }
-
 
     @Override
     public ModelAndView render() {
+        //TODO is ok, but looks shitty. Also cryptic HashMap
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("task", experiment.getQuestion());
-        attributes.put("pic", experiment.getPictureUrl());
-        attributes.put("exdesc", experiment.getDescription());
+        String pictureUrl = experiment.getPictureUrl();
+        if (pictureUrl == null) pictureUrl = "";
+        attributes.put("pic", pictureUrl);
+        attributes.put("exdesc", experiment.getAnswerDescription());
         attributes.put("expid", experiment.getIdexperiment());
         //WTF! Warum haben die in cc das iframe genannt?
-        attributes.put("iframe", experiment.getPictureLicenseUrl());
-        attributes.put("next", "");
+        String pictureLicenseUrl = experiment.getPictureLicenseUrl();
+        if (pictureLicenseUrl == null) pictureLicenseUrl = "";
+        attributes.put("iframe", pictureLicenseUrl);
+        if (again) {
+            attributes.put("next", "n");
+            attributes.put("sub", "s");
+        } else {
+            attributes.put("next", "");
+            attributes.put("sub", "only");
+        }
         attributes.put("again", "");
-        attributes.put("sub", "");
-
         return new ModelAndView(attributes, "creativeTask.ftl");
     }
 }
