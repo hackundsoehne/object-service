@@ -95,4 +95,18 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontro
 	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Experiment> fetchByMaxAnswersPerAssignment(java.lang.Integer... values) {
 		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.MAX_ANSWERS_PER_ASSIGNMENT, values);
 	}
+
+	/**
+	 * Fetch records that have <code>answer_description IN (values)</code>
+	 */
+	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Experiment> fetchByAnswerDescription(java.lang.String... values) {
+		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.ANSWER_DESCRIPTION, values);
+	}
+
+	/**
+	 * Fetch records that have <code>rating_description IN (values)</code>
+	 */
+	public java.util.List<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.pojos.Experiment> fetchByRatingDescription(java.lang.String... values) {
+		return fetch(edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.Experiment.EXPERIMENT.RATING_DESCRIPTION, values);
+	}
 }

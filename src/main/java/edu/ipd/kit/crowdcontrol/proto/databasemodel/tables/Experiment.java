@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.proto.databasemodel.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord> {
 
-	private static final long serialVersionUID = -982655812;
+	private static final long serialVersionUID = 2110021357;
 
 	/**
 	 * The singleton instance of <code>crowdcontrolproto.Experiment</code>
@@ -65,6 +65,16 @@ public class Experiment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol
 	 * The column <code>crowdcontrolproto.Experiment.max_answers_per_assignment</code>.
 	 */
 	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.Integer> MAX_ANSWERS_PER_ASSIGNMENT = createField("max_answers_per_assignment", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>crowdcontrolproto.Experiment.answer_description</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> ANSWER_DESCRIPTION = createField("answer_description", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
+
+	/**
+	 * The column <code>crowdcontrolproto.Experiment.rating_description</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.proto.databasemodel.tables.records.ExperimentRecord, java.lang.String> RATING_DESCRIPTION = createField("rating_description", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
 
 	/**
 	 * Create a <code>crowdcontrolproto.Experiment</code> table reference

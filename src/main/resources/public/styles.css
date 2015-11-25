@@ -1,0 +1,215 @@
+@import url("reset.css");
+#afgstellung h1{
+	font-family:Helvetica;
+	font-size: 20px;
+	font-face:bold;
+margin: 30px;
+	}
+#errorview{
+	color: red;
+}
+.error{
+	border: 2px solid red;
+}
+.hidden{
+	visibility:hidden;
+}
+.checkboxgroup{
+	height: 80px;
+}
+.checkbox{
+	height: 100%;
+	position: relative;
+}
+.checkbox input{
+	position:absolute;
+	bottom: 0;
+	left: 0;
+}
+#colleft{
+	width:50%;
+	text-align:center;
+	float:left;
+}
+
+#afgstellung{
+	display:inline-block;
+}
+#task{
+	color: #ef1e1e;
+	font-size: 20px;
+	
+	}
+#answertext{
+	height:40px;
+	width: 300px;
+	font-size: 20px;
+	padding: 5px;
+margin-bottom: 10px;
+}
+#answer{
+	width: 600px;
+	height: 50px;
+	font-size:20px;
+	padding:5px;
+	
+	}
+#subagain, #subnext{
+	width: 175px;
+	height: 80px;
+	font-size: 20px;
+	font-family: Helvetica;
+	float:left;
+	}
+#subagain, #subnext{
+	margin-right:25px;
+	}
+#subex{
+	width: 175px;
+	height: 30px;
+	font-size: 20px;
+	font-family: Helvetica;
+}
+#subnext{
+	margin-left:25px;
+	}
+#pic{
+	margin-bottom: 30px;
+	}
+
+#alreadygiven h2{
+	font-family: Helvetica;
+	font-size: 15px;
+	}
+#alreadygiven{
+	margin-bottom:10px;
+	}
+
+#hallo{
+	float:left;
+	width: 50%;
+}
+#ifr{
+	
+	float: right;
+	width: 50%;
+	height: 100%;
+	border: none;
+	opacity: 0.2;
+	transition: opacity 0.5s ease;
+
+}
+#ifr:hover{
+	opacity: 1.0;
+	
+}
+.given{
+	width:100%;
+	display:block;
+	background-color: #cbcbcb;
+	}
+.gi{
+	font-size: 18px;
+	padding:3px;
+	}
+
+	input{
+		margin-left: 15px;
+	}
+.checkboxgroup{
+    display:inline-block;
+    text-align:center;
+}
+.checkboxgroup img, label {
+    display:block;
+}
+.checkbox{
+	float:left;
+}
+.thumb{
+	width: 50px;
+	height: 50px;
+	cursor: pointer;
+}
+.thumbupinput:checked + .thumbup{
+	background: url("thumbupgreen.png");
+}
+.thumbdowninput:checked + .thumbdown{
+	background: url("thumbdownred.png");
+}
+.thumbup{
+	background: url("thumbup.png");
+	background-size:contain;
+}
+.thumbup:hover{
+	background: url("thumbupgreen.png");
+}
+.thumbup:active{
+	background: url("thumbupgreen.png");
+}
+.thumbdown{
+	background: url("thumbdown.png");
+	background-size:contain;
+}
+.thumbdown:hover{
+	background: url("thumbdownred.png");
+}
+.thumbdown:active{
+	background: url("thumbdownred.png");
+}
+
+.rating {
+    float:left;
+}
+
+/* :not(:checked) is a filter, so that browsers that don’t support :checked don’t 
+   follow these rules. Every browser that supports :checked also supports :not(), so
+   it doesn’t make the test unnecessarily selective */
+.rating:not(:checked) > input {
+    position:absolute;
+    top:-9999px;
+    clip:rect(0,0,0,0);
+}
+
+.rating:not(:checked) > label {
+    float:right;
+    width:1em;
+    padding:0 .1em;
+    overflow:hidden;
+    white-space:nowrap;
+    cursor:pointer;
+    font-size:200%;
+    line-height:1.2;
+    color:#ddd;
+    text-shadow:1px 1px #bbb, 2px 2px #666, .1em .1em .2em rgba(0,0,0,.5);
+}
+
+.rating:not(:checked) > label:before {
+    content: '★ ';
+}
+
+.rating > input:checked ~ label {
+    color: #f70;
+    text-shadow:1px 1px #c60, 2px 2px #940, .1em .1em .2em rgba(0,0,0,.5);
+}
+
+.rating:not(:checked) > label:hover,
+.rating:not(:checked) > label:hover ~ label {
+    color: gold;
+    text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);
+}
+
+.rating > input:checked + label:hover,
+.rating > input:checked + label:hover ~ label,
+.rating > input:checked ~ label:hover,
+.rating > input:checked ~ label:hover ~ label,
+.rating > label:hover ~ input:checked ~ label {
+    color: #ea0;
+    text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);
+}
+
+.rating > label:active {
+    position:relative;
+    top:2px;
+    left:2px;
+}

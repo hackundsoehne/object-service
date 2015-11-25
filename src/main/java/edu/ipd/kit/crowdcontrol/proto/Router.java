@@ -1,6 +1,7 @@
 package edu.ipd.kit.crowdcontrol.proto;
 
 import edu.ipd.kit.crowdcontrol.proto.controller.*;
+import edu.ipd.kit.crowdcontrol.proto.web.FreeMarkerEngine;
 import spark.servlet.SparkApplication;
 
 import static spark.Spark.*;
@@ -14,11 +15,15 @@ import static spark.Spark.*;
 public class Router implements SparkApplication {
     private final ExperimentController experimentController;
     private final CrowdComputingController crowdComputingController;
+    private final TaskController taskController;
+    private final FreeMarkerEngine freeMarkerEngine;
     private final StatisticsController statisticsController;
 
-    public Router(ExperimentController experimentController, CrowdComputingController crowdComputingController, StatisticsController statisticsController) {
+    public Router(ExperimentController experimentController, CrowdComputingController crowdComputingController, TaskController taskController, FreeMarkerEngine freeMarkerEngine, StatisticsController statisticsController) {
         this.experimentController = experimentController;
         this.crowdComputingController = crowdComputingController;
+        this.taskController = taskController;
+        this.freeMarkerEngine = freeMarkerEngine;
         this.statisticsController = statisticsController;
     }
 
@@ -41,6 +46,10 @@ public class Router implements SparkApplication {
             System.err.println("Internal server error for: " + request.toString() + " error: " + e.getMessage());
         });
 
+        // Serve static files from src/main/resources/public
+        staticFileLocation("/public");
+
+        //experiemtn/<id>/start
         get("/experiments/delete", experimentController::deleteExperiment);
 
         post("/experiments/create", experimentController::createExperiment);
@@ -55,7 +64,7 @@ public class Router implements SparkApplication {
 
         get("/crowd/stop", crowdComputingController::stopHIT);
 
-        put("/crowd/update", crowdComputingController::updateHIT);
+        get("/crowd/update", crowdComputingController::updateHIT);
 
         get("/statistics/hits", statisticsController::getAllHitsOverview);
 
@@ -70,6 +79,14 @@ public class Router implements SparkApplication {
         get("/statistics/detail/hit", statisticsController::getHit);
 
         get("/statistics/detail/task", statisticsController::getFullTaskJSON);
+
+        get("/tasks/answer/render", taskController::processRenderCreativeRequest, freeMarkerEngine);
+
+        get("/tasks/rating/render", taskController::processRenderRatingRequest, freeMarkerEngine);
+
+        post("/tasks/rating/:expID/:workID", taskController::submitRatingTask, freeMarkerEngine);
+
+        post("/tasks/answer/:expID/:workID", taskController::submitAnswerTask, freeMarkerEngine);
 
         //TODO: shutdown and calling Unirest.shutdown();
     }

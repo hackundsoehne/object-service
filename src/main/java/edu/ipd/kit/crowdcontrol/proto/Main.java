@@ -3,8 +3,10 @@ package edu.ipd.kit.crowdcontrol.proto;
 import edu.ipd.kit.crowdcontrol.proto.controller.CrowdComputingController;
 import edu.ipd.kit.crowdcontrol.proto.controller.ExperimentController;
 import edu.ipd.kit.crowdcontrol.proto.controller.StatisticsController;
+import edu.ipd.kit.crowdcontrol.proto.controller.TaskController;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.CrowdPlatformManager;
 import edu.ipd.kit.crowdcontrol.proto.crowdplatform.MTurkPlatform;
+import edu.ipd.kit.crowdcontrol.proto.web.FreeMarkerEngine;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -54,7 +56,9 @@ public class Main {
         }
         CrowdComputingController crowdComputingController = new CrowdComputingController(databaseManager.getContext(), crowdPlatformManager, url);
         StatisticsController statisticsController = new StatisticsController(databaseManager.getContext());
-        Router router = new Router(experimentController, crowdComputingController, statisticsController);
+        TaskController taskController = new TaskController(databaseManager.getContext(), crowdPlatformManager);
+        FreeMarkerEngine freeMarkerEngine = new FreeMarkerEngine();
+        Router router = new Router(experimentController, crowdComputingController, taskController, freeMarkerEngine, statisticsController);
         router.init();
         return router;
     }
