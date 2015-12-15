@@ -58,7 +58,7 @@ jooq {
                 daos = true
             }
             target {
-                packageName = "edu.ipd.kit.crowdcontrol.objectservice.databasemodel"
+                packageName = "edu.ipd.kit.crowdcontrol.objectservice.database.model"
                 directory = 'src/main/java'
             }
         }
