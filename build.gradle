@@ -43,7 +43,7 @@ jooq {
             driver = 'com.mysql.jdbc.Driver'
             user = 'LeanderK'
             password = ''
-            schema = 'crowdcontrolproto'
+            schema = 'crowdcontrol'
         }
         generator {
             name = 'org.jooq.util.DefaultGenerator'
@@ -52,13 +52,13 @@ jooq {
             }
             database {
                 name = 'org.jooq.util.mysql.MySQLDatabase'
-                inputSchema = 'crowdcontrolproto'
+                inputSchema = 'crowdcontrol'
             }
             generate {
                 daos = true
             }
             target {
-                packageName = "edu.ipd.kit.crowdcontrol.proto.databasemodel"
+                packageName = "edu.ipd.kit.crowdcontrol.objectservice.databasemodel"
                 directory = 'src/main/java'
             }
         }
