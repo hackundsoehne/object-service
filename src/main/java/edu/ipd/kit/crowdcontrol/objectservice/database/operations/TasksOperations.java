@@ -18,7 +18,6 @@ public class TasksOperations extends AbstractOperation {
      * creates a Task
      * @param taskRecord the task to create
      * @return the id of the task
-     *
      */
     public int createTask(TaskRecord taskRecord) {
         return doIfNotRunning(taskRecord.getExperiment(), trans -> DSL.using(trans).executeInsert(taskRecord));
