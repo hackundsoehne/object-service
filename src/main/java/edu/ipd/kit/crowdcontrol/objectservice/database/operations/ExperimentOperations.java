@@ -8,6 +8,7 @@ import org.jooq.impl.DSL;
 import java.util.Optional;
 
 /**
+ * responsible for the CRUD operations on the Experiment
  * @author LeanderK
  * @version 1.0
  */
