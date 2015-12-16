@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Pictures extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PicturesRecord> {
 
-	private static final long serialVersionUID = 169917926;
+	private static final long serialVersionUID = 1551736076;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Pictures</code>

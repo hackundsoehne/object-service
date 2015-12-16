@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AnswersRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.AnswersRecord> implements org.jooq.Record5<java.lang.Integer, java.lang.Integer, java.lang.String, java.sql.Timestamp, java.lang.Integer> {
 
-	private static final long serialVersionUID = -735591504;
+	private static final long serialVersionUID = 283856608;
 
 	/**
 	 * Setter for <code>crowdcontrol.Answers.idAnswers</code>.

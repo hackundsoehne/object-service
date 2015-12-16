@@ -24,11 +24,6 @@ public class Tables {
 	public static final edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment EXPERIMENT = edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT;
 
 	/**
-	 * The table crowdcontrol.HIT
-	 */
-	public static final edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Hit HIT = edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Hit.HIT;
-
-	/**
 	 * The table crowdcontrol.Payment
 	 */
 	public static final edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Payment PAYMENT = edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Payment.PAYMENT;
@@ -52,6 +47,11 @@ public class Tables {
 	 * The table crowdcontrol.Tags
 	 */
 	public static final edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Tags TAGS = edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Tags.TAGS;
+
+	/**
+	 * The table crowdcontrol.Task
+	 */
+	public static final edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Task TASK = edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Task.TASK;
 
 	/**
 	 * The table crowdcontrol.Worker

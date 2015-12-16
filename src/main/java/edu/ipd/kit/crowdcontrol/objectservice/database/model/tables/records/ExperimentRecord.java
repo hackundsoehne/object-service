@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord> implements org.jooq.Record13<java.lang.Integer, java.lang.String, java.lang.Object, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Integer> {
 
-	private static final long serialVersionUID = 429876868;
+	private static final long serialVersionUID = -2082228924;
 
 	/**
 	 * Setter for <code>crowdcontrol.Experiment.idexperiment</code>.

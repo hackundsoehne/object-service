@@ -2,12 +2,10 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.operations;
 
 import edu.ipd.kit.crowdcontrol.objectservice.database.model.Tables;
 import edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
-import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author LeanderK
@@ -61,28 +59,6 @@ public class ExperimentOperations extends AbstractOperation {
                     .where(Tables.EXPERIMENT.IDEXPERIMENT.eq(id))
                     .execute();
             return deleted == 1;
-        });
-    }
-
-    /**
-     * executes the function if the experiment is not running.
-     * @param id the id of the event
-     * @param function the function to execute
-     * @param <R> the return type
-     * @return the result of the function
-     */
-    private <R> R doIfNotRunning(int id, Function<Configuration, R> function) {
-        return create.transactionResult(trans -> {
-            int running = DSL.using(trans)
-                    .fetchCount(
-                            Tables.HIT,
-                            Tables.HIT.EXPERIMENT.eq(id).and(Tables.HIT.RUNNING.isTrue()));
-            if (running == 0) {
-                return function.apply(trans);
-            } else {
-                //TODO other exception?
-                throw new IllegalArgumentException("Experiment is running");
-            }
         });
     }
 }

@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Crowdcontrol extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -160387020;
+	private static final long serialVersionUID = -1962121710;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol</code>
@@ -36,12 +36,12 @@ public class Crowdcontrol extends org.jooq.impl.SchemaImpl {
 		return java.util.Arrays.<org.jooq.Table<?>>asList(
 			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Answers.ANSWERS,
 			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT,
-			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Hit.HIT,
 			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Payment.PAYMENT,
 			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Pictures.PICTURES,
 			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Population.POPULATION,
 			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Ratings.RATINGS,
 			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Tags.TAGS,
+			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Task.TASK,
 			edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Worker.WORKER);
 	}
 }

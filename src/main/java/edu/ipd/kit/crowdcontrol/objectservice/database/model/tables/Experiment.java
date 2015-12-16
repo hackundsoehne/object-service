@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord> {
 
-	private static final long serialVersionUID = 1877062859;
+	private static final long serialVersionUID = 763833287;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Experiment</code>

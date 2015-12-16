@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Answers extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.AnswersRecord> {
 
-	private static final long serialVersionUID = 536597152;
+	private static final long serialVersionUID = -1164210478;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Answers</code>
@@ -94,7 +94,7 @@ public class Answers extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.ob
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.AnswersRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.AnswersRecord, ?>>asList(edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.IDHITANSWERS, edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.WORKERANSWERED);
+		return java.util.Arrays.<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.AnswersRecord, ?>>asList(edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.WORKERANSWERED);
 	}
 
 	/**

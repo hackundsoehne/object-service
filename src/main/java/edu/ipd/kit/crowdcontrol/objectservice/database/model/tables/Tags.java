@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tags extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.TagsRecord> {
 
-	private static final long serialVersionUID = 433085064;
+	private static final long serialVersionUID = 825786992;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Tags</code>

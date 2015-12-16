@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Worker extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord> {
 
-	private static final long serialVersionUID = -540469384;
+	private static final long serialVersionUID = -741949118;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Worker</code>

@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PicturesRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PicturesRecord> implements org.jooq.Record4<java.lang.Integer, java.lang.Integer, java.lang.String, java.lang.String> {
 
-	private static final long serialVersionUID = -1202564608;
+	private static final long serialVersionUID = 1411564570;
 
 	/**
 	 * Setter for <code>crowdcontrol.Pictures.idPictures</code>.

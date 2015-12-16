@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Payment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord> {
 
-	private static final long serialVersionUID = -2060769195;
+	private static final long serialVersionUID = -989295631;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Payment</code>

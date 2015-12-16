@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Worker implements java.io.Serializable {
 
-	private static final long serialVersionUID = -2129935610;
+	private static final long serialVersionUID = -1032201546;
 
 	private java.lang.Integer idworker;
 	private java.lang.Object  platformData;

@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tags implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1260213579;
+	private static final long serialVersionUID = -917175045;
 
 	private java.lang.Integer idtags;
 	private java.lang.String  tag;

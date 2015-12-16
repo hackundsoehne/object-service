@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Pictures implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1441181327;
+	private static final long serialVersionUID = 578496801;
 
 	private java.lang.Integer idpictures;
 	private java.lang.Integer experiment;
