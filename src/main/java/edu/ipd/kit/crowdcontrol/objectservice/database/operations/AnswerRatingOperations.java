@@ -24,7 +24,11 @@ public class AnswerRatingOperations extends AbstractOperation {
      * @return the id of the answer
      */
     public int insertAnswer(AnswersRecord answersRecord) {
-        return create.executeInsert(answersRecord);
+        return create.insertInto(Tables.ANSWERS)
+                .set(answersRecord)
+                .returning()
+                .fetchOne()
+                .getIdanswers();
     }
 
     /**
@@ -33,7 +37,11 @@ public class AnswerRatingOperations extends AbstractOperation {
      * @return the id of rating
      */
     public int insertRating(RatingsRecord ratingsRecord) {
-        return create.executeInsert(ratingsRecord);
+        return create.insertInto(Tables.RATINGS)
+                .set(ratingsRecord)
+                .returning()
+                .fetchOne()
+                .getIdratings();
     }
 
     /**
@@ -46,15 +54,15 @@ public class AnswerRatingOperations extends AbstractOperation {
                 .selectFrom(Tables.ANSWERS)
                 .where(Tables.ANSWERS.IDANSWERS.eq(answerID))
                 .fetchOptional()
-                .flatMap(answer -> createEmptyRating(answer, trans)));
+                .map(answer -> createEmptyRating(answer, trans)));
     }
 
-    private Optional<Integer> createEmptyRating (AnswersRecord answer, Configuration trans) {
+    private int createEmptyRating (AnswersRecord answer, Configuration trans) {
         return DSL.using(trans)
                 .insertInto(Tables.RATINGS)
                 .set(new RatingsRecord(null, answer.getHitA(), answer.getIdanswers(), null, null, null))
                 .returning()
-                .fetchOptional()
-                .map(RatingsRecord::getIdratings);
+                .fetchOne()
+                .getIdratings();
     }
 }
