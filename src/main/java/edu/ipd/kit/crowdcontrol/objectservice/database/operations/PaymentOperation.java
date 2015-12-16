@@ -17,8 +17,8 @@ public class PaymentOperation extends AbstractOperation {
     }
 
 
-    public int preparePayment(int workerID, int experimentId, LocalDateTime limit) {
-        //TODO: check for limit
+    public int preparePayment(int workerID, int experimentId, LocalDateTime lastPayment) {
+        //TODO: check for for no other payments after last
         return create.insertInto(Tables.PAYMENT)
                 .set(new PaymentRecord(null, workerID, experimentId, null))
                 .returning()
