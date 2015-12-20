@@ -64,14 +64,14 @@ public class TaskDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontrol.obje
 	/**
 	 * Fetch records that have <code>platform_data IN (values)</code>
 	 */
-	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByPlatformData(java.lang.Object... values) {
+	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByPlatformData(java.lang.String... values) {
 		return fetch(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Task.TASK.PLATFORM_DATA, values);
 	}
 
 	/**
 	 * Fetch records that have <code>crowd_platform IN (values)</code>
 	 */
-	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByCrowdPlatform(java.lang.String... values) {
+	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByCrowdPlatform(java.lang.Integer... values) {
 		return fetch(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Task.TASK.CROWD_PLATFORM, values);
 	}
 }

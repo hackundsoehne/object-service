@@ -48,13 +48,6 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontro
 	}
 
 	/**
-	 * Fetch records that have <code>question IN (values)</code>
-	 */
-	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByQuestion(java.lang.String... values) {
-		return fetch(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.QUESTION, values);
-	}
-
-	/**
 	 * Fetch records that have <code>rating_options IN (values)</code>
 	 */
 	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByRatingOptions(java.lang.Object... values) {
@@ -129,5 +122,12 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontro
 	 */
 	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByBonusRating(java.lang.Integer... values) {
 		return fetch(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.BONUS_RATING, values);
+	}
+
+	/**
+	 * Fetch records that have <code>template_data IN (values)</code>
+	 */
+	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByTemplateData(java.lang.String... values) {
+		return fetch(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.TEMPLATE_DATA, values);
 	}
 }

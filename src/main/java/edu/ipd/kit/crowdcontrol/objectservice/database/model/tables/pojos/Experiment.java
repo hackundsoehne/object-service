@@ -11,10 +11,9 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment implements java.io.Serializable {
 
-	private static final long serialVersionUID = 897428309;
+	private static final long serialVersionUID = 1969309945;
 
 	private java.lang.Integer idexperiment;
-	private java.lang.String  question;
 	private java.lang.Object  ratingOptions;
 	private java.lang.String  titel;
 	private java.lang.String  answerDescription;
@@ -26,12 +25,12 @@ public class Experiment implements java.io.Serializable {
 	private java.lang.Integer basePayment;
 	private java.lang.Integer bonusAnswer;
 	private java.lang.Integer bonusRating;
+	private java.lang.String  templateData;
 
 	public Experiment() {}
 
 	public Experiment(
 		java.lang.Integer idexperiment,
-		java.lang.String  question,
 		java.lang.Object  ratingOptions,
 		java.lang.String  titel,
 		java.lang.String  answerDescription,
@@ -42,10 +41,10 @@ public class Experiment implements java.io.Serializable {
 		java.lang.String  algorithmQualityRating,
 		java.lang.Integer basePayment,
 		java.lang.Integer bonusAnswer,
-		java.lang.Integer bonusRating
+		java.lang.Integer bonusRating,
+		java.lang.String  templateData
 	) {
 		this.idexperiment = idexperiment;
-		this.question = question;
 		this.ratingOptions = ratingOptions;
 		this.titel = titel;
 		this.answerDescription = answerDescription;
@@ -57,6 +56,7 @@ public class Experiment implements java.io.Serializable {
 		this.basePayment = basePayment;
 		this.bonusAnswer = bonusAnswer;
 		this.bonusRating = bonusRating;
+		this.templateData = templateData;
 	}
 
 	public java.lang.Integer getIdexperiment() {
@@ -65,14 +65,6 @@ public class Experiment implements java.io.Serializable {
 
 	public void setIdexperiment(java.lang.Integer idexperiment) {
 		this.idexperiment = idexperiment;
-	}
-
-	public java.lang.String getQuestion() {
-		return this.question;
-	}
-
-	public void setQuestion(java.lang.String question) {
-		this.question = question;
 	}
 
 	public java.lang.Object getRatingOptions() {
@@ -161,5 +153,13 @@ public class Experiment implements java.io.Serializable {
 
 	public void setBonusRating(java.lang.Integer bonusRating) {
 		this.bonusRating = bonusRating;
+	}
+
+	public java.lang.String getTemplateData() {
+		return this.templateData;
+	}
+
+	public void setTemplateData(java.lang.String templateData) {
+		this.templateData = templateData;
 	}
 }
