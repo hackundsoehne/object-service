@@ -24,8 +24,15 @@ public class DatabaseManager {
         initDatabase();
     }
 
+    /**
+     * initializes the database if not already initialized.
+     */
     private void initDatabase() {
         String sql = "-- MySQL Workbench Forward Engineering\n" +
+                "\n" +
+                "SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;\n" +
+                "SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;\n" +
+                "SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';\n" +
                 "\n" +
                 "-- -----------------------------------------------------\n" +
                 "-- Schema mydb\n" +
