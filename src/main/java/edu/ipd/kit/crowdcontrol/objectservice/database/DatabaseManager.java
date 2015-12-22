@@ -288,8 +288,8 @@ public class DatabaseManager {
                 "  CONSTRAINT `populationAnswer`\n" +
                 "    FOREIGN KEY (`population`)\n" +
                 "    REFERENCES `crowdcontrol`.`Population` (`idPopulation`)\n" +
-                "    ON DELETE NO ACTION\n" +
-                "    ON UPDATE NO ACTION)\n" +
+                "    ON DELETE CASCADE\n" +
+                "    ON UPDATE CASCADE)\n" +
                 "ENGINE = InnoDB;\n" +
                 "\n" +
                 "\n" +
@@ -313,13 +313,13 @@ public class DatabaseManager {
                 "  CONSTRAINT `referencedPopulation`\n" +
                 "    FOREIGN KEY (`referenced_population`)\n" +
                 "    REFERENCES `crowdcontrol`.`Population` (`idPopulation`)\n" +
-                "    ON DELETE NO ACTION\n" +
-                "    ON UPDATE NO ACTION,\n" +
+                "    ON DELETE CASCADE\n" +
+                "    ON UPDATE CASCADE,\n" +
                 "  CONSTRAINT `referencedPlatform`\n" +
                 "    FOREIGN KEY (`referenced_platform`)\n" +
                 "    REFERENCES `crowdcontrol`.`Platforms` (`idPlatforms`)\n" +
-                "    ON DELETE NO ACTION\n" +
-                "    ON UPDATE NO ACTION)\n" +
+                "    ON DELETE CASCADE\n" +
+                "    ON UPDATE CASCADE)\n" +
                 "ENGINE = InnoDB;\n" +
                 "\n" +
                 "\n" +
@@ -336,13 +336,13 @@ public class DatabaseManager {
                 "  CONSTRAINT `referencedWorker`\n" +
                 "    FOREIGN KEY (`worker`)\n" +
                 "    REFERENCES `crowdcontrol`.`Worker` (`idWorker`)\n" +
-                "    ON DELETE NO ACTION\n" +
-                "    ON UPDATE NO ACTION,\n" +
+                "    ON DELETE CASCADE\n" +
+                "    ON UPDATE CASCADE,\n" +
                 "  CONSTRAINT `referencedAnswer`\n" +
                 "    FOREIGN KEY (`answer`)\n" +
                 "    REFERENCES `crowdcontrol`.`PopulationAnswersOptions` (`idPopulationAnswers`)\n" +
-                "    ON DELETE NO ACTION\n" +
-                "    ON UPDATE NO ACTION)\n" +
+                "    ON DELETE CASCADE\n" +
+                "    ON UPDATE CASCADE)\n" +
                 "ENGINE = InnoDB;\n" +
                 "\n" +
                 "\n" +
@@ -351,17 +351,17 @@ public class DatabaseManager {
                 "-- -----------------------------------------------------\n" +
                 "CREATE TABLE IF NOT EXISTS `crowdcontrol`.`TemplateVariables` (\n" +
                 "  `idTemplateVariables` INT NOT NULL,\n" +
-                "  `template` INT NULL,\n" +
-                "  `name` VARCHAR(255) NULL,\n" +
-                "  `description` VARCHAR(255) NULL,\n" +
-                "  `type` VARCHAR(255) NULL,\n" +
+                "  `template` INT NOT NULL,\n" +
+                "  `name` VARCHAR(255) NOT NULL,\n" +
+                "  `description` VARCHAR(255) NOT NULL,\n" +
+                "  `type` VARCHAR(255) NOT NULL,\n" +
                 "  PRIMARY KEY (`idTemplateVariables`),\n" +
                 "  INDEX `referencedTemplate_idx` (`template` ASC),\n" +
                 "  CONSTRAINT `referencedTemplate`\n" +
                 "    FOREIGN KEY (`template`)\n" +
                 "    REFERENCES `crowdcontrol`.`Templates` (`idTemplates`)\n" +
-                "    ON DELETE NO ACTION\n" +
-                "    ON UPDATE NO ACTION)\n" +
+                "    ON DELETE CASCADE\n" +
+                "    ON UPDATE CASCADE)\n" +
                 "ENGINE = InnoDB;\n" +
                 "\n" +
                 "\n" +
