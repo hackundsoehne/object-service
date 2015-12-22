@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Payment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord> {
 
-	private static final long serialVersionUID = -989295631;
+	private static final long serialVersionUID = 74651421;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Payment</code>
@@ -45,6 +45,11 @@ public class Payment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.ob
 	 * The column <code>crowdcontrol.Payment.timestamp</code>.
 	 */
 	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord, java.sql.Timestamp> TIMESTAMP = createField("timestamp", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaulted(true), this, "");
+
+	/**
+	 * The column <code>crowdcontrol.Payment.amount</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord, java.lang.Integer> AMOUNT = createField("amount", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * Create a <code>crowdcontrol.Payment</code> table reference
