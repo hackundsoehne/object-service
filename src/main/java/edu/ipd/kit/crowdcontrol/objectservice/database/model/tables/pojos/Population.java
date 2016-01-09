@@ -11,25 +11,28 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Population implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1530481745;
+	private static final long serialVersionUID = 1677068831;
 
 	private java.lang.Integer idpopulation;
 	private java.lang.String  property;
-	private java.lang.String  answers;
 	private java.lang.String  description;
+	private java.lang.String  name;
+	private java.lang.Integer experiment;
 
 	public Population() {}
 
 	public Population(
 		java.lang.Integer idpopulation,
 		java.lang.String  property,
-		java.lang.String  answers,
-		java.lang.String  description
+		java.lang.String  description,
+		java.lang.String  name,
+		java.lang.Integer experiment
 	) {
 		this.idpopulation = idpopulation;
 		this.property = property;
-		this.answers = answers;
 		this.description = description;
+		this.name = name;
+		this.experiment = experiment;
 	}
 
 	public java.lang.Integer getIdpopulation() {
@@ -48,19 +51,27 @@ public class Population implements java.io.Serializable {
 		this.property = property;
 	}
 
-	public java.lang.String getAnswers() {
-		return this.answers;
-	}
-
-	public void setAnswers(java.lang.String answers) {
-		this.answers = answers;
-	}
-
 	public java.lang.String getDescription() {
 		return this.description;
 	}
 
 	public void setDescription(java.lang.String description) {
 		this.description = description;
+	}
+
+	public java.lang.String getName() {
+		return this.name;
+	}
+
+	public void setName(java.lang.String name) {
+		this.name = name;
+	}
+
+	public java.lang.Integer getExperiment() {
+		return this.experiment;
+	}
+
+	public void setExperiment(java.lang.Integer experiment) {
+		this.experiment = experiment;
 	}
 }

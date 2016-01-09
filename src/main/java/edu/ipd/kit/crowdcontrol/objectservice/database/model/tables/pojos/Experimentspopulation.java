@@ -11,32 +11,35 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experimentspopulation implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1266076887;
+	private static final long serialVersionUID = -519867547;
 
-	private java.lang.Integer idexperimentspopulation;
+	private java.lang.String  idexperimentspopulation;
 	private java.lang.Integer populationUser;
-	private java.lang.Integer referencedPopulation;
-	private java.lang.Integer referencedPlatform;
+	private java.lang.Integer correctAnswer;
+	private java.lang.String  referencedPlatform;
+	private java.lang.Boolean not;
 
 	public Experimentspopulation() {}
 
 	public Experimentspopulation(
-		java.lang.Integer idexperimentspopulation,
+		java.lang.String  idexperimentspopulation,
 		java.lang.Integer populationUser,
-		java.lang.Integer referencedPopulation,
-		java.lang.Integer referencedPlatform
+		java.lang.Integer correctAnswer,
+		java.lang.String  referencedPlatform,
+		java.lang.Boolean not
 	) {
 		this.idexperimentspopulation = idexperimentspopulation;
 		this.populationUser = populationUser;
-		this.referencedPopulation = referencedPopulation;
+		this.correctAnswer = correctAnswer;
 		this.referencedPlatform = referencedPlatform;
+		this.not = not;
 	}
 
-	public java.lang.Integer getIdexperimentspopulation() {
+	public java.lang.String getIdexperimentspopulation() {
 		return this.idexperimentspopulation;
 	}
 
-	public void setIdexperimentspopulation(java.lang.Integer idexperimentspopulation) {
+	public void setIdexperimentspopulation(java.lang.String idexperimentspopulation) {
 		this.idexperimentspopulation = idexperimentspopulation;
 	}
 
@@ -48,19 +51,27 @@ public class Experimentspopulation implements java.io.Serializable {
 		this.populationUser = populationUser;
 	}
 
-	public java.lang.Integer getReferencedPopulation() {
-		return this.referencedPopulation;
+	public java.lang.Integer getCorrectAnswer() {
+		return this.correctAnswer;
 	}
 
-	public void setReferencedPopulation(java.lang.Integer referencedPopulation) {
-		this.referencedPopulation = referencedPopulation;
+	public void setCorrectAnswer(java.lang.Integer correctAnswer) {
+		this.correctAnswer = correctAnswer;
 	}
 
-	public java.lang.Integer getReferencedPlatform() {
+	public java.lang.String getReferencedPlatform() {
 		return this.referencedPlatform;
 	}
 
-	public void setReferencedPlatform(java.lang.Integer referencedPlatform) {
+	public void setReferencedPlatform(java.lang.String referencedPlatform) {
 		this.referencedPlatform = referencedPlatform;
+	}
+
+	public java.lang.Boolean getNot() {
+		return this.not;
+	}
+
+	public void setNot(java.lang.Boolean not) {
+		this.not = not;
 	}
 }
