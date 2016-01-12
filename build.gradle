@@ -64,3 +64,4 @@ jooq {
         }
     }
 }
+generateSampleJooqSchemaSource.enabled = false
