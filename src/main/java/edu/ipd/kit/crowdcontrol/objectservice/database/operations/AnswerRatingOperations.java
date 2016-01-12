@@ -2,14 +2,17 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.operations;
 
 import edu.ipd.kit.crowdcontrol.objectservice.database.model.Tables;
 import edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.AnswersRecord;
+import edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.RatingsRecord;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
+ * responsible for all queries related to the Answer and Rating Table
  * @author LeanderK
  * @version 1.0
  */
