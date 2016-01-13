@@ -1,4 +1,4 @@
-# Control UI
+# Object-Service
 
 [![Build Status](https://travis-ci.org/coolcrowd/object-service.svg?branch=master)](https://travis-ci.org/coolcrowd/object-service)
 
