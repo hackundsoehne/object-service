@@ -5,6 +5,7 @@ import edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.Work
 import org.jooq.DSLContext;
 
 /**
+ * responsible for the operations involving the worker-table.
  * @author LeanderK
  * @version 1.0
  */
