@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Payment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord> {
 
-	private static final long serialVersionUID = -2060769195;
+	private static final long serialVersionUID = 1729391216;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Payment</code>
@@ -45,6 +45,16 @@ public class Payment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.ob
 	 * The column <code>crowdcontrol.Payment.timestamp</code>.
 	 */
 	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord, java.sql.Timestamp> TIMESTAMP = createField("timestamp", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaulted(true), this, "");
+
+	/**
+	 * The column <code>crowdcontrol.Payment.amount</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord, java.lang.Integer> AMOUNT = createField("amount", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+	/**
+	 * The column <code>crowdcontrol.Payment.giftcode</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord, java.lang.Integer> GIFTCODE = createField("giftcode", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>crowdcontrol.Payment</code> table reference
@@ -89,7 +99,7 @@ public class Payment extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.ob
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord, ?>>asList(edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.PAYEDWORKER, edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.PAYEDEXPERIMENT);
+		return java.util.Arrays.<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord, ?>>asList(edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.PAYEDWORKER, edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.PAYEDEXPERIMENT, edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.USEDGIFTCODE);
 	}
 
 	/**

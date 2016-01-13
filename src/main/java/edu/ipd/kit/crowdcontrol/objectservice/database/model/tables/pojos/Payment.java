@@ -11,12 +11,14 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Payment implements java.io.Serializable {
 
-	private static final long serialVersionUID = -529334338;
+	private static final long serialVersionUID = 972188106;
 
 	private java.lang.Integer  idpayment;
 	private java.lang.Integer  workerId;
 	private java.lang.Integer  experimentId;
 	private java.sql.Timestamp timestamp;
+	private java.lang.Integer  amount;
+	private java.lang.Integer  giftcode;
 
 	public Payment() {}
 
@@ -24,12 +26,16 @@ public class Payment implements java.io.Serializable {
 		java.lang.Integer  idpayment,
 		java.lang.Integer  workerId,
 		java.lang.Integer  experimentId,
-		java.sql.Timestamp timestamp
+		java.sql.Timestamp timestamp,
+		java.lang.Integer  amount,
+		java.lang.Integer  giftcode
 	) {
 		this.idpayment = idpayment;
 		this.workerId = workerId;
 		this.experimentId = experimentId;
 		this.timestamp = timestamp;
+		this.amount = amount;
+		this.giftcode = giftcode;
 	}
 
 	public java.lang.Integer getIdpayment() {
@@ -62,5 +68,21 @@ public class Payment implements java.io.Serializable {
 
 	public void setTimestamp(java.sql.Timestamp timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public java.lang.Integer getAmount() {
+		return this.amount;
+	}
+
+	public void setAmount(java.lang.Integer amount) {
+		this.amount = amount;
+	}
+
+	public java.lang.Integer getGiftcode() {
+		return this.giftcode;
+	}
+
+	public void setGiftcode(java.lang.Integer giftcode) {
+		this.giftcode = giftcode;
 	}
 }

@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Worker extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord> {
 
-	private static final long serialVersionUID = -540469384;
+	private static final long serialVersionUID = 2044323083;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Worker</code>
@@ -32,9 +32,19 @@ public class Worker extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.obj
 	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord, java.lang.Integer> IDWORKER = createField("idWorker", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>crowdcontrol.Worker.platform_data</code>.
+	 * The column <code>crowdcontrol.Worker.identification</code>.
 	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord, java.lang.Object> PLATFORM_DATA = createField("platform_data", org.jooq.impl.DefaultDataType.getDefaultDataType("json"), this, "");
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord, java.lang.String> IDENTIFICATION = createField("identification", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>crowdcontrol.Worker.platform</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord, java.lang.String> PLATFORM = createField("platform", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "");
+
+	/**
+	 * The column <code>crowdcontrol.Worker.email</code>.
+	 */
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord, java.lang.String> EMAIL = createField("email", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
 	 * Create a <code>crowdcontrol.Worker</code> table reference
@@ -72,6 +82,14 @@ public class Worker extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.obj
 	@Override
 	public java.util.List<org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord>> getKeys() {
 		return java.util.Arrays.<org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord>>asList(edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.KEY_WORKER_PRIMARY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public java.util.List<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord, ?>> getReferences() {
+		return java.util.Arrays.<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord, ?>>asList(edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.WORKERORIGIN);
 	}
 
 	/**

@@ -11,14 +11,12 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1807141797;
+	private static final long serialVersionUID = 2019263725;
 
 	private java.lang.Integer idexperiment;
-	private java.lang.String  question;
 	private java.lang.Object  ratingOptions;
 	private java.lang.String  titel;
 	private java.lang.String  answerDescription;
-	private java.lang.String  ratingDescription;
 	private java.lang.Integer ratingsPerAnswer;
 	private java.lang.String  algorithmTaskChooser;
 	private java.lang.String  algorithmQualityAnswer;
@@ -26,30 +24,32 @@ public class Experiment implements java.io.Serializable {
 	private java.lang.Integer basePayment;
 	private java.lang.Integer bonusAnswer;
 	private java.lang.Integer bonusRating;
+	private java.lang.String  templateData;
+	private java.lang.Integer template;
+	private java.lang.String  answertype;
 
 	public Experiment() {}
 
 	public Experiment(
 		java.lang.Integer idexperiment,
-		java.lang.String  question,
 		java.lang.Object  ratingOptions,
 		java.lang.String  titel,
 		java.lang.String  answerDescription,
-		java.lang.String  ratingDescription,
 		java.lang.Integer ratingsPerAnswer,
 		java.lang.String  algorithmTaskChooser,
 		java.lang.String  algorithmQualityAnswer,
 		java.lang.String  algorithmQualityRating,
 		java.lang.Integer basePayment,
 		java.lang.Integer bonusAnswer,
-		java.lang.Integer bonusRating
+		java.lang.Integer bonusRating,
+		java.lang.String  templateData,
+		java.lang.Integer template,
+		java.lang.String  answertype
 	) {
 		this.idexperiment = idexperiment;
-		this.question = question;
 		this.ratingOptions = ratingOptions;
 		this.titel = titel;
 		this.answerDescription = answerDescription;
-		this.ratingDescription = ratingDescription;
 		this.ratingsPerAnswer = ratingsPerAnswer;
 		this.algorithmTaskChooser = algorithmTaskChooser;
 		this.algorithmQualityAnswer = algorithmQualityAnswer;
@@ -57,6 +57,9 @@ public class Experiment implements java.io.Serializable {
 		this.basePayment = basePayment;
 		this.bonusAnswer = bonusAnswer;
 		this.bonusRating = bonusRating;
+		this.templateData = templateData;
+		this.template = template;
+		this.answertype = answertype;
 	}
 
 	public java.lang.Integer getIdexperiment() {
@@ -65,14 +68,6 @@ public class Experiment implements java.io.Serializable {
 
 	public void setIdexperiment(java.lang.Integer idexperiment) {
 		this.idexperiment = idexperiment;
-	}
-
-	public java.lang.String getQuestion() {
-		return this.question;
-	}
-
-	public void setQuestion(java.lang.String question) {
-		this.question = question;
 	}
 
 	public java.lang.Object getRatingOptions() {
@@ -97,14 +92,6 @@ public class Experiment implements java.io.Serializable {
 
 	public void setAnswerDescription(java.lang.String answerDescription) {
 		this.answerDescription = answerDescription;
-	}
-
-	public java.lang.String getRatingDescription() {
-		return this.ratingDescription;
-	}
-
-	public void setRatingDescription(java.lang.String ratingDescription) {
-		this.ratingDescription = ratingDescription;
 	}
 
 	public java.lang.Integer getRatingsPerAnswer() {
@@ -161,5 +148,29 @@ public class Experiment implements java.io.Serializable {
 
 	public void setBonusRating(java.lang.Integer bonusRating) {
 		this.bonusRating = bonusRating;
+	}
+
+	public java.lang.String getTemplateData() {
+		return this.templateData;
+	}
+
+	public void setTemplateData(java.lang.String templateData) {
+		this.templateData = templateData;
+	}
+
+	public java.lang.Integer getTemplate() {
+		return this.template;
+	}
+
+	public void setTemplate(java.lang.Integer template) {
+		this.template = template;
+	}
+
+	public java.lang.String getAnswertype() {
+		return this.answertype;
+	}
+
+	public void setAnswertype(java.lang.String answertype) {
+		this.answertype = answertype;
 	}
 }

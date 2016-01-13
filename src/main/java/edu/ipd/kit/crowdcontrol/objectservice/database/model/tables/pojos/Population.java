@@ -11,25 +11,28 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Population implements java.io.Serializable {
 
-	private static final long serialVersionUID = -664705145;
+	private static final long serialVersionUID = 1677068831;
 
 	private java.lang.Integer idpopulation;
+	private java.lang.String  property;
+	private java.lang.String  description;
+	private java.lang.String  name;
 	private java.lang.Integer experiment;
-	private java.lang.String  volume;
-	private java.lang.Object  platformData;
 
 	public Population() {}
 
 	public Population(
 		java.lang.Integer idpopulation,
-		java.lang.Integer experiment,
-		java.lang.String  volume,
-		java.lang.Object  platformData
+		java.lang.String  property,
+		java.lang.String  description,
+		java.lang.String  name,
+		java.lang.Integer experiment
 	) {
 		this.idpopulation = idpopulation;
+		this.property = property;
+		this.description = description;
+		this.name = name;
 		this.experiment = experiment;
-		this.volume = volume;
-		this.platformData = platformData;
 	}
 
 	public java.lang.Integer getIdpopulation() {
@@ -40,27 +43,35 @@ public class Population implements java.io.Serializable {
 		this.idpopulation = idpopulation;
 	}
 
+	public java.lang.String getProperty() {
+		return this.property;
+	}
+
+	public void setProperty(java.lang.String property) {
+		this.property = property;
+	}
+
+	public java.lang.String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(java.lang.String description) {
+		this.description = description;
+	}
+
+	public java.lang.String getName() {
+		return this.name;
+	}
+
+	public void setName(java.lang.String name) {
+		this.name = name;
+	}
+
 	public java.lang.Integer getExperiment() {
 		return this.experiment;
 	}
 
 	public void setExperiment(java.lang.Integer experiment) {
 		this.experiment = experiment;
-	}
-
-	public java.lang.String getVolume() {
-		return this.volume;
-	}
-
-	public void setVolume(java.lang.String volume) {
-		this.volume = volume;
-	}
-
-	public java.lang.Object getPlatformData() {
-		return this.platformData;
-	}
-
-	public void setPlatformData(java.lang.Object platformData) {
-		this.platformData = platformData;
 	}
 }
