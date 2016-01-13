@@ -132,9 +132,9 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontro
 	}
 
 	/**
-	 * Fetch records that have <code>answerType IN (values)</code>
+	 * Fetch records that have <code>answer_type IN (values)</code>
 	 */
-	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByAnswertype(java.lang.String... values) {
-		return fetch(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.ANSWERTYPE, values);
+	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByAnswerType(java.lang.String... values) {
+		return fetch(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.ANSWER_TYPE, values);
 	}
 }

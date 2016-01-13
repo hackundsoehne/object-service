@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentspopulationRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.ExperimentspopulationRecord> implements org.jooq.Record5<java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, java.lang.Boolean> {
 
-	private static final long serialVersionUID = 1036768633;
+	private static final long serialVersionUID = 82405794;
 
 	/**
 	 * Setter for <code>crowdcontrol.ExperimentsPopulation.idExperimentsPopulation</code>.
@@ -42,16 +42,16 @@ public class ExperimentspopulationRecord extends org.jooq.impl.UpdatableRecordIm
 	}
 
 	/**
-	 * Setter for <code>crowdcontrol.ExperimentsPopulation.correct_answer</code>.
+	 * Setter for <code>crowdcontrol.ExperimentsPopulation.answer</code>.
 	 */
-	public void setCorrectAnswer(java.lang.Integer value) {
+	public void setAnswer(java.lang.Integer value) {
 		setValue(2, value);
 	}
 
 	/**
-	 * Getter for <code>crowdcontrol.ExperimentsPopulation.correct_answer</code>.
+	 * Getter for <code>crowdcontrol.ExperimentsPopulation.answer</code>.
 	 */
-	public java.lang.Integer getCorrectAnswer() {
+	public java.lang.Integer getAnswer() {
 		return (java.lang.Integer) getValue(2);
 	}
 
@@ -136,7 +136,7 @@ public class ExperimentspopulationRecord extends org.jooq.impl.UpdatableRecordIm
 	 */
 	@Override
 	public org.jooq.Field<java.lang.Integer> field3() {
-		return edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experimentspopulation.EXPERIMENTSPOPULATION.CORRECT_ANSWER;
+		return edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experimentspopulation.EXPERIMENTSPOPULATION.ANSWER;
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class ExperimentspopulationRecord extends org.jooq.impl.UpdatableRecordIm
 	 */
 	@Override
 	public java.lang.Integer value3() {
-		return getCorrectAnswer();
+		return getAnswer();
 	}
 
 	/**
@@ -218,7 +218,7 @@ public class ExperimentspopulationRecord extends org.jooq.impl.UpdatableRecordIm
 	 */
 	@Override
 	public ExperimentspopulationRecord value3(java.lang.Integer value) {
-		setCorrectAnswer(value);
+		setAnswer(value);
 		return this;
 	}
 
@@ -262,12 +262,12 @@ public class ExperimentspopulationRecord extends org.jooq.impl.UpdatableRecordIm
 	/**
 	 * Create a detached, initialised ExperimentspopulationRecord
 	 */
-	public ExperimentspopulationRecord(java.lang.String idexperimentspopulation, java.lang.Integer populationUser, java.lang.Integer correctAnswer, java.lang.String referencedPlatform, java.lang.Boolean not) {
+	public ExperimentspopulationRecord(java.lang.String idexperimentspopulation, java.lang.Integer populationUser, java.lang.Integer answer, java.lang.String referencedPlatform, java.lang.Boolean not) {
 		super(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experimentspopulation.EXPERIMENTSPOPULATION);
 
 		setValue(0, idexperimentspopulation);
 		setValue(1, populationUser);
-		setValue(2, correctAnswer);
+		setValue(2, answer);
 		setValue(3, referencedPlatform);
 		setValue(4, not);
 	}

@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Notification extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord> {
 
-	private static final long serialVersionUID = -2001676806;
+	private static final long serialVersionUID = -1266347827;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Notification</code>
@@ -54,7 +54,7 @@ public class Notification extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontr
 	/**
 	 * The column <code>crowdcontrol.Notification.query</code>.
 	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord, java.lang.String> QUERY = createField("query", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "");
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord, java.lang.String> QUERY = createField("query", org.jooq.impl.SQLDataType.CLOB.length(16777215).nullable(false), this, "");
 
 	/**
 	 * The column <code>crowdcontrol.Notification.lastSent</code>.

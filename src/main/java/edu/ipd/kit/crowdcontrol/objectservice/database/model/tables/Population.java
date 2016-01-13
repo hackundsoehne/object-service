@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Population extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord> {
 
-	private static final long serialVersionUID = -1914882670;
+	private static final long serialVersionUID = 1755871871;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Population</code>
@@ -87,6 +87,14 @@ public class Population extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol
 	@Override
 	public java.util.List<org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord>> getKeys() {
 		return java.util.Arrays.<org.jooq.UniqueKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord>>asList(edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.KEY_POPULATION_PRIMARY, edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.KEY_POPULATION_EXPERIMENT_UNIQUE);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public java.util.List<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord, ?>> getReferences() {
+		return java.util.Arrays.<org.jooq.ForeignKey<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord, ?>>asList(edu.ipd.kit.crowdcontrol.objectservice.database.model.Keys.PARTICIPATEDIN);
 	}
 
 	/**
