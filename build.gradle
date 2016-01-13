@@ -18,9 +18,12 @@ dependencies {
     compile 'org.jooq:jool:0.9.7'
     compile 'com.sparkjava:spark-core:2.3'
     compile 'com.google.code.gson:gson:2.4'
-    compile 'net.ettinsmoor:java-aws-mturk:1.6.2'
+    //compile ("net.ettinsmoor:java-aws-mturk:1.6.2"){
+    //    exclude group: 'org.apache.commons', module: 'not-yet-commons-ssl'
+    //}
+    //compile 'ca.juliusdavies:not-yet-commons-ssl:0.3.11'
     compile 'com.mashape.unirest:unirest-java:1.4.7'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'junit:junit:4.12'
 }
 
 buildscript {
@@ -64,5 +67,4 @@ jooq {
         }
     }
 }
-
 generateSampleJooqSchemaSource.enabled = false
