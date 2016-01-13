@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Template extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord> {
 
-	private static final long serialVersionUID = -1753516287;
+	private static final long serialVersionUID = -588825125;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Template</code>
@@ -40,11 +40,6 @@ public class Template extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.o
 	 * The column <code>crowdcontrol.Template.titel</code>.
 	 */
 	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord, java.lang.String> TITEL = createField("titel", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
-
-	/**
-	 * The column <code>crowdcontrol.Template.answer_type</code>.
-	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord, java.lang.String> ANSWER_TYPE = createField("answer_type", org.jooq.impl.SQLDataType.VARCHAR.length(45), this, "");
 
 	/**
 	 * Create a <code>crowdcontrol.Template</code> table reference

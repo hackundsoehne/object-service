@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord> implements org.jooq.Record14<java.lang.Integer, java.lang.Object, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Integer, java.lang.String, java.lang.Integer, java.lang.String> {
 
-	private static final long serialVersionUID = -1093387529;
+	private static final long serialVersionUID = 1223807690;
 
 	/**
 	 * Setter for <code>crowdcontrol.Experiment.idexperiment</code>.
@@ -196,16 +196,16 @@ public class ExperimentRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.
 	}
 
 	/**
-	 * Setter for <code>crowdcontrol.Experiment.answer_type</code>.
+	 * Setter for <code>crowdcontrol.Experiment.answerType</code>.
 	 */
-	public void setAnswerType(java.lang.String value) {
+	public void setAnswertype(java.lang.String value) {
 		setValue(13, value);
 	}
 
 	/**
-	 * Getter for <code>crowdcontrol.Experiment.answer_type</code>.
+	 * Getter for <code>crowdcontrol.Experiment.answerType</code>.
 	 */
-	public java.lang.String getAnswerType() {
+	public java.lang.String getAnswertype() {
 		return (java.lang.String) getValue(13);
 	}
 
@@ -350,7 +350,7 @@ public class ExperimentRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.
 	 */
 	@Override
 	public org.jooq.Field<java.lang.String> field14() {
-		return edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.ANSWER_TYPE;
+		return edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.ANSWERTYPE;
 	}
 
 	/**
@@ -462,7 +462,7 @@ public class ExperimentRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.
 	 */
 	@Override
 	public java.lang.String value14() {
-		return getAnswerType();
+		return getAnswertype();
 	}
 
 	/**
@@ -587,7 +587,7 @@ public class ExperimentRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.
 	 */
 	@Override
 	public ExperimentRecord value14(java.lang.String value) {
-		setAnswerType(value);
+		setAnswertype(value);
 		return this;
 	}
 
@@ -613,7 +613,7 @@ public class ExperimentRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.
 	/**
 	 * Create a detached, initialised ExperimentRecord
 	 */
-	public ExperimentRecord(java.lang.Integer idexperiment, java.lang.Object ratingOptions, java.lang.String titel, java.lang.String answerDescription, java.lang.Integer ratingsPerAnswer, java.lang.String algorithmTaskChooser, java.lang.String algorithmQualityAnswer, java.lang.String algorithmQualityRating, java.lang.Integer basePayment, java.lang.Integer bonusAnswer, java.lang.Integer bonusRating, java.lang.String templateData, java.lang.Integer template, java.lang.String answerType) {
+	public ExperimentRecord(java.lang.Integer idexperiment, java.lang.Object ratingOptions, java.lang.String titel, java.lang.String answerDescription, java.lang.Integer ratingsPerAnswer, java.lang.String algorithmTaskChooser, java.lang.String algorithmQualityAnswer, java.lang.String algorithmQualityRating, java.lang.Integer basePayment, java.lang.Integer bonusAnswer, java.lang.Integer bonusRating, java.lang.String templateData, java.lang.Integer template, java.lang.String answertype) {
 		super(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT);
 
 		setValue(0, idexperiment);
@@ -629,6 +629,6 @@ public class ExperimentRecord extends org.jooq.impl.UpdatableRecordImpl<edu.ipd.
 		setValue(10, bonusRating);
 		setValue(11, templateData);
 		setValue(12, template);
-		setValue(13, answerType);
+		setValue(13, answertype);
 	}
 }

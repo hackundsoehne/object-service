@@ -74,11 +74,4 @@ public class TaskDao extends org.jooq.impl.DAOImpl<edu.ipd.kit.crowdcontrol.obje
 	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByCrowdPlatform(java.lang.String... values) {
 		return fetch(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Task.TASK.CROWD_PLATFORM, values);
 	}
-
-	/**
-	 * Fetch records that have <code>stopping IN (values)</code>
-	 */
-	public java.util.List<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByStopping(java.lang.Boolean... values) {
-		return fetch(edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Task.TASK.STOPPING, values);
-	}
 }

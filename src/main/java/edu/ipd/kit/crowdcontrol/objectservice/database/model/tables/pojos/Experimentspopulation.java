@@ -11,11 +11,11 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experimentspopulation implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1109034701;
+	private static final long serialVersionUID = -519867547;
 
 	private java.lang.String  idexperimentspopulation;
 	private java.lang.Integer populationUser;
-	private java.lang.Integer answer;
+	private java.lang.Integer correctAnswer;
 	private java.lang.String  referencedPlatform;
 	private java.lang.Boolean not;
 
@@ -24,13 +24,13 @@ public class Experimentspopulation implements java.io.Serializable {
 	public Experimentspopulation(
 		java.lang.String  idexperimentspopulation,
 		java.lang.Integer populationUser,
-		java.lang.Integer answer,
+		java.lang.Integer correctAnswer,
 		java.lang.String  referencedPlatform,
 		java.lang.Boolean not
 	) {
 		this.idexperimentspopulation = idexperimentspopulation;
 		this.populationUser = populationUser;
-		this.answer = answer;
+		this.correctAnswer = correctAnswer;
 		this.referencedPlatform = referencedPlatform;
 		this.not = not;
 	}
@@ -51,12 +51,12 @@ public class Experimentspopulation implements java.io.Serializable {
 		this.populationUser = populationUser;
 	}
 
-	public java.lang.Integer getAnswer() {
-		return this.answer;
+	public java.lang.Integer getCorrectAnswer() {
+		return this.correctAnswer;
 	}
 
-	public void setAnswer(java.lang.Integer answer) {
-		this.answer = answer;
+	public void setCorrectAnswer(java.lang.Integer correctAnswer) {
+		this.correctAnswer = correctAnswer;
 	}
 
 	public java.lang.String getReferencedPlatform() {

@@ -1,10 +1,18 @@
 package edu.ipd.kit.crowdcontrol.objectservice.database.operations;
 
+import edu.ipd.kit.crowdcontrol.objectservice.database.DatabaseManager;
+import edu.ipd.kit.crowdcontrol.objectservice.database.model.Tables;
 import edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.impl.DSL;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -13,14 +21,19 @@ import java.util.List;
  * @version 1.0
  */
 public class NotificationOperation extends AbstractOperation {
+    private final Connection readOnlyConnection;
+    private final DSLContext readOnlyCreate;
     /**
      * creates an new instance of NotificationOperation.
-     * @param create the context used for normal communication with the DB
+     * @param manager the manager used to obtain all relevant information about the DB
      * @param username the username belonging to a read-only account on the DB
-     * @param password the matching passwort belonging to a read-only accoint on the DB
+     * @param password the matching password belonging to a read-only accoint on the DB
+     * @throws SQLException if there was a problem establishing a connection to the database
      */
-    protected NotificationOperation(DSLContext create, String username, String password) {
-        super(create);
+    protected NotificationOperation(DatabaseManager manager, String username, String password) throws SQLException {
+        super(manager.getContext());
+        readOnlyConnection = DriverManager.getConnection(manager.getUrl(), username, password);
+        readOnlyCreate = DSL.using(readOnlyConnection, manager.getContext().configuration().dialect());
     }
 
     /**
@@ -28,16 +41,20 @@ public class NotificationOperation extends AbstractOperation {
      * @return a list of notifications
      */
     public List<NotificationRecord> getAllNotifications() {
-        return null;
+        return create.selectFrom(Tables.NOTIFICATION)
+                .fetch();
     }
 
     /**
      * inserts a notification into the database.
      * @param record the record to insert
-     * @return the primary-key or -1
+     * @return the resulting record (the primary key is guaranteed to be set)
      */
-    public int insertNotification(NotificationRecord record) {
-        return -1;
+    public NotificationRecord insertNotification(NotificationRecord record) {
+        return create.insertInto(Tables.NOTIFICATION)
+                .set(record)
+                .returning()
+                .fetchOne();
     }
 
     /**
@@ -46,7 +63,9 @@ public class NotificationOperation extends AbstractOperation {
      * @return true if deleted, false if not found
      */
     public boolean delteNotification(int notificationID) {
-        return false;
+        return create.deleteFrom(Tables.NOTIFICATION)
+                .where(Tables.NOTIFICATION.IDNOTIFICATION.eq(notificationID))
+                .execute() == 1;
     }
 
     /**
@@ -55,7 +74,10 @@ public class NotificationOperation extends AbstractOperation {
      * @return tre if updated, false if not found
      */
     public boolean updateLastSendForNotification(int notificationID) {
-        return false;
+        return create.update(Tables.NOTIFICATION)
+                .set(Tables.NOTIFICATION.LASTSENT, Timestamp.valueOf(LocalDateTime.now()))
+                .where(Tables.NOTIFICATION.IDNOTIFICATION.eq(notificationID))
+                .execute() == 1;
     }
 
     /**
@@ -64,6 +86,6 @@ public class NotificationOperation extends AbstractOperation {
      * @return the Result of the query
      */
     public Result<Record> runReadOnlySQL(String sql) {
-        return null;
+        return readOnlyCreate.fetch(sql);
     }
 }

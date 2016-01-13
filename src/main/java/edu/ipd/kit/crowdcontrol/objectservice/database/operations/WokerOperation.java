@@ -27,7 +27,7 @@ public class WokerOperation extends AbstractOperation {
     }
 
     public boolean anonymizeWorker(WorkerRecord workerRecord) {
-        //TODO: what?
+        //TODO: default-Worker
         return true;
     }
 }

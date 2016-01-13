@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experimentspopulation extends org.jooq.impl.TableImpl<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.ExperimentspopulationRecord> {
 
-	private static final long serialVersionUID = -355373417;
+	private static final long serialVersionUID = -1931246196;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.ExperimentsPopulation</code>
@@ -37,9 +37,9 @@ public class Experimentspopulation extends org.jooq.impl.TableImpl<edu.ipd.kit.c
 	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.ExperimentspopulationRecord, java.lang.Integer> POPULATION_USER = createField("population_user", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>crowdcontrol.ExperimentsPopulation.answer</code>.
+	 * The column <code>crowdcontrol.ExperimentsPopulation.correct_answer</code>.
 	 */
-	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.ExperimentspopulationRecord, java.lang.Integer> ANSWER = createField("answer", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final org.jooq.TableField<edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.records.ExperimentspopulationRecord, java.lang.Integer> CORRECT_ANSWER = createField("correct_answer", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>crowdcontrol.ExperimentsPopulation.referenced_platform</code>.

@@ -11,7 +11,7 @@ package edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1051744365;
+	private static final long serialVersionUID = 2019263725;
 
 	private java.lang.Integer idexperiment;
 	private java.lang.Object  ratingOptions;
@@ -26,7 +26,7 @@ public class Experiment implements java.io.Serializable {
 	private java.lang.Integer bonusRating;
 	private java.lang.String  templateData;
 	private java.lang.Integer template;
-	private java.lang.String  answerType;
+	private java.lang.String  answertype;
 
 	public Experiment() {}
 
@@ -44,7 +44,7 @@ public class Experiment implements java.io.Serializable {
 		java.lang.Integer bonusRating,
 		java.lang.String  templateData,
 		java.lang.Integer template,
-		java.lang.String  answerType
+		java.lang.String  answertype
 	) {
 		this.idexperiment = idexperiment;
 		this.ratingOptions = ratingOptions;
@@ -59,7 +59,7 @@ public class Experiment implements java.io.Serializable {
 		this.bonusRating = bonusRating;
 		this.templateData = templateData;
 		this.template = template;
-		this.answerType = answerType;
+		this.answertype = answertype;
 	}
 
 	public java.lang.Integer getIdexperiment() {
@@ -166,11 +166,11 @@ public class Experiment implements java.io.Serializable {
 		this.template = template;
 	}
 
-	public java.lang.String getAnswerType() {
-		return this.answerType;
+	public java.lang.String getAnswertype() {
+		return this.answertype;
 	}
 
-	public void setAnswerType(java.lang.String answerType) {
-		this.answerType = answerType;
+	public void setAnswertype(java.lang.String answertype) {
+		this.answertype = answertype;
 	}
 }

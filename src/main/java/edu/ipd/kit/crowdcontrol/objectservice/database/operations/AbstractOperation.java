@@ -8,12 +8,17 @@ import org.jooq.impl.DSL;
 import java.util.function.Function;
 
 /**
+ * superclass of all database operations. Contains abstractions and helper-methods.
  * @author LeanderK
  * @version 1.0
  */
 public abstract class AbstractOperation {
     protected final DSLContext create;
 
+    /**
+     * creates a new AbstractOperation
+     * @param create the context to use to communicate with the database
+     */
     protected AbstractOperation(DSLContext create) {
         this.create = create;
     }
