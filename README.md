@@ -4,4 +4,4 @@
 
 ## Installation
 
-We are not in this phase yet. To build the object-service you need java-8 and gradle.
+We are not there yet. To build the object-service you need java-8 and gradle.
