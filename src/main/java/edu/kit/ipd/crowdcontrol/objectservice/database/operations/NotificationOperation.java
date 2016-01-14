@@ -12,20 +12,23 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
  * contains all Operations needed to interact with the notifications-table.
+ *
  * @author LeanderK
  * @version 1.0
  */
 public class NotificationOperation extends AbstractOperation {
     private final Connection readOnlyConnection;
     private final DSLContext readOnlyCreate;
+
     /**
      * creates an new instance of NotificationOperation.
-     * @param manager the manager used to obtain all relevant information about the DB
+     *
+     * @param manager  the manager used to obtain all relevant information about the DB
      * @param username the username belonging to a read-only account on the DB
      * @param password the matching password belonging to a read-only accoint on the DB
      * @throws SQLException if there was a problem establishing a connection to the database
@@ -38,6 +41,7 @@ public class NotificationOperation extends AbstractOperation {
 
     /**
      * returns all the stored notifications
+     *
      * @return a list of notifications
      */
     public List<NotificationRecord> getAllNotifications() {
@@ -47,6 +51,7 @@ public class NotificationOperation extends AbstractOperation {
 
     /**
      * inserts a notification into the database.
+     *
      * @param record the record to insert
      * @return the resulting record (the primary key is guaranteed to be set)
      */
@@ -59,6 +64,7 @@ public class NotificationOperation extends AbstractOperation {
 
     /**
      * deletes a notification from the database
+     *
      * @param notificationID the primary key of the notification
      * @return true if deleted, false if not found
      */
@@ -69,19 +75,21 @@ public class NotificationOperation extends AbstractOperation {
     }
 
     /**
-     * updates the notifications lastSend field
+     * updates the notifications lastSent field
+     *
      * @param notificationID the primary key of the notification
-     * @return tre if updated, false if not found
+     * @return true if updated, false if not found
      */
-    public boolean updateLastSendForNotification(int notificationID) {
+    public boolean updateLastSentForNotification(int notificationID, Instant now) {
         return create.update(Tables.NOTIFICATION)
-                .set(Tables.NOTIFICATION.LASTSENT, Timestamp.valueOf(LocalDateTime.now()))
+                .set(Tables.NOTIFICATION.LASTSENT, Timestamp.from(now))
                 .where(Tables.NOTIFICATION.IDNOTIFICATION.eq(notificationID))
                 .execute() == 1;
     }
 
     /**
      * runs a sql-query in read-only mode
+     *
      * @param sql the seq to execute in read-only mode
      * @return the Result of the query
      */
