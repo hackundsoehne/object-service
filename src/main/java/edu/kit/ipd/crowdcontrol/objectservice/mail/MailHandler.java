@@ -1,15 +1,22 @@
-package edu.ipd.kit.crowdcontrol.objectservice.mail;
+package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
-import sun.awt.image.ImageWatched;
-
-import javax.mail.*;
 import java.io.UnsupportedEncodingException;
+
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.Properties;
+import java.util.LinkedList;
+
+import javax.mail.Authenticator;
+import javax.mail.NoSuchProviderException;
+import javax.mail.MessagingException;
+import javax.mail.Store;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.Folder;
+import javax.mail.Session;
+import javax.mail.Message;
+import javax.mail.Transport;
 
 /**
  * A Mailhandler, that can send and fetch mails to another mail address/from a mailbox

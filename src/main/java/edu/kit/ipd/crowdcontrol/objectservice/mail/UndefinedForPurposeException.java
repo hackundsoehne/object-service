@@ -1,4 +1,4 @@
-package edu.ipd.kit.crowdcontrol.objectservice.mail;
+package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
 /**
  * This exception gets thrown, if a properties object of the MailHandler is not sufficient for the given purpose (either send or receive mails)

@@ -1,26 +1,30 @@
-package edu.ipd.kit.crowdcontrol.objectservice.mail;
+package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.mail.Authenticator;
+import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
+import java.util.LinkedList;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
 
 /**
- * Created by frittler on 14.01.16.
+ * @author felix
  */
 public class MailHandlerTest {
+
+    private MailHandler handler;
 
     @Before
     public void setUp() throws Exception {
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.web.de");
         props.put("mail.smtp.port", "587");
-        props.put("mail.transport.protocol","smtp");
+        props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.tls", "true");
@@ -38,10 +42,9 @@ public class MailHandlerTest {
                 return new PasswordAuthentication("pse2016@web.de", "pse2016ipd");
             }
         };
-        MailHandler handler = new MailHandler(props, auth);
+        handler = new MailHandler(props, auth);
 
     }
-
 
 
     @After
@@ -50,14 +53,12 @@ public class MailHandlerTest {
     }
 
     @Test
-    public void testFetchNewSince() throws Exception {
-        return;
+    public void test() throws Exception {
+        handler.sendMail("pse2016@web.de", "test", "test");
+        LinkedList<Message> msg = handler.fetchNewSince(8);
 
-    }
+        assertTrue(msg.getFirst().getSubject().equals("test"));
 
-    @Test
-    public void testSendMail() throws Exception {
-        return;
 
     }
 }

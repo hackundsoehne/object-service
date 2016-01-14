@@ -25,6 +25,7 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.7'
     compile 'com.google.protobuf:protobuf-java:3.0.0-beta-1'
     compile 'com.googlecode.protobuf-java-format:protobuf-java-format:1.4'
+    compile 'javax.mail:mail:1.4.7'
     testCompile 'junit:junit:4.12'
 }
 

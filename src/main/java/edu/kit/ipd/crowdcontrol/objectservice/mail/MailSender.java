@@ -1,4 +1,4 @@
-package edu.ipd.kit.crowdcontrol.objectservice.mail;
+package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;

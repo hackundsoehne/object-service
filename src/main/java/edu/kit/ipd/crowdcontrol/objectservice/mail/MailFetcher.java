@@ -1,4 +1,5 @@
-package edu.ipd.kit.crowdcontrol.objectservice.mail;
+package edu.kit.ipd.crowdcontrol.objectservice.mail;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import java.util.LinkedList;
