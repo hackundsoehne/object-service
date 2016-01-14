@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Populationansweroption implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1342656216;
+	private static final long serialVersionUID = 780872872;
 
 	private java.lang.Integer idpopulationansweroption;
 	private java.lang.Integer population;
