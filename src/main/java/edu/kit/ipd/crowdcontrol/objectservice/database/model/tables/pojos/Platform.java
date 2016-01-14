@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Platform implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1138031235;
+	private static final long serialVersionUID = 1358217469;
 
 	private java.lang.String  idplatform;
 	private java.lang.String  name;
