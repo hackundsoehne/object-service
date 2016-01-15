@@ -3,6 +3,11 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import org.jooq.DSLContext;
+import org.jooq.Result;
+
+
+import java.util.List;
+import java.util.Map;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
@@ -21,6 +26,20 @@ public class AnswerRatingOperations extends AbstractOperations {
     public AnswerRatingOperations(DSLContext create) {
         super(create);
     }
+
+    public  Map<AnswerRecord,List<RatingRecord>> getAnswersWithRatings(int experimentID){
+        return null;
+    }
+
+    public Result<RatingRecord> getRatingsOfAnswer(AnswerRecord answerRecord){
+        return null;
+    }
+
+    public Result<AnswerRecord> getAnswersOfExperiment(int expID){
+        return null;
+    }
+
+    public void setQualityToRatings(Map<RatingRecord,Integer> map){}
 
     /**
      * inserts a new answer into the DB
