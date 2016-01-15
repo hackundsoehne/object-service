@@ -28,43 +28,24 @@ public class MailHandler implements MailFetcher, MailSender {
     private Authenticator auth;
     private Session session;
     private String sender;
-    private boolean canSend;
-    private boolean canFetch;
     Store store;
     Folder emailfolder;
 
 
-    public MailHandler(Properties props, Authenticator auth) throws IllegalPropertiesException {
+    public MailHandler(Properties props, Authenticator auth) throws IllegalPropertiesException, MessagingException {
         sender = props.getProperty("sender");
         props.remove("sender");
         this.auth = auth;
         this.props = props;
         session = Session.getDefaultInstance(props, auth);
-        if (props.containsKey("mail.smtp.host") && props.containsKey("mail.smtp.port")
-                && props.containsKey("mail.transport.protocol") && props.containsKey("mail.smtp.auth")
-                && props.containsKey("mail.smtp.starttls.enable") && props.containsKey("mail.smtp.tls")
-                && props.containsKey("mail.smtp.ssl.checkserveridentity")) {
-            canSend = true;
+        try {
+            store = session.getStore("imap");
+        } catch (NoSuchProviderException e) {
+            throw new IllegalPropertiesException();
         }
-        if (props.containsKey("mail.store.protocol") && props.containsKey("mail.imap.host")
-                && props.containsKey("mail.imap.port") && props.containsKey("mail.imap.tls")) {
-            canFetch = true;
-            try{
-                store = session.getStore("imap");
-            } catch (NoSuchProviderException e) {
-                throw new IllegalPropertiesException();
-            }
-            try {
-                store.connect();
-                emailfolder = store.getFolder("INBOX");
-                emailfolder.open(Folder.READ_ONLY);
-            } catch (MessagingException e) {
-                throw new IllegalPropertiesException();
-            }
-
-
-
-        }
+        store.connect();
+        emailfolder = store.getFolder("INBOX");
+        emailfolder.open(Folder.READ_ONLY);
     }
 
     /**
@@ -74,19 +55,17 @@ public class MailHandler implements MailFetcher, MailSender {
      * @return Returns a list of fetched mails
      */
     @Override
-    public LinkedList<Message> fetchNewSince(int ageOfOldestMail) throws UndefinedForPurposeException, MessagingException {
-        if (!canFetch) {
-            throw new UndefinedForPurposeException();
-        }
+    public Message[] fetchNewSince(int ageOfOldestMail) throws UndefinedForPurposeException, MessagingException {
         Message[] messages = emailfolder.getMessages();
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, ageOfOldestMail * -1);
         Date dateOfOldestMail = cal.getTime();
         LinkedList<Message> mails = new LinkedList<Message>();
-        for (int i = 0; i < messages.length && messages[i].getReceivedDate().before(dateOfOldestMail); i++) {
+        System.out.print(messages.length);
+        for (int i = 0; i < messages.length /*&& messages[i].getReceivedDate().before(dateOfOldestMail)*/; i++) {
             mails.add(messages[i]);
         }
-        return mails;
+        return messages;
     }
 
     /**
@@ -98,9 +77,6 @@ public class MailHandler implements MailFetcher, MailSender {
      */
     @Override
     public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException, UndefinedForPurposeException {
-        if (!canSend) {
-            throw new UndefinedForPurposeException();
-        }
         Message msg = new MimeMessage(session);
         msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientMail, recipientMail));
         msg.setFrom(new InternetAddress(sender, sender));

@@ -15,5 +15,5 @@ public interface MailFetcher {
      * @param ageOfOldestMail The maximal age of a mail, that gets fetched in days
      * @return Returns a list of fetched mails
      */
-    public LinkedList<Message> fetchNewSince(int ageOfOldestMail) throws UndefinedForPurposeException, MessagingException;
+    public Message[] fetchNewSince(int ageOfOldestMail) throws UndefinedForPurposeException, MessagingException;
 }
