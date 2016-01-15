@@ -49,12 +49,6 @@ public class AnswerRatingOperations extends AbstractOperations {
 
 
     /**
-     * Sets quality ratings to a set of ratings
-     * @param map of ratings and matching qualities
-     */
-    public void setQualityToRatings(Map<RatingRecord,Integer> map){}
-
-    /**
      * Returns all ratings of given answer, which have a quality rating above passed threshold
      * @param answerRecord answer, whose good ratings (specified by given threshold) are returned
      * @param threshold of type int, which specifies good ratings
@@ -63,6 +57,22 @@ public class AnswerRatingOperations extends AbstractOperations {
     public Result<RatingRecord> getGoodRatingsOfAnswer(AnswerRecord answerRecord, int threshold){
         return null;
     }
+
+
+    /**
+     * Sets quality ratings to a set of ratings
+     * @param map of ratings and matching qualities
+     */
+    public void setQualityToRatings(Map<RatingRecord,Integer> map){}
+
+    /**
+     * Sets quality rating to an answer
+     * @param answer whose quality is to be set
+     *    @param quality of the answer
+     */
+    public void setQualityToAnswer(AnswerRecord answer, int quality){}
+
+
 
     /**
      * inserts a new answer into the DB
