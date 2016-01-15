@@ -37,7 +37,7 @@ public class MailHandler implements MailFetcher, MailSender {
         props.remove("sender");
         this.auth = auth;
         this.props = props;
-        session = Session.getDefaultInstance(props, auth);
+        session = Session.getInstance(props, auth);
         try {
             store = session.getStore("imap");
         } catch (NoSuchProviderException e) {

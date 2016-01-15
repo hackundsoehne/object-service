@@ -58,7 +58,6 @@ public class MailHandlerTest2 {
     public void test() throws Exception {
         handler.sendMail("pseipd@gmail.com", "test", "test");
         Message[] msg = handler.fetchNewSince(8);
-
         assertTrue(msg[0].getSubject().equals("test"));
 
 
