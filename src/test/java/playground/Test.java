@@ -1,7 +1,7 @@
 package playground;
 
-import edu.ipd.kit.crowdcontrol.objectservice.event.ChangeEvent;
-import edu.ipd.kit.crowdcontrol.objectservice.event.EventObservable;
+import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventObservable;
 
 /**
  * Created by marcel on 17.12.15.

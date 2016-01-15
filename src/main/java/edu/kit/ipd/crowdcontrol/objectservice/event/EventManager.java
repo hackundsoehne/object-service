@@ -1,4 +1,4 @@
-package edu.ipd.kit.crowdcontrol.objectservice.event;
+package edu.kit.ipd.crowdcontrol.objectservice.event;
 
 import edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Answers;
 import edu.ipd.kit.crowdcontrol.objectservice.database.model.tables.Experiment;

@@ -1,4 +1,4 @@
-package edu.ipd.kit.crowdcontrol.objectservice.event;
+package edu.kit.ipd.crowdcontrol.objectservice.event;
 
 import rx.Observable;
 import rx.Subscriber;
