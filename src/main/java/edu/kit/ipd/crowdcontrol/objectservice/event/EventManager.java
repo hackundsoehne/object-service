@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.event;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
 
 /**
+ * Class which carrys all predefined events
  * Created by marcel on 02.01.16.
  */
 public class EventManager {
