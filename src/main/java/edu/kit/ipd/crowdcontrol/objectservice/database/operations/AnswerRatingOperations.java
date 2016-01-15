@@ -4,6 +4,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Answ
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer;
 import org.jooq.DSLContext;
+import org.jooq.Result;
+
+
+import java.util.List;
+import java.util.Map;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
@@ -29,6 +34,20 @@ public class AnswerRatingOperations extends AbstractOperations {
         this.calibrationOperations = calibrationOperations;
         this.workerCalibrationOperations = workerCalibrationOperations;
     }
+
+    public  Map<AnswerRecord,List<RatingRecord>> getAnswersWithRatings(int experimentID){
+        return null;
+    }
+
+    public Result<RatingRecord> getRatingsOfAnswer(AnswerRecord answerRecord){
+        return null;
+    }
+
+    public Result<AnswerRecord> getAnswersOfExperiment(int expID){
+        return null;
+    }
+
+    public void setQualityToRatings(Map<RatingRecord,Integer> map){}
 
     /**
      * inserts a new answer into the DB
