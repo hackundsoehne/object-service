@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Notification implements java.io.Serializable {
 
-	private static final long serialVersionUID = 902451009;
+	private static final long serialVersionUID = -1412044095;
 
 	private java.lang.Integer  idnotification;
 	private java.lang.String   name;

@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Rating implements java.io.Serializable {
 
-	private static final long serialVersionUID = -897626073;
+	private static final long serialVersionUID = 3312551;
 
 	private java.lang.Integer  idrating;
 	private java.lang.Integer  task;
