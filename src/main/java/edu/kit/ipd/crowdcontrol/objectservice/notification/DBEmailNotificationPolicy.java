@@ -10,7 +10,7 @@ import java.time.Instant;
  * @author Simon Korz
  * @version 1.0
  */
-public class DBEmailNotificationPolicy extends NotificationPolicy {
+public class DBEmailNotificationPolicy extends NotificationPolicy<Result<Record>> {
     private MailSender mailSender;
     private String receiver;
     private NotificationOperation operation;
@@ -23,33 +23,26 @@ public class DBEmailNotificationPolicy extends NotificationPolicy {
     }
 
     @Override
-    protected Object check(Notification notification) {
+    protected Result<Record> check(Notification notification) {
 
         return operation.runReadOnlySQL(notification.getQuery());
     }
 
 
     @Override
-    protected void send(Notification notification, Object token) {
-        @SuppressWarnings("unchecked")
-        Result<Record> result;
-        try {
-            result = (Result<Record>) token;
-        } catch (ClassCastException cce) {
-            result = null;
-        }
+    protected void send(Notification notification, Result<Record> token) {
 
         //TODO can mail format be html?
         StringBuilder message = new StringBuilder();
         message.append(notification.getDescription());
-        if (result != null) {
-            message.append(result.formatHTML());
+        if (token != null) {
+            message.append(token.formatHTML());
         }
 
         //TODO send mail
 
 
-        // if sent do
+        // if sent do lastsent update
         Instant now = Instant.now();
         notification.setLastSent(now);
         operation.updateLastSentForNotification(notification.getID(), now);
