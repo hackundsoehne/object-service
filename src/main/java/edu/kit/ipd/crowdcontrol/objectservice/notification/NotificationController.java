@@ -1,8 +1,12 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperation;
+import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -23,18 +27,78 @@ public class NotificationController {
         this.operation = operation;
         this.policy = policy;
 
-        handleMap = new HashMap<Integer, ScheduledFuture<?>>();
+        handleMap = new HashMap<>();
+
+        loadNotificationsFromDatabase();
+
+        EventManager.NOTIFICATION_CREATE.getObservable().subscribe(this::newNotification);
+        EventManager.NOTIFICATION_DELETE.getObservable().subscribe(this::deleteNotification);
+        EventManager.NOTIFICATION_UPDATE.getObservable().subscribe(this::updateNotification);
     }
 
+    private void loadNotificationsFromDatabase() {
+        List<NotificationRecord> notificationList = operation.getAllNotifications();
+        for (NotificationRecord record : notificationList) {
+            newNotification(new Notification(record.getIdnotification(), record.getName(), record.getDescription(),
+                    record.getSendthreshold(), record.getCheckperiod(), record.getQuery(), policy));
+        }
+    }
+
+    /**
+     * Creates a new Notification
+     *
+     * @param notification the notification to create
+     */
+    public void newNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notification) {
+        Notification internalNotification = new Notification(notification.getId(), notification.getName(),
+                notification.getDescription(), notification.getSendThreshold(),
+                notification.getCheckPeriod(), notification.getQuery(), policy);
+
+        newNotification(internalNotification);
+    }
+
+    /**
+     * Creates a new Notification
+     *
+     * @param notification the notification to create
+     */
     public void newNotification(Notification notification) {
-        // TODO real event handling
         final ScheduledFuture<?> notificationHandle =
                 scheduler.scheduleAtFixedRate(notification, 0, notification.getCheckPeriod(), TimeUnit.SECONDS);
         handleMap.put(notification.getID(), notificationHandle);
     }
 
+    /**
+     * Deletes a notification
+     *
+     * @param notification the notification to delete
+     */
+    public void deleteNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notification) {
+        deleteNotification(notification.getId());
+    }
+
+    /**
+     * Deletes a notification
+     *
+     * @param notification the notification to delete
+     */
     public void deleteNotification(Notification notification) {
-        ScheduledFuture<?> notificationHandle = handleMap.get(notification.getID());
+        deleteNotification(notification.getID());
+    }
+
+    private void deleteNotification(int id) {
+        ScheduledFuture<?> notificationHandle = handleMap.get(id);
         notificationHandle.cancel(true);
+    }
+
+    /**
+     * Updates a notification
+     *
+     * @param notificationChangeEvent the notification change event
+     */
+    public void updateNotification(ChangeEvent<edu.kit.ipd.crowdcontrol.objectservice.proto.Notification> notificationChangeEvent) {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notification = notificationChangeEvent.getNeww();
+        deleteNotification(notification);
+        newNotification(notification);
     }
 }
