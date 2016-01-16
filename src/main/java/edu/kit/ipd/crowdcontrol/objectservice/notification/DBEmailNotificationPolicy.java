@@ -1,9 +1,13 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperation;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.UndefinedForPurposeException;
 import org.jooq.Record;
 import org.jooq.Result;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 
 /**
@@ -39,8 +43,15 @@ public class DBEmailNotificationPolicy extends NotificationPolicy<Result<Record>
             message.append(token.formatHTML());
         }
 
-        //TODO send mail
-
+        try {
+            mailSender.sendMail(receiver, notification.getDescription(), message.toString());
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (UndefinedForPurposeException e) {
+            e.printStackTrace();
+        }
 
         // if sent do lastsent update
         Instant now = Instant.now();
