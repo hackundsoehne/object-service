@@ -4,10 +4,10 @@ package edu.kit.ipd.crowdcontrol.objectservice.notification;
  * @author Simon Korz
  * @version 1.0
  */
-public abstract class NotificationPolicy {
+public abstract class NotificationPolicy<T> {
     public void invoke(Notification notification) {
         if (notification.thresholdPassed()) {
-            Object token = check(notification);
+            T token = check(notification);
             if (token != null) {
                 send(notification, token);
             }
@@ -18,9 +18,9 @@ public abstract class NotificationPolicy {
      * Checks the query of a notification
      *
      * @param notification the notification to check
-     * @return instance of an Object e.g. a result of the check
+     * @return instance of a generic result of the check
      */
-    protected abstract Object check(Notification notification);
+    protected abstract T check(Notification notification);
 
     /**
      * Sends a notification
@@ -28,5 +28,5 @@ public abstract class NotificationPolicy {
      * @param notification the notification to send
      * @param token        a token acquired from a check. Can be null.
      */
-    protected abstract void send(Notification notification, Object token);
+    protected abstract void send(Notification notification, T token);
 }
