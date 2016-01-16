@@ -10,13 +10,13 @@ import spark.ResponseTransformer;
  *
  * @author Niklas Keller
  */
-public class JsonTransformer implements ResponseTransformer {
+public class JsonOutputTransformer implements ResponseTransformer {
 	private JsonFormat.Printer printer;
 
 	/**
 	 * Create an instance with the default printer.
 	 */
-	public JsonTransformer() {
+	public JsonOutputTransformer() {
 		this(JsonFormat.printer());
 	}
 
@@ -26,7 +26,7 @@ public class JsonTransformer implements ResponseTransformer {
 	 * @param printer
 	 * 		JSON format printer.
 	 */
-	public JsonTransformer(JsonFormat.Printer printer) {
+	public JsonOutputTransformer(JsonFormat.Printer printer) {
 		this.printer = printer;
 	}
 

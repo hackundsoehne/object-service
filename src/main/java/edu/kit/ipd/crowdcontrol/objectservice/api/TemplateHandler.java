@@ -25,4 +25,14 @@ public class TemplateHandler {
 
 		return Template.newBuilder().setId(id).setContent("{{TEST}}").build();
 	}
+
+	public Template put(Request request, Response response) {
+		return request.attribute("input");
+	}
+
+	public Template patch(Request request, Response response) {
+		Template template = request.attribute("input");
+		template = template.toBuilder().setId(12).build();
+		return template;
+	}
 }
