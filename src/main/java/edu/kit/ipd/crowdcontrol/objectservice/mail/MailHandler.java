@@ -28,11 +28,14 @@ public class MailHandler implements MailFetcher, MailSender {
         this.props = props;
         session = Session.getInstance(props, auth);
         store = session.getStore();
-        store.connect();
     }
 
     @Override
     public Message[] fetchUnseen(String name) throws MessagingException {
+        if (!store.isConnected()) {
+            store.connect();
+        }
+
         Folder folder = store.getFolder(name);
         folder.open(Folder.READ_ONLY);
 
@@ -45,6 +48,10 @@ public class MailHandler implements MailFetcher, MailSender {
 
     @Override
     public Message[] fetchFolder(String name) throws MessagingException {
+        if (!store.isConnected()) {
+            store.connect();
+        }
+
         Folder folder = store.getFolder(name);
         folder.open(Folder.READ_ONLY);
         Message[] messages = folder.getMessages();
@@ -53,6 +60,10 @@ public class MailHandler implements MailFetcher, MailSender {
 
     @Override
     public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException, UndefinedForPurposeException {
+        if (!store.isConnected()) {
+            store.connect();
+        }
+
         Message msg = new MimeMessage(session);
         msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientMail, recipientMail));
         msg.setFrom(new InternetAddress(sender, sender));
@@ -64,6 +75,10 @@ public class MailHandler implements MailFetcher, MailSender {
     }
 
     protected void deleteMails(String subject, String name) throws MessagingException{
+        if (!store.isConnected()) {
+            store.connect();
+        }
+        
         Folder folder = store.getFolder(name);
         folder.open(Folder.READ_WRITE);
         SubjectTerm subjectterm = new SubjectTerm(subject);
