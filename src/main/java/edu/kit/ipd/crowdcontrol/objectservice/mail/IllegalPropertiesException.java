@@ -2,7 +2,8 @@ package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
 /**
  * This exception gets thrown, if a properties file in a mail handler is not valid.
- * @author felix
+ *
+ * @author Felix Rittler
  */
 public class IllegalPropertiesException extends Exception {
 

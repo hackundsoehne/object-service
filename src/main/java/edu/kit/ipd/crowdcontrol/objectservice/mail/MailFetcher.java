@@ -10,17 +10,17 @@ import javax.mail.MessagingException;
  * @author Niklas Keller
  */
 public interface MailFetcher {
-	/**
-	 * Fetches all unseen mails.
-	 *
-	 * @return Fetched mails.
-	 */
-	Message[] fetchUnseen() throws MessagingException;
+    /**
+     * Fetches all unseen mails.
+     *
+     * @return Fetched mails.
+     */
+    Message[] fetchUnseen(String name) throws MessagingException;
 
-	/**
-	 * Fetches all mails in a folder.
-	 *
-	 * @return Fetched mails.
-	 */
-	Message[] fetchFolder(String name) throws MessagingException;
+    /**
+     * Fetches all mails in a folder.
+     *
+     * @return Fetched mails.
+     */
+    Message[] fetchFolder(String name) throws MessagingException;
 }

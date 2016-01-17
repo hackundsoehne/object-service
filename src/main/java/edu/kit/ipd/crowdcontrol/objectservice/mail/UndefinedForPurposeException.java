@@ -2,7 +2,8 @@ package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
 /**
  * This exception gets thrown, if a properties object of the MailHandler is not sufficient for the given purpose (either send or receive mails)
- * @author felix
+ *
+ * @author Felix Rittler
  */
 public class UndefinedForPurposeException extends Exception {
 
