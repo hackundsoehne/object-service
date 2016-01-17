@@ -35,4 +35,8 @@ public class TemplateHandler {
 		template = template.toBuilder().setId(12).build();
 		return template;
 	}
+
+	public Template delete(Request request, Response response) {
+		return null;
+	}
 }

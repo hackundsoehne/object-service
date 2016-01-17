@@ -4,9 +4,9 @@ public class ErrorResponse {
 	private String code;
 	private String detail;
 
-	public ErrorResponse(String code, String detail) {
+	public ErrorResponse(String code, String detail, String... args) {
 		this.code = code;
-		this.detail = detail;
+		this.detail = String.format(detail, args);
 	}
 
 	public String getCode() {
