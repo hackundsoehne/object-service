@@ -4,6 +4,9 @@ version '0.5-SNAPSHOT'
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'nu.studer.jooq'
+apply plugin: 'application'
+
+mainClassName = 'edu.kit.ipd.crowdcontrol.objectservice.Main'
 
 sourceCompatibility = 1.8
 
@@ -22,6 +25,7 @@ dependencies {
     compile 'com.google.protobuf:protobuf-java:3.+'
     compile 'com.google.protobuf:protobuf-java-util:3.+'
     compile 'io.reactivex:rxjava:1.1.0'
+    compile 'mysql:mysql-connector-java:5.1.37'
     testCompile 'junit:junit:4.12'
 }
 

@@ -26,9 +26,9 @@ public class Router implements SparkApplication {
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
-    public Router() {
+    public Router(TemplateResource templateResource) {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
-        this.templateResource = new TemplateResource();
+        this.templateResource = templateResource;
     }
 
     @Override
@@ -37,6 +37,12 @@ public class Router implements SparkApplication {
             response.status(400);
             response.type("application/json");
             response.body(gson.toJson(new ErrorResponse("badRequest", exception.getMessage())));
+        });
+
+        exception(NotFoundException.class, (exception, request, response) -> {
+            response.status(404);
+            response.type("application/json");
+            response.body(gson.toJson(new ErrorResponse("notFound", exception.getMessage())));
         });
 
         exception(NotAcceptableException.class, (exception, request, response) -> {
