@@ -9,6 +9,7 @@ import spark.Route;
 import spark.utils.MimeParse;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,13 +24,15 @@ public class OutputTransformer implements Route {
 
     private static final String TYPE_JSON = "application/json";
     private static final String TYPE_PROTOBUF = "application/protobuf";
-
     private static final List<String> SUPPORTED_TYPES;
 
+    private static final JsonFormat.Printer jsonPrinter = JsonFormat.printer();
+
     static {
-        SUPPORTED_TYPES = new ArrayList<>();
-        SUPPORTED_TYPES.add("application/protobuf");
-        SUPPORTED_TYPES.add("application/json"); // Last to be default.
+        List<String> supported_types = new ArrayList<>();
+        supported_types.add("application/protobuf");
+        supported_types.add("application/json"); // Last to be default.
+        SUPPORTED_TYPES =  Collections.unmodifiableList(supported_types);
     }
 
     private Route route;
@@ -82,7 +85,7 @@ public class OutputTransformer implements Route {
             switch (bestMatch) {
                 case TYPE_JSON:
                     response.type(TYPE_JSON);
-                    return JsonFormat.printer().print(message);
+                    return jsonPrinter.print(message);
                 case TYPE_PROTOBUF:
                     response.type(TYPE_PROTOBUF);
                     return new String(message.toByteArray());

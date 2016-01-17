@@ -15,8 +15,9 @@ import java.lang.reflect.Method;
  * @author Niklas Keller
  */
 public class InputTransformer implements Route {
-    private Route next;
-    private Class<? extends Message> type;
+    private final Route next;
+    private final Class<? extends Message> type;
+    private final JsonFormat.Parser jsonParser = JsonFormat.parser();
 
     /**
      * @param next
@@ -50,7 +51,7 @@ public class InputTransformer implements Route {
         try {
             switch (contentType) {
                 case "application/json":
-                    JsonFormat.parser().merge(body, builder);
+                    jsonParser.merge(body, builder);
                     break;
                 case "application/protobuf":
                     // https://tools.ietf.org/html/draft-rfernando-protocol-buffers-00
