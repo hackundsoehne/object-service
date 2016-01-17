@@ -60,6 +60,6 @@ public class Router implements SparkApplication {
 	}
 
 	private void delete(String uri, Route route) {
-		Spark.get(uri, new OutputTransformer(route));
+		Spark.delete(uri, new OutputTransformer(route));
 	}
 }
