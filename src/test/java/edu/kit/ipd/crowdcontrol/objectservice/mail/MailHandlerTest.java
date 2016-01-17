@@ -1,65 +1,44 @@
 package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import javax.mail.Authenticator;
 import javax.mail.Message;
-import javax.mail.PasswordAuthentication;
-import java.util.Properties;
+import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
- * @author felix
+ * @author Niklas Keller
  */
-public class MailHandlerTest {
+public abstract class MailHandlerTest {
+	protected MailHandler handler;
+	protected String mail;
+	protected String folder;
 
-    private MailHandler handler;
+	@Test
+	public void test() throws Exception {
+		String uuid = UUID.randomUUID().toString();
+		String subject = "[test] " + uuid;
 
-    @Before
-    public void setUp() throws Exception {
-        Properties props = new Properties();
-        props.put("sender", "pse2016@web.de");
-        props.put("mail.smtp.host", "smtp.web.de");
-        props.put("mail.smtp.port", "587");
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.tls", "true");
-        props.put("mail.smtp.tls.enable", "true");
-        props.put("mail.smtp.ssl.checkserveridentity", "true");
-        props.put("mail.store.protocol", "imap");
-        props.put("mail.imap.host", "imap.web.de");
-        props.put("mail.imap.port", "993");
-        props.put("mail.imap.ssl", "true");
-        java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-        props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.put("mail.imap.socketFactory.fallback", "false");
-        Authenticator auth = new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("pse2016", "pse2016ipd");
-            }
-        };
-        handler = new MailHandler(props, auth);
+		handler.sendMail(this.mail, subject, uuid);
 
-    }
+		// TODO: Fetch sent items here instead of received, mails need their time.
 
+		Message[] messages = handler.fetchUnseen();
 
-    @After
-    public void tearDown() throws Exception {
+		boolean found = false;
 
-    }
+		for (Message message : messages) {
+			if (message.getSubject().equals(subject)) {
+				found = true;
+				break;
+			}
 
-    @Test
-    public void test() throws Exception {
-        handler.sendMail("pse2016@web.de", "test", "test");
-        Message[] msg = handler.fetchNewSince(8);
+			System.out.println(message.getSubject());
+		}
 
-        assertTrue(msg[0].getSubject().equals("test"));
+		// TODO: Delete test messages...
 
-
-    }
+		assertTrue(found);
+	}
 }
