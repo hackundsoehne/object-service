@@ -1,12 +1,18 @@
 package edu.kit.ipd.crowdcontrol.objectservice.api;
 
 /**
- * Thrown on invalid requests. The exception's message will be forwarded to clients.
+ * Thrown on invalid requests.
  *
  * @author Niklas Keller
  */
 public class BadRequestException extends RuntimeException {
-	public BadRequestException(String message, String... args) {
+	/**
+	 * @param message
+	 * 		Error details. Forwarded to the client.
+	 * @param args
+	 * 		Arguments for {@link String#format(String, Object...)}.
+	 */
+	public BadRequestException(String message, Object... args) {
 		super(String.format(message, args));
 	}
 }

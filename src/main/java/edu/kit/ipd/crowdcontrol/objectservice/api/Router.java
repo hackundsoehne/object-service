@@ -8,16 +8,27 @@ import spark.Route;
 import spark.Spark;
 import spark.servlet.SparkApplication;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import static spark.Spark.before;
 import static spark.Spark.exception;
 
+/**
+ * Application entry point. Defines the REST API.
+ *
+ * @author Niklas Keller
+ */
 public class Router implements SparkApplication {
 	private Gson gson;
-	private TemplateHandler templateHandler;
+	private TemplateResource templateResource;
 
+	/**
+	 * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
+	 */
 	public Router() {
 		this.gson = new GsonBuilder().setPrettyPrinting().create();
-		this.templateHandler = new TemplateHandler();
+		this.templateResource = new TemplateResource();
 	}
 
 	@Override
@@ -26,6 +37,21 @@ public class Router implements SparkApplication {
 			response.status(400);
 			response.type("application/json");
 			response.body(gson.toJson(new ErrorResponse("badRequest", exception.getMessage())));
+		});
+
+		exception(NotAcceptableException.class, (exception, request, response) -> {
+			response.status(406);
+			response.type("application/json");
+			response.body(gson.toJson(new ErrorResponse("notAcceptable", exception.getMessage())));
+		});
+
+		exception(UnsupportedMediaTypeException.class, (exception, request, response) -> {
+			String[] acceptedTypes = ((UnsupportedMediaTypeException) exception).getSupportedTypes();
+			String accept = Arrays.stream(acceptedTypes).collect(Collectors.joining(","));
+
+			response.status(415);
+			response.header("accept", accept);
+			response.body(gson.toJson(new ErrorResponse("unsupportedMediaType", exception.getMessage())));
 		});
 
 		exception(InternalServerErrorException.class, (exception, request, response) -> {
@@ -40,26 +66,62 @@ public class Router implements SparkApplication {
 			}
 		});
 
-		put("/templates", templateHandler::put, Template.class);
-		get("/templates", templateHandler::getAll);
-		get("/templates/:id", templateHandler::get);
-		patch("/templates/:id", templateHandler::patch, Template.class);
-		delete("/templates/:id", templateHandler::delete);
+		put("/templates", templateResource::put, Template.class);
+		get("/templates", templateResource::all);
+		get("/templates/:id", templateResource::get);
+		patch("/templates/:id", templateResource::patch, Template.class);
+		delete("/templates/:id", templateResource::delete);
 	}
 
-	private void get(String uri, Route route) {
-		Spark.get(uri, new OutputTransformer(route));
+	/**
+	 * Creates a new GET route.
+	 *
+	 * @param path
+	 * 		Path.
+	 * @param route
+	 * 		Handler.
+	 */
+	private void get(String path, Route route) {
+		Spark.get(path, new OutputTransformer(route));
 	}
 
-	private void put(String uri, Route route, Class<? extends Message> type) {
-		Spark.put(uri, new InputTransformer(new OutputTransformer(route), type));
+	/**
+	 * Creates a new PUT route.
+	 *
+	 * @param path
+	 * 		Path.
+	 * @param route
+	 * 		Handler.
+	 * @param type
+	 * 		Protocol buffer type.
+	 */
+	private void put(String path, Route route, Class<? extends Message> type) {
+		Spark.put(path, new InputTransformer(new OutputTransformer(route), type));
 	}
 
-	private void patch(String uri, Route route, Class<? extends Message> type) {
-		Spark.patch(uri, new InputTransformer(new OutputTransformer(route), type));
+	/**
+	 * Creates a new PATCH route.
+	 *
+	 * @param path
+	 * 		Path.
+	 * @param route
+	 * 		Handler.
+	 * @param type
+	 * 		Protocol buffer type.
+	 */
+	private void patch(String path, Route route, Class<? extends Message> type) {
+		Spark.patch(path, new InputTransformer(new OutputTransformer(route), type));
 	}
 
-	private void delete(String uri, Route route) {
-		Spark.delete(uri, new OutputTransformer(route));
+	/**
+	 * Creates a new DELETE route.
+	 *
+	 * @param path
+	 * 		Path.
+	 * @param route
+	 * 		Handler.
+	 */
+	private void delete(String path, Route route) {
+		Spark.delete(path, new OutputTransformer(route));
 	}
 }
