@@ -1,9 +1,10 @@
 package edu.kit.ipd.crowdcontrol.objectservice.api;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.protobuf.Message;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
+import spark.Request;
+import spark.Response;
 import spark.Route;
 import spark.Spark;
 import spark.servlet.SparkApplication;
@@ -20,14 +21,12 @@ import static spark.Spark.exception;
  * @author Niklas Keller
  */
 public class Router implements SparkApplication {
-    private Gson gson;
     private TemplateResource templateResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
     public Router() {
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.templateResource = new TemplateResource();
     }
 
@@ -35,14 +34,16 @@ public class Router implements SparkApplication {
     public void init() {
         exception(BadRequestException.class, (exception, request, response) -> {
             response.status(400);
-            response.type("application/json");
-            response.body(gson.toJson(new ErrorResponse("badRequest", exception.getMessage())));
+            response.body(error(request, response, "badRequest", exception.getMessage()));
         });
 
         exception(NotAcceptableException.class, (exception, request, response) -> {
+            // Don't use error(...) in this handler,
+            // otherwise we end up throwing the same exception again.
+
             response.status(406);
-            response.type("application/json");
-            response.body(gson.toJson(new ErrorResponse("notAcceptable", exception.getMessage())));
+            response.type("text/plain");
+            response.body("notAcceptable: " + exception.getMessage());
         });
 
         exception(UnsupportedMediaTypeException.class, (exception, request, response) -> {
@@ -51,13 +52,12 @@ public class Router implements SparkApplication {
 
             response.status(415);
             response.header("accept", accept);
-            response.body(gson.toJson(new ErrorResponse("unsupportedMediaType", exception.getMessage())));
+            response.body(error(request, response, "unsupportedMediaType", exception.getMessage()));
         });
 
         exception(InternalServerErrorException.class, (exception, request, response) -> {
             response.status(500);
-            response.type("application/json");
-            response.body(gson.toJson(new ErrorResponse("internalServerError", exception.getMessage())));
+            response.body(error(request, response, "internalServerError", exception.getMessage()));
         });
 
         before((request, response) -> {
@@ -123,5 +123,24 @@ public class Router implements SparkApplication {
      */
     private void delete(String path, Route route) {
         Spark.delete(path, new OutputTransformer(route));
+    }
+
+    /**
+     * Creates an error response and encodes it into JSON / protocol buffers.
+     *
+     * @param request
+     *         Request provided by Spark.
+     * @param response
+     *         Response provided by Spark.
+     * @param code
+     *         Short error code to make errors machine readable.
+     * @param detail
+     *         Detailed error message for humans.
+     *
+     * @return Encoded message.
+     */
+    private String error(Request request, Response response, String code, String detail) {
+        ErrorResponse error = ErrorResponse.newBuilder().setCode(code).setDetail(detail).build();
+        return OutputTransformer.transform(request, response, error);
     }
 }

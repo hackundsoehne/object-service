@@ -61,7 +61,7 @@ public class OutputTransformer implements Route {
             throw new InternalServerErrorException("Route did not respond with a protocol buffer.");
         }
 
-        return this.transform(request, response, (Message) result);
+        return transform(request, response, (Message) result);
     }
 
     /**
@@ -75,7 +75,7 @@ public class OutputTransformer implements Route {
      * @param message
      *         Protocol buffer to transform.
      */
-    private String transform(Request request, Response response, Message message) {
+    public static String transform(Request request, Response response, Message message) {
         String bestMatch = MimeParse.bestMatch(SUPPORTED_TYPES, request.headers("accept"));
 
         try {
