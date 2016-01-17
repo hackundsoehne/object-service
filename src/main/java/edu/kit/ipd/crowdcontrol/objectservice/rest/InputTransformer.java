@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.api;
+package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
@@ -15,9 +15,10 @@ import java.lang.reflect.Method;
  * @author Niklas Keller
  */
 public class InputTransformer implements Route {
+    private static final JsonFormat.Parser PARSER = JsonFormat.parser();
+
     private final Route next;
     private final Class<? extends Message> type;
-    private final JsonFormat.Parser jsonParser = JsonFormat.parser();
 
     /**
      * @param next
@@ -51,7 +52,7 @@ public class InputTransformer implements Route {
         try {
             switch (contentType) {
                 case "application/json":
-                    jsonParser.merge(body, builder);
+                    PARSER.merge(body, builder);
                     break;
                 case "application/protobuf":
                     // https://tools.ietf.org/html/draft-rfernando-protocol-buffers-00

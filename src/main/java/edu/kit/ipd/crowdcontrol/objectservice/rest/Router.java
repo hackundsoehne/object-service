@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.api;
+package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import com.google.protobuf.Message;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
@@ -21,7 +21,7 @@ import static spark.Spark.exception;
  * @author Niklas Keller
  */
 public class Router implements SparkApplication {
-    private TemplateResource templateResource;
+    private final TemplateResource templateResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.

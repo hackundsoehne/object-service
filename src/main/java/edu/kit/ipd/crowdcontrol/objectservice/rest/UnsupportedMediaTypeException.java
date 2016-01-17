@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.api;
+package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 /**
  * Thrown on requests with an invalid content-type header.
@@ -6,7 +6,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.api;
  * @author Niklas Keller
  */
 public class UnsupportedMediaTypeException extends BadRequestException {
-    private String[] supportedTypes;
+    private final String[] supportedTypes;
 
     /**
      * @param providedType

@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.api;
+package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
@@ -22,11 +22,10 @@ public class OutputTransformer implements Route {
     // Request and Response objects. We need access to the accept header and must change the type of
     // the response.
 
+    private static final JsonFormat.Printer PRINTER = JsonFormat.printer();
     private static final String TYPE_JSON = "application/json";
     private static final String TYPE_PROTOBUF = "application/protobuf";
     private static final List<String> SUPPORTED_TYPES;
-
-    private static final JsonFormat.Printer jsonPrinter = JsonFormat.printer();
 
     static {
         List<String> supported_types = new ArrayList<>();
@@ -35,7 +34,7 @@ public class OutputTransformer implements Route {
         SUPPORTED_TYPES =  Collections.unmodifiableList(supported_types);
     }
 
-    private Route route;
+    private final Route route;
 
     /**
      * @param route
@@ -85,7 +84,7 @@ public class OutputTransformer implements Route {
             switch (bestMatch) {
                 case TYPE_JSON:
                     response.type(TYPE_JSON);
-                    return jsonPrinter.print(message);
+                    return PRINTER.print(message);
                 case TYPE_PROTOBUF:
                     response.type(TYPE_PROTOBUF);
                     return new String(message.toByteArray());
