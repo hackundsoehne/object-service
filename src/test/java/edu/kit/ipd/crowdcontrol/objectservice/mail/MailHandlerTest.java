@@ -2,7 +2,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
 import org.junit.Test;
 
-import javax.mail.Flags;
 import javax.mail.Message;
 import java.util.UUID;
 

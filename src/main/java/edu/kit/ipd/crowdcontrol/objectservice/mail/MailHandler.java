@@ -15,8 +15,6 @@ import java.util.Properties;
  */
 public class MailHandler implements MailFetcher, MailSender {
 
-    private Properties props;
-    private Authenticator auth;
     private Session session;
     private String sender;
     private Store store;
@@ -32,8 +30,6 @@ public class MailHandler implements MailFetcher, MailSender {
     public MailHandler(Properties props, Authenticator auth) throws MessagingException {
         sender = props.getProperty("sender");
         props.remove("sender");
-        this.auth = auth;
-        this.props = props;
         session = Session.getInstance(props, auth);
         store = session.getStore();
     }
@@ -88,7 +84,7 @@ public class MailHandler implements MailFetcher, MailSender {
         Folder folder = store.getFolder(name);
         folder.open(Folder.READ_WRITE);
         SubjectTerm subjectterm = new SubjectTerm(subject);
-        
+
         Message[] messages = folder.search(subjectterm);
         for (Message msg : messages) {
             msg.setFlag(Flags.Flag.DELETED, true);
