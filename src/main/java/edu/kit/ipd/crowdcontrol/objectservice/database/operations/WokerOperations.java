@@ -20,7 +20,7 @@ public class WokerOperations extends AbstractOperations {
                 .set(workerRecord)
                 .returning()
                 .fetchOne()
-                .getIdworker();
+                .getIdWorker();
     }
 
     public boolean deleteWorker(WorkerRecord workerRecord) {

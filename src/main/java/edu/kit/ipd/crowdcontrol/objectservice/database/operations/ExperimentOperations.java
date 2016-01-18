@@ -34,7 +34,7 @@ public class ExperimentOperations extends AbstractOperations {
      */
     public Optional<ExperimentRecord> getExperiment(int id) {
         return create.selectFrom(Tables.EXPERIMENT)
-                .where(Tables.EXPERIMENT.IDEXPERIMENT.eq(id))
+                .where(Tables.EXPERIMENT.ID_EXPERIMENT.eq(id))
                 .fetchOptional();
     }
 
@@ -44,7 +44,7 @@ public class ExperimentOperations extends AbstractOperations {
      * @return true if successful, false if not
      */
     public boolean updateExperiment(ExperimentRecord experimentRecord) {
-        return doIfNotRunning(experimentRecord.getIdexperiment(), trans ->
+        return doIfNotRunning(experimentRecord.getIdExperiment(), trans ->
                 DSL.using(trans).executeUpdate(experimentRecord) == 1);
     }
 
@@ -58,13 +58,13 @@ public class ExperimentOperations extends AbstractOperations {
         return doIfNotRunning(id, trans -> {
             int deleted = DSL.using(trans)
                     .deleteFrom(Tables.EXPERIMENT)
-                    .where(Tables.EXPERIMENT.IDEXPERIMENT.eq(id))
+                    .where(Tables.EXPERIMENT.ID_EXPERIMENT.eq(id))
                     .execute();
             return deleted == 1;
         });
     }
 
     public Range<ExperimentRecord> getRecords(int from, boolean next, int limit) {
-        return getRange(create.selectFrom(Tables.EXPERIMENT), Tables.EXPERIMENT.IDEXPERIMENT, from, next, limit);
+        return getRange(create.selectFrom(Tables.EXPERIMENT), Tables.EXPERIMENT.ID_EXPERIMENT, from, next, limit);
     }
 }
