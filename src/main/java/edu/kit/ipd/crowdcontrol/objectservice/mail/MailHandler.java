@@ -29,7 +29,7 @@ public class MailHandler implements MailFetcher, MailSender {
      * @throws AuthenticationFailedException  Throws this exception, if there is a problem with the authentication
      * @throws MessagingException For other problems e.g. with properties object: unvalid domains, ports not valid etc.
      */
-    public MailHandler(Properties props, Authenticator auth) throws AuthenticationFailedException, MessagingException {
+    public MailHandler(Properties props, Authenticator auth) throws MessagingException {
         sender = props.getProperty("sender");
         props.remove("sender");
         this.auth = auth;
@@ -40,9 +40,7 @@ public class MailHandler implements MailFetcher, MailSender {
 
     @Override
     public Message[] fetchUnseen(String name) throws MessagingException {
-        if (!store.isConnected()) {
-            store.connect();
-        }
+        connectToStore();
 
         Folder folder = store.getFolder(name);
         folder.open(Folder.READ_ONLY);
@@ -56,9 +54,7 @@ public class MailHandler implements MailFetcher, MailSender {
 
     @Override
     public Message[] fetchFolder(String name) throws MessagingException{
-        if (!store.isConnected()) {
-            store.connect();
-        }
+        connectToStore();
 
         Folder folder = store.getFolder(name);
         folder.open(Folder.READ_ONLY);
@@ -68,9 +64,7 @@ public class MailHandler implements MailFetcher, MailSender {
 
     @Override
     public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException {
-        if (!store.isConnected()) {
-            store.connect();
-        }
+        connectToStore();
 
         Message msg = new MimeMessage(session);
         msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientMail, recipientMail));
@@ -89,16 +83,22 @@ public class MailHandler implements MailFetcher, MailSender {
      * @throws MessagingException
      */
     protected void deleteMails(String subject, String name) throws MessagingException{
-        if (!store.isConnected()) {
-            store.connect();
-        }
+        connectToStore();
+
         Folder folder = store.getFolder(name);
         folder.open(Folder.READ_WRITE);
         SubjectTerm subjectterm = new SubjectTerm(subject);
+        
         Message[] messages = folder.search(subjectterm);
         for (Message msg : messages) {
             msg.setFlag(Flags.Flag.DELETED, true);
         }
         folder.close(true);
+    }
+
+    private void connectToStore() throws MessagingException {
+        if (!store.isConnected()) {
+            store.connect();
+        }
     }
 }
