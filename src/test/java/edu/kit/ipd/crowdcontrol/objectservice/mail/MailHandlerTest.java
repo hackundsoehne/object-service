@@ -30,6 +30,7 @@ public abstract class MailHandlerTest {
 
         boolean found = false;
 
+
         for (Message message : messages) {
 
             if (message.getSubject().equals(subject)) {
@@ -37,8 +38,6 @@ public abstract class MailHandlerTest {
                 handler.deleteMails(message.getSubject(), "inbox");
                 break;
             }
-
-            System.out.println(message.getSubject());
         }
         assertTrue(found);
     }

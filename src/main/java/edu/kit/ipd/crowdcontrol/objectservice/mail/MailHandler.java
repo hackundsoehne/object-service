@@ -21,7 +21,15 @@ public class MailHandler implements MailFetcher, MailSender {
     private String sender;
     private Store store;
 
-    public MailHandler(Properties props, Authenticator auth) throws MessagingException {
+    /**
+     *
+     * A Mailhandler object to send and fetch emails.
+     * @param props properties, that describe the connection to the mailserver
+     * @param auth an authenticator authenticating the user to connect to the account
+     * @throws AuthenticationFailedException  Throws this exception, if there is a problem with the authentication
+     * @throws MessagingException For other problems e.g. with properties object: unvalid domains, ports not valid etc.
+     */
+    public MailHandler(Properties props, Authenticator auth) throws AuthenticationFailedException, MessagingException {
         sender = props.getProperty("sender");
         props.remove("sender");
         this.auth = auth;
@@ -47,7 +55,7 @@ public class MailHandler implements MailFetcher, MailSender {
     }
 
     @Override
-    public Message[] fetchFolder(String name) throws MessagingException {
+    public Message[] fetchFolder(String name) throws MessagingException{
         if (!store.isConnected()) {
             store.connect();
         }
@@ -59,7 +67,7 @@ public class MailHandler implements MailFetcher, MailSender {
     }
 
     @Override
-    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException, UndefinedForPurposeException {
+    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException {
         if (!store.isConnected()) {
             store.connect();
         }
@@ -74,11 +82,16 @@ public class MailHandler implements MailFetcher, MailSender {
         Transport.send(msg);
     }
 
+    /**
+     * Deletes all mails in a certain folder with a certain subject.
+     * @param subject the subject of the mails
+     * @param name the name of the folder
+     * @throws MessagingException
+     */
     protected void deleteMails(String subject, String name) throws MessagingException{
         if (!store.isConnected()) {
             store.connect();
         }
-        
         Folder folder = store.getFolder(name);
         folder.open(Folder.READ_WRITE);
         SubjectTerm subjectterm = new SubjectTerm(subject);
