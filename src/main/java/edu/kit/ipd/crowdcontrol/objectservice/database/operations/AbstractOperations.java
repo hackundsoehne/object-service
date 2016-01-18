@@ -47,33 +47,123 @@ public abstract class AbstractOperations {
         });
     }
 
-    protected <R extends org.jooq.Record> Range<R> getRange(SelectWhereStep<R> step, Field<Integer> primaryKey,
-                                                            int from, boolean next, int limit) {
-        return getRange(step.where(true), primaryKey, from, next, limit);
+    /**
+     * this method returns a range of results from a passed query.
+     * @param query the query to use
+     * @param primaryKey the primary key used to index the records inside the range
+     * @param start the exclusive start, when the associated record does not fulfill the conditions of the passed query
+     *              or is not existing, the range-object communicates that there are no elements left (next = true) or
+     *              right (next=false) of the range.
+     * @param next whether the Range is right (true) or left of the primary key (false) assuming natural order
+     * @param limit the max. amount of the range, may be smaller
+     * @param <R> the type of the records
+     * @return an instance of Range
+     * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
+     */
+    protected <R extends org.jooq.Record> Range<R, Integer> getNextRange(SelectWhereStep<R> query, Field<Integer> primaryKey,
+                                                                      Integer start, boolean next, int limit) {
+        return getNextRange(query, primaryKey, start, next, limit, Comparator.naturalOrder());
     }
 
-    protected <R extends org.jooq.Record> Range<R> getRange(SelectConditionStep<R> step, Field<Integer> primaryKey,
-                                                            int from, boolean next, int limit) {
-        Condition primaryKeyCondition = next
-                            ? primaryKey.greaterOrEqual(from)
-                            : primaryKey.lessThan(from);
+    /**
+     * this method returns a range of results from a passed query.
+     * @param query the query to use
+     * @param primaryKey the primary key used to index the records inside the range
+     * @param start the exclusive start, when the associated record does not fulfill the conditions of the passed query
+     *              or is not existing, the range-object communicates that there are no elements left (next = true) or
+     *              right (next=false) of the range.
+     * @param next whether the Range is right (true) or left of the primary key (false) assuming natural order
+     * @param limit the max. amount of the range, may be smaller
+     * @param <R> the type of the records
+     * @return an instance of Range
+     * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
+     */
+    protected <R extends org.jooq.Record> Range<R, Integer> getNextRange(SelectConditionStep<R> query, Field<Integer> primaryKey,
+                                                                         Integer start, boolean next, int limit) {
+        return getNextRange(query, primaryKey, start, next, limit, Comparator.naturalOrder());
+    }
 
-        SortField<Integer> sortField = next
+    /**
+     * this method returns a range of results from a passed query.
+     * @param query the query to use
+     * @param primaryKey the primary key used to index the records inside the range
+     * @param start the exclusive start, when the associated record does not fulfill the conditions of the passed query
+     *              or is not existing, the range-object communicates that there are no elements left (next = true) or
+     *              right (next=false) of the range.
+     * @param next whether the Range is right (true) or left of the primary key (false) assuming natural order
+     * @param limit the max. amount of the range, may be smaller
+     * @param sort the comparator used to sort the elements
+     * @param <R> the type of the records
+     * @param <K> the type of the primary-key
+     * @return an instance of Range
+     * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
+     */
+    protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectWhereStep<R> query, Field<K> primaryKey,
+                                                            K start, boolean next, int limit, Comparator<K> sort) {
+        return getNextRange(query.where(true), primaryKey, start, next, limit, sort);
+    }
+
+    /**
+     * this method returns a range of results from a passed query.
+     * The range is indexed by a primary key to support good performance for bigger datasets. The resulting range always
+     * starts after the passed start and tries to get the amount of records specified with limit. The next-modifier decides
+     * whether the range should be after or before the start-parameter.
+     * An application for this method could be paging where for a specific query you only want a specific range of results.
+     * @param query the query to use
+     * @param primaryKey the primary key used to index the records inside the range
+     * @param start the exclusive start, when the associated record does not fulfill the conditions of the passed query
+     *              or is not existing, the range-object communicates that there are no elements left (next = true) or
+     *              right (next=false) of the range.
+     * @param next whether the Range is right (true) or left of the primary key (false) assuming natural order
+     * @param limit the max. amount of the range, may be smaller
+     * @param sort the comparator used to sort the elements
+     * @param <R> the type of the records
+     * @param <K> the type of the primary-key
+     * @return an instance of Range
+     */
+    protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectConditionStep<R> query, Field<K> primaryKey,
+                                                            K start, boolean next, int limit, Comparator<K> sort) {
+        Condition primaryKeyCondition = next
+                            ? primaryKey.greaterOrEqual(start)
+                            : primaryKey.lessOrEqual(start);
+
+        SortField<K> sortField = next
                 ? primaryKey.asc()
                 : primaryKey.desc();
 
-        Result<R> results = step.and(primaryKeyCondition)
+        Result<R> results = query.and(primaryKeyCondition)
                 .orderBy(sortField)
-                .limit(limit + 1)
+                .limit(limit + 2)
                 .fetch();
 
-        boolean hasMore = results.size() == (limit + 1);
+        int toSkip = 0;
+        if (results.get(0).getValue(primaryKey).equals(start)) {
+            toSkip = 1;
+        }
 
         List<R> sortedResults = results.stream()
+                .skip(toSkip)
                 .limit(limit)
-                .sorted(Comparator.comparingInt(record -> record.getValue(primaryKey)))
+                .sorted(Comparator.comparing(record -> record.getValue(primaryKey), sort))
                 .collect(Collectors.toList());
 
-        return new Range<>(sortedResults, hasMore);
+        K leftLimit = null;
+        K rightLimit = null;
+        if (!sortedResults.isEmpty()) {
+            leftLimit = sortedResults.get(0).getValue(primaryKey);
+            rightLimit = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
+        }
+
+        boolean hasStart = false;
+        if (!results.isEmpty()) {
+            hasStart = results.get(0).getValue(primaryKey).equals(start);
+        }
+        boolean end = results.size() == (limit + 2);
+
+        if (next) {
+            return new Range<>(sortedResults, leftLimit, rightLimit, hasStart, end);
+        } else {
+            return new Range<>(sortedResults, leftLimit, rightLimit, end, hasStart);
+        }
     }
 }

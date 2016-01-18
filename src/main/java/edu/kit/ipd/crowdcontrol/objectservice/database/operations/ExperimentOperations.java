@@ -63,8 +63,4 @@ public class ExperimentOperations extends AbstractOperations {
             return deleted == 1;
         });
     }
-
-    public Range<ExperimentRecord> getRecords(int from, boolean next, int limit) {
-        return getRange(create.selectFrom(Tables.EXPERIMENT), Tables.EXPERIMENT.ID_EXPERIMENT, from, next, limit);
-    }
 }
