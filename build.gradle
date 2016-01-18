@@ -69,6 +69,11 @@ jooq {
 }
 generateSampleJooqSchemaSource.enabled = false
 
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
 sourceSets {
     integrationTest {
         java {
@@ -78,4 +83,16 @@ sourceSets {
         }
         resources.srcDir file('src/integration-test/resources')
     }
+}
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test
+
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
 }
