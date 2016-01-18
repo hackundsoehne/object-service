@@ -23,10 +23,10 @@ public abstract class MailHandlerTest {
         String subject = "[test] " + uuid;
 
         handler.sendMail(this.mail, subject, uuid);
-
-        // TODO: Fetch sent items here instead of received, mails need their time.
-
-        Message[] messages = handler.fetchUnseen("inbox");
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {}
+        Message[] messages = handler.fetchUnseen(folder);
 
         boolean found = false;
 
@@ -35,6 +35,7 @@ public abstract class MailHandlerTest {
 
             if (message.getSubject().equals(subject)) {
                 found = true;
+                handler.deleteMails(message.getSubject(), folder);
                 handler.deleteMails(message.getSubject(), "inbox");
                 break;
             }

@@ -14,7 +14,7 @@ public class GmailMailTest extends MailHandlerTest {
     @Before
     public void setUp() throws Exception {
         this.mail = "pseipd@gmail.com";
-        this.folder = "[Gmail]/Sent Mail";
+        this.folder = "[Gmail]/Gesendet";
 
         Properties props = new Properties();
         props.put("sender", this.mail);

@@ -14,7 +14,7 @@ public class WebMailTest extends MailHandlerTest {
     @Before
     public void setUp() throws Exception {
         this.mail = "pse2016@web.de";
-        this.folder = "Sent";
+        this.folder = "INBOX";
 
         Properties props = new Properties();
         props.put("sender", this.mail);
