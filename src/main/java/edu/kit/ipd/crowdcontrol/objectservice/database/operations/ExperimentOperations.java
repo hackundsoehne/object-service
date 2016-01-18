@@ -12,7 +12,7 @@ import java.util.Optional;
  * @author LeanderK
  * @version 1.0
  */
-public class ExperimentOperations extends AbstractOperation {
+public class ExperimentOperations extends AbstractOperations {
     protected ExperimentOperations(DSLContext create) {
         super(create);
     }
@@ -62,5 +62,9 @@ public class ExperimentOperations extends AbstractOperation {
                     .execute();
             return deleted == 1;
         });
+    }
+
+    public Range<ExperimentRecord> getRecords(int from, boolean next, int limit) {
+        return getRange(create.selectFrom(Tables.EXPERIMENT), Tables.EXPERIMENT.IDEXPERIMENT, from, next, limit);
     }
 }

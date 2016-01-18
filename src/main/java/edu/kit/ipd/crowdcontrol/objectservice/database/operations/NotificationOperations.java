@@ -20,7 +20,7 @@ import java.util.List;
  * @author LeanderK
  * @version 1.0
  */
-public class NotificationOperation extends AbstractOperation {
+public class NotificationOperations extends AbstractOperations {
     private final Connection readOnlyConnection;
     private final DSLContext readOnlyCreate;
     /**
@@ -30,7 +30,7 @@ public class NotificationOperation extends AbstractOperation {
      * @param password the matching password belonging to a read-only accoint on the DB
      * @throws SQLException if there was a problem establishing a connection to the database
      */
-    protected NotificationOperation(DatabaseManager manager, String username, String password) throws SQLException {
+    protected NotificationOperations(DatabaseManager manager, String username, String password) throws SQLException {
         super(manager.getContext());
         readOnlyConnection = DriverManager.getConnection(manager.getUrl(), username, password);
         readOnlyCreate = DSL.using(readOnlyConnection, manager.getContext().configuration().dialect());

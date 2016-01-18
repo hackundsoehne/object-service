@@ -9,7 +9,7 @@ import org.jooq.impl.DSL;
  * @author LeanderK
  * @version 1.0
  */
-public class TasksOperations extends AbstractOperation {
+public class TasksOperations extends AbstractOperations {
     protected TasksOperations(DSLContext create) {
         super(create);
     }

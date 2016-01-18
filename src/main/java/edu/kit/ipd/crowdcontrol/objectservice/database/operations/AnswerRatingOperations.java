@@ -7,7 +7,7 @@ import org.jooq.DSLContext;
  * @author LeanderK
  * @version 1.0
  */
-public class AnswerRatingOperations extends AbstractOperation {
+public class AnswerRatingOperations extends AbstractOperations {
     protected AnswerRatingOperations(DSLContext create) {
         super(create);
     }

@@ -9,9 +9,9 @@ import org.jooq.DSLContext;
  * @author LeanderK
  * @version 1.0
  */
-public class WokerOperation extends AbstractOperation {
+public class WokerOperations extends AbstractOperations {
 
-    protected WokerOperation(DSLContext create) {
+    protected WokerOperations(DSLContext create) {
         super(create);
     }
 
