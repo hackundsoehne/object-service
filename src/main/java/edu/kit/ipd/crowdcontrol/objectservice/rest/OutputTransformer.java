@@ -92,6 +92,8 @@ public class OutputTransformer implements Route {
                     throw new NotAcceptableException(request.headers("accept"), TYPE_JSON, TYPE_PROTOBUF);
             }
         } catch (InvalidProtocolBufferException e) {
+            // Can't happen, because we don't use any "Any" fields.
+            // https://developers.google.com/protocol-buffers/docs/proto3#any
             throw new InternalServerErrorException("Attempt to transform an invalid protocol buffer into JSON.");
         }
     }
