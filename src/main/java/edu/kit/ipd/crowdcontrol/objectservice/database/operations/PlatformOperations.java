@@ -17,13 +17,14 @@ public class PlatformOperations extends AbstractOperations {
      * @return
      */
     public int createPlatform(PlatformRecord taskRecord) {
-
+        //TODO: code the things
+        return -1;
     }
 
     /**
      * Delete all platforms
      */
-    public void deleteAllPlatform() {
-
+    public void deleteAllPlatforms() {
+        //TODO: code the things
     }
 }
