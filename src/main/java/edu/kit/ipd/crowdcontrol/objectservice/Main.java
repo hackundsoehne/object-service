@@ -1,6 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
-import edu.kit.ipd.crowdcontrol.objectservice.api.Router;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.api.TemplateResource;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperation;
 import org.jooq.DSLContext;

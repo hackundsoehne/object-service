@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.api;
+package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
@@ -9,6 +9,7 @@ import spark.Route;
 import spark.utils.MimeParse;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,18 +22,19 @@ public class OutputTransformer implements Route {
     // Request and Response objects. We need access to the accept header and must change the type of
     // the response.
 
+    private static final JsonFormat.Printer PRINTER = JsonFormat.printer();
     private static final String TYPE_JSON = "application/json";
     private static final String TYPE_PROTOBUF = "application/protobuf";
-
     private static final List<String> SUPPORTED_TYPES;
 
     static {
-        SUPPORTED_TYPES = new ArrayList<>();
-        SUPPORTED_TYPES.add("application/protobuf");
-        SUPPORTED_TYPES.add("application/json"); // Last to be default.
+        List<String> supported_types = new ArrayList<>();
+        supported_types.add("application/protobuf");
+        supported_types.add("application/json"); // Last to be default.
+        SUPPORTED_TYPES =  Collections.unmodifiableList(supported_types);
     }
 
-    private Route route;
+    private final Route route;
 
     /**
      * @param route
@@ -61,7 +63,7 @@ public class OutputTransformer implements Route {
             throw new InternalServerErrorException("Route did not respond with a protocol buffer.");
         }
 
-        return this.transform(request, response, (Message) result);
+        return transform(request, response, (Message) result);
     }
 
     /**
@@ -75,14 +77,14 @@ public class OutputTransformer implements Route {
      * @param message
      *         Protocol buffer to transform.
      */
-    private String transform(Request request, Response response, Message message) {
+    public static String transform(Request request, Response response, Message message) {
         String bestMatch = MimeParse.bestMatch(SUPPORTED_TYPES, request.headers("accept"));
 
         try {
             switch (bestMatch) {
                 case TYPE_JSON:
                     response.type(TYPE_JSON);
-                    return JsonFormat.printer().print(message);
+                    return PRINTER.print(message);
                 case TYPE_PROTOBUF:
                     response.type(TYPE_PROTOBUF);
                     return new String(message.toByteArray());
@@ -90,6 +92,8 @@ public class OutputTransformer implements Route {
                     throw new NotAcceptableException(request.headers("accept"), TYPE_JSON, TYPE_PROTOBUF);
             }
         } catch (InvalidProtocolBufferException e) {
+            // Can't happen, because we don't use any "Any" fields.
+            // https://developers.google.com/protocol-buffers/docs/proto3#any
             throw new InternalServerErrorException("Attempt to transform an invalid protocol buffer into JSON.");
         }
     }

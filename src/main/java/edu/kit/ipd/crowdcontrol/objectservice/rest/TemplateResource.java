@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.api;
+package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperation;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
