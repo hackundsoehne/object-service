@@ -37,7 +37,7 @@ public class WebMailTest extends MailHandlerTest {
         Authenticator auth = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("pse2016", "pse2016ipd");
+                return new PasswordAuthentication("pse2016", "pseboehm2016");
             }
         };
         handler = new MailHandler(props, auth);
