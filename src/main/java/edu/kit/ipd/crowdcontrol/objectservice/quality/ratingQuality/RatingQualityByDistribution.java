@@ -12,15 +12,7 @@ import java.util.Map;
  */
 public class RatingQualityByDistribution implements RatingQualityStrategy {
 
-    private class Tuple{
-        int count;
-        int index;
-        public Tuple(int count, int index){
-            this.count = count;
-            this.index = index;
 
-        }
-    }
 
 
     @Override
