@@ -1,7 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
-
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * The Notification class represents a complete Notification.
@@ -37,6 +37,9 @@ public class Notification implements Runnable {
         this.checkPeriod = checkPeriod;
         this.query = query;
         this.policy = policy;
+
+        // set last sent in past to allow immediate checking after creation
+        setLastSent(Instant.now().minus(sendThreshold, ChronoUnit.SECONDS));
     }
 
     /**
@@ -51,7 +54,7 @@ public class Notification implements Runnable {
      */
     public boolean thresholdPassed() {
         return ((lastSent.plusSeconds(sendThreshold)
-                .compareTo(Instant.now())) >= 0);
+                .compareTo(Instant.now())) <= 0);
     }
 
     /**

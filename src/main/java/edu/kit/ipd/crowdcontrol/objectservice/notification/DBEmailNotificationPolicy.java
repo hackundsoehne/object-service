@@ -28,15 +28,18 @@ public class DBEmailNotificationPolicy extends NotificationPolicy<Result<Record>
 
     @Override
     protected Result<Record> check(Notification notification) {
-
-        return operation.runReadOnlySQL(notification.getQuery());
+        Result<Record> result = operation.runReadOnlySQL(notification.getQuery());
+        if (result.isNotEmpty()) {
+            return result;
+        } else {
+            return null;
+        }
     }
 
 
     @Override
     protected void send(Notification notification, Result<Record> token) {
 
-        //TODO can mail format be html?
         StringBuilder message = new StringBuilder();
         message.append(notification.getDescription());
         if (token != null) {
@@ -53,7 +56,7 @@ public class DBEmailNotificationPolicy extends NotificationPolicy<Result<Record>
             e.printStackTrace();
         }
 
-        // if sent do lastsent update
+        // if sent update lastSent
         Instant now = Instant.now();
         notification.setLastSent(now);
         operation.updateLastSentForNotification(notification.getID(), now);
