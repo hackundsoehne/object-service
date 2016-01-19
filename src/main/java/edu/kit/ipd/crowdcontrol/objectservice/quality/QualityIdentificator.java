@@ -5,14 +5,14 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Rati
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
-import edu.kit.ipd.crowdcontrol.objectservice.event.EventObservable;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Answer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import org.jooq.DSLContext;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityByRatings;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityStrategy;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.*;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.RatingQualityByDistribution;
 import rx.Observable;
 import rx.Observer;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -35,8 +35,8 @@ public class QualityIdentificator implements Observer<ChangeEvent<Experiment>> {
 
     private Observable observable = EventManager.EXPERIMENT_CHANGE.getObservable();
     private AnswerRatingOperations operations;
-    private AnswerQualityIdentification answerIdentifier;
-    private RatingQualityIdentification ratingIdentifier;
+    private AnswerQualityStrategy answerIdentifier;
+    private RatingQualityStrategy ratingIdentifier;
 
 
     /**
@@ -98,7 +98,7 @@ public class QualityIdentificator implements Observer<ChangeEvent<Experiment>> {
         for (AnswerRecord answer: answers) {
             List<RatingRecord> records = operations.getRatingsOfAnswer(answer);
 
-            Map<RatingRecord,Integer> map = ratingIdentifier.rateRatings(records);
+            Map<RatingRecord,Integer> map = ratingIdentifier.identifyRatingQuality(records);
             operations.setQualityToRatings(map);
         }
 
@@ -130,11 +130,11 @@ public class QualityIdentificator implements Observer<ChangeEvent<Experiment>> {
     Setter methods might be needed if more strategies are added to RatingQualityIdentification
     and AnswerQualityIdentification
 
-    public void setAnswerIdentifier(AnswerQualityIdentification answerIdentifier) {
+    public void setAnswerIdentifier(AnswerQualityStrategy answerIdentifier) {
         this.answerIdentifier = answerIdentifier;
     }
 
-    public void setRatingIdentifier(RatingQualityIdentification ratingIdentifier) {
+    public void setRatingIdentifier(RatingQualityStrategy ratingIdentifier) {
         this.ratingIdentifier = ratingIdentifier;
     }
 
