@@ -4,6 +4,10 @@ import org.junit.Before;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
+
+import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+
 import java.util.Properties;
 
 /**
@@ -31,10 +35,15 @@ public class GmailMailTest extends MailHandlerTest {
         props.put("mail.imap.ssl.enable", "true");
         java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
         props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+
+        Properties properties = new Properties();
+        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/integration-test/resources/gmailLogin.properties"));
+        properties.load(stream);
+        stream.close();
         Authenticator auth = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("pseipd@gmail.com", "pseboehm");
+                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
             }
         };
         handler = new MailHandler(props, auth);
