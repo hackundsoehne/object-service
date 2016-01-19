@@ -1,6 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperation;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
 import spark.Request;
@@ -15,9 +15,9 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.QueryParamUtil.getInte
  * @author Niklas Keller
  */
 public class TemplateResource {
-    private TemplateOperation operation;
+    private TemplateOperations operation;
 
-    public TemplateResource(TemplateOperation operation) {
+    public TemplateResource(TemplateOperations operation) {
         this.operation = operation;
     }
 

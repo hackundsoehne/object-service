@@ -1,8 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
-import edu.kit.ipd.crowdcontrol.objectservice.api.TemplateResource;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperation;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.TemplateResource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -54,8 +54,8 @@ public class Main {
 
     private static void boot(Connection connection) {
         DSLContext context = DSL.using(connection, SQLDialect.MYSQL);
-        TemplateOperation templateOperation = new TemplateOperation(context);
+        TemplateOperations templateOperations = new TemplateOperations(context);
 
-        new Router(new TemplateResource(templateOperation)).init();
+        new Router(new TemplateResource(templateOperations)).init();
     }
 }

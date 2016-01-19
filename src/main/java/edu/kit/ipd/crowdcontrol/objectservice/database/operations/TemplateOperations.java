@@ -12,8 +12,8 @@ import org.jooq.Result;
 /**
  * @author Niklas Keller
  */
-public class TemplateOperation extends AbstractOperation {
-    public TemplateOperation(DSLContext create) {
+public class TemplateOperations extends AbstractOperations {
+    public TemplateOperations(DSLContext create) {
         super(create);
     }
 
@@ -33,8 +33,8 @@ public class TemplateOperation extends AbstractOperation {
         // TODO: Use boolean or enum for ASC / DESC?
         // TODO: How to do next and prev for pagination? Select one more + the one before?
         Condition condition = asc
-                ? Tables.TEMPLATE.IDTEMPLATE.greaterOrEqual(ref)
-                : Tables.TEMPLATE.IDTEMPLATE.lessOrEqual(ref);
+                ? Tables.TEMPLATE.ID_TEMPLATE.greaterOrEqual(ref)
+                : Tables.TEMPLATE.ID_TEMPLATE.lessOrEqual(ref);
 
         Result<TemplateRecord> result = create.selectFrom(Tables.TEMPLATE)
                 .where(condition)
@@ -60,7 +60,7 @@ public class TemplateOperation extends AbstractOperation {
      */
     public Template get(int id) {
         Result<TemplateRecord> result = create.selectFrom(Tables.TEMPLATE)
-                .where(Tables.TEMPLATE.IDTEMPLATE.eq(id))
+                .where(Tables.TEMPLATE.ID_TEMPLATE.eq(id))
                 .fetch();
 
         if (result.isEmpty()) {
@@ -118,7 +118,7 @@ public class TemplateOperation extends AbstractOperation {
                 : AnswerType.TEXT;
 
         return Template.newBuilder()
-                .setId(record.getIdtemplate())
+                .setId(record.getIdTemplate())
                 .setName(record.getTitel())
                 .setContent(record.getTemplate())
                 .setAnswerType(answerType).build();
