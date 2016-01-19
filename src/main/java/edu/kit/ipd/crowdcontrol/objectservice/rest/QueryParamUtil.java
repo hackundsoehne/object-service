@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.api;
+package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import spark.Request;
 

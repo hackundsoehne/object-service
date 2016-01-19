@@ -6,8 +6,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
 import spark.Request;
 import spark.Response;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.api.QueryParamUtil.getBoolean;
-import static edu.kit.ipd.crowdcontrol.objectservice.api.QueryParamUtil.getInteger;
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.QueryParamUtil.getBoolean;
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.QueryParamUtil.getInteger;
 
 /**
  * Handles requests to template resources.

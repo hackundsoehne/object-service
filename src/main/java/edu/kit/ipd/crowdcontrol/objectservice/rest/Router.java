@@ -39,8 +39,7 @@ public class Router implements SparkApplication {
 
         exception(NotFoundException.class, (exception, request, response) -> {
             response.status(404);
-            response.type("application/json");
-            response.body(gson.toJson(new ErrorResponse("notFound", exception.getMessage())));
+            response.body(error(request, response, "notFound", exception.getMessage()));
         });
 
         exception(NotAcceptableException.class, (exception, request, response) -> {
