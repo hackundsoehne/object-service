@@ -31,7 +31,7 @@ public class NotificationController {
 
         loadNotificationsFromDatabase();
 
-        EventManager.NOTIFICATION_CREATE.getObservable().subscribe(this::newNotification);
+        EventManager.NOTIFICATION_CREATE.getObservable().subscribe(this::createNotification);
         EventManager.NOTIFICATION_DELETE.getObservable().subscribe(this::deleteNotification);
         EventManager.NOTIFICATION_UPDATE.getObservable().subscribe(this::updateNotification);
     }
@@ -39,7 +39,7 @@ public class NotificationController {
     private void loadNotificationsFromDatabase() {
         List<NotificationRecord> notificationList = operation.getAllNotifications();
         for (NotificationRecord record : notificationList) {
-            newNotification(new Notification(record.getIdnotification(), record.getName(), record.getDescription(),
+            createNotification(new Notification(record.getIdnotification(), record.getName(), record.getDescription(),
                     record.getSendthreshold(), record.getCheckperiod(), record.getQuery(), policy));
         }
     }
@@ -49,12 +49,12 @@ public class NotificationController {
      *
      * @param notification the notification to create
      */
-    public void newNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notification) {
+    public void createNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notification) {
         Notification internalNotification = new Notification(notification.getId(), notification.getName(),
                 notification.getDescription(), notification.getSendThreshold(),
                 notification.getCheckPeriod(), notification.getQuery(), policy);
 
-        newNotification(internalNotification);
+        createNotification(internalNotification);
     }
 
     /**
@@ -62,7 +62,7 @@ public class NotificationController {
      *
      * @param notification the notification to create
      */
-    public void newNotification(Notification notification) {
+    public void createNotification(Notification notification) {
         final ScheduledFuture<?> notificationHandle =
                 scheduler.scheduleAtFixedRate(notification, 0, notification.getCheckPeriod(), TimeUnit.SECONDS);
         handleMap.put(notification.getID(), notificationHandle);
@@ -99,6 +99,6 @@ public class NotificationController {
     public void updateNotification(ChangeEvent<edu.kit.ipd.crowdcontrol.objectservice.proto.Notification> notificationChangeEvent) {
         edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notification = notificationChangeEvent.getNeww();
         deleteNotification(notification);
-        newNotification(notification);
+        createNotification(notification);
     }
 }
