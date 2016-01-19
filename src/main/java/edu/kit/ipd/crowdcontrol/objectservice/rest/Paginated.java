@@ -5,8 +5,6 @@ import com.google.protobuf.Message;
 /**
  * Represents a page containing the items and whether there's a next / previous page.
  *
- * @param <T>
- *         Type of the data.
  * @param <X>
  *         Type of the cursor.
  *

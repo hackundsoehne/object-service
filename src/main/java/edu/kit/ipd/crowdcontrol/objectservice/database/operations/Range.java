@@ -1,6 +1,11 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.protobuf.Message;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
+
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -104,5 +109,21 @@ public class Range<T, X> {
      */
     public boolean hasSuccessors() {
         return hasSuccessors;
+    }
+
+    /**
+     * constructs an instance of Paginated out of the range if the range is existing (not empty)
+     * @param builder the builder to use
+     * @param merge the function to merge the data into the builder
+     * @param <R> the type of the builder
+     * @return an instance Paginated
+     */
+    public<R extends Message.Builder> Optional<Paginated<X>> constructPaginated(R builder, BiFunction<R, List<T>, R> merge) {
+        if (data.isEmpty()) {
+            return Optional.empty();
+        } else {
+            Message message = merge.apply(builder, data).build();
+            return Optional.of(new Paginated<>(message, left, right, hasPredecessors, hasSuccessors));
+        }
     }
 }

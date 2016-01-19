@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -45,6 +46,16 @@ public abstract class AbstractOperations {
                 throw new IllegalArgumentException("Experiment is running");
             }
         });
+    }
+
+    /**
+     * returns whether the MessageOrBuilder has the passed field.
+     * @param messageOrBuilder the MessageOrBuilder to check on
+     * @param field the field to exist
+     * @return tre if it has the field, false if not
+     */
+    protected boolean hasField(MessageOrBuilder messageOrBuilder, int field) {
+        return messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field));
     }
 
     /**

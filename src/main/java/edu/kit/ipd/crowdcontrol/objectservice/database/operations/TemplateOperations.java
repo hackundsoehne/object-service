@@ -7,7 +7,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.NotFoundException;
 import org.jooq.DSLContext;
-import org.jooq.Result;
+
+import java.util.Optional;
+
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.TEMPLATE;
 
 /**
  * @author Niklas Keller
@@ -30,12 +33,8 @@ public class TemplateOperations extends AbstractOperations {
      * @return List of templates.
      */
     public Range<Template, Integer> all(int cursor, boolean next, int limit) {
-        Range<TemplateRecord, Integer> range = getNextRange(
-                create.selectFrom(Tables.TEMPLATE),
-                Tables.TEMPLATE.ID_TEMPLATE, cursor, next, limit
-        );
-
-        return range.map(this::toProto);
+        return  getNextRange(create.selectFrom(TEMPLATE), TEMPLATE.ID_TEMPLATE, cursor, next, limit)
+                .map(this::toProto);
     }
 
     /**
@@ -46,38 +45,27 @@ public class TemplateOperations extends AbstractOperations {
      *
      * @return The template.
      */
-    public Template get(int id) {
-        Result<TemplateRecord> result = create.fetch(Tables.TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id));
-
-        if (result.isEmpty()) {
-            return null;
-        }
-
-        return toProto(result.get(0));
+    public Optional<Template> get(int id) {
+        return create.fetchOptional(TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id))
+                .map(this::toProto);
     }
 
     /**
      * Creates a new template.
      *
-     * @param template
+     * @param toStore
      *         Template to save.
      *
      * @return Template with ID assigned.
      */
-    public Template create(Template template) {
-        if (!hasFields(template, Template.NAME_FIELD_NUMBER, Template.CONTENT_FIELD_NUMBER)) {
+    public Template create(Template toStore) {
+        if (!hasField(toStore, Template.NAME_FIELD_NUMBER) || !hasField(toStore, Template.CONTENT_FIELD_NUMBER)) {
             throw new BadRequestException("Name and content must be set!");
         }
-
-        String type = template.getAnswerType().name();
-
-        TemplateRecord record = create.newRecord(Tables.TEMPLATE);
-        record.setTitel(template.getName());
-        record.setTemplate(template.getContent());
-        record.setAnswerType(type.equals("INVALID") ? "TEXT" : type);
-        record.store();
-
-        return this.get(record.getIdTemplate());
+        TemplateRecord templateRecord = toRecord(toStore);
+        templateRecord.setIdTemplate(null);
+        templateRecord.insert();
+        return toProto(templateRecord);
     }
 
     /**
@@ -91,29 +79,15 @@ public class TemplateOperations extends AbstractOperations {
      * @return Updated template.
      */
     public Template update(int id, Template template) {
-        TemplateRecord record = create.fetchOne(Tables.TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id));
-
-        if (record == null) {
-            throw new NotFoundException("Template does not exist!");
-        }
-
-        if (hasFields(template, Template.NAME_FIELD_NUMBER)) {
-            record.setTitel(template.getName());
-        }
-
-        if (hasFields(template, Template.CONTENT_FIELD_NUMBER)) {
-            record.setTemplate(template.getContent());
-        }
-
-        if (template.getAnswerType() != AnswerType.INVALID) {
-            record.setAnswerType(template.getAnswerType().name());
-        }
-
-        if (record.changed()) {
-            record.store();
-        }
-
-        return this.get(id);
+        TemplateRecord templateRecord = toRecord(template);
+        templateRecord.setIdTemplate(id);
+        TemplateRecord resultingRecord = create.update(Tables.TEMPLATE)
+                .set(templateRecord)
+                .where(TEMPLATE.ID_TEMPLATE.eq(id))
+                .returning()
+                .fetchOptional()
+                .orElseThrow(() -> new NotFoundException("Template does not exist!"));
+        return toProto(resultingRecord);
     }
 
     /**
@@ -121,25 +95,13 @@ public class TemplateOperations extends AbstractOperations {
      *
      * @param id
      *         ID of the template.
+     *
+     * @return {@code true} if deleted, {@code false} otherwise.
      */
-    public void delete(int id) {
-        TemplateRecord record = create.fetchOne(Tables.TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id));
-
-        if (record == null) {
-            throw new NotFoundException("Template does not exist!");
-        }
-
-        record.delete();
-    }
-
-    private static boolean hasFields(Template template, int... fields) {
-        for (int field : fields) {
-            if (!template.hasField(Template.getDescriptor().findFieldByNumber(field))) {
-                return false;
-            }
-        }
-
-        return true;
+    public boolean delete(int id) {
+        TemplateRecord record = create.newRecord(Tables.TEMPLATE);
+        record.setIdTemplate(id);
+        return create.executeDelete(record, Tables.TEMPLATE.ID_TEMPLATE.eq(id)) == 1;
     }
 
     private Template toProto(TemplateRecord record) {
@@ -152,5 +114,15 @@ public class TemplateOperations extends AbstractOperations {
                 .setName(record.getTitel())
                 .setContent(record.getTemplate())
                 .setAnswerType(answerType).build();
+    }
+
+    private TemplateRecord toRecord(Template template) {
+        TemplateRecord templateRecord = new TemplateRecord();
+        templateRecord.setTitel(template.getName());
+        templateRecord.setTemplate(template.getContent());
+        templateRecord.setAnswerType(template.getAnswerType().name());
+        if (template.hasField(template.getDescriptorForType().findFieldByNumber(Template.ID_FIELD_NUMBER)))
+            templateRecord.setIdTemplate(template.getId());
+        return templateRecord;
     }
 }

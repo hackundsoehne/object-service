@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.Range;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
@@ -16,10 +15,10 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.QueryParamUtil.getInte
  * @author Niklas Keller
  */
 public class TemplateResource {
-    private TemplateOperations operation;
+    private TemplateOperations operations;
 
-    public TemplateResource(TemplateOperations operation) {
-        this.operation = operation;
+    public TemplateResource(TemplateOperations operations) {
+        this.operations = operations;
     }
 
     /**
@@ -34,16 +33,9 @@ public class TemplateResource {
         int from = getInteger(request, "from", 0);
         boolean asc = getBoolean(request, "asc", true);
 
-        Range<Template, Integer> range = operation.all(from, asc, 20);
-
-        if (range.getData().isEmpty()) {
-            throw new NotFoundException("Resources not found.");
-        }
-
-        TemplateList.Builder builder = TemplateList.newBuilder();
-        range.getData().forEach(builder::addItems);
-
-        return new Paginated<>(builder.build(), range.getLeft(), range.getRight(), range.hasPredecessors(), range.hasSuccessors());
+        return operations.all(from, asc, 20)
+                .constructPaginated(TemplateList.newBuilder(), TemplateList.Builder::addAllItems)
+                .orElseThrow(() -> new NotFoundException("Resources not found."));
     }
 
     /**
@@ -63,13 +55,8 @@ public class TemplateResource {
             throw new BadRequestException("ID must be a valid integer.");
         }
 
-        Template template = operation.get(id);
-
-        if (template == null) {
-            throw new NotFoundException("Resource not found.");
-        }
-
-        return template;
+        return operations.get(id)
+                .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
 
     /**
@@ -83,7 +70,7 @@ public class TemplateResource {
     public Template put(Request request, Response response) {
         Template template = request.attribute("input");
 
-        return operation.create(template);
+        return operations.create(template);
     }
 
     /**
@@ -105,7 +92,7 @@ public class TemplateResource {
 
         Template template = request.attribute("input");
 
-        return operation.update(id, template);
+        return operations.update(id, template);
     }
 
     /**
@@ -125,7 +112,10 @@ public class TemplateResource {
             throw new BadRequestException("ID must be a valid integer.");
         }
 
-        operation.delete(id);
+        boolean existed = operations.delete(id);
+        if (!existed) {
+            throw new NotFoundException("Template does not exist!");
+        }
 
         return null;
     }
