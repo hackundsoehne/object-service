@@ -8,9 +8,11 @@ import spark.Response;
 import spark.Route;
 import spark.utils.MimeParse;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.*;
 
 /**
  * Transforms protocol buffer objects into JSON / protocol buffer responses.
@@ -31,7 +33,7 @@ public class OutputTransformer implements Route {
         List<String> supported_types = new ArrayList<>();
         supported_types.add("application/protobuf");
         supported_types.add("application/json"); // Last to be default.
-        SUPPORTED_TYPES =  Collections.unmodifiableList(supported_types);
+        SUPPORTED_TYPES = Collections.unmodifiableList(supported_types);
     }
 
     private final Route route;
@@ -57,13 +59,45 @@ public class OutputTransformer implements Route {
             return "";
         }
 
-        if (!(result instanceof Message)) {
+        Message message;
+
+        if (result instanceof Message) {
+            message = (Message) result;
+        } else if (result instanceof Paginated) {
+            Paginated paginated = (Paginated) result;
+            StringBuilder linkBuilder = new StringBuilder();
+
+            if (paginated.hasPrevious()) {
+                Map<String, String> params = new HashMap<>();
+                params.put("from", paginated.getLeft().toString());
+                params.put("asc", "false");
+
+                linkBuilder.append("<").append(link(request, params)).append("> rel=\"prev\", ");
+            }
+
+            if (paginated.hasNext()) {
+                Map<String, String> params = new HashMap<>();
+                params.put("from", paginated.getRight().toString());
+                params.put("asc", "true");
+
+                linkBuilder.append("<").append(link(request, params)).append("> rel=\"next\", ");
+            }
+
+            String link = linkBuilder.toString();
+
+            if (!link.isEmpty()) {
+                link = link.substring(0, link.length() - 2); // remove trailing comma
+                response.header("Link", link);
+            }
+
+            message = paginated.getMessage();
+        } else {
             // Unfortunately, we can't statically check this,
             // because of the method signature of Spark's Route interface.
-            throw new InternalServerErrorException("Route did not respond with a protocol buffer.");
+            throw new InternalServerErrorException("Route did not respond with a protocol buffer or paginated.");
         }
 
-        return transform(request, response, (Message) result);
+        return transform(request, response, message);
     }
 
     /**
@@ -96,5 +130,48 @@ public class OutputTransformer implements Route {
             // https://developers.google.com/protocol-buffers/docs/proto3#any
             throw new InternalServerErrorException("Attempt to transform an invalid protocol buffer into JSON.");
         }
+    }
+
+    public static String link(Request request, Map<String, String> replaceQueryParams) {
+        StringBuilder builder = new StringBuilder();
+        URL url;
+
+        try {
+            url = new URL(request.url());
+        } catch (MalformedURLException e) {
+            throw new InternalServerErrorException("Request URI could not be parsed!");
+        }
+
+        builder.append(url.getPath()).append("?");
+
+        try {
+            for (String key : request.queryParams()) {
+                if (replaceQueryParams.containsKey(key)) {
+                    continue;
+                }
+
+                builder.append(URLEncoder.encode(key, "utf-8"));
+                builder.append("=");
+                builder.append(URLEncoder.encode(request.queryParams(key), "utf-8"));
+                builder.append("&");
+            }
+
+            for (String key : replaceQueryParams.keySet()) {
+                builder.append(URLEncoder.encode(key, "utf-8"));
+                builder.append("=");
+                builder.append(URLEncoder.encode(replaceQueryParams.get(key), "utf-8"));
+                builder.append("&");
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new InternalServerErrorException("utf-8 is an unsupported encoding");
+        }
+
+        String link = builder.toString();
+
+        if (link.isEmpty()) {
+            return link;
+        }
+
+        return link.substring(0, link.length() - 1);
     }
 }

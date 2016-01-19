@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.Range;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
@@ -29,17 +30,20 @@ public class TemplateResource {
      *
      * @return A list of all templates.
      */
-    public TemplateList all(Request request, Response response) {
-        int from = getInteger(request, "from", 1);
+    public Paginated<Integer> all(Request request, Response response) {
+        int from = getInteger(request, "from", 0);
         boolean asc = getBoolean(request, "asc", true);
 
-        TemplateList list = operation.all(from, asc);
+        Range<Template, Integer> range = operation.all(from, asc, 20);
 
-        if (list.getItemsCount() == 0) {
+        if (range.getData().isEmpty()) {
             throw new NotFoundException("Resources not found.");
         }
 
-        return list;
+        TemplateList.Builder builder = TemplateList.newBuilder();
+        range.getData().forEach(builder::addItems);
+
+        return new Paginated<>(builder.build(), range.getLeft(), range.getRight(), range.hasPredecessors(), range.hasSuccessors());
     }
 
     /**
@@ -121,9 +125,7 @@ public class TemplateResource {
             throw new BadRequestException("ID must be a valid integer.");
         }
 
-        if (!operation.delete(id)) {
-            throw new NotFoundException("There's no template with ID '%d'", id);
-        }
+        operation.delete(id);
 
         return null;
     }

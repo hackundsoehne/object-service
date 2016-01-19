@@ -4,8 +4,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
-import org.jooq.Condition;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.NotFoundException;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 
@@ -17,37 +17,25 @@ public class TemplateOperations extends AbstractOperations {
         super(create);
     }
 
-    // TODO: DB calls
-
     /**
-     * Returns 20 templates starting from {@code ref}.
+     * Returns a range of templates starting from {@code cursor}.
      *
-     * @param ref
-     *         ID of the first element.
-     * @param asc
-     *         Larger or smaller IDs?
+     * @param cursor
+     *         Pagination cursor.
+     * @param next
+     *         {@code true} for next, {@code false} for previous.
+     * @param limit
+     *         Number of records.
      *
      * @return List of templates.
      */
-    public TemplateList all(int ref, boolean asc) {
-        // TODO: Use boolean or enum for ASC / DESC?
-        // TODO: How to do next and prev for pagination? Select one more + the one before?
-        Condition condition = asc
-                ? Tables.TEMPLATE.ID_TEMPLATE.greaterOrEqual(ref)
-                : Tables.TEMPLATE.ID_TEMPLATE.lessOrEqual(ref);
+    public Range<Template, Integer> all(int cursor, boolean next, int limit) {
+        Range<TemplateRecord, Integer> range = getNextRange(
+                create.selectFrom(Tables.TEMPLATE),
+                Tables.TEMPLATE.ID_TEMPLATE, cursor, next, limit
+        );
 
-        Result<TemplateRecord> result = create.selectFrom(Tables.TEMPLATE)
-                .where(condition)
-                .limit(20)
-                .fetch();
-
-        TemplateList.Builder builder = TemplateList.newBuilder();
-
-        for (TemplateRecord record : result) {
-            builder.addItems(toProto(record));
-        }
-
-        return builder.build();
+        return range.map(this::toProto);
     }
 
     /**
@@ -59,9 +47,7 @@ public class TemplateOperations extends AbstractOperations {
      * @return The template.
      */
     public Template get(int id) {
-        Result<TemplateRecord> result = create.selectFrom(Tables.TEMPLATE)
-                .where(Tables.TEMPLATE.ID_TEMPLATE.eq(id))
-                .fetch();
+        Result<TemplateRecord> result = create.fetch(Tables.TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id));
 
         if (result.isEmpty()) {
             return null;
@@ -79,8 +65,19 @@ public class TemplateOperations extends AbstractOperations {
      * @return Template with ID assigned.
      */
     public Template create(Template template) {
-        // TODO: Use passed template or call .get(id)?
-        return template.toBuilder().setId(1).build();
+        if (!hasFields(template, Template.NAME_FIELD_NUMBER, Template.CONTENT_FIELD_NUMBER)) {
+            throw new BadRequestException("Name and content must be set!");
+        }
+
+        String type = template.getAnswerType().name();
+
+        TemplateRecord record = create.newRecord(Tables.TEMPLATE);
+        record.setTitel(template.getName());
+        record.setTemplate(template.getContent());
+        record.setAnswerType(type.equals("INVALID") ? "TEXT" : type);
+        record.store();
+
+        return this.get(record.getIdTemplate());
     }
 
     /**
@@ -94,9 +91,29 @@ public class TemplateOperations extends AbstractOperations {
      * @return Updated template.
      */
     public Template update(int id, Template template) {
-        // TODO: Use template.getId or pass id?
-        // TODO: Use passed template or call .get(id)?
-        return template;
+        TemplateRecord record = create.fetchOne(Tables.TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id));
+
+        if (record == null) {
+            throw new NotFoundException("Template does not exist!");
+        }
+
+        if (hasFields(template, Template.NAME_FIELD_NUMBER)) {
+            record.setTitel(template.getName());
+        }
+
+        if (hasFields(template, Template.CONTENT_FIELD_NUMBER)) {
+            record.setTemplate(template.getContent());
+        }
+
+        if (template.getAnswerType() != AnswerType.INVALID) {
+            record.setAnswerType(template.getAnswerType().name());
+        }
+
+        if (record.changed()) {
+            record.store();
+        }
+
+        return this.get(id);
     }
 
     /**
@@ -104,16 +121,29 @@ public class TemplateOperations extends AbstractOperations {
      *
      * @param id
      *         ID of the template.
-     *
-     * @return {@code true} if deleted, {@code false} otherwise.
      */
-    public boolean delete(int id) {
-        // TODO: Void + exception or boolean?
-        return false;
+    public void delete(int id) {
+        TemplateRecord record = create.fetchOne(Tables.TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id));
+
+        if (record == null) {
+            throw new NotFoundException("Template does not exist!");
+        }
+
+        record.delete();
+    }
+
+    private static boolean hasFields(Template template, int... fields) {
+        for (int field : fields) {
+            if (!template.hasField(Template.getDescriptor().findFieldByNumber(field))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private Template toProto(TemplateRecord record) {
-        AnswerType answerType = record.getAnswerType().equals("IMAGE")
+        AnswerType answerType = "IMAGE".equals(record.getAnswerType())
                 ? AnswerType.IMAGE
                 : AnswerType.TEXT;
 

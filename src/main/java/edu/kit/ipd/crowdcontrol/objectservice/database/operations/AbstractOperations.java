@@ -49,6 +49,7 @@ public abstract class AbstractOperations {
 
     /**
      * this method returns a range of results from a passed query.
+     * @param <R> the type of the records
      * @param query the query to use
      * @param primaryKey the primary key used to index the records inside the range
      * @param start the exclusive start, when the associated record does not fulfill the conditions of the passed query
@@ -56,7 +57,6 @@ public abstract class AbstractOperations {
      *              right (next=false) of the range.
      * @param next whether the Range is right (true) or left of the primary key (false) assuming natural order
      * @param limit the max. amount of the range, may be smaller
-     * @param <R> the type of the records
      * @return an instance of Range
      * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
      */
@@ -137,8 +137,9 @@ public abstract class AbstractOperations {
                 .fetch();
 
         int toSkip = 0;
-        if (results.get(0).getValue(primaryKey).equals(start)) {
-            toSkip = 1;
+
+        if (results.isNotEmpty() && results.get(0).getValue(primaryKey).equals(start)) {
+            toSkip++;
         }
 
         List<R> sortedResults = results.stream()
@@ -147,23 +148,21 @@ public abstract class AbstractOperations {
                 .sorted(Comparator.comparing(record -> record.getValue(primaryKey), sort))
                 .collect(Collectors.toList());
 
-        K leftLimit = null;
-        K rightLimit = null;
+        K left = null;
+        K right = null;
+
         if (!sortedResults.isEmpty()) {
-            leftLimit = sortedResults.get(0).getValue(primaryKey);
-            rightLimit = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
+            left = sortedResults.get(0).getValue(primaryKey);
+            right = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
         }
 
-        boolean hasStart = false;
-        if (!results.isEmpty()) {
-            hasStart = results.get(0).getValue(primaryKey).equals(start);
-        }
-        boolean end = results.size() == (limit + 2);
+        boolean hasPredecessors = !results.isEmpty() && results.get(0).getValue(primaryKey).equals(start);
+        boolean hasSuccessors = results.size() == (limit + 2);
 
         if (next) {
-            return new Range<>(sortedResults, leftLimit, rightLimit, hasStart, end);
+            return new Range<>(sortedResults, left, right, hasPredecessors, hasSuccessors);
         } else {
-            return new Range<>(sortedResults, leftLimit, rightLimit, end, hasStart);
+            return new Range<>(sortedResults, left, right, hasSuccessors, hasPredecessors);
         }
     }
 }
