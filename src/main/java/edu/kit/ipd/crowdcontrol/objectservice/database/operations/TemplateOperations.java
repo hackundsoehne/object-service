@@ -4,8 +4,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.BadRequestException;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.NotFoundException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
 
 import java.util.Optional;

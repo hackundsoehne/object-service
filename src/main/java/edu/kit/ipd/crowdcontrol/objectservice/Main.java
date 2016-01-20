@@ -2,9 +2,9 @@ package edu.kit.ipd.crowdcontrol.objectservice;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRestOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.NotificationResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.TemplateResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;

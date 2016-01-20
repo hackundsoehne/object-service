@@ -1,4 +1,6 @@
-package edu.kit.ipd.crowdcontrol.objectservice.rest;
+package edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions;
+
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 
 /**
  * Thrown on requests with an invalid content-type header.

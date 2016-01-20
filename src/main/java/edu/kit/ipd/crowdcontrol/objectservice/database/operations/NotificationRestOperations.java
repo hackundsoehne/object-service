@@ -2,8 +2,8 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.BadRequestException;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.NotFoundException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
 
 import java.util.Optional;

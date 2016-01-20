@@ -1,17 +1,24 @@
-package edu.kit.ipd.crowdcontrol.objectservice.rest;
+package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRestOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.NotificationList;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
-public class NotificationResource {
-    private NotificationRestOperations operations;
+/**
+ * Handles requests to template resources.
+ *
+ * @author Niklas Keller
+ */
+public class TemplateResource {
+    private TemplateOperations operations;
 
-    public NotificationResource(NotificationRestOperations operations) {
+    public TemplateResource(TemplateOperations operations) {
         this.operations = operations;
     }
 
@@ -28,8 +35,8 @@ public class NotificationResource {
         boolean asc = getQueryBool(request, "asc", true);
 
         return operations.all(from, asc, 20)
-                .constructPaginated(NotificationList.newBuilder(), NotificationList.Builder::addAllItems)
-                .orElseThrow(() -> new NotFoundException("No resources found."));
+                .constructPaginated(TemplateList.newBuilder(), TemplateList.Builder::addAllItems)
+                .orElseThrow(() -> new NotFoundException("Resources not found."));
     }
 
     /**
@@ -40,7 +47,7 @@ public class NotificationResource {
      *
      * @return A single template.
      */
-    public Notification get(Request request, Response response) {
+    public Template get(Request request, Response response) {
         return operations.get(getParamInt(request, "id"))
                 .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
@@ -53,14 +60,14 @@ public class NotificationResource {
      *
      * @return The created template.
      */
-    public Notification put(Request request, Response response) {
-        Notification notification = request.attribute("input");
-        notification = operations.create(notification);
+    public Template put(Request request, Response response) {
+        Template template = request.attribute("input");
+        template = operations.create(template);
 
         response.status(201);
-        response.header("Location", "/notifications/" + notification.getId());
+        response.header("Location", "/notifications/" + template.getId());
 
-        return notification;
+        return template;
     }
 
     /**
@@ -71,9 +78,9 @@ public class NotificationResource {
      *
      * @return The modified template.
      */
-    public Notification patch(Request request, Response response) {
-        Notification notification = request.attribute("input");
-        return operations.update(getParamInt(request, "id"), notification);
+    public Template patch(Request request, Response response) {
+        Template template = request.attribute("input");
+        return operations.update(getParamInt(request, "id"), template);
     }
 
     /**
@@ -84,7 +91,7 @@ public class NotificationResource {
      *
      * @return {@code null}.
      */
-    public Notification delete(Request request, Response response) {
+    public Template delete(Request request, Response response) {
         boolean existed = operations.delete(getParamInt(request, "id"));
 
         if (!existed) {

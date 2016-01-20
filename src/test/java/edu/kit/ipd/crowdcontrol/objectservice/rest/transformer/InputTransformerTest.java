@@ -1,6 +1,8 @@
-package edu.kit.ipd.crowdcontrol.objectservice.rest;
+package edu.kit.ipd.crowdcontrol.objectservice.rest.transformer;
 
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.UnsupportedMediaTypeException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.InputTransformer;
 import org.junit.Before;
 import org.junit.Test;
 import spark.Request;

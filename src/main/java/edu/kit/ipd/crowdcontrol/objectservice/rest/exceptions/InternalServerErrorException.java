@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.rest;
+package edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions;
 
 /**
  * Thrown on internal errors that require code changes. Any condition that can trigger such an error
