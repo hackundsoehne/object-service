@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord;
 
 import org.jooq.DSLContext;
@@ -7,6 +8,7 @@ import org.jooq.DSLContext;
 import java.util.List;
 
 /**
+ * contains all the Operations needed for the Payment-Table
  * @author LeanderK
  * @version 1.0
  */
@@ -15,9 +17,15 @@ public class PaymentOperations extends AbstractOperations {
         super(create);
     }
 
+    /**
+     * Returns all the payments for the passed workerID.
+     * @param workerID the primary key of the worker
+     * @return a list of payment
+     */
     public List<PaymentRecord> getAllPayments(int workerID) {
-        //TODO
-        return null;
+        return create.selectFrom(Tables.PAYMENT)
+                .where(Tables.PAYMENT.WORKER_ID.eq(workerID))
+                .fetch();
     }
 
 
