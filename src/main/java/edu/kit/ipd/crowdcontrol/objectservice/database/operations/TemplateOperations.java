@@ -4,8 +4,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.BadRequestException;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.NotFoundException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
 
 import java.util.Optional;
@@ -33,7 +33,7 @@ public class TemplateOperations extends AbstractOperations {
      * @return List of templates.
      */
     public Range<Template, Integer> all(int cursor, boolean next, int limit) {
-        return  getNextRange(create.selectFrom(TEMPLATE), TEMPLATE.ID_TEMPLATE, cursor, next, limit)
+        return getNextRange(create.selectFrom(TEMPLATE), TEMPLATE.ID_TEMPLATE, cursor, next, limit)
                 .map(this::toProto);
     }
 
@@ -62,10 +62,11 @@ public class TemplateOperations extends AbstractOperations {
         if (!hasField(toStore, Template.NAME_FIELD_NUMBER) || !hasField(toStore, Template.CONTENT_FIELD_NUMBER)) {
             throw new BadRequestException("Name and content must be set!");
         }
-        TemplateRecord templateRecord = toRecord(toStore);
-        templateRecord.setIdTemplate(null);
-        templateRecord.insert();
-        return toProto(templateRecord);
+
+        TemplateRecord record = mergeRecord(create.newRecord(TEMPLATE), toStore);
+        record.store();
+
+        return toProto(record);
     }
 
     /**
@@ -79,15 +80,14 @@ public class TemplateOperations extends AbstractOperations {
      * @return Updated template.
      */
     public Template update(int id, Template template) {
-        TemplateRecord templateRecord = toRecord(template);
-        templateRecord.setIdTemplate(id);
-        TemplateRecord resultingRecord = create.update(Tables.TEMPLATE)
-                .set(templateRecord)
-                .where(TEMPLATE.ID_TEMPLATE.eq(id))
-                .returning()
-                .fetchOptional()
+        TemplateRecord record = create
+                .fetchOptional(TEMPLATE, TEMPLATE.ID_TEMPLATE.eq(id))
                 .orElseThrow(() -> new NotFoundException("Template does not exist!"));
-        return toProto(resultingRecord);
+
+        record = mergeRecord(record, template);
+        record.update();
+
+        return toProto(record);
     }
 
     /**
@@ -101,6 +101,7 @@ public class TemplateOperations extends AbstractOperations {
     public boolean delete(int id) {
         TemplateRecord record = create.newRecord(Tables.TEMPLATE);
         record.setIdTemplate(id);
+
         return create.executeDelete(record, Tables.TEMPLATE.ID_TEMPLATE.eq(id)) == 1;
     }
 
@@ -116,13 +117,19 @@ public class TemplateOperations extends AbstractOperations {
                 .setAnswerType(answerType).build();
     }
 
-    private TemplateRecord toRecord(Template template) {
-        TemplateRecord templateRecord = new TemplateRecord();
-        templateRecord.setTitel(template.getName());
-        templateRecord.setTemplate(template.getContent());
-        templateRecord.setAnswerType(template.getAnswerType().name());
-        if (template.hasField(template.getDescriptorForType().findFieldByNumber(Template.ID_FIELD_NUMBER)))
-            templateRecord.setIdTemplate(template.getId());
-        return templateRecord;
+    private TemplateRecord mergeRecord(TemplateRecord target, Template template) {
+        if (template.hasField(template.getDescriptorForType().findFieldByNumber(Template.NAME_FIELD_NUMBER))) {
+            target.setTitel(template.getName());
+        }
+
+        if (template.hasField(template.getDescriptorForType().findFieldByNumber(Template.CONTENT_FIELD_NUMBER))) {
+            target.setTemplate(template.getContent());
+        }
+
+        if (template.hasField(template.getDescriptorForType().findFieldByNumber(Template.ANSWER_TYPE_FIELD_NUMBER))) {
+            target.setAnswerType(template.getAnswerType().name());
+        }
+
+        return target;
     }
 }

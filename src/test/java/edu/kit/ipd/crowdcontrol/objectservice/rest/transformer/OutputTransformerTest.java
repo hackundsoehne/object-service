@@ -1,7 +1,9 @@
-package edu.kit.ipd.crowdcontrol.objectservice.rest;
+package edu.kit.ipd.crowdcontrol.objectservice.rest.transformer;
 
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotAcceptableException;
 import org.junit.Before;
 import org.junit.Test;
 import spark.Request;

@@ -2,7 +2,13 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import com.google.protobuf.Message;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.*;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.InputTransformer;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.OutputTransformer;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -22,12 +28,14 @@ import static spark.Spark.exception;
  */
 public class Router implements SparkApplication {
     private final TemplateResource templateResource;
+    private final NotificationResource notificationResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
-    public Router(TemplateResource templateResource) {
+    public Router(TemplateResource templateResource, NotificationResource notificationResource) {
         this.templateResource = templateResource;
+        this.notificationResource = notificationResource;
     }
 
     @Override
@@ -76,6 +84,12 @@ public class Router implements SparkApplication {
         get("/templates/:id", templateResource::get);
         patch("/templates/:id", templateResource::patch, Template.class);
         delete("/templates/:id", templateResource::delete);
+
+        put("/notifications", notificationResource::put, Notification.class);
+        get("/notifications", notificationResource::all);
+        get("/notifications/:id", notificationResource::get);
+        patch("/notifications/:id", notificationResource::patch, Notification.class);
+        delete("/notifications/:id", notificationResource::delete);
     }
 
     /**

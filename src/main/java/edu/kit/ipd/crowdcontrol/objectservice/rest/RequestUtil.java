@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import spark.Request;
 
 public class RequestUtil {

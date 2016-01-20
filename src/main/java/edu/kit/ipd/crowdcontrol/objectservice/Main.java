@@ -1,8 +1,10 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRestOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.TemplateResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -42,7 +44,7 @@ public class Main {
 
         try {
             connection = DriverManager.getConnection(url, username, password);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -54,8 +56,13 @@ public class Main {
 
     private static void boot(Connection connection) {
         DSLContext context = DSL.using(connection, SQLDialect.MYSQL);
-        TemplateOperations templateOperations = new TemplateOperations(context);
 
-        new Router(new TemplateResource(templateOperations)).init();
+        TemplateOperations templateOperations = new TemplateOperations(context);
+        NotificationRestOperations notificationRestOperations = new NotificationRestOperations(context);
+
+        new Router(
+                new TemplateResource(templateOperations),
+                new NotificationResource(notificationRestOperations)
+        ).init();
     }
 }
