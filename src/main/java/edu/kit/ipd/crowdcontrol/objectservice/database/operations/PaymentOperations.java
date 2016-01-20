@@ -29,6 +29,7 @@ public class PaymentOperations extends AbstractOperations {
      * @param workerID the primary key of the worker
      * @return a list of payment
      */
+    public List<PaymentRecord> getAllPayments(int workerID) {
         return create.selectFrom(Tables.PAYMENT)
                 .where(Tables.PAYMENT.WORKER_ID.eq(workerID))
                 .fetch();
