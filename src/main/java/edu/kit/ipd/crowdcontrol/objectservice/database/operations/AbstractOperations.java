@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -28,18 +29,19 @@ public abstract class AbstractOperations {
 
     /**
      * executes the function if the experiment is not running.
-     * @param id the id of the event
+     * @param experimentID the id of the experiment
      * @param function the function to execute
      * @param <R> the return type
      * @return the result of the function
      */
-    protected <R> R doIfNotRunning(int id, Function<Configuration, R> function) {
+    protected <R> R doIfNotRunning(int experimentID, Function<Configuration, R> function) {
         return create.transactionResult(trans -> {
-            int running = DSL.using(trans)
-                    .fetchCount(
-                            Tables.TASK,
-                            Tables.TASK.EXPERIMENT.eq(id).and(Tables.TASK.RUNNING.isTrue()));
-            if (running == 0) {
+            boolean running = DSL.using(trans).fetchExists(
+                    DSL.selectFrom(Tables.TASK)
+                            .where(Tables.TASK.EXPERIMENT.eq(experimentID))
+                            .and(Tables.TASK.STATUS.eq(TaskStatus.running).or(Tables.TASK.STATUS.eq(TaskStatus.stopping)))
+            );
+            if (!running) {
                 return function.apply(trans);
             } else {
                 //TODO other exception?
