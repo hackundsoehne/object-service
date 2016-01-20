@@ -81,13 +81,28 @@ public abstract class AbstractOperations {
     }
 
     /**
-     * returns whether the MessageOrBuilder has the passed field.
+     * Throws an exception if the passed field is not set.
      * @param messageOrBuilder the MessageOrBuilder to check on
      * @param field the field to exist
-     * @return tre if it has the field, false if not
+     * @throws IllegalArgumentException thrown if the field is not set
      */
-    protected boolean hasField(MessageOrBuilder messageOrBuilder, int field) {
-        return messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field));
+    protected void assertHasField(MessageOrBuilder messageOrBuilder, int field) throws IllegalArgumentException {
+        if (!messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field))) {
+            throw new IllegalArgumentException("MessageOrBuilder must have field set: " +
+                    messageOrBuilder.getDescriptorForType().findFieldByNumber(field).getName());
+        }
+    }
+
+    /**
+     * Throws an exception if one of the passed field is not set.
+     * @param messageOrBuilder the MessageOrBuilder to check on
+     * @param fields the fields to exist
+     * @throws IllegalArgumentException thrown if on the field is not set
+     */
+    protected void assertHasField(MessageOrBuilder messageOrBuilder, int... fields) throws IllegalArgumentException {
+        for (int aField : fields) {
+            assertHasField(messageOrBuilder, aField);
+        }
     }
 
     /**
