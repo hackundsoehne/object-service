@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AnswerRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord> implements org.jooq.Record6<java.lang.Integer, java.lang.Integer, java.lang.String, java.sql.Timestamp, java.lang.Integer, java.lang.Integer> {
 
-	private static final long serialVersionUID = 1530462009;
+	private static final long serialVersionUID = 2120282305;
 
 	/**
 	 * Setter for <code>crowdcontrol.Answer.id_answer</code>.
@@ -28,16 +28,16 @@ public class AnswerRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	}
 
 	/**
-	 * Setter for <code>crowdcontrol.Answer.task</code>.
+	 * Setter for <code>crowdcontrol.Answer.experiment</code>.
 	 */
-	public void setTask(java.lang.Integer value) {
+	public void setExperiment(java.lang.Integer value) {
 		setValue(1, value);
 	}
 
 	/**
-	 * Getter for <code>crowdcontrol.Answer.task</code>.
+	 * Getter for <code>crowdcontrol.Answer.experiment</code>.
 	 */
-	public java.lang.Integer getTask() {
+	public java.lang.Integer getExperiment() {
 		return (java.lang.Integer) getValue(1);
 	}
 
@@ -142,7 +142,7 @@ public class AnswerRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	 */
 	@Override
 	public org.jooq.Field<java.lang.Integer> field2() {
-		return edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.TASK;
+		return edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.EXPERIMENT;
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class AnswerRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	 */
 	@Override
 	public java.lang.Integer value2() {
-		return getTask();
+		return getExperiment();
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class AnswerRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	 */
 	@Override
 	public AnswerRecord value2(java.lang.Integer value) {
-		setTask(value);
+		setExperiment(value);
 		return this;
 	}
 
@@ -301,11 +301,11 @@ public class AnswerRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	/**
 	 * Create a detached, initialised AnswerRecord
 	 */
-	public AnswerRecord(java.lang.Integer idAnswer, java.lang.Integer task, java.lang.String answer, java.sql.Timestamp timestamp, java.lang.Integer workerId, java.lang.Integer quality) {
+	public AnswerRecord(java.lang.Integer idAnswer, java.lang.Integer experiment, java.lang.String answer, java.sql.Timestamp timestamp, java.lang.Integer workerId, java.lang.Integer quality) {
 		super(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER);
 
 		setValue(0, idAnswer);
-		setValue(1, task);
+		setValue(1, experiment);
 		setValue(2, answer);
 		setValue(3, timestamp);
 		setValue(4, workerId);

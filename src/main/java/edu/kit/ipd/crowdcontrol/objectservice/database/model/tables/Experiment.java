@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord> {
 
-	private static final long serialVersionUID = -1410414334;
+	private static final long serialVersionUID = 144629106;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Experiment</code>
@@ -30,11 +30,6 @@ public class Experiment extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol
 	 * The column <code>crowdcontrol.Experiment.id_experiment</code>.
 	 */
 	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, java.lang.Integer> ID_EXPERIMENT = createField("id_experiment", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
-
-	/**
-	 * The column <code>crowdcontrol.Experiment.rating_options</code>.
-	 */
-	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, java.lang.String> RATING_OPTIONS = createField("rating_options", org.jooq.impl.SQLDataType.CLOB.length(16777215), this, "");
 
 	/**
 	 * The column <code>crowdcontrol.Experiment.titel</code>.
@@ -147,7 +142,7 @@ public class Experiment extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, ?>>asList(edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.USEDTASKCHOOSER, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.USEDTEMPLATE);
+		return java.util.Arrays.<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, ?>>asList(edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.USEDTASKCHOOSER, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.USEDANSWERQUALITY, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.USEDRATINGQUALITY, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.USEDTEMPLATE);
 	}
 
 	/**
