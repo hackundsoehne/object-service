@@ -4,7 +4,6 @@ import com.google.protobuf.Message;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -118,12 +117,8 @@ public class Range<T, X> {
      * @param <R> the type of the builder
      * @return an instance Paginated
      */
-    public<R extends Message.Builder> Optional<Paginated<X>> constructPaginated(R builder, BiFunction<R, List<T>, R> merge) {
-        if (data.isEmpty()) {
-            return Optional.empty();
-        } else {
-            Message message = merge.apply(builder, data).build();
-            return Optional.of(new Paginated<>(message, left, right, hasPredecessors, hasSuccessors));
-        }
+    public <R extends Message.Builder> Paginated<X> constructPaginated(R builder, BiFunction<R, List<T>, R> merge) {
+        Message message = merge.apply(builder, data).build();
+        return new Paginated<>(message, left, right, hasPredecessors, hasSuccessors);
     }
 }

@@ -35,8 +35,7 @@ public class TemplateResource {
         boolean asc = getQueryBool(request, "asc", true);
 
         return operations.all(from, asc, 20)
-                .constructPaginated(TemplateList.newBuilder(), TemplateList.Builder::addAllItems)
-                .orElseThrow(() -> new NotFoundException("Resources not found."));
+                .constructPaginated(TemplateList.newBuilder(), TemplateList.Builder::addAllItems);
     }
 
     /**
