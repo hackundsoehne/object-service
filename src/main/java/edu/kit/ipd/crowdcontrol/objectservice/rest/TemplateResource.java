@@ -6,8 +6,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
 import spark.Request;
 import spark.Response;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.rest.QueryParamUtil.getBoolean;
-import static edu.kit.ipd.crowdcontrol.objectservice.rest.QueryParamUtil.getInteger;
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
 /**
  * Handles requests to template resources.
@@ -30,8 +29,8 @@ public class TemplateResource {
      * @return A list of all templates.
      */
     public Paginated<Integer> all(Request request, Response response) {
-        int from = getInteger(request, "from", 0);
-        boolean asc = getBoolean(request, "asc", true);
+        int from = getQueryInt(request, "from", 0);
+        boolean asc = getQueryBool(request, "asc", true);
 
         return operations.all(from, asc, 20)
                 .constructPaginated(TemplateList.newBuilder(), TemplateList.Builder::addAllItems)
@@ -47,15 +46,7 @@ public class TemplateResource {
      * @return A single template.
      */
     public Template get(Request request, Response response) {
-        int id;
-
-        try {
-            id = Integer.parseInt(request.params("id"));
-        } catch (NumberFormatException e) {
-            throw new BadRequestException("ID must be a valid integer.");
-        }
-
-        return operations.get(id)
+        return operations.get(getParamInt(request, "id"))
                 .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
 
@@ -69,7 +60,6 @@ public class TemplateResource {
      */
     public Template put(Request request, Response response) {
         Template template = request.attribute("input");
-
         return operations.create(template);
     }
 
@@ -82,17 +72,8 @@ public class TemplateResource {
      * @return The modified template.
      */
     public Template patch(Request request, Response response) {
-        int id;
-
-        try {
-            id = Integer.parseInt(request.params("id"));
-        } catch (NumberFormatException e) {
-            throw new BadRequestException("ID must be a valid integer.");
-        }
-
         Template template = request.attribute("input");
-
-        return operations.update(id, template);
+        return operations.update(getParamInt(request, "id"), template);
     }
 
     /**
@@ -104,15 +85,8 @@ public class TemplateResource {
      * @return {@code null}.
      */
     public Template delete(Request request, Response response) {
-        int id;
+        boolean existed = operations.delete(getParamInt(request, "id"));
 
-        try {
-            id = Integer.parseInt(request.params("id"));
-        } catch (NumberFormatException e) {
-            throw new BadRequestException("ID must be a valid integer.");
-        }
-
-        boolean existed = operations.delete(id);
         if (!existed) {
             throw new NotFoundException("Template does not exist!");
         }
