@@ -4,6 +4,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Task
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
+import java.util.Optional;
+
 /**
  * responsible for the operations involving the creation of tasks.
  * @author LeanderK
@@ -30,5 +32,16 @@ public class TasksOperations extends AbstractOperations {
      */
     public boolean updateTask(TaskRecord taskRecord) {
         return create.executeUpdate(taskRecord) == 1;
+    }
+
+    /**
+     * searches for a task specified by platform and experimentid
+     * @param platform The string of the platform
+     * @param experimentId the experimentId
+     * @return the found task or empty if not found
+     */
+    public Optional<TaskRecord> searchTask(String platform, int experimentId) {
+        //TODO: code
+        return Optional.empty();
     }
 }

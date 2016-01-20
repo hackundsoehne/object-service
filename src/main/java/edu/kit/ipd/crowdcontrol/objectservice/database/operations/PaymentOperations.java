@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord;
 
 import org.jooq.DSLContext;
@@ -15,7 +16,7 @@ public class PaymentOperations extends AbstractOperations {
         super(create);
     }
 
-    public List<PaymentRecord> getAllPayments(int workerID) {
+    public List<GiftCodeRecord> getAllGiftCodes() {
         //TODO
         return null;
     }
