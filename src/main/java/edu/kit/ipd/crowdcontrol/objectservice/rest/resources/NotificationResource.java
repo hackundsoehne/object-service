@@ -30,8 +30,7 @@ public class NotificationResource {
         boolean asc = getQueryBool(request, "asc", true);
 
         return operations.all(from, asc, 20)
-                .constructPaginated(NotificationList.newBuilder(), NotificationList.Builder::addAllItems)
-                .orElseThrow(() -> new NotFoundException("No resources found."));
+                .constructPaginated(NotificationList.newBuilder(), NotificationList.Builder::addAllItems);
     }
 
     /**
