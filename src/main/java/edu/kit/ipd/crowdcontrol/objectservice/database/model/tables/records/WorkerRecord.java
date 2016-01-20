@@ -69,7 +69,7 @@ public class WorkerRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 		return (java.lang.String) getValue(3);
 	}
 
-	public void setCreditBalance() {
+	public void setCreditBalance(java.lang.Integer amount) {
 		//TODO
 	}
 
