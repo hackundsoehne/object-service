@@ -1,10 +1,12 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PaymentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WokerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -35,12 +37,22 @@ public class MoneyTransferManager {
      */
     public void logMoneyTransfer(int workerID, int amount) {
         WorkerRecord worker = wokerOperations.getWorker(workerID);
-        //worker.setCreditBalance(worker.getCreditBalance() + amount);
-
+        worker.setCreditBalance(worker.getCreditBalance() + amount);
     }
 
     /**
      * Pays all workers depending on their logged money transfers.
      */
-    public void payOff(){}
+    public void payOff(){
+        List<WorkerRecord> workers = wokerOperations.getAllWorkers();
+        Iterator<WorkerRecord> it = workers.iterator();
+        while(it.hasNext()) {
+            WorkerRecord worker = it.next();
+            int salary = worker.getCreditBalance();
+            List<GiftCodeRecord> giftCodes = paymentOperations.getAllGiftCodes();
+            //TODO : Algorithm implementation
+            worker.setCreditBalance(0);
+
+        }
+    }
 }
