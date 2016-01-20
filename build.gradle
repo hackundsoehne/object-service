@@ -62,13 +62,14 @@ buildscript {
     }
 }
 
+//jooq database-model generation
 jooq {
     sample(sourceSets.main) {
         jdbc {
             url = 'jdbc:mysql://localhost:8888'
             driver = 'com.mysql.jdbc.Driver'
             user = 'LeanderK'
-            password = ''
+            password = 'y560'
             schema = 'crowdcontrol'
         }
         generator {
@@ -90,7 +91,7 @@ jooq {
         }
     }
 }
-generateSampleJooqSchemaSource.enabled = false
+//generateSampleJooqSchemaSource.enabled = false
 
 configurations {
     integrationTestCompile.extendsFrom testCompile
