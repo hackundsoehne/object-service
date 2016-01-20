@@ -1,10 +1,13 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import org.jooq.DSLContext;
 
 /**
- * Created by marcel on 19.01.16.
+ * the Operations concerned with the Platform-Table.
+ * @author LeanderK
+ * @author Marcel Hollerbach
  */
 public class PlatformOperations extends AbstractOperations {
     protected PlatformOperations(DSLContext create) {
@@ -12,19 +15,20 @@ public class PlatformOperations extends AbstractOperations {
     }
 
     /**
-     * Insert new platform
-     * @param taskRecord The platform
-     * @return
+     * Insert new platform into the database
+     * @param platformRecord The platform to insert
+     * @return true if inserted, false if existing
+     * @throws IllegalArgumentException if the record has no primary key
      */
-    public int createPlatform(PlatformRecord taskRecord) {
-        //TODO: code the things
-        return -1;
+    public boolean createPlatform(PlatformRecord platformRecord) throws IllegalArgumentException {
+        assertHasPrimaryKey(platformRecord);
+        return create.executeInsert(platformRecord) == 1;
     }
 
     /**
-     * Delete all platforms
+     * Delete all platforms existing in the database.
      */
     public void deleteAllPlatforms() {
-        //TODO: code the things
+        create.deleteFrom(Tables.PLATFORM).execute();
     }
 }

@@ -3,9 +3,11 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.impl.TableRecordImpl;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,24 +29,54 @@ public abstract class AbstractOperations {
 
     /**
      * executes the function if the experiment is not running.
-     * @param id the id of the event
+     * @param experimentID the id of the experiment
      * @param function the function to execute
      * @param <R> the return type
      * @return the result of the function
      */
-    protected <R> R doIfNotRunning(int id, Function<Configuration, R> function) {
+    protected <R> R doIfNotRunning(int experimentID, Function<Configuration, R> function) {
         return create.transactionResult(trans -> {
             int running = DSL.using(trans)
                     .fetchCount(
                             Tables.TASK,
-                            Tables.TASK.EXPERIMENT.eq(id).and(Tables.TASK.RUNNING.isTrue()));
+                            Tables.TASK.EXPERIMENT.eq(experimentID).and(Tables.TASK.RUNNING.isTrue()));
             if (running == 0) {
                 return function.apply(trans);
             } else {
                 //TODO other exception?
-                throw new IllegalArgumentException("Experiment is running");
+                throw new IllegalArgumentException("Experiment is running: " + experimentID);
             }
         });
+    }
+
+    /**
+     * Throws an exception if the record has no primary key set.
+     * @param record the record to check
+     * @param <R> the type of he record.
+     * @throws IllegalArgumentException thrown if the record has no primary key
+     */
+    protected <R extends TableRecord<R>> void assertHasPrimaryKey(TableRecordImpl<R> record) throws IllegalArgumentException {
+        boolean hasPrimaryKey = record.getTable().getPrimaryKey().getFields().stream()
+                .map(record::getValue)
+                .filter(Objects::nonNull)
+                .findAny()
+                .isPresent();
+        if (!hasPrimaryKey)
+            throw new IllegalArgumentException("Record from Table: " + record.getTable().getName()
+                    + " needs PrimaryKey for this action");
+    }
+
+    /**
+     * Throws an exception if the passed field is not set.
+     * @param record the record to check on
+     * @param field the field to check for
+     * @param <R> the type of the record
+     * @throws IllegalArgumentException thrown if the field is not set
+     */
+    protected <R extends TableRecord<R>> void assertHasField(TableRecordImpl<R> record, Field<?> field) throws IllegalArgumentException {
+        if (record.getValue(field) == null)
+            throw new IllegalArgumentException("Record from Table: " + record.getTable().getName()
+                    + " needs PrimaryKey for this action");
     }
 
     /**
