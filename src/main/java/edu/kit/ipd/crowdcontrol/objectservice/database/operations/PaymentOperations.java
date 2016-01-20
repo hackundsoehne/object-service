@@ -21,6 +21,12 @@ public class PaymentOperations extends AbstractOperations {
     public List<GiftCodeRecord> getAllGiftCodes() {
         //TODO
         return null;
+    }
+    
+    public void addGiftCode(String code, int amount){
+        //TODO
+    }
+
     /**
      * Returns all the payments for the passed workerID.
      * @param workerID the primary key of the worker
