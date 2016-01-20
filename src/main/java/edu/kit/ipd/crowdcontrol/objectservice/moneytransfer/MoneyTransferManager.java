@@ -1,7 +1,11 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PaymentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WokerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 
+import java.util.LinkedList;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
@@ -14,9 +18,13 @@ import javax.mail.MessagingException;
 public class MoneyTransferManager {
 
     MailHandler mailHandler;
+    PaymentOperations paymentOperations;
+    WokerOperations wokerOperations;
 
-    public MoneyTransferManager(MailHandler mailHandler) throws MessagingException{
+    public MoneyTransferManager(MailHandler mailHandler, PaymentOperations paymentOperations, WokerOperations wokerOperations) throws MessagingException{
         this.mailHandler = mailHandler;
+        this.wokerOperations = wokerOperations;
+        this.paymentOperations = paymentOperations;
     }
 
     /**
@@ -24,7 +32,9 @@ public class MoneyTransferManager {
      * @param workerID the id of the worker, who gets the money
      * @param amount the amount of money in ct
      */
-    public void logMoneyTransfer(int workerID, int amount) {    }
+    public void logMoneyTransfer(int workerID, int amount) {
+        LinkedList<WorkerRecord> workers = wokerOperations.getAllWorkers();
+    }
 
     /**
      * Pays all workers depending on their logged money transfers.
