@@ -75,7 +75,7 @@ public class OutputTransformer implements Route {
                 params.put("from", paginated.getLeft().toString());
                 params.put("asc", "false");
 
-                linkBuilder.append("<").append(link(request, params)).append("> rel=\"prev\", ");
+                linkBuilder.append("<").append(link(request, params)).append(">; rel=\"prev\", ");
             }
 
             if (paginated.hasNext()) {
@@ -83,7 +83,7 @@ public class OutputTransformer implements Route {
                 params.put("from", paginated.getRight().toString());
                 params.put("asc", "true");
 
-                linkBuilder.append("<").append(link(request, params)).append("> rel=\"next\", ");
+                linkBuilder.append("<").append(link(request, params)).append(">; rel=\"next\", ");
             }
 
             String link = linkBuilder.toString();
