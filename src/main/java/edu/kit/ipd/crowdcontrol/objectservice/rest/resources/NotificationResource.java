@@ -4,6 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRe
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.NotificationList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
@@ -56,7 +57,11 @@ public class NotificationResource {
      */
     public Notification put(Request request, Response response) {
         Notification notification = request.attribute("input");
-        notification = operations.create(notification);
+        try {
+            notification = operations.create(notification);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("All parameters must be set!");
+        }
 
         response.status(201);
         response.header("Location", "/notifications/" + notification.getId());
