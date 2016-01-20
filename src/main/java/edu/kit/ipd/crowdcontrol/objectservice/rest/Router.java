@@ -26,8 +26,8 @@ public class Router implements SparkApplication {
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
-    public Router() {
-        this.templateResource = new TemplateResource();
+    public Router(TemplateResource templateResource) {
+        this.templateResource = templateResource;
     }
 
     @Override
@@ -35,6 +35,11 @@ public class Router implements SparkApplication {
         exception(BadRequestException.class, (exception, request, response) -> {
             response.status(400);
             response.body(error(request, response, "badRequest", exception.getMessage()));
+        });
+
+        exception(NotFoundException.class, (exception, request, response) -> {
+            response.status(404);
+            response.body(error(request, response, "notFound", exception.getMessage()));
         });
 
         exception(NotAcceptableException.class, (exception, request, response) -> {

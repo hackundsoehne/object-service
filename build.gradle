@@ -4,6 +4,9 @@ version '0.5-SNAPSHOT'
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'nu.studer.jooq'
+apply plugin: 'application'
+
+mainClassName = 'edu.kit.ipd.crowdcontrol.objectservice.Main'
 
 sourceCompatibility = 1.8
 
