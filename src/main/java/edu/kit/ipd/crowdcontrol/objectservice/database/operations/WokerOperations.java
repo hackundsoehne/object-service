@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -85,5 +86,17 @@ public class WokerOperations extends AbstractOperations {
                 .execute();
 
         create.executeDelete(toAnonymize);
+    }
+
+    //either implement this:
+    public AnswerRecord getCreditBalance(int workerID) { //change to CreditBalanceRecord if implemented
+        //TODO
+        return null;
+    }
+
+    //or implement this and implement a "public java.lang.Integer getCreditBalance()"-Method into WorkerRecord (Felix)
+    public WorkerRecord getAllWorkers() {
+        //TODO
+        return null;
     }
 }
