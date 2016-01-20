@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -7,7 +8,7 @@ import org.jooq.impl.DSL;
 import java.util.Optional;
 
 /**
- * responsible for the operations involving the creation of tasks.
+ * Responsible for the operations involving the creation of tasks.
  * @author LeanderK
  * @version 1.0
  */
@@ -17,31 +18,41 @@ public class TasksOperations extends AbstractOperations {
     }
 
     /**
-     * creates a Task
+     * Inserts the TaskRecord into the database.
      * @param taskRecord the task to create
-     * @return the id of the task
+     * @return the resulting TaskRecord existing in the DB
      */
-    public int createTask(TaskRecord taskRecord) {
-        return doIfNotRunning(taskRecord.getExperiment(), trans -> DSL.using(trans).executeInsert(taskRecord));
+    public TaskRecord createTask(TaskRecord taskRecord) {
+        taskRecord.setIdTask(null);
+        return doIfNotRunning(taskRecord.getExperiment(), trans ->
+                DSL.using(trans)
+                        .insertInto(Tables.TASK)
+                        .set(taskRecord)
+                        .returning()
+                        .fetchOne());
     }
 
     /**
-     * updates a Task
+     * Updates a Task.
      * @param taskRecord the update
      * @return whether the update was successful
+     * @throws IllegalArgumentException if the record has no primary key
      */
-    public boolean updateTask(TaskRecord taskRecord) {
+    public boolean updateTask(TaskRecord taskRecord) throws IllegalArgumentException {
+        assertHasPrimaryKey(taskRecord);
         return create.executeUpdate(taskRecord) == 1;
     }
 
     /**
-     * searches for a task specified by platform and experimentid
-     * @param platform The string of the platform
-     * @param experimentId the experimentId
+     * Searches for a task specified by platform and experimentId.
+     * @param platform the string of the platform
+     * @param experimentId the primary key of the experiment
      * @return the found task or empty if not found
      */
     public Optional<TaskRecord> searchTask(String platform, int experimentId) {
-        //TODO: code
-        return Optional.empty();
+        return create.selectFrom(Tables.TASK)
+                .where(Tables.TASK.CROWD_PLATFORM.eq(platform))
+                .and(Tables.TASK.EXPERIMENT.eq(experimentId))
+                .fetchOptional();
     }
 }
