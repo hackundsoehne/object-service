@@ -5,6 +5,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Answ
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import org.jooq.DSLContext;
 
+import java.util.List;
+
 /**
  * responsible for the operations involving the worker-table.
  * @author LeanderK
@@ -33,14 +35,12 @@ public class WokerOperations extends AbstractOperations {
         return true;
     }
 
-    //either implement this:
-    public AnswerRecord getCreditBalance(int workerID) { //change to CreditBalanceRecord if implemented
+    public WorkerRecord getWorker(int workerID) {
         //TODO
         return null;
     }
 
-    //or implement this and implement a "public java.lang.Integer getCreditBalance()"-Method into WorkerRecord (Felix)
-    public WorkerRecord getAllWorkers() {
+    public List<WorkerRecord> getAllWorkers() {
         //TODO
         return null;
     }
