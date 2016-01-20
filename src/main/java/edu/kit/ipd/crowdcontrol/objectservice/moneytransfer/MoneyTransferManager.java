@@ -6,6 +6,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WokerOperation
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
@@ -33,7 +34,9 @@ public class MoneyTransferManager {
      * @param amount the amount of money in ct
      */
     public void logMoneyTransfer(int workerID, int amount) {
-        LinkedList<WorkerRecord> workers = wokerOperations.getAllWorkers();
+        WorkerRecord worker = wokerOperations.getWorker(workerID);
+        //worker.setCreditBalance(worker.getCreditBalance() + amount);
+
     }
 
     /**
