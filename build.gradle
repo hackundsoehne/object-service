@@ -62,6 +62,7 @@ buildscript {
     }
 }
 
+//jooq database-model generation
 jooq {
     sample(sourceSets.main) {
         jdbc {

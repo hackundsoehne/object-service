@@ -48,10 +48,10 @@ public class AnswerDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.ob
 	}
 
 	/**
-	 * Fetch records that have <code>task IN (values)</code>
+	 * Fetch records that have <code>experiment IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer> fetchByTask(java.lang.Integer... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.TASK, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer> fetchByExperiment(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.EXPERIMENT, values);
 	}
 
 	/**
