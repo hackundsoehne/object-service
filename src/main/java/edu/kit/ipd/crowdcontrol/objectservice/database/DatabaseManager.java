@@ -11,12 +11,14 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * initializes and holds the connection to the database and eventually the database itself.
+ * Initializes and holds the connection to the database and eventually the database itself.
+ * When the system-property dropSchema is set to true, if will drop the schema first.
  * @author LeanderK
  * @version 1.0
  */
@@ -24,14 +26,16 @@ public class DatabaseManager {
     private final DSLContext context;
     private final String url;
     private final DataSource ds;
+    private final Connection connection;
 
     /**
      * creates new DatabaseManager.
      * @param providedDBPoolName the name of the provided ConnectionPool
      * @param sqlDialect the dialect to use
+     * @throws NamingException if there was a problem establishing a connection to the provided database-pool
      * @throws SQLException if there was a problem establishing a connection to the database
      */
-    public DatabaseManager(String providedDBPoolName, SQLDialect sqlDialect) throws SQLException {
+    public DatabaseManager(String providedDBPoolName, SQLDialect sqlDialect) throws NamingException, SQLException {
         this(null, null, null, Objects.requireNonNull(providedDBPoolName), sqlDialect);
     }
 
@@ -44,9 +48,10 @@ public class DatabaseManager {
      * @param password the password for the database
      * @param url the url to the database
      * @param sqlDialect the dialect to use
+     * @throws NamingException if there was a problem establishing a connection to the provided database-pool
      * @throws SQLException if there was a problem establishing a connection to the database
      */
-    public DatabaseManager(String userName, String password, String url, SQLDialect sqlDialect) throws SQLException {
+    public DatabaseManager(String userName, String password, String url, SQLDialect sqlDialect) throws NamingException, SQLException {
         this(userName, password, url, System.getProperty("providedDBPool"), sqlDialect);
     }
 
@@ -58,19 +63,14 @@ public class DatabaseManager {
      * @param url the url to the database
      * @param providedDBPoolName if not null, it will use the built in Connection pool with the passed Name
      * @param sqlDialect the dialect to use
+     * @throws NamingException if there was a problem establishing a connection to the provided database-pool
      * @throws SQLException if there was a problem establishing a connection to the database
      */
-    public DatabaseManager(String userName, String password, String url, String providedDBPoolName, SQLDialect sqlDialect) throws SQLException {
+    public DatabaseManager(String userName, String password, String url, String providedDBPoolName, SQLDialect sqlDialect) throws NamingException, SQLException {
         this.url = url;
         DataSource ds = null;
         if (providedDBPoolName != null) {
-            try {
-                ds = (DataSource) new InitialContext().lookup(providedDBPoolName);
-            } catch (NamingException e) {
-                System.err.println("unable to establish database connection");
-                e.printStackTrace();
-                System.exit(-1);
-            }
+            ds = (DataSource) new InitialContext().lookup(providedDBPoolName);
         } else {
             ComboPooledDataSource cpds = new ComboPooledDataSource();
             cpds.setJdbcUrl(url);
@@ -80,14 +80,14 @@ public class DatabaseManager {
             ds = cpds;
         }
         this.ds = ds;
+        this.connection = ds.getConnection();
         context = DSL.using(this.ds, sqlDialect);
-        initDatabase();
     }
 
     /**
      * initializes the database if not already initialized.
      */
-    private void initDatabase() {
+    public void initDatabase() {
         try {
             String initScript = Files.lines(new File("db.sql").toPath()).collect(Collectors.joining());
             if (Boolean.getBoolean("dropSchema")) {
@@ -107,6 +107,14 @@ public class DatabaseManager {
      */
     public DSLContext getContext() {
         return context;
+    }
+
+    /**
+     * returns the Connection used to communicate with the database.
+     * @return an instance of Connection
+     */
+    public Connection getConnection() {
+        return connection;
     }
 
     /**

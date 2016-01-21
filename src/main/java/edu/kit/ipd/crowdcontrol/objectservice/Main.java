@@ -1,32 +1,28 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRestOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
+import javax.naming.NamingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
+import java.util.function.Function;
 
 /**
  * @author Niklas Keller
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
         Properties properties = new Properties();
 
         try (InputStream in = Main.class.getResourceAsStream("/config.properties")) {
@@ -36,22 +32,29 @@ public class Main {
             System.exit(1);
         }
 
-        String url = properties.getProperty("database.url").trim();
-        String username = properties.getProperty("database.username").trim();
-        String password = properties.getProperty("database.password").trim();
+        Function<String, String> trimIfNotNull = s -> {
+            if (s != null)
+                return s.trim();
+            else
+                return s;
+        };
+        String url = trimIfNotNull.apply(properties.getProperty("database.url"));
+        String username = trimIfNotNull.apply(properties.getProperty("database.username"));
+        String password = trimIfNotNull.apply(properties.getProperty("database.password"));
+        String databasePool = trimIfNotNull.apply(properties.getProperty("database.poolName"));
 
-        Connection connection = null;
-
+        SQLDialect dialect = SQLDialect.valueOf(properties.getProperty("database.dialect").trim());
+        DatabaseManager databaseManager = null;
         try {
-            connection = DriverManager.getConnection(url, username, password);
-        } catch (Exception e) {
+            databaseManager = new DatabaseManager(username, password, url, databasePool, dialect);
+        } catch (NamingException | SQLException e) {
+            System.err.println("unable to establish database connection");
             e.printStackTrace();
-            System.exit(1);
+            System.exit(-1);
         }
 
-        // Don't close connection.
-        // FIXME: If connection breaks, we need to reconnect.
-        boot(connection);
+        databaseManager.initDatabase();
+        boot(databaseManager.getConnection());
     }
 
     private static void boot(Connection connection) {
