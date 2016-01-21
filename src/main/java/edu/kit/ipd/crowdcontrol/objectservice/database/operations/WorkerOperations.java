@@ -13,9 +13,9 @@ import java.util.Optional;
  * @author LeanderK
  * @version 1.0
  */
-public class WokerOperations extends AbstractOperations {
+public class WorkerOperations extends AbstractOperations {
 
-    protected WokerOperations(DSLContext create) {
+    protected WorkerOperations(DSLContext create) {
         super(create);
     }
 
@@ -82,9 +82,9 @@ public class WokerOperations extends AbstractOperations {
                 .where(Tables.ANSWER.WORKER_ID.eq(toAnonymize.getIdWorker()))
                 .execute();
 
-        create.update(Tables.PAYMENT)
-                .set(Tables.PAYMENT.WORKER_ID, anonWorker.getIdWorker())
-                .where(Tables.PAYMENT.WORKER_ID.eq(anonWorker.getIdWorker()))
+        create.update(Tables.WORKER_BALANCE)
+                .set(Tables.WORKER_BALANCE.WORKER, anonWorker.getIdWorker())
+                .where(Tables.WORKER_BALANCE.WORKER.eq(anonWorker.getIdWorker()))
                 .execute();
 
         create.executeDelete(toAnonymize);
