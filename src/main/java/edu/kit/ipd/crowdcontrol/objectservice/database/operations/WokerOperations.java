@@ -1,12 +1,12 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Responsible for the operations involving the worker-table.
@@ -90,13 +90,23 @@ public class WokerOperations extends AbstractOperations {
         create.executeDelete(toAnonymize);
     }
 
-    public WorkerRecord getWorker(int workerID) {
-        //TODO
-        return null;
+    /**
+     * finds the worker with the passed workerId in the database
+     * @param workerID the primary-key of the worker
+     * @return the found worker or emtpy
+     */
+    public Optional<WorkerRecord> getWorker(int workerID) {
+        return create.selectFrom(Tables.WORKER)
+                .where(Tables.WORKER.ID_WORKER.eq(workerID))
+                .fetchOptional();
     }
 
+    /**
+     * returns all the workers existing in the database
+     * @return a list with all the workers
+     */
     public List<WorkerRecord> getAllWorkers() {
-        //TODO
-        return null;
+        return create.selectFrom(Tables.WORKER)
+                .fetch();
     }
 }
