@@ -27,6 +27,19 @@ public class PaymentOperations extends AbstractOperations {
         //TODO
     }
 
+    public void addTranscation(int workerID, int amount, int experiment) {
+        //TODO
+    }
+
+    public void addTranscation(int workerID, int amount, int experiment, int giftCard) {
+        //TODO
+    }
+
+    public int getCreditBalance() {
+        //TODO
+        return -1;
+    }
+
     /**
      * Returns all the payments for the passed workerID.
      * @param workerID the primary key of the worker
