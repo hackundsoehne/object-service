@@ -18,12 +18,19 @@ public class PaymentOperations extends AbstractOperations {
         super(create);
     }
 
-    public List<GiftCodeRecord> getAllGiftCodes() {
+    /**
+     * Returns all giftcodes sorted after the amount of money in descending order.
+     * @return a list of giftcodes
+     */
+    public List<GiftCodeRecord> getAllGiftCodesDescending() {
         //TODO
         return null;
     }
     
-    
+    public void deleteGiftCode(String giftCode) {
+        //TODO
+    }
+
     /**
      * Returns all the payments for the passed workerID.
      * @param workerID the primary key of the worker
