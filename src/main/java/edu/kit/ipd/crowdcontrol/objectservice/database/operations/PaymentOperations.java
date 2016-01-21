@@ -2,8 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord;
-
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerBalanceRecord;
 import org.jooq.DSLContext;
 
 import java.util.List;
@@ -41,13 +40,13 @@ public class PaymentOperations extends AbstractOperations {
     }
 
     /**
-     * Returns all the payments for the passed workerID.
+     * Returns all the transactions for the passed workerID.
      * @param workerID the primary key of the worker
-     * @return a list of payment
+     * @return a list of transactions
      */
-    public List<PaymentRecord> getAllPayments(int workerID) {
-        return create.selectFrom(Tables.PAYMENT)
-                .where(Tables.PAYMENT.WORKER_ID.eq(workerID))
+    public List<WorkerBalanceRecord> getAllPayments(int workerID) {
+        return create.selectFrom(Tables.WORKER_BALANCE)
+                .where(Tables.WORKER_BALANCE.WORKER.eq(workerID))
                 .fetch();
     }
 
