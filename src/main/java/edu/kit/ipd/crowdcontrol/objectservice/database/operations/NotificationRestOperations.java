@@ -2,7 +2,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
 
@@ -12,24 +11,19 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.NOTIF
 
 public class NotificationRestOperations extends AbstractOperations {
     /**
-     * @param create
-     *         context to use to communicate with the database
+     * @param create context to use to communicate with the database
      */
     public NotificationRestOperations(DSLContext create) {
         super(create);
     }
 
     /**
-     * Returns a range of notifications starting from {@code cursor}.
+     * Returns a range of notifications starting from {@code cursor}
      *
-     * @param cursor
-     *         Pagination cursor.
-     * @param next
-     *         {@code true} for next, {@code false} for previous.
-     * @param limit
-     *         Number of records.
-     *
-     * @return List of notifications.
+     * @param cursor pagination cursor
+     * @param next {@code true} for next, {@code false} for previous
+     * @param limit the umber of records
+     * @return a list of notifications
      */
     public Range<Notification, Integer> all(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(NOTIFICATION), NOTIFICATION.ID_NOTIFICATION, cursor, next, limit)
@@ -39,10 +33,8 @@ public class NotificationRestOperations extends AbstractOperations {
     /**
      * Returns a single notification.
      *
-     * @param id
-     *         ID of the notification.
-     *
-     * @return The notification.
+     * @param id the ID of the notification
+     * @return the notification of empty if not found
      */
     public Optional<Notification> get(int id) {
         return create.fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
@@ -51,20 +43,20 @@ public class NotificationRestOperations extends AbstractOperations {
 
     /**
      * Creates a new notification.
-     *
-     * @param toStore
-     *         Notification to save.
-     *
-     * @return Notification with ID assigned.
+     * <p>
+     * the passed notification must have the following fields set:<br>
+     * name, description, query, check_period and send_threshold
+     * @param toStore Notification to save
+     * @return an instance of notification with ID assigned
+     * @throws IllegalArgumentException if one of the specified fields is not set
      */
-    public Notification create(Notification toStore) {
-        if (!hasField(toStore, Notification.NAME_FIELD_NUMBER)
-                || !hasField(toStore, Notification.DESCRIPTION_FIELD_NUMBER)
-                || !hasField(toStore, Notification.QUERY_FIELD_NUMBER)
-                || !hasField(toStore, Notification.CHECK_PERIOD_FIELD_NUMBER)
-                || !hasField(toStore, Notification.SEND_THRESHOLD_FIELD_NUMBER)) {
-            throw new BadRequestException("All parameters must be set!");
-        }
+    public Notification create(Notification toStore) throws IllegalArgumentException {
+        assertHasField(toStore,
+                Notification.NAME_FIELD_NUMBER,
+                Notification.DESCRIPTION_FIELD_NUMBER,
+                Notification.QUERY_FIELD_NUMBER,
+                Notification.CHECK_PERIOD_FIELD_NUMBER,
+                Notification.SEND_THRESHOLD_FIELD_NUMBER);
 
         NotificationRecord record = mergeRecord(create.newRecord(NOTIFICATION), toStore);
         record.store();
@@ -75,12 +67,9 @@ public class NotificationRestOperations extends AbstractOperations {
     /**
      * Updates a notification.
      *
-     * @param id
-     *         ID of the notification.
-     * @param notification
-     *         New notification contents.
-     *
-     * @return Updated notification.
+     * @param id ID of the notification
+     * @param notification new notification contents
+     * @return the updated notification
      */
     public Notification update(int id, Notification notification) {
         NotificationRecord record = create
@@ -96,10 +85,8 @@ public class NotificationRestOperations extends AbstractOperations {
     /**
      * Deletes a notification.
      *
-     * @param id
-     *         ID of the notification.
-     *
-     * @return {@code true} if deleted, {@code false} otherwise.
+     * @param id the id of the notification
+     * @return {@code true} if deleted, {@code false} otherwise
      */
     public boolean delete(int id) {
         NotificationRecord record = create.newRecord(NOTIFICATION);

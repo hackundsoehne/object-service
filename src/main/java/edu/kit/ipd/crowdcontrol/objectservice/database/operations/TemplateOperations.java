@@ -4,7 +4,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
 
@@ -57,11 +56,12 @@ public class TemplateOperations extends AbstractOperations {
      *         Template to save.
      *
      * @return Template with ID assigned.
+     * @throws IllegalArgumentException if the name or content is not set
      */
-    public Template create(Template toStore) {
-        if (!hasField(toStore, Template.NAME_FIELD_NUMBER) || !hasField(toStore, Template.CONTENT_FIELD_NUMBER)) {
-            throw new BadRequestException("Name and content must be set!");
-        }
+    public Template create(Template toStore) throws IllegalArgumentException {
+        assertHasField(toStore,
+                Template.NAME_FIELD_NUMBER,
+                Template.CONTENT_FIELD_NUMBER);
 
         TemplateRecord record = mergeRecord(create.newRecord(TEMPLATE), toStore);
         record.store();

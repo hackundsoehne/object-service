@@ -4,6 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperat
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
@@ -61,7 +62,11 @@ public class TemplateResource {
      */
     public Template put(Request request, Response response) {
         Template template = request.attribute("input");
-        template = operations.create(template);
+        try {
+            template = operations.create(template);
+        } catch (IllegalArgumentException e) {
+           throw new BadRequestException("Name and content must be set!");
+        }
 
         response.status(201);
         response.header("Location", "/notifications/" + template.getId());

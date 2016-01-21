@@ -5,9 +5,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.impl.TableRecordImpl;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -45,24 +47,68 @@ public abstract class AbstractOperations {
                 return function.apply(trans);
             } else {
                 //TODO other exception?
-                throw new IllegalArgumentException("Experiment is running");
+                throw new IllegalArgumentException("Experiment is running: " + experimentID);
             }
         });
     }
 
     /**
-     * returns whether the MessageOrBuilder has the passed field.
+     * Throws an exception if the record has no primary key set.
+     * @param record the record to check
+     * @param <R> the type of he record.
+     * @throws IllegalArgumentException thrown if the record has no primary key
+     */
+    protected <R extends TableRecord<R>> void assertHasPrimaryKey(TableRecordImpl<R> record) throws IllegalArgumentException {
+        boolean hasPrimaryKey = record.getTable().getPrimaryKey().getFields().stream()
+                .map(record::getValue)
+                .filter(Objects::nonNull)
+                .findAny()
+                .isPresent();
+        if (!hasPrimaryKey)
+            throw new IllegalArgumentException("Record from Table: " + record.getTable().getName()
+                    + " needs PrimaryKey for this action");
+    }
+
+    /**
+     * Throws an exception if the passed field is not set.
+     * @param record the record to check on
+     * @param field the field to check for
+     * @param <R> the type of the record
+     * @throws IllegalArgumentException thrown if the field is not set
+     */
+    protected <R extends TableRecord<R>> void assertHasField(TableRecordImpl<R> record, Field<?> field) throws IllegalArgumentException {
+        if (record.getValue(field) == null)
+            throw new IllegalArgumentException("Record from Table: " + record.getTable().getName()
+                    + " needs PrimaryKey for this action");
+    }
+
+    /**
+     * Throws an exception if the passed field is not set.
      * @param messageOrBuilder the MessageOrBuilder to check on
      * @param field the field to exist
-     * @return tre if it has the field, false if not
+     * @throws IllegalArgumentException thrown if the field is not set
      */
-    protected boolean hasField(MessageOrBuilder messageOrBuilder, int field) {
-        return messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field));
+    protected void assertHasField(MessageOrBuilder messageOrBuilder, int field) throws IllegalArgumentException {
+        if (!messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field))) {
+            throw new IllegalArgumentException("MessageOrBuilder must have field set: " +
+                    messageOrBuilder.getDescriptorForType().findFieldByNumber(field).getName());
+        }
+    }
+
+    /**
+     * Throws an exception if one of the passed field is not set.
+     * @param messageOrBuilder the MessageOrBuilder to check on
+     * @param fields the fields to exist
+     * @throws IllegalArgumentException thrown if on the field is not set
+     */
+    protected void assertHasField(MessageOrBuilder messageOrBuilder, int... fields) throws IllegalArgumentException {
+        for (int aField : fields) {
+            assertHasField(messageOrBuilder, aField);
+        }
     }
 
     /**
      * this method returns a range of results from a passed query.
-     * @param <R> the type of the records
      * @param query the query to use
      * @param primaryKey the primary key used to index the records inside the range
      * @param start the exclusive start, when the associated record does not fulfill the conditions of the passed query
@@ -70,6 +116,7 @@ public abstract class AbstractOperations {
      *              right (next=false) of the range.
      * @param next whether the Range is right (true) or left of the primary key (false) assuming natural order
      * @param limit the max. amount of the range, may be smaller
+     * @param <R> the type of the records
      * @return an instance of Range
      * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
      */
