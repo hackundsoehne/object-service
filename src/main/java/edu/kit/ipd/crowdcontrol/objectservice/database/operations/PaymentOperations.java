@@ -22,7 +22,7 @@ public class PaymentOperations extends AbstractOperations {
         //TODO
         return null;
     }
-    
+
     public void addGiftCode(String code, int amount){
         //TODO
     }
