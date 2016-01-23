@@ -190,8 +190,7 @@ public class PlatformManager {
      */
     public Optional<WorkerRecord> getWorker(String name, Map<String, String[]> params) {
         return identifyWorker(name, params).map(uid ->
-            workerOps.getAllWorkers().stream().
-                    filter(workerRecord1 -> workerRecord1.getIdentification().equals(uid)).findFirst().
+            workerOps.getWorker(name, uid).
                     orElseGet(() -> {
                         //create a new entry in the database
                         WorkerRecord record = new WorkerRecord(-1, uid, name, null);
