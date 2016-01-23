@@ -11,14 +11,17 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment implements java.io.Serializable {
 
-	private static final long serialVersionUID = 479657503;
+	private static final long serialVersionUID = -938979743;
 
 	private java.lang.Integer idExperiment;
 	private java.lang.String  titel;
 	private java.lang.String  description;
+	private java.lang.Integer neededAnswers;
 	private java.lang.Integer ratingsPerAnswer;
+	private java.lang.Integer anwersPerWorker;
+	private java.lang.Integer ratingsPerWorker;
+	private java.lang.String  answerType;
 	private java.lang.String  algorithmTaskChooser;
-	private java.lang.String  algorithmTaskChooserParam;
 	private java.lang.String  algorithmQualityAnswer;
 	private java.lang.String  algorithmQualityRating;
 	private java.lang.Integer basePayment;
@@ -26,7 +29,6 @@ public class Experiment implements java.io.Serializable {
 	private java.lang.Integer bonusRating;
 	private java.lang.String  templateData;
 	private java.lang.Integer template;
-	private java.lang.String  answerType;
 
 	public Experiment() {}
 
@@ -34,24 +36,29 @@ public class Experiment implements java.io.Serializable {
 		java.lang.Integer idExperiment,
 		java.lang.String  titel,
 		java.lang.String  description,
+		java.lang.Integer neededAnswers,
 		java.lang.Integer ratingsPerAnswer,
+		java.lang.Integer anwersPerWorker,
+		java.lang.Integer ratingsPerWorker,
+		java.lang.String  answerType,
 		java.lang.String  algorithmTaskChooser,
-		java.lang.String  algorithmTaskChooserParam,
 		java.lang.String  algorithmQualityAnswer,
 		java.lang.String  algorithmQualityRating,
 		java.lang.Integer basePayment,
 		java.lang.Integer bonusAnswer,
 		java.lang.Integer bonusRating,
 		java.lang.String  templateData,
-		java.lang.Integer template,
-		java.lang.String  answerType
+		java.lang.Integer template
 	) {
 		this.idExperiment = idExperiment;
 		this.titel = titel;
 		this.description = description;
+		this.neededAnswers = neededAnswers;
 		this.ratingsPerAnswer = ratingsPerAnswer;
+		this.anwersPerWorker = anwersPerWorker;
+		this.ratingsPerWorker = ratingsPerWorker;
+		this.answerType = answerType;
 		this.algorithmTaskChooser = algorithmTaskChooser;
-		this.algorithmTaskChooserParam = algorithmTaskChooserParam;
 		this.algorithmQualityAnswer = algorithmQualityAnswer;
 		this.algorithmQualityRating = algorithmQualityRating;
 		this.basePayment = basePayment;
@@ -59,7 +66,6 @@ public class Experiment implements java.io.Serializable {
 		this.bonusRating = bonusRating;
 		this.templateData = templateData;
 		this.template = template;
-		this.answerType = answerType;
 	}
 
 	public java.lang.Integer getIdExperiment() {
@@ -86,6 +92,14 @@ public class Experiment implements java.io.Serializable {
 		this.description = description;
 	}
 
+	public java.lang.Integer getNeededAnswers() {
+		return this.neededAnswers;
+	}
+
+	public void setNeededAnswers(java.lang.Integer neededAnswers) {
+		this.neededAnswers = neededAnswers;
+	}
+
 	public java.lang.Integer getRatingsPerAnswer() {
 		return this.ratingsPerAnswer;
 	}
@@ -94,20 +108,36 @@ public class Experiment implements java.io.Serializable {
 		this.ratingsPerAnswer = ratingsPerAnswer;
 	}
 
+	public java.lang.Integer getAnwersPerWorker() {
+		return this.anwersPerWorker;
+	}
+
+	public void setAnwersPerWorker(java.lang.Integer anwersPerWorker) {
+		this.anwersPerWorker = anwersPerWorker;
+	}
+
+	public java.lang.Integer getRatingsPerWorker() {
+		return this.ratingsPerWorker;
+	}
+
+	public void setRatingsPerWorker(java.lang.Integer ratingsPerWorker) {
+		this.ratingsPerWorker = ratingsPerWorker;
+	}
+
+	public java.lang.String getAnswerType() {
+		return this.answerType;
+	}
+
+	public void setAnswerType(java.lang.String answerType) {
+		this.answerType = answerType;
+	}
+
 	public java.lang.String getAlgorithmTaskChooser() {
 		return this.algorithmTaskChooser;
 	}
 
 	public void setAlgorithmTaskChooser(java.lang.String algorithmTaskChooser) {
 		this.algorithmTaskChooser = algorithmTaskChooser;
-	}
-
-	public java.lang.String getAlgorithmTaskChooserParam() {
-		return this.algorithmTaskChooserParam;
-	}
-
-	public void setAlgorithmTaskChooserParam(java.lang.String algorithmTaskChooserParam) {
-		this.algorithmTaskChooserParam = algorithmTaskChooserParam;
 	}
 
 	public java.lang.String getAlgorithmQualityAnswer() {
@@ -164,13 +194,5 @@ public class Experiment implements java.io.Serializable {
 
 	public void setTemplate(java.lang.Integer template) {
 		this.template = template;
-	}
-
-	public java.lang.String getAnswerType() {
-		return this.answerType;
-	}
-
-	public void setAnswerType(java.lang.String answerType) {
-		this.answerType = answerType;
 	}
 }
