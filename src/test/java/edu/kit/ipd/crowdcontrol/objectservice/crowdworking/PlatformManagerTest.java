@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Plat
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -40,6 +41,7 @@ public class PlatformManagerTest {
                 .build();
         TasksOperations tasksOps = mock(TasksOperations.class);
         PlatformOperations platformOps = mock(PlatformOperations.class);
+        WorkerOperations workerOps = mock(WorkerOperations.class);
         TaskRecord rec = new TaskRecord();
 
 
@@ -47,54 +49,63 @@ public class PlatformManagerTest {
                 param -> Optional.empty(),
                 (worker, amount) -> CompletableFuture.completedFuture(true),
                 tasksOps,
-                platformOps);
+                platformOps,
+                workerOps);
 
         verify(platformOps).deleteAllPlatforms();
 
         platforms.forEach(platform -> {
                     //check that every platform got init
                     verify(platformOps).createPlatform(((PlatformTest)platform).toRecord());
-                }
-        );
+        });
         platforms.forEach(platform -> {
-                    TaskRecord record = new TaskRecord();
-                    record.setExperiment(42);
-                    record.setStatus(TaskStatus.running);
-                    record.setCrowdPlatform(platform.getName());
-                    record.setPlatformData(42+"");
+            TaskRecord record = new TaskRecord();
+            record.setExperiment(42);
+            record.setStatus(TaskStatus.running);
+            record.setCrowdPlatform(platform.getName());
+            record.setPlatformData(42+"");
 
-                    manager.publishTask(platform.getName(),experiment).
-                            map(booleanCompletableFuture -> booleanCompletableFuture.join());
-                    verify(tasksOps).createTask(record);
-                }
-        );
+            try {
+                manager.publishTask(platform.getName(),experiment).
+                        map(booleanCompletableFuture -> booleanCompletableFuture.join());
+            } catch (TaskOperationException e) {
+                e.printStackTrace();
+            }
+            verify(tasksOps).createTask(record);
+        });
         platforms.forEach(platform -> {
-                    TaskRecord record = new TaskRecord();
-                    record.setExperiment(42);
-                    record.setCrowdPlatform(platform.getName());
-                    record.setStatus(TaskStatus.running);
-                    record.setPlatformData(42+"");
+            TaskRecord record = new TaskRecord();
+            record.setExperiment(42);
+            record.setCrowdPlatform(platform.getName());
+            record.setStatus(TaskStatus.running);
+            record.setPlatformData(42+"");
 
-                    when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
-                    manager.updateTask(platform.getName(), experiment).
-                            map(booleanCompletableFuture -> booleanCompletableFuture.join());
+            when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
+            try {
+                manager.updateTask(platform.getName(), experiment).
+                        map(booleanCompletableFuture -> booleanCompletableFuture.join());
+            } catch (TaskOperationException e) {
+                e.printStackTrace();
+            }
+            verify(tasksOps).updateTask(record);
+        });
+        platforms.forEach(platform -> {
+            TaskRecord record = new TaskRecord();
+            record.setExperiment(42);
+            record.setCrowdPlatform(platform.getName());
+            record.setStatus(TaskStatus.running);
+            record.setPlatformData(42+"");
+
+            when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
+            try {
+                manager.unpublishTask(platform.getName(), experiment).
+                        map(booleanCompletableFuture -> booleanCompletableFuture.join());
+            } catch (TaskOperationException e) {
+                e.printStackTrace();
+            }
+            record.setStatus(TaskStatus.finished);
                     verify(tasksOps).updateTask(record);
-                }
-        );
-        platforms.forEach(platform -> {
-                    TaskRecord record = new TaskRecord();
-                    record.setExperiment(42);
-                    record.setCrowdPlatform(platform.getName());
-                    record.setStatus(TaskStatus.running);
-                    record.setPlatformData(42+"");
-
-                    when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
-                    manager.unpublishTask(platform.getName(), experiment).
-                            map(booleanCompletableFuture -> booleanCompletableFuture.join());
-                    record.setStatus(TaskStatus.finished);
-                    verify(tasksOps).updateTask(record);
-                }
-        );
+        });
     }
 
     static class PlatformTest implements Platform, Payment, Worker {
@@ -171,8 +182,8 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public Optional<String> getWorkerId(Map<String, String[]> param) {
-            return Optional.of("5");
+        public Optional<String> identifyWorker(Map<String, String[]> param) {
+            return Optional.of("50");
         }
     }
 }
