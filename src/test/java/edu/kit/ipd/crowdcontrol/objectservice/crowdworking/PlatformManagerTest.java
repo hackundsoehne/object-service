@@ -65,6 +65,7 @@ public class PlatformManagerTest {
             record.setCrowdPlatform(platform.getName());
             record.setPlatformData(42+"");
 
+            when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.empty());
             try {
                 manager.publishTask(platform.getName(),experiment).
                         map(booleanCompletableFuture -> booleanCompletableFuture.join());
