@@ -74,4 +74,11 @@ public class TaskDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.obje
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByStatus(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus... values) {
 		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.STATUS, values);
 	}
+
+	/**
+	 * Fetch records that have <code>stopgap IN (values)</code>
+	 */
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByStopgap(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStopgap... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.STOPGAP, values);
+	}
 }

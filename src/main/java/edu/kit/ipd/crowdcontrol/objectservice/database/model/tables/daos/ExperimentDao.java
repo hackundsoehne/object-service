@@ -62,6 +62,13 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontro
 	}
 
 	/**
+	 * Fetch records that have <code>needed_answers IN (values)</code>
+	 */
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByNeededAnswers(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.NEEDED_ANSWERS, values);
+	}
+
+	/**
 	 * Fetch records that have <code>ratings_per_answer IN (values)</code>
 	 */
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByRatingsPerAnswer(java.lang.Integer... values) {
@@ -69,17 +76,31 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontro
 	}
 
 	/**
+	 * Fetch records that have <code>anwers_per_worker IN (values)</code>
+	 */
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByAnwersPerWorker(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.ANWERS_PER_WORKER, values);
+	}
+
+	/**
+	 * Fetch records that have <code>ratings_per_worker IN (values)</code>
+	 */
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByRatingsPerWorker(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.RATINGS_PER_WORKER, values);
+	}
+
+	/**
+	 * Fetch records that have <code>answer_type IN (values)</code>
+	 */
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByAnswerType(java.lang.String... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.ANSWER_TYPE, values);
+	}
+
+	/**
 	 * Fetch records that have <code>algorithm_task_chooser IN (values)</code>
 	 */
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByAlgorithmTaskChooser(java.lang.String... values) {
 		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.ALGORITHM_TASK_CHOOSER, values);
-	}
-
-	/**
-	 * Fetch records that have <code>algorithm_task_chooser_param IN (values)</code>
-	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByAlgorithmTaskChooserParam(java.lang.String... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.ALGORITHM_TASK_CHOOSER_PARAM, values);
 	}
 
 	/**
@@ -129,12 +150,5 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontro
 	 */
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByTemplate(java.lang.Integer... values) {
 		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.TEMPLATE, values);
-	}
-
-	/**
-	 * Fetch records that have <code>answer_type IN (values)</code>
-	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByAnswerType(java.lang.String... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.ANSWER_TYPE, values);
 	}
 }
