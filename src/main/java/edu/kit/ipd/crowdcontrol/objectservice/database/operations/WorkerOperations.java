@@ -26,10 +26,21 @@ public class WorkerOperations extends AbstractOperations {
      */
     public WorkerRecord createWorker(WorkerRecord workerRecord) {
         workerRecord.setIdWorker(null);
-        return create.insertInto(Tables.WORKER)
-                .set(workerRecord)
-                .returning()
-                .fetchOne();
+        return create.transactionResult(conf -> {
+            boolean existing = DSL.using(conf).fetchExists(
+                    DSL.selectFrom(Tables.WORKER)
+                            .where(Tables.WORKER.PLATFORM.eq(workerRecord.getPlatform()))
+                            .and(Tables.WORKER.IDENTIFICATION.eq(workerRecord.getIdentification()))
+            );
+            if (existing) {
+                throw new IllegalArgumentException("worker with the same platform and identification is" +
+                        "already existing");
+            }
+            return create.insertInto(Tables.WORKER)
+                    .set(workerRecord)
+                    .returning()
+                    .fetchOne();
+        });
     }
 
     /**
@@ -91,9 +102,22 @@ public class WorkerOperations extends AbstractOperations {
     }
 
     /**
+     * finds the worker with the passed platform and platform-identification data
+     * @param platform the platform the wanted worker is working on
+     * @param identification the platform-specific identification
+     * @return the found worker or empty
+     */
+    public Optional<WorkerRecord> getWorker(String platform, String identification) {
+        return create.selectFrom(Tables.WORKER)
+                .where(Tables.WORKER.PLATFORM.eq(platform))
+                .and(Tables.WORKER.IDENTIFICATION.eq(identification))
+                .fetchOptional();
+    }
+
+    /**
      * finds the worker with the passed workerId in the database
      * @param workerID the primary-key of the worker
-     * @return the found worker or emtpy
+     * @return the found worker or empty
      */
     public Optional<WorkerRecord> getWorker(int workerID) {
         return create.selectFrom(Tables.WORKER)
