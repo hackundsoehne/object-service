@@ -69,7 +69,7 @@ public class PlatformManager {
             if (!platform.getWorker().isPresent())
                 rec.setNeedsEmail(true);
 
-            rec.setRenderCalibrations(platform.isCalibsAllowd());
+            rec.setRenderCalibrations(platform.isCalibrationAllowed());
 
             platformOps.createPlatform(rec);
         });

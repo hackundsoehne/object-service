@@ -54,5 +54,5 @@ public interface Platform {
      * Returns if calibration questions can be asked on this platform
      * @return true or false
      */
-    Boolean isCalibsAllowd();
+    Boolean isCalibrationAllowed();
 }
