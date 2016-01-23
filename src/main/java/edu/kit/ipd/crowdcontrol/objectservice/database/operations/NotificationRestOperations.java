@@ -25,7 +25,7 @@ public class NotificationRestOperations extends AbstractOperations {
      * @param limit the umber of records
      * @return a list of notifications
      */
-    public Range<Notification, Integer> all(int cursor, boolean next, int limit) {
+    public Range<Notification, Integer> getNotificationsFrom(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(NOTIFICATION), NOTIFICATION.ID_NOTIFICATION, cursor, next, limit)
                 .map(this::toProto);
     }
@@ -36,7 +36,7 @@ public class NotificationRestOperations extends AbstractOperations {
      * @param id the ID of the notification
      * @return the notification of empty if not found
      */
-    public Optional<Notification> get(int id) {
+    public Optional<Notification> getNotification(int id) {
         return create.fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
                 .map(this::toProto);
     }
@@ -50,7 +50,7 @@ public class NotificationRestOperations extends AbstractOperations {
      * @return an instance of notification with ID assigned
      * @throws IllegalArgumentException if one of the specified fields is not set
      */
-    public Notification create(Notification toStore) throws IllegalArgumentException {
+    public Notification insertNotification(Notification toStore) throws IllegalArgumentException {
         assertHasField(toStore,
                 Notification.NAME_FIELD_NUMBER,
                 Notification.DESCRIPTION_FIELD_NUMBER,
@@ -58,7 +58,7 @@ public class NotificationRestOperations extends AbstractOperations {
                 Notification.CHECK_PERIOD_FIELD_NUMBER,
                 Notification.SEND_THRESHOLD_FIELD_NUMBER);
 
-        NotificationRecord record = mergeRecord(create.newRecord(NOTIFICATION), toStore);
+        NotificationRecord record = toRecord(toStore);
         record.store();
 
         return toProto(record);
@@ -71,15 +71,16 @@ public class NotificationRestOperations extends AbstractOperations {
      * @param notification new notification contents
      * @return the updated notification
      */
-    public Notification update(int id, Notification notification) {
-        NotificationRecord record = create
-                .fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
+    public Notification updateNotification(int id, Notification notification) {
+        NotificationRecord notificationRecord = toRecord(notification);
+        notificationRecord.setIdNotification(id);
+        return create.update(NOTIFICATION)
+                .set(notificationRecord)
+                .where(NOTIFICATION.ID_NOTIFICATION.eq(id))
+                .returning()
+                .fetchOptional()
+                .map(this::toProto)
                 .orElseThrow(() -> new NotFoundException("Notification does not exist!"));
-
-        record = mergeRecord(record, notification);
-        record.update();
-
-        return toProto(record);
     }
 
     /**
@@ -88,7 +89,7 @@ public class NotificationRestOperations extends AbstractOperations {
      * @param id the id of the notification
      * @return {@code true} if deleted, {@code false} otherwise
      */
-    public boolean delete(int id) {
+    public boolean deleteNotification(int id) {
         NotificationRecord record = create.newRecord(NOTIFICATION);
         record.setIdNotification(id);
 
@@ -106,7 +107,8 @@ public class NotificationRestOperations extends AbstractOperations {
                 .build();
     }
 
-    private NotificationRecord mergeRecord(NotificationRecord target, Notification notification) {
+    private NotificationRecord toRecord(Notification notification) {
+        NotificationRecord target = create.newRecord(NOTIFICATION);
         if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.NAME_FIELD_NUMBER))) {
             target.setName(notification.getName());
         }

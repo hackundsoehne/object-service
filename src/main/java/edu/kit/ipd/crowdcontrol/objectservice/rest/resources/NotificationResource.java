@@ -30,7 +30,7 @@ public class NotificationResource {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
-        return operations.all(from, asc, 20)
+        return operations.getNotificationsFrom(from, asc, 20)
                 .constructPaginated(NotificationList.newBuilder(), NotificationList.Builder::addAllItems);
     }
 
@@ -43,7 +43,7 @@ public class NotificationResource {
      * @return A single template.
      */
     public Notification get(Request request, Response response) {
-        return operations.get(getParamInt(request, "id"))
+        return operations.getNotification(getParamInt(request, "id"))
                 .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
 
@@ -58,7 +58,7 @@ public class NotificationResource {
     public Notification put(Request request, Response response) {
         Notification notification = request.attribute("input");
         try {
-            notification = operations.create(notification);
+            notification = operations.insertNotification(notification);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("All parameters must be set!");
         }
@@ -79,7 +79,7 @@ public class NotificationResource {
      */
     public Notification patch(Request request, Response response) {
         Notification notification = request.attribute("input");
-        return operations.update(getParamInt(request, "id"), notification);
+        return operations.updateNotification(getParamInt(request, "id"), notification);
     }
 
     /**
@@ -91,7 +91,7 @@ public class NotificationResource {
      * @return {@code null}.
      */
     public Notification delete(Request request, Response response) {
-        boolean existed = operations.delete(getParamInt(request, "id"));
+        boolean existed = operations.deleteNotification(getParamInt(request, "id"));
 
         if (!existed) {
             throw new NotFoundException("Template does not exist!");

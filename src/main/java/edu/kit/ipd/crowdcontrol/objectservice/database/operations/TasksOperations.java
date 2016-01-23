@@ -49,7 +49,7 @@ public class TasksOperations extends AbstractOperations {
      * @param experimentId the primary key of the experiment
      * @return the found task or empty if not found
      */
-    public Optional<TaskRecord> searchTask(String platform, int experimentId) {
+    public Optional<TaskRecord> findTask(String platform, int experimentId) {
         return create.selectFrom(Tables.TASK)
                 .where(Tables.TASK.CROWD_PLATFORM.eq(platform))
                 .and(Tables.TASK.EXPERIMENT.eq(experimentId))
