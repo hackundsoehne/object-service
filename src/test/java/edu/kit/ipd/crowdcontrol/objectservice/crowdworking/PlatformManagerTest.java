@@ -67,8 +67,7 @@ public class PlatformManagerTest {
 
             when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.empty());
             try {
-                manager.publishTask(platform.getName(),experiment).
-                        map(booleanCompletableFuture -> booleanCompletableFuture.join());
+                manager.publishTask(platform.getName(),experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
@@ -83,8 +82,7 @@ public class PlatformManagerTest {
 
             when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
             try {
-                manager.updateTask(platform.getName(), experiment).
-                        map(booleanCompletableFuture -> booleanCompletableFuture.join());
+                manager.updateTask(platform.getName(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
@@ -99,8 +97,7 @@ public class PlatformManagerTest {
 
             when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
             try {
-                manager.unpublishTask(platform.getName(), experiment).
-                        map(booleanCompletableFuture -> booleanCompletableFuture.join());
+                manager.unpublishTask(platform.getName(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }

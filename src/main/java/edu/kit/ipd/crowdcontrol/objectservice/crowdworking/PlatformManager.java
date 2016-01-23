@@ -113,22 +113,21 @@ public class PlatformManager {
      * @param experiment The experiment to publish
      * @return None if the platform does not exist
      */
-    public Optional<CompletableFuture<Boolean>> publishTask(String name, Experiment experiment) throws TaskOperationException {
+    public CompletableFuture<Boolean> publishTask(String name, Experiment experiment) throws TaskOperationException {
         if (tasksOps.searchTask(name,experiment.getId()).isPresent())
             throw new TaskOperationException("Experiment is already published!");
-        return getPlatform(name).
-                map(platform1 -> platform1.publishTask(experiment)).
-                map(stringCompletableFuture -> stringCompletableFuture.handle((s, throwable) -> {
-                    if (s != null && throwable == null) {
-                        TaskRecord record = new TaskRecord();
-                        record.setExperiment(experiment.getId());
-                        record.setPlatformData(s);
-                        record.setStatus(TaskStatus.running);
-                        record.setCrowdPlatform(name);
-                        tasksOps.createTask(record);
-                    }
-                    return true;
-                }));
+
+        return getPlatform(name)
+                .map(platform1 -> platform1.publishTask(experiment))
+                .orElseThrow(() -> new IllegalArgumentException("Experiment not found!"))
+                .thenApply(s -> {
+                    TaskRecord record = new TaskRecord();
+                    record.setExperiment(experiment.getId());
+                    record.setPlatformData(s);
+                    record.setStatus(TaskStatus.running);
+                    record.setCrowdPlatform(name);
+                    return tasksOps.createTask(record) != null;
+                });
     }
 
     /**
@@ -138,21 +137,18 @@ public class PlatformManager {
      * @param experiment The experiment to unpublish
      * @return None if the platform was not found, false if the unpublish failed and true if everything went fine
      */
-    public Optional<CompletableFuture<Boolean>> unpublishTask(String name, Experiment experiment) throws TaskOperationException {
+    public CompletableFuture<Boolean> unpublishTask(String name, Experiment experiment) throws TaskOperationException {
         TaskRecord record;
 
         record = tasksOps.searchTask(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment is not published"));
 
-        return getPlatform(name).map(platform1 ->
-            platform1.unpublishTask(record.getPlatformData()).handle((b, throwable) -> {
-                if (b != null && throwable == null) {
+        return getPlatform(name).map(platform -> platform.unpublishTask(record.getPlatformData()))
+                .orElseThrow(() -> new IllegalArgumentException("Experiment not found!"))
+                .thenApply(aBoolean -> {
                     record.setStatus(TaskStatus.finished);
-                    tasksOps.updateTask(record);
-                }
-                return true;
-            })
-        );
+                    return tasksOps.updateTask(record);
+                });
     }
 
     /**
@@ -161,25 +157,19 @@ public class PlatformManager {
      * @param experiment The experiment to update
      * @return None if the platform was not found, false if the update failed and true if everything went fine.
      */
-    public Optional<CompletableFuture<Boolean>> updateTask(String name, Experiment experiment) throws TaskOperationException {
+    public CompletableFuture<Boolean> updateTask(String name, Experiment experiment) throws TaskOperationException {
         TaskRecord record;
 
         record = tasksOps.searchTask(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment is not published"));
 
-        return getPlatform(name).
-                map(platform -> platform.updateTask(record.getPlatformData(), experiment)).
-                map(stringCompletableFuture -> {
-                    CompletableFuture<Boolean> result = new CompletableFuture<Boolean>();
-                    stringCompletableFuture.whenComplete((s, throwable) -> {
-                        if (s != null && throwable == null) {
-                            record.setPlatformData(s);
-                            tasksOps.updateTask(record);
-                        }
-                        result.complete(true);
-                    });
-                    return result;
-        });
+        return getPlatform(name)
+                .map(platform -> platform.updateTask(record.getPlatformData(), experiment))
+                .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+                .thenApply(s -> {
+                    record.setPlatformData(s);
+                    return tasksOps.updateTask(record);
+                });
     }
 
     /**
