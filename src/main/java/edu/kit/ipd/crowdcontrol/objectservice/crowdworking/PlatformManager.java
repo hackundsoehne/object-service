@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
@@ -39,7 +40,7 @@ public class PlatformManager {
         platforms = crowdPlatforms.stream()
                 .collect(Collectors.toMap(Platform::getName, Function.identity()));
         //clear database
-        platformOps.deleteAllPlatform();
+        platformOps.deleteAllPlatforms();
         //update database
         platforms.forEach((s, platform) -> {
             PlatformRecord rec = new PlatformRecord();
@@ -47,10 +48,10 @@ public class PlatformManager {
             rec.setNeedsEmail(false);
 
             /* platform does not handle payment, email is needed for internal payment */
-            if (platform.getPayment() == null)
+            if (!platform.getPayment().isPresent())
                 rec.setNeedsEmail(true);
             /* if platform cannot identify worker, we need to do that with a email adress */
-            if (platform.getWorker() == null)
+            if (!platform.getWorker().isPresent())
                 rec.setNeedsEmail(true);
 
             rec.setRenderCalibrations(platform.isCalibsAllowd());
@@ -100,20 +101,17 @@ public class PlatformManager {
     public Optional<CompletableFuture<Boolean>> publishTask(String name, Experiment experiment) {
         return getPlatform(name).
                 map(platform1 -> platform1.publishTask(experiment)).
-                map(stringCompletableFuture -> {
-                    CompletableFuture<Boolean> result = new CompletableFuture<Boolean>();
-                    stringCompletableFuture.whenComplete((s, throwable) -> {
-                        if (s != null && throwable == null) {
-                            TaskRecord record = new TaskRecord();
-                            record.setExperiment(experiment.getId());
-                            record.setPlatformData(s);
-                            //FIXME set running / stopping
-                            record.setCrowdPlatform(name);
-                        }
+                map(stringCompletableFuture -> stringCompletableFuture.handle((s, throwable) -> {
+                    if (s != null && throwable == null) {
+                        TaskRecord record = new TaskRecord();
+                        record.setExperiment(experiment.getId());
+                        record.setPlatformData(s);
+                        record.setStatus(TaskStatus.running);
+                        record.setCrowdPlatform(name);
+                        tasksOps.createTask(record);
                     }
-                    );
-                    return result;
-                });
+                    return true;
+                }));
     }
 
     /**
@@ -124,10 +122,20 @@ public class PlatformManager {
      * @return None if the platform was not found, false if the unpublish failed and true if everything went fine
      */
     public Optional<CompletableFuture<Boolean>> unpublishTask(String name, Experiment experiment) {
-        return getPlatform(name).map(platform1 -> {
-            String id = "";
-            return platform1.unpublishTask(id);
-        });
+        TaskRecord record;
+
+        record = tasksOps.searchTask(name, experiment.getId()).orElse(null);
+        if (record == null) return Optional.empty();
+
+        return getPlatform(name).map(platform1 ->
+            platform1.unpublishTask(record.getPlatformData()).handle((b, throwable) -> {
+                if (b != null && throwable == null) {
+                    record.setStatus(TaskStatus.finished);
+                    tasksOps.updateTask(record);
+                }
+                return true;
+            })
+        );
     }
 
     /**
@@ -139,7 +147,7 @@ public class PlatformManager {
     public Optional<CompletableFuture<Boolean>> updateTask(String name, Experiment experiment) {
         TaskRecord record;
 
-        record = tasksOps.searchTask(name, experiment.getId());
+        record = tasksOps.searchTask(name, experiment.getId()).orElse(null);
         if (record == null) return Optional.empty();
 
         return getPlatform(name).
