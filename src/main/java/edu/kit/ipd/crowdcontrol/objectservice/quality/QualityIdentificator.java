@@ -3,13 +3,12 @@ package edu.kit.ipd.crowdcontrol.objectservice.quality;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityByRatings;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityStrategy;
-import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.*;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.RatingQualityByDistribution;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.RatingQualityStrategy;
 import rx.Observable;
 import rx.Observer;
 
@@ -29,27 +28,33 @@ import java.util.Map;
  *
  *
  */
-public class QualityIdentificator implements Observer<ChangeEvent<Experiment>> {
+public class QualityIdentificator implements  Observer<Rating> {
 
 
 
-    private Observable observable = EventManager.EXPERIMENT_CHANGE.getObservable();
+    final static int MAXIMUM_QUALITY = 9;
+    final static int MINUMUM_QUALITY = 0;
+
+   // private Observable<Answer> answerObservable = EventManager.ANSWER_CREATE.getObservable();
+    private Observable<Rating> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
     private AnswerRatingOperations operations;
     private AnswerQualityStrategy answerIdentifier;
     private RatingQualityStrategy ratingIdentifier;
+
 
 
     /**
      * Has to be  >= 0 and  <10
      *
      * Might be set to allow more flexibility and more good answers
-     * //TODO ?
      */
     private int ratingQualityThreshold = 10;
 
 
     public QualityIdentificator(AnswerRatingOperations ops){
-        observable.subscribe();
+      //  answerObservable.subscribe();
+        //TODO get alg. params
+        ratingObservable.subscribe();
         operations = ops;
         answerIdentifier = new AnswerQualityByRatings();
         ratingIdentifier = new RatingQualityByDistribution();
@@ -65,24 +70,14 @@ public class QualityIdentificator implements Observer<ChangeEvent<Experiment>> {
         //NOP
     }
 
-
-    /**
-     * If an ending experiment is detected (via EXPERIMENT_CHANGE-observable),
-     * the quality of its ratings and answers are identified.
-     *
-     * @param changeEvent
-     */
     @Override
-    public void onNext(ChangeEvent<Experiment> changeEvent) {
+    public void onNext(Rating rating) {
 
-        if( (changeEvent.getOld().getState() != Experiment.State.STOPPED)
-                && (changeEvent.getNeww().getState() == Experiment.State.STOPPED) ){
 
-            rateQualityOfRatings(changeEvent.getNeww().getId());
-            rateQualityOfAnswers(changeEvent.getNeww().getId());
-
-        }
     }
+
+
+
 
 
     /**
@@ -98,7 +93,7 @@ public class QualityIdentificator implements Observer<ChangeEvent<Experiment>> {
         for (AnswerRecord answer: answers) {
             List<RatingRecord> records = operations.getRatingsOfAnswer(answer);
 
-            Map<RatingRecord,Integer> map = ratingIdentifier.identifyRatingQuality(records);
+            Map<RatingRecord,Integer> map = ratingIdentifier.identifyRatingQuality(records, MAXIMUM_QUALITY, MINUMUM_QUALITY);
             operations.setQualityToRatings(map);
         }
 
@@ -115,6 +110,7 @@ public class QualityIdentificator implements Observer<ChangeEvent<Experiment>> {
         List<AnswerRecord> answers = operations.getAnswersOfExperiment(expID);
 
         for (AnswerRecord answer: answers) {
+            RatingRecord r;
             List<RatingRecord> records = operations.getGoodRatingsOfAnswer(answer, ratingQualityThreshold);
 
 
@@ -123,6 +119,14 @@ public class QualityIdentificator implements Observer<ChangeEvent<Experiment>> {
 
 
 
+    }
+
+    public static int getMinumumQuality() {
+        return MINUMUM_QUALITY;
+    }
+
+    public static int getMaximumQuality() {
+        return MAXIMUM_QUALITY;
     }
 
 
