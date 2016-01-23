@@ -4,6 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Gift
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PaymentRecord;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import org.jooq.DSLContext;
 
 import java.util.List;
@@ -22,12 +23,12 @@ public class PaymentOperations extends AbstractOperations {
      * Returns all giftcodes sorted after the amount of money in descending order.
      * @return a list of giftcodes
      */
-    public List<GiftCodeRecord> getAllGiftCodesDescending() {
+    public List<GiftCodeRecord> getUnusedGiftCodesDescending() {
         //TODO
         return null;
     }
     
-    public void deleteGiftCode(String giftCode) {
+    public void markGiftCodeAsUsed(GiftCodeRecord giftCode, WorkerRecord worker) {
         //TODO
     }
 

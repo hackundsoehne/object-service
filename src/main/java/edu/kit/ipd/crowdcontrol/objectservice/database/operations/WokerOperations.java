@@ -95,7 +95,7 @@ public class WokerOperations extends AbstractOperations {
         return null;
     }
 
-    public List<WorkerRecord> getAllWorkers() {
+    public List<WorkerRecord> getWorkersWithCreditBalanceGreaterThan(int creditBalance) {
         //TODO
         return null;
     }
