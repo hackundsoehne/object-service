@@ -12,5 +12,5 @@ public interface Worker {
      * @param param The parameters which were sent by a platform
      * @return The id of the worker if one can be found
      */
-    Optional<String> getWorkerId(Map<String, String[]> param);
+    Optional<String> identifyWorker(Map<String, String[]> param);
 }

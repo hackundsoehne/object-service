@@ -3,9 +3,12 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import org.jooq.DSLContext;
 
 import java.util.List;
@@ -17,9 +20,6 @@ import java.util.stream.Collectors;
 
 /**
  * This class handles managing of the platforms.
- *
- * The class will update the list of known platforms in the database.
- * c
  * Created by marcel on 19.01.16.
  */
 public class PlatformManager {
@@ -27,14 +27,29 @@ public class PlatformManager {
     private final Worker fallbackWorker;
     private final Payment fallbackPayment;
     private TasksOperations tasksOps;
+    private WorkerOperations workerOps;
 
+    /**
+     * Create a new manager for platforms. The known platforms in the database will be deleted,
+     * and filled with the new.
+     *
+     * @param crowdPlatforms The list of crowdplatforms to be managed by this manager,
+     *                       will be used to setup the list of platforms in the database
+     * @param fallbackWorker handler which is called if a platform does not support identifying a worker
+     *                       for this case need_email on the platform is set and the email which got entered by the worker
+     *                       should be set as some param
+     * @param fallbackPayment handler which is called if a platform does not support payment
+     * @param tasksOps Used for the task operations on the database
+     * @param platformOps Used for the platform operations on the database
+     * @param workerOps Used for the worker operations on the database
+     */
     public PlatformManager(List<Platform> crowdPlatforms, Worker fallbackWorker,
                            Payment fallbackPayment, TasksOperations tasksOps,
-                           PlatformOperations platformOps) {
+                           PlatformOperations platformOps, WorkerOperations workerOps) {
         this.tasksOps = tasksOps;
+        this.workerOps = workerOps;
         this.fallbackWorker = fallbackWorker;
         this.fallbackPayment = fallbackPayment;
-
 
         //create hashmap of platforms
         platforms = crowdPlatforms.stream()
@@ -98,7 +113,9 @@ public class PlatformManager {
      * @param experiment The experiment to publish
      * @return None if the platform does not exist
      */
-    public Optional<CompletableFuture<Boolean>> publishTask(String name, Experiment experiment) {
+    public Optional<CompletableFuture<Boolean>> publishTask(String name, Experiment experiment) throws TaskOperationException {
+        if (tasksOps.searchTask(name,experiment.getId()).isPresent())
+            throw new TaskOperationException("Experiment is already published!");
         return getPlatform(name).
                 map(platform1 -> platform1.publishTask(experiment)).
                 map(stringCompletableFuture -> stringCompletableFuture.handle((s, throwable) -> {
@@ -121,11 +138,11 @@ public class PlatformManager {
      * @param experiment The experiment to unpublish
      * @return None if the platform was not found, false if the unpublish failed and true if everything went fine
      */
-    public Optional<CompletableFuture<Boolean>> unpublishTask(String name, Experiment experiment) {
+    public Optional<CompletableFuture<Boolean>> unpublishTask(String name, Experiment experiment) throws TaskOperationException {
         TaskRecord record;
 
-        record = tasksOps.searchTask(name, experiment.getId()).orElse(null);
-        if (record == null) return Optional.empty();
+        record = tasksOps.searchTask(name, experiment.getId()).
+                orElseThrow(() -> new TaskOperationException("Experiment is not published"));
 
         return getPlatform(name).map(platform1 ->
             platform1.unpublishTask(record.getPlatformData()).handle((b, throwable) -> {
@@ -144,11 +161,11 @@ public class PlatformManager {
      * @param experiment The experiment to update
      * @return None if the platform was not found, false if the update failed and true if everything went fine.
      */
-    public Optional<CompletableFuture<Boolean>> updateTask(String name, Experiment experiment) {
+    public Optional<CompletableFuture<Boolean>> updateTask(String name, Experiment experiment) throws TaskOperationException {
         TaskRecord record;
 
-        record = tasksOps.searchTask(name, experiment.getId()).orElse(null);
-        if (record == null) return Optional.empty();
+        record = tasksOps.searchTask(name, experiment.getId()).
+                orElseThrow(() -> new TaskOperationException("Experiment is not published"));
 
         return getPlatform(name).
                 map(platform -> platform.updateTask(record.getPlatformData(), experiment)).
@@ -171,7 +188,30 @@ public class PlatformManager {
      * @param params Params passed by the platform
      * @return A String if the platform exists
      */
-    public Optional<String> getWorkerId(String name, Map<String, String[]> params) {
-        return getWorker(name).flatMap(worker -> worker.getWorkerId(params));
+    public Optional<String> identifyWorker(String name, Map<String, String[]> params) {
+        return getWorker(name).flatMap(worker -> worker.identifyWorker(params));
+    }
+
+    /**
+     * Get a worker record from the database which is associated with the given parameters
+     * @param name Name of the platform
+     * @param params Params which were passed by the platform to the workerservice
+     * @return A WorkerRecord if one is found
+     */
+    public Optional<WorkerRecord> getWorker(String name, Map<String, String[]> params) {
+        return identifyWorker(name, params).map(uid ->
+            workerOps.getAllWorkers().stream().
+                    filter(workerRecord1 -> workerRecord1.getIdentification().equals(uid)).findFirst().
+                    orElseGet(() -> {
+                        //create a new entry in the database
+                        WorkerRecord record = new WorkerRecord(-1, uid, name, null);
+                        record = workerOps.createWorker(record);
+                        return record;
+                    })
+        );
+    }
+
+    public Optional<CompletableFuture<Boolean>> payWorker(String name, Worker worker, int amount) {
+        return getPlatformPayment(name).map(payment -> payment.payWorker(worker, amount));
     }
 }
