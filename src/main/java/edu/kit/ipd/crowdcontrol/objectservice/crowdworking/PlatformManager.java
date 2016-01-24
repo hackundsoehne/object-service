@@ -27,7 +27,6 @@ public class PlatformManager {
     private final Worker fallbackWorker;
     private final Payment fallbackPayment;
     private TasksOperations tasksOps;
-    private WorkerOperations workerOps;
 
     /**
      * Create a new manager for platforms. The known platforms in the database will be deleted,
@@ -41,13 +40,11 @@ public class PlatformManager {
      * @param fallbackPayment handler which is called if a platform does not support payment
      * @param tasksOps Used for the task operations on the database
      * @param platformOps Used for the platform operations on the database
-     * @param workerOps Used for the worker operations on the database
      */
     public PlatformManager(List<Platform> crowdPlatforms, Worker fallbackWorker,
                            Payment fallbackPayment, TasksOperations tasksOps,
-                           PlatformOperations platformOps, WorkerOperations workerOps) {
+                           PlatformOperations platformOps) {
         this.tasksOps = tasksOps;
-        this.workerOps = workerOps;
         this.fallbackWorker = fallbackWorker;
         this.fallbackPayment = fallbackPayment;
 
@@ -90,8 +87,10 @@ public class PlatformManager {
      * @param name The name of the platform
      * @return The interface used to identify a worker
      */
-    public Optional<Worker> getWorker(String name) {
-        return getPlatform(name).map(platform -> platform.getWorker().orElse(fallbackWorker));
+    public Worker getWorker(String name) {
+        return getPlatform(name)
+                .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+                .getWorker().orElse(fallbackWorker);
     }
 
     /**
@@ -101,8 +100,10 @@ public class PlatformManager {
      * @param name The name of the platform to use
      * @return The interface used for payment
      */
-    public Optional<Payment> getPlatformPayment(String name) {
-        return getPlatform(name).map(platform -> platform.getPayment().orElse(fallbackPayment));
+    public Payment getPlatformPayment(String name) {
+        return getPlatform(name)
+                .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+                .getPayment().orElse(fallbackPayment);
     }
 
     /**
@@ -178,29 +179,18 @@ public class PlatformManager {
      * @param params Params passed by the platform
      * @return A String if the platform exists
      */
-    public Optional<String> identifyWorker(String name, Map<String, String[]> params) {
-        return getWorker(name).flatMap(worker -> worker.identifyWorker(params));
+    public String identifyWorker(String name, Map<String, String[]> params) throws UnknownWorkerException {
+        return getWorker(name).identifyWorker(params);
     }
 
     /**
-     * Get a worker record from the database which is associated with the given parameters
-     * @param name Name of the platform
-     * @param params Params which were passed by the platform to the workerservice
-     * @return A WorkerRecord if one is found
+     * Pay a worker
+     * @param name The name of the platform
+     * @param worker Worker to pay
+     * @param amount The amount of money
+     * @return A completable future which returns the success of the call
      */
-    public Optional<WorkerRecord> getWorker(String name, Map<String, String[]> params) {
-        return identifyWorker(name, params).map(uid ->
-            workerOps.getWorker(name, uid).
-                    orElseGet(() -> {
-                        //create a new entry in the database
-                        WorkerRecord record = new WorkerRecord(-1, uid, name, null);
-                        record = workerOps.createWorker(record);
-                        return record;
-                    })
-        );
-    }
-
-    public Optional<CompletableFuture<Boolean>> payWorker(String name, Worker worker, int amount) {
-        return getPlatformPayment(name).map(payment -> payment.payWorker(worker, amount));
+    public CompletableFuture<Boolean> payWorker(String name, Worker worker, int amount) {
+        return getPlatformPayment(name).payWorker(worker, amount);
     }
 }

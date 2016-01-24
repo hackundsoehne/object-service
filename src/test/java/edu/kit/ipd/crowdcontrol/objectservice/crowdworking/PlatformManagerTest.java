@@ -7,7 +7,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -35,22 +33,18 @@ public class PlatformManagerTest {
         platforms.add( new PlatformTest("test3", true, false, true, true));
     }
     @Test
-    public void dbInit(){
+    public void dbOperations(){
         Experiment experiment = Experiment.newBuilder()
                 .setId(42)
                 .build();
         TasksOperations tasksOps = mock(TasksOperations.class);
         PlatformOperations platformOps = mock(PlatformOperations.class);
-        WorkerOperations workerOps = mock(WorkerOperations.class);
-        TaskRecord rec = new TaskRecord();
-
 
         manager = new PlatformManager(platforms,
-                param -> Optional.empty(),
+                param -> "42",
                 (worker, amount) -> CompletableFuture.completedFuture(true),
                 tasksOps,
-                platformOps,
-                workerOps);
+                platformOps);
 
         verify(platformOps).deleteAllPlatforms();
 
@@ -170,7 +164,7 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public Boolean isCalibsAllowd() {
+        public Boolean isCalibrationAllowed() {
             return renderCalib;
         }
 
@@ -180,8 +174,8 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public Optional<String> identifyWorker(Map<String, String[]> param) {
-            return Optional.of("50");
+        public String identifyWorker(Map<String, String[]> param) {
+            return "50";
         }
     }
 }
