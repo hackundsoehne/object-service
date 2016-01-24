@@ -12,5 +12,5 @@ public interface WorkerIdentification {
      * @param param The parameters which were sent by a platform
      * @return The id of the worker if one can be found
      */
-    String identifyWorker(Map<String, String[]> param) throws UnknownWorkerException;
+    String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException;
 }
