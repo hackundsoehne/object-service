@@ -76,7 +76,6 @@ public class MoneyTransferManager {
     private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
         List<GiftCodeRecord> payedCodes = new LinkedList<GiftCodeRecord>();
         int creditBalance = worker.getCreditBalance();
-        Iterator<GiftCodeRecord> payedCodesIt = payedCodes.iterator();
         Iterator<GiftCodeRecord> giftCodesIt = giftCodes.iterator();
         while (giftCodesIt.hasNext()) {
             if (creditBalance == 0) {
