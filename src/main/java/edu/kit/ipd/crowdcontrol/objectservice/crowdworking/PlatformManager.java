@@ -152,7 +152,7 @@ public class PlatformManager {
     public CompletableFuture<Boolean> unpublishTask(String name, Experiment experiment) throws TaskOperationException {
         TaskRecord record;
 
-        record = tasksOps.searchTask(name, experiment.getId()).orElse(null);
+        record = tasksOps.getTask(name, experiment.getId()).orElse(null);
 
         if (record == null)
             return CompletableFuture.completedFuture(true);
@@ -174,7 +174,7 @@ public class PlatformManager {
     public CompletableFuture<Boolean> updateTask(String name, Experiment experiment) throws TaskOperationException {
         TaskRecord record;
 
-        record = tasksOps.searchTask(name, experiment.getId()).
+        record = tasksOps.getTask(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment is not published"));
 
         return getPlatform(name)

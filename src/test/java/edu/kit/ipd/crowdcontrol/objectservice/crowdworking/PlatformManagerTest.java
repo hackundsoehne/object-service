@@ -99,7 +99,7 @@ public class PlatformManagerTest {
             record.setStatus(TaskStatus.running);
             record.setPlatformData(42 + "");
 
-            when(tasksOps.searchTask(platform.getName(), experiment.getId())).thenReturn(Optional.of(record));
+            when(tasksOps.getTask(platform.getName(), experiment.getId())).thenReturn(Optional.of(record));
             try {
                 manager.updateTask(platform.getName(), experiment).join();
             } catch (TaskOperationException e) {
@@ -117,7 +117,7 @@ public class PlatformManagerTest {
             record.setStatus(TaskStatus.running);
             record.setPlatformData(42+"");
 
-            when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
+            when(tasksOps.getTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
             try {
                 manager.unpublishTask(platform.getName(), experiment).join();
             } catch (TaskOperationException e) {
