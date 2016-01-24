@@ -31,14 +31,14 @@ public interface Platform {
      * Publish a passed experiment on the platform
      * @param experiment the object which should be published
      * @return This should return a unique string which is used to identify the published experiment later.
-     *         Will return None if the publishing failed
+     *         Or finish with a exception if the publishing failed.
      */
     CompletableFuture<String> publishTask(Experiment experiment);
 
     /**
      * Unpublish the given id from the platform, after this call no worker should be able access the before published experiment.
      * @param id The id of the before published experiment
-     * @return true on success, false on fail
+     * @return true on success, false or a exception if it failed
      */
     CompletableFuture<Boolean> unpublishTask(String id);
 
@@ -46,7 +46,7 @@ public interface Platform {
      * Update the published task, with the given id, to the parameters of experiment
      * @param id The id of the published Task
      * @param experiment The experiment with the new parameters
-     * @return The new id
+     * @return The new id or a Exception if the update failed.
      */
     CompletableFuture<String> updateTask(String id, Experiment experiment);
 

@@ -27,6 +27,7 @@ public class PlatformManager {
     private final Worker fallbackWorker;
     private final Payment fallbackPayment;
     private TasksOperations tasksOps;
+    private WorkerOperations workerOps;
 
     /**
      * Create a new manager for platforms. The known platforms in the database will be deleted,
@@ -115,19 +116,34 @@ public class PlatformManager {
      * @return None if the platform does not exist
      */
     public CompletableFuture<Boolean> publishTask(String name, Experiment experiment) throws TaskOperationException {
-        if (tasksOps.searchTask(name,experiment.getId()).isPresent())
-            throw new TaskOperationException("Experiment is already published!");
+
+        TaskRecord record = new TaskRecord();
+        record.setExperiment(experiment.getId());
+        record.setStatus(TaskStatus.running);
+        record.setCrowdPlatform(name);
+
+        if (tasksOps.createTask(record) == null)
+            throw new TaskOperationException("Task could not be created");
 
         return getPlatform(name)
                 .map(platform1 -> platform1.publishTask(experiment))
                 .orElseThrow(() -> new IllegalArgumentException("Experiment not found!"))
-                .thenApply(s -> {
-                    TaskRecord record = new TaskRecord();
-                    record.setExperiment(experiment.getId());
-                    record.setPlatformData(s);
-                    record.setStatus(TaskStatus.running);
-                    record.setCrowdPlatform(name);
-                    return tasksOps.createTask(record) != null;
+                .handle((s1, throwable) -> {
+                    if (s1 != null) {
+                        record.setCrowdPlatform(s1);
+                    } else {
+                        record.setStatus(TaskStatus.stopped);
+                    }
+                    if (!tasksOps.updateTask(record)) {
+                        if (s1 != null)
+                            try {
+                                unpublishTask(name, experiment).join();
+                            } catch (TaskOperationException e) {
+                                e.printStackTrace();
+                            }
+                        throw new IllegalStateException("Updating record for published task failed");
+                    }
+                    return true;
                 });
     }
 
@@ -183,6 +199,37 @@ public class PlatformManager {
         return getWorker(name).identifyWorker(params);
     }
 
+    /**
+     * Get a worker if he exists
+     * @param name Name of the platform
+     * @param params Params passed by the platform
+     * @return A worker if one is found
+     * @throws UnknownWorkerException if the platform does not identify a worker
+     */
+    public Optional<WorkerRecord> getWorker(String name, Map<String ,String[]> params) throws UnknownWorkerException {
+        String uid = identifyWorker(name, params);
+
+        return workerOps.getWorker(name, uid);
+    }
+
+    /**
+     * A Worker in every case
+     * @param name Name of the Platform
+     * @param params Params passed by the platform
+     * @return A worker which is identified by the params
+     * @throws UnknownWorkerException if the platform does not identify a worker
+     */
+    public WorkerRecord createWorker(String name, Map<String, String[]> params) throws UnknownWorkerException {
+        String uid = identifyWorker(name, params);
+
+        return workerOps.getWorker(name, uid).orElseGet(() -> {
+            WorkerRecord wr = new WorkerRecord();
+            wr.setIdentification(uid);
+            wr.setPlatform(name);
+
+            return workerOps.createWorker(wr);
+        });
+    }
     /**
      * Pay a worker
      * @param name The name of the platform
