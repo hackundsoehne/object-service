@@ -8,6 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,7 +31,8 @@ public class PlatformManagerTest {
             .setId(42)
             .build();
     private TasksOperations tasksOps;
-    private  PlatformOperations platformOps;
+    private PlatformOperations platformOps;
+    private WorkerOperations workerOps;
 
     @BeforeClass
     public static void setUp() {
@@ -43,12 +45,14 @@ public class PlatformManagerTest {
     public void prepare() {
         tasksOps = mock(TasksOperations.class);
         platformOps = mock(PlatformOperations.class);
+        workerOps = mock(WorkerOperations.class);
 
         manager = new PlatformManager(platforms,
                 param -> "42",
                 (worker, amount) -> CompletableFuture.completedFuture(true),
                 tasksOps,
-                platformOps);
+                platformOps,
+                workerOps);
     }
     @Test
     public void dbinit(){
@@ -128,7 +132,7 @@ public class PlatformManagerTest {
         });
     }
 
-    static class PlatformTest implements Platform, Payment, Worker {
+    static class PlatformTest implements Platform, Payment, WorkerIdentification {
         private boolean needEmail;
         private boolean handlePayment;
         private boolean handleWorker;
@@ -164,7 +168,7 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public Optional<Worker> getWorker() {
+        public Optional<WorkerIdentification> getWorker() {
             if (!handleWorker)
                 return Optional.empty();
             else
@@ -205,5 +209,6 @@ public class PlatformManagerTest {
         public String identifyWorker(Map<String, String[]> param) {
             return "50";
         }
+
     }
 }

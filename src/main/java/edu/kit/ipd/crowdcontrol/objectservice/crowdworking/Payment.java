@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
+
 import java.util.concurrent.CompletableFuture;
 
 /**

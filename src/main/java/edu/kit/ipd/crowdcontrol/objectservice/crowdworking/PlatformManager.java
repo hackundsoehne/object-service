@@ -8,6 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import org.jooq.DSLContext;
 
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public class PlatformManager {
     private final Map<String, Platform> platforms;
-    private final Worker fallbackWorker;
+    private final WorkerIdentification fallbackWorker;
     private final Payment fallbackPayment;
     private TasksOperations tasksOps;
     private WorkerOperations workerOps;
@@ -41,13 +42,15 @@ public class PlatformManager {
      * @param fallbackPayment handler which is called if a platform does not support payment
      * @param tasksOps Used for the task operations on the database
      * @param platformOps Used for the platform operations on the database
+     * @param workerOps Used for the worker operations on the database
      */
-    public PlatformManager(List<Platform> crowdPlatforms, Worker fallbackWorker,
+    public PlatformManager(List<Platform> crowdPlatforms, WorkerIdentification fallbackWorker,
                            Payment fallbackPayment, TasksOperations tasksOps,
-                           PlatformOperations platformOps) {
+                           PlatformOperations platformOps, WorkerOperations workerOps) {
         this.tasksOps = tasksOps;
         this.fallbackWorker = fallbackWorker;
         this.fallbackPayment = fallbackPayment;
+        this.workerOps = workerOps;
 
         //create hashmap of platforms
         platforms = crowdPlatforms.stream()
@@ -88,7 +91,7 @@ public class PlatformManager {
      * @param name The name of the platform
      * @return The interface used to identify a worker
      */
-    public Worker getWorker(String name) {
+    public WorkerIdentification getWorker(String name) {
         return getPlatform(name)
                 .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
                 .getWorker().orElse(fallbackWorker);

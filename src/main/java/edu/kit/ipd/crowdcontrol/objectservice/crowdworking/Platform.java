@@ -19,7 +19,7 @@ public interface Platform {
      * if the Platform has his own worker identification the interface can be returned here
      * @return The value to indicate if it supports worker identification or not.
      */
-    Optional<Worker> getWorker();
+    Optional<WorkerIdentification> getWorker();
 
     /**
      * Get the name of this platform
