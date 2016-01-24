@@ -9,8 +9,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperation
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
-import org.jooq.DSLContext;
 
 import java.util.List;
 import java.util.Map;
@@ -195,7 +193,7 @@ public class PlatformManager {
      * @param params Params passed by the platform
      * @return A String if the platform exists
      */
-    public String identifyWorker(String name, Map<String, String[]> params) throws UnknownWorkerException {
+    public String identifyWorker(String name, Map<String, String[]> params) throws UnidentifiedWorkerException {
         return getWorker(name).identifyWorker(params);
     }
 
@@ -204,9 +202,9 @@ public class PlatformManager {
      * @param name Name of the platform
      * @param params Params passed by the platform
      * @return A worker if one is found
-     * @throws UnknownWorkerException if the platform does not identify a worker
+     * @throws UnidentifiedWorkerException if the platform does not identify a worker
      */
-    public Optional<WorkerRecord> getWorker(String name, Map<String ,String[]> params) throws UnknownWorkerException {
+    public Optional<WorkerRecord> getWorker(String name, Map<String ,String[]> params) throws UnidentifiedWorkerException {
         String uid = identifyWorker(name, params);
 
         return workerOps.getWorker(name, uid);
@@ -217,9 +215,9 @@ public class PlatformManager {
      * @param name Name of the Platform
      * @param params Params passed by the platform
      * @return A worker which is identified by the params
-     * @throws UnknownWorkerException if the platform does not identify a worker
+     * @throws UnidentifiedWorkerException if the platform does not identify a worker
      */
-    public WorkerRecord createWorker(String name, Map<String, String[]> params) throws UnknownWorkerException {
+    public WorkerRecord createWorker(String name, Map<String, String[]> params) throws UnidentifiedWorkerException {
         String uid = identifyWorker(name, params);
 
         return workerOps.getWorker(name, uid).orElseGet(() -> {
