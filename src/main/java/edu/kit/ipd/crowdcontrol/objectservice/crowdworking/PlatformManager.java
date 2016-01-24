@@ -192,6 +192,7 @@ public class PlatformManager {
      * @param name The name of the platform
      * @param params Params passed by the platform
      * @return A String if the platform exists
+     * @throws UnidentifiedWorkerException if the user can not be found by the platform code
      */
     public String identifyWorker(String name, Map<String, String[]> params) throws UnidentifiedWorkerException {
         return getWorker(name).identifyWorker(params);
@@ -205,29 +206,9 @@ public class PlatformManager {
      * @throws UnidentifiedWorkerException if the platform does not identify a worker
      */
     public Optional<WorkerRecord> getWorker(String name, Map<String ,String[]> params) throws UnidentifiedWorkerException {
-        String uid = identifyWorker(name, params);
-
-        return workerOps.getWorker(name, uid);
+        return getWorker(name).getWorker(workerOps,name,params);
     }
 
-    /**
-     * A Worker in every case
-     * @param name Name of the Platform
-     * @param params Params passed by the platform
-     * @return A worker which is identified by the params
-     * @throws UnidentifiedWorkerException if the platform does not identify a worker
-     */
-    public WorkerRecord createWorker(String name, Map<String, String[]> params) throws UnidentifiedWorkerException {
-        String uid = identifyWorker(name, params);
-
-        return workerOps.getWorker(name, uid).orElseGet(() -> {
-            WorkerRecord wr = new WorkerRecord();
-            wr.setIdentification(uid);
-            wr.setPlatform(name);
-
-            return workerOps.createWorker(wr);
-        });
-    }
     /**
      * Pay a worker
      * @param name The name of the platform
