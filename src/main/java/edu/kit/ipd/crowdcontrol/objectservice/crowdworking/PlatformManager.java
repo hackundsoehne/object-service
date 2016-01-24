@@ -122,25 +122,20 @@ public class PlatformManager {
         record.setStatus(TaskStatus.running);
         record.setCrowdPlatform(name);
 
-        if (tasksOps.createTask(record) == null)
+        TaskRecord result = tasksOps.createTask(record);
+        if (result == null)
             throw new TaskOperationException("Task could not be created");
 
         return getPlatform(name)
                 .map(platform1 -> platform1.publishTask(experiment))
-                .orElseThrow(() -> new IllegalArgumentException("Experiment not found!"))
+                .orElseThrow(() -> new IllegalArgumentException("Platform not found!"))
                 .handle((s1, throwable) -> {
                     if (s1 != null) {
-                        record.setCrowdPlatform(s1);
+                        result.setPlatformData(s1);
                     } else {
-                        record.setStatus(TaskStatus.stopped);
+                        result.setStatus(TaskStatus.stopped);
                     }
-                    if (!tasksOps.updateTask(record)) {
-                        if (s1 != null)
-                            try {
-                                unpublishTask(name, experiment).join();
-                            } catch (TaskOperationException e) {
-                                e.printStackTrace();
-                            }
+                    if (!tasksOps.updateTask(result)) {
                         throw new IllegalStateException("Updating record for published task failed");
                     }
                     return true;
@@ -157,8 +152,10 @@ public class PlatformManager {
     public CompletableFuture<Boolean> unpublishTask(String name, Experiment experiment) throws TaskOperationException {
         TaskRecord record;
 
-        record = tasksOps.searchTask(name, experiment.getId()).
-                orElseThrow(() -> new TaskOperationException("Experiment is not published"));
+        record = tasksOps.searchTask(name, experiment.getId()).orElse(null);
+
+        if (record == null)
+            return CompletableFuture.completedFuture(true);
 
         return getPlatform(name).map(platform -> platform.unpublishTask(record.getPlatformData()))
                 .orElseThrow(() -> new IllegalArgumentException("Experiment not found!"))

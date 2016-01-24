@@ -1,12 +1,14 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -24,6 +26,11 @@ import static org.mockito.Mockito.*;
 public class PlatformManagerTest {
     private PlatformManager manager;
     private static List<Platform> platforms = new ArrayList<>();
+    private Experiment experiment = Experiment.newBuilder()
+            .setId(42)
+            .build();
+    private TasksOperations tasksOps;
+    private  PlatformOperations platformOps;
 
     @BeforeClass
     public static void setUp() {
@@ -32,49 +39,67 @@ public class PlatformManagerTest {
         platforms.add( new PlatformTest("test2", false, true, false, true));
         platforms.add( new PlatformTest("test3", true, false, true, true));
     }
-    @Test
-    public void dbOperations(){
-        Experiment experiment = Experiment.newBuilder()
-                .setId(42)
-                .build();
-        TasksOperations tasksOps = mock(TasksOperations.class);
-        PlatformOperations platformOps = mock(PlatformOperations.class);
+    @Before
+    public void prepare() {
+        tasksOps = mock(TasksOperations.class);
+        platformOps = mock(PlatformOperations.class);
 
         manager = new PlatformManager(platforms,
                 param -> "42",
                 (worker, amount) -> CompletableFuture.completedFuture(true),
                 tasksOps,
                 platformOps);
-
+    }
+    @Test
+    public void dbinit(){
         verify(platformOps).deleteAllPlatforms();
 
         platforms.forEach(platform -> {
-                    //check that every platform got init
-                    verify(platformOps).createPlatform(((PlatformTest)platform).toRecord());
+            //check that every platform got init
+            verify(platformOps).createPlatform(((PlatformTest)platform).toRecord());
         });
+    }
+    @Test
+    public void publishTest() {
         platforms.forEach(platform -> {
             TaskRecord record = new TaskRecord();
-            record.setExperiment(42);
-            record.setStatus(TaskStatus.running);
-            record.setCrowdPlatform(platform.getName());
-            record.setPlatformData(42+"");
+            TaskRecord record2 = new TaskRecord();
 
-            when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.empty());
+            record.setExperiment(42);
+            record2.setExperiment(42);
+
+            record.setStatus(TaskStatus.running);
+            record2.setStatus(TaskStatus.running);
+
+            record.setCrowdPlatform(platform.getName());
+            record2.setCrowdPlatform(platform.getName());
+
+            record2.setPlatformData(42 + "");
+
+            when(tasksOps.createTask(record)).thenReturn(record.copy());
+            when(tasksOps.updateTask(record2)).thenReturn(true);
+
             try {
-                manager.publishTask(platform.getName(),experiment).join();
+                manager.publishTask(platform.getName(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
+
             verify(tasksOps).createTask(record);
+            verify(tasksOps).updateTask(record2);
         });
+    }
+
+    @Test
+    public void updateTest() {
         platforms.forEach(platform -> {
             TaskRecord record = new TaskRecord();
             record.setExperiment(42);
             record.setCrowdPlatform(platform.getName());
             record.setStatus(TaskStatus.running);
-            record.setPlatformData(42+"");
+            record.setPlatformData(42 + "");
 
-            when(tasksOps.searchTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
+            when(tasksOps.searchTask(platform.getName(), experiment.getId())).thenReturn(Optional.of(record));
             try {
                 manager.updateTask(platform.getName(), experiment).join();
             } catch (TaskOperationException e) {
@@ -82,6 +107,9 @@ public class PlatformManagerTest {
             }
             verify(tasksOps).updateTask(record);
         });
+    }
+    @Test
+    public void unpublishTask() {
         platforms.forEach(platform -> {
             TaskRecord record = new TaskRecord();
             record.setExperiment(42);
