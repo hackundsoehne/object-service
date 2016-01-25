@@ -20,5 +20,5 @@ public interface AnswerQualityStrategy {
      * @param ratings of the given answer
      * @return the quality of the answer based on the implementation
      */
-     int identifyAnswerQuality(AnswerRecord answer, List<RatingRecord> ratings) throws IllegalArgumentException;
+     int identifyAnswerQuality(AnswerRecord answer, List<RatingRecord> ratings, int maximumQuality, int minimumQuality) throws IllegalArgumentException;
 }
