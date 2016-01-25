@@ -51,7 +51,7 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
                 }
             }
         }
-        return null;
+        return map;
     }
 
     /**
@@ -67,9 +67,14 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
 
         //Gets most chosen rating (optimal rating) depending on the lengths of the sub lists
         List<List<RatingRecord>> mostChosenRating = new LinkedList<>();
+        if(sortedRatings.length == 0){
+            throw new IllegalArgumentException("Error! Answer without valid ratings. In " + this.getClass());
+        }
 
         for (int i = 0; i < sortedRatings.length; i++) {
-            if (sortedRatings[i] != null && (mostChosenRating.get(0) == null || sortedRatings[i].size() > mostChosenRating.get(0).size())) {
+            if(sortedRatings[i] != null  && mostChosenRating.size() == 0){
+                mostChosenRating.add(sortedRatings[i]);
+            } else if (sortedRatings[i] != null && sortedRatings[i].size() > mostChosenRating.get(0).size()) {
                 mostChosenRating.set(0, sortedRatings[i]);
             } else if ((sortedRatings[i] != null) && (sortedRatings[i].size() == mostChosenRating.get(0).size())) {
                 mostChosenRating.add(sortedRatings[i]);
