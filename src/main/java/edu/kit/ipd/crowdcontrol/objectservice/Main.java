@@ -66,13 +66,16 @@ public class Main {
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
         WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
         PopulationOperations populationOperations = new PopulationOperations(databaseManager.getContext());
+        ExperimentOperations experimentOperations = new ExperimentOperations(databaseManager.getContext());
+        AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext());
 
         new Router(
                 new TemplateResource(templateOperations),
                 new NotificationResource(notificationRestOperations),
                 new PlatformResource(platformOperations),
                 new WorkerResource(workerOperations, platformManager),
-                new PopulationResource(populationOperations)
+                new PopulationResource(populationOperations),
+                new ExperimentResource(experimentOperations, answerRatingOperations)
         ).init();
     }
 }

@@ -4,6 +4,15 @@ import com.google.protobuf.Message;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ExperimentResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.WorkerResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.InputTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.OutputTransformer;
 import spark.Request;
@@ -29,18 +38,21 @@ public class Router implements SparkApplication {
     private final PlatformResource platformResource;
     private final WorkerResource workerResource;
     private final PopulationResource populationResource;
+    private final ExperimentResource experimentResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
     public Router(TemplateResource templateResource, NotificationResource notificationResource,
                   PlatformResource platformResource, WorkerResource workerResource,
-                  PopulationResource populationResource) {
+                  PopulationResource populationResource,
+                  ExperimentResource experimentResource) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
         this.populationResource = populationResource;
         this.workerResource = workerResource;
+        this.experimentResource = experimentResource;
     }
 
     @Override
@@ -109,6 +121,16 @@ public class Router implements SparkApplication {
         get("/workers", workerResource::all);
         get("/workers/:id", workerResource::get);
         delete("/workers/:id", workerResource::delete);
+
+        put("/experiments", experimentResource::put, Experiment.class);
+        get("/experiments", experimentResource::all);
+        get("/experiments/:id", experimentResource::get);
+        patch("/experiments/:id", experimentResource::patch, Experiment.class);
+        delete("/experiments/:id", experimentResource::delete);
+        put("/experiments/:id/answers", experimentResource::putAnswer, Experiment.class);
+        get("/experiments/:id/answers", experimentResource::getAnswers);
+        get("/experiments/:id/answers/:aid", experimentResource::getAnswer);
+        put("/experiments/:id/answers/:aid/rating", experimentResource::putRating, Rating.class);
     }
 
     /**
