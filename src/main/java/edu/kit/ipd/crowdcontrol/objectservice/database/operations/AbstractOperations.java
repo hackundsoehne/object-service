@@ -4,7 +4,6 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableRecordImpl;
@@ -46,6 +45,29 @@ public abstract class AbstractOperations {
                             .and(Tables.TASK.STATUS.eq(TaskStatus.running).or(Tables.TASK.STATUS.eq(TaskStatus.stopping)))
             );
             if (!running) {
+                return function.apply(trans);
+            } else {
+                //TODO other exception?
+                throw new IllegalArgumentException("Experiment is running: " + experimentID);
+            }
+        });
+    }
+
+    /**
+     * executes the function if the experiment is not running.
+     * @param experimentID the id of the experiment
+     * @param function the function to execute
+     * @param <R> the return type
+     * @return the result of the function
+     */
+    protected <R> R doIfRunning(int experimentID, Function<Configuration, R> function) {
+        return create.transactionResult(trans -> {
+            boolean running = DSL.using(trans).fetchExists(
+                    DSL.selectFrom(Tables.TASK)
+                            .where(Tables.TASK.EXPERIMENT.eq(experimentID))
+                            .and(Tables.TASK.STATUS.eq(TaskStatus.running).or(Tables.TASK.STATUS.eq(TaskStatus.stopping)))
+            );
+            if (running) {
                 return function.apply(trans);
             } else {
                 //TODO other exception?

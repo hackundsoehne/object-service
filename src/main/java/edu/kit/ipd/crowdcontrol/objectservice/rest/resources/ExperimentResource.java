@@ -1,7 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
@@ -11,8 +9,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErro
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
-
-import javax.naming.NameNotFoundException;
 
 import java.util.Optional;
 
@@ -124,7 +120,7 @@ public class ExperimentResource {
         boolean asc = getQueryBool(request, "asc", true);
         int experimentId = getParamInt(request, "id");
 
-        return R(answerRatingOperations.getAnswers(experimentId, from, asc, 20))
+        return R(answerRatingOperations.getAnswersFrom(experimentId, from, asc, 20))
                 .map(answerRecord -> answerRatingOperations
                     .toAnswerProto(answerRecord, answerRatingOperations.getRatings(answerRecord.getIdAnswer())))
                 .constructPaginated(AnswerList.newBuilder(), AnswerList.Builder::addAllItems);

@@ -3,13 +3,12 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.util.Optional;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.TEMPLATE;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.EXPERIMENT;
 
 /**
  * responsible for the operations on the Experiment-Table
@@ -69,8 +68,8 @@ public class ExperimentOperations extends AbstractOperations {
     }
 
     public Range<Experiment, Integer> getExperimentsFrom(int cursor, boolean next, int limit) {
-        //TODO implement
-        return null;
+        return getNextRange(create.selectFrom(EXPERIMENT), EXPERIMENT.ID_EXPERIMENT, cursor, next, limit)
+                .map(this::toProto);
     }
 
     public Experiment toProto(ExperimentRecord record) {

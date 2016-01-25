@@ -5,10 +5,15 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Rati
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Answer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import org.jooq.DSLContext;
+import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.ANSWER;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATING;
 
 /**
  * responsible for all queries related to the Answer and Rating Table
@@ -20,26 +25,36 @@ public class AnswerRatingOperations extends AbstractOperations {
         super(create);
     }
 
-    public int insertNewAnswer(AnswerRecord answerRecord) {
-        //TODO
-        //FIXME check if experiment is running
-        return 0;
+    public AnswerRecord insertNewAnswer(AnswerRecord answerRecord) {
+        answerRecord.setIdAnswer(null);
+        return doIfRunning(answerRecord.getExperiment(), conf ->
+                DSL.using(conf)
+                        .insertInto(ANSWER)
+                        .set(answerRecord)
+                        .returning()
+                        .fetchOne()
+        );
     }
 
-    public int insertNewRating(RatingRecord ratingRecord) {
-        //TODO
-        //FIXME check if experiment is running
-        return 0;
+    public RatingRecord insertNewRating(RatingRecord ratingRecord) {
+        ratingRecord.setIdRating(null);
+        return doIfRunning(ratingRecord.getExperiment(), conf ->
+                DSL.using(conf)
+                        .insertInto(RATING)
+                        .set(ratingRecord)
+                        .returning()
+                        .fetchOne()
+        );
     }
 
-    public Optional<AnswerRecord> getAnswer(int expid, int aid) {
-        //TODO
-        return null;
+    public Optional<AnswerRecord> getAnswer(int answerID) {
+        return create.fetchOptional(ANSWER, ANSWER.ID_ANSWER.eq(answerID));
     }
 
-    public Optional<Range<AnswerRecord, Integer>> getAnswers(int expid, int cursor, boolean next, int limit) {
-        //TODO
-        return null;
+    public Range<AnswerRecord, Integer> getAnswersFrom(int expid, int cursor, boolean next, int limit) {
+        SelectConditionStep<AnswerRecord> query = create.selectFrom(ANSWER)
+                .where(ANSWER.EXPERIMENT.eq(expid));
+        return getNextRange(query, ANSWER.ID_ANSWER, cursor, next, limit);
     }
 
     /**
@@ -48,8 +63,7 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @return a RatingRecord if it exists in the db
      */
     public Optional<RatingRecord> getRating(int id) {
-        //TODO
-        return null;
+        return create.fetchOptional(RATING, RATING.ID_RATING.eq(id));
     }
 
     /**
@@ -58,7 +72,9 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @return A list of ratingRecords
      */
     public List<RatingRecord> getRatings(int answerId) {
-        return null;
+        return create.selectFrom(RATING)
+                .where(RATING.ANSWER_R.eq(answerId))
+                .fetch();
     }
 
     /**
@@ -75,7 +91,7 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .setTime(answerRecord.getTimestamp().getNanos())
                 .setWorker(answerRecord.getWorkerId())
                 .addAllRatings(() -> ratings.stream()
-                        .map(ratingRecord -> toRatingProto(ratingRecord))
+                        .map(this::toRatingProto)
                         .iterator()).build();
     }
 
@@ -126,5 +142,4 @@ public class AnswerRatingOperations extends AbstractOperations {
                 0);
 
     }
-
 }
