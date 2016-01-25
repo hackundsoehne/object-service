@@ -32,10 +32,22 @@ public class ExperimentResource {
         this.answerRatingOperations = answerRatingOperations;
     }
 
+    /**
+     * get the value of a optional or end with a NotFoundException
+     * @param c The optional to unbox
+     * @param <U> The typ which should be in the optional
+     * @return The type which was in the optional
+     */
     private <U> U R(Optional<U> c) {
         return c.orElseThrow(() -> new NotFoundException("Experiment not found!"));
     }
 
+    /**
+     * List all experiments
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return 20 experiments
+     */
     public Paginated<Integer> all(Request request, Response response) {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
@@ -44,6 +56,12 @@ public class ExperimentResource {
                 .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
     }
 
+    /**
+     * Create a new experiment
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return The new created experiment
+     */
     public Experiment put(Request request, Response response) {
         Experiment experiment = request.attribute("input");
         int id = experimentOperations.insertNewExperiment(experimentOperations.toRecord(experiment));
@@ -51,11 +69,23 @@ public class ExperimentResource {
         return experimentOperations.toProto(R(experimentOperations.getExperiment(id)));
     }
 
+    /**
+     * Returns a experiment which was specified by :id
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return The experiment if it was found
+     */
     public Experiment get(Request request, Response response) {
         int id = getParamInt(request, "id");
         return experimentOperations.toProto(R(experimentOperations.getExperiment(id)));
     }
 
+    /**
+     * Patch a experiment with the new :id
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return The experiment with the new attributes
+     */
     public Experiment patch(Request request, Response response) {
         int id = getParamInt(request, "id");
 
@@ -65,6 +95,12 @@ public class ExperimentResource {
         return experimentOperations.toProto(R(experimentOperations.getExperiment(id)));
     }
 
+    /**
+     * Delete a experiment which was specified :id
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return null on success
+     */
     public Experiment delete(Request request, Response response) {
         int id = getParamInt(request, "id");
 
@@ -77,6 +113,12 @@ public class ExperimentResource {
         return null;
     }
 
+    /**
+     * Get answers from a experiment
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return The answer if it was found
+     */
     public Paginated<Integer> getAnswers(Request request, Response response) {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
@@ -88,6 +130,12 @@ public class ExperimentResource {
                 .constructPaginated(AnswerList.newBuilder(), AnswerList.Builder::addAllItems);
     }
 
+    /**
+     * Creates a new Answer
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return The new created answer object
+     */
     public Answer putAnswer(Request request, Response response) {
         int experimentId = getParamInt(request, "id");
         Answer answer = request.attribute("input");
@@ -102,6 +150,12 @@ public class ExperimentResource {
         );
     }
 
+    /**
+     * Return a answer with :aid from experiment :id
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return The answer if it was found
+     */
     public Answer getAnswer(Request request, Response response) {
         int experimentId = getParamInt(request, "id");
         int answerId = getParamInt(request, "aid");
@@ -112,6 +166,12 @@ public class ExperimentResource {
         );
     }
 
+    /**
+     * Creates a new Rating for answer :aid in experiment :id
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return The new Created Rating
+     */
     public Rating putRating(Request request, Response response) {
         int experimentId = getParamInt(request, "id");
         int answerId = getParamInt(request, "aid");
