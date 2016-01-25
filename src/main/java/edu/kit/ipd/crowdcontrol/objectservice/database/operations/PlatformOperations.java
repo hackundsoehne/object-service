@@ -30,7 +30,7 @@ public class PlatformOperations extends AbstractOperations {
      *
      * @return List of platforms.
      */
-    public Range<Platform, String> all(String cursor, boolean next, int limit) {
+    public Range<Platform, String> getPlatformList(String cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(PLATFORM), PLATFORM.ID_PLATFORM, cursor, next, limit, String::compareTo)
                 .map(this::toProto);
     }
@@ -42,7 +42,7 @@ public class PlatformOperations extends AbstractOperations {
      *
      * @return The platform.
      */
-    public Optional<Platform> get(String id) {
+    public Optional<Platform> getPlatform(String id) {
         return create.fetchOptional(PLATFORM, PLATFORM.ID_PLATFORM.eq(id))
                 .map(this::toProto);
     }

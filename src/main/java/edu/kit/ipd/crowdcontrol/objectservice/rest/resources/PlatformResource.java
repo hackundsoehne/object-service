@@ -27,7 +27,7 @@ public class PlatformResource {
         String from = request.queryParams("from");
         boolean asc = getQueryBool(request, "asc", true);
 
-        return operations.all(from == null ? "" : from, asc, 20)
+        return operations.getPlatformList(from == null ? "" : from, asc, 20)
                 .constructPaginated(PlatformList.newBuilder(), PlatformList.Builder::addAllItems);
     }
 
@@ -38,7 +38,7 @@ public class PlatformResource {
      * @return A single platform.
      */
     public Platform get(Request request, Response response) {
-        return operations.get(request.params("id"))
+        return operations.getPlatform(request.params("id"))
                 .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
 }
