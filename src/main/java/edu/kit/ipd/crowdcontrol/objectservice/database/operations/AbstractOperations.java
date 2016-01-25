@@ -4,6 +4,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableRecordImpl;
