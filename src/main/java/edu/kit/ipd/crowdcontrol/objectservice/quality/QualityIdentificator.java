@@ -108,25 +108,10 @@ public class QualityIdentificator implements  Observer<Rating> {
      */
     private void rateQualityOfAnswers(int expID){
         List<AnswerRecord> answers = operations.getAnswersOfExperiment(expID);
-
         for (AnswerRecord answer: answers) {
-            RatingRecord r;
             List<RatingRecord> records = operations.getGoodRatingsOfAnswer(answer, ratingQualityThreshold);
-
-
+            operations.setQualityToAnswer(answer,answerIdentifier.identifyAnswerQuality(answer,records, MAXIMUM_QUALITY, MINUMUM_QUALITY));
         }
-
-
-
-
-    }
-
-    public static int getMinumumQuality() {
-        return MINUMUM_QUALITY;
-    }
-
-    public static int getMaximumQuality() {
-        return MAXIMUM_QUALITY;
     }
 
 

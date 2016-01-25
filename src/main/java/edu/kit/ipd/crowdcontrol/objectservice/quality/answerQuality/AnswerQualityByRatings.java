@@ -27,7 +27,7 @@ public class AnswerQualityByRatings implements AnswerQualityStrategy {
      * @return quality of an answer
      */
     @Override
-    public int identifyAnswerQuality(AnswerRecord answer, List<RatingRecord> ratings)throws IllegalArgumentException{
+    public int identifyAnswerQuality(AnswerRecord answer, List<RatingRecord> ratings, int maximumQuality, int minimumQuality)throws IllegalArgumentException{
 
         int answerQuality = -1;
         for (RatingRecord rating : ratings){
