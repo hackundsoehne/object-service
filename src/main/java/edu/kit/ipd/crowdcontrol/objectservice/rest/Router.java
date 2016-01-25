@@ -6,6 +6,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.InputTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.OutputTransformer;
@@ -29,13 +30,15 @@ import static spark.Spark.exception;
 public class Router implements SparkApplication {
     private final TemplateResource templateResource;
     private final NotificationResource notificationResource;
+    private final PlatformResource platformResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
-    public Router(TemplateResource templateResource, NotificationResource notificationResource) {
+    public Router(TemplateResource templateResource, NotificationResource notificationResource, PlatformResource platformResource) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
+        this.platformResource = platformResource;
     }
 
     @Override
@@ -90,6 +93,9 @@ public class Router implements SparkApplication {
         get("/notifications/:id", notificationResource::get);
         patch("/notifications/:id", notificationResource::patch, Notification.class);
         delete("/notifications/:id", notificationResource::delete);
+
+        get("/platforms", platformResource::all);
+        get("/platforms/:id", platformResource::get);
     }
 
     /**

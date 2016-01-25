@@ -2,9 +2,11 @@ package edu.kit.ipd.crowdcontrol.objectservice;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRestOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -62,10 +64,12 @@ public class Main {
 
         TemplateOperations templateOperations = new TemplateOperations(context);
         NotificationRestOperations notificationRestOperations = new NotificationRestOperations(context);
+        PlatformOperations platformOperations = new PlatformOperations(context);
 
         new Router(
                 new TemplateResource(templateOperations),
-                new NotificationResource(notificationRestOperations)
+                new NotificationResource(notificationRestOperations),
+                new PlatformResource(platformOperations)
         ).init();
     }
 }
