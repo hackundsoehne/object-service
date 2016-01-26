@@ -10,7 +10,7 @@ import java.util.Optional;
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.PLATFORM;
 
 /**
- * the Operations concerned with the Platform-Table.
+ * Operations concerned with the {@code Platform} table.
  *
  * @author LeanderK
  * @author Marcel Hollerbach
@@ -32,7 +32,7 @@ public class PlatformOperations extends AbstractOperations {
      */
     public Range<Platform, String> getPlatformList(String cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(PLATFORM), PLATFORM.ID_PLATFORM, cursor, next, limit, String::compareTo)
-                .map(this::toProto);
+                .map(PlatformOperations::toProto);
     }
 
     /**
@@ -44,7 +44,7 @@ public class PlatformOperations extends AbstractOperations {
      */
     public Optional<Platform> getPlatform(String id) {
         return create.fetchOptional(PLATFORM, PLATFORM.ID_PLATFORM.eq(id))
-                .map(this::toProto);
+                .map(PlatformOperations::toProto);
     }
 
     /**
@@ -68,7 +68,7 @@ public class PlatformOperations extends AbstractOperations {
         create.deleteFrom(Tables.PLATFORM).execute();
     }
 
-    private Platform toProto(PlatformRecord record) {
+    public static Platform toProto(PlatformRecord record) {
         return Platform.newBuilder()
                 .setId(record.getIdPlatform())
                 .setName(record.getName())

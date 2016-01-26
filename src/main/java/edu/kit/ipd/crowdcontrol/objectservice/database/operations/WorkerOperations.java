@@ -15,7 +15,7 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKE
  * Responsible for the operations involving the worker-table.
  *
  * @author LeanderK
- * @version 1.0
+ * @author Niklas Keller
  */
 public class WorkerOperations extends AbstractOperations {
 
@@ -160,7 +160,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Optional<Worker> identifyWorker(String platform, String identity) {
         return create.fetchOptional(WORKER, WORKER.PLATFORM.eq(platform).and(WORKER.IDENTIFICATION.eq(identity)))
-                .map(this::toProto);
+                .map(WorkerOperations::toProto);
     }
 
     /**
@@ -172,7 +172,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Optional<Worker> getWorkerProto(int id) {
         return create.fetchOptional(WORKER, WORKER.ID_WORKER.eq(id))
-                .map(this::toProto);
+                .map(WorkerOperations::toProto);
     }
 
     /**
@@ -186,7 +186,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Range<Worker, Integer> getWorkerList(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, cursor, next, limit)
-                .map(this::toProto);
+                .map(WorkerOperations::toProto);
     }
 
     /**
@@ -209,7 +209,14 @@ public class WorkerOperations extends AbstractOperations {
         return toProto(record);
     }
 
-    private Worker toProto(WorkerRecord record) {
+    /**
+     * Converts a worker record to its protobuf representation.
+     *
+     * @param record worker record
+     *
+     * @return Worker.
+     */
+    public static Worker toProto(WorkerRecord record) {
         return Worker.newBuilder()
                 .setId(record.getIdWorker())
                 .setPlatform(record.getPlatform())
@@ -217,7 +224,15 @@ public class WorkerOperations extends AbstractOperations {
                 .build();
     }
 
-    private WorkerRecord mergeRecord(WorkerRecord target, Worker worker) {
+    /**
+     * Merges a record with the set properties of a protobuf worker.
+     *
+     * @param target record to merge into
+     * @param worker message to merge from
+     *
+     * @return Merged worker record.
+     */
+    public static WorkerRecord mergeRecord(WorkerRecord target, Worker worker) {
         if (worker.hasField(worker.getDescriptorForType().findFieldByNumber(Worker.PLATFORM_FIELD_NUMBER))) {
             target.setPlatform(worker.getPlatform());
         }

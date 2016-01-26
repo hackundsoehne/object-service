@@ -34,16 +34,13 @@ public class WorkerResource {
      * @return Worker if found.
      */
     public Worker identify(Request request, Response response) {
-        String identity;
-
         try {
-            identity = manager.identifyWorker(request.params("platform"), request.queryMap().toMap());
+            return manager.getWorker(request.params("platform"), request.queryMap().toMap())
+                    .map(WorkerOperations::toProto)
+                    .orElseThrow(() -> new NotFoundException("Resource not found."));
         } catch (UnidentifiedWorkerException e) {
             throw new BadRequestException("Unidentified worker!");
         }
-
-        return operations.identifyWorker(request.params("platform"), identity)
-                .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
 
     /**
