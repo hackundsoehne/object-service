@@ -83,32 +83,18 @@ public abstract class AbstractOperations {
     }
 
     /**
-     * Throws an exception if the passed field is not set.
+     * returns whether the MessageOrBuilder has the passed field.
      * @param messageOrBuilder the MessageOrBuilder to check on
      * @param field the field to exist
-     * @throws IllegalArgumentException thrown if the field is not set
+     * @return tre if it has the field, false if not
      */
-    protected void assertHasField(MessageOrBuilder messageOrBuilder, int field) throws IllegalArgumentException {
-        if (!messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field))) {
-            throw new IllegalArgumentException("MessageOrBuilder must have field set: " +
-                    messageOrBuilder.getDescriptorForType().findFieldByNumber(field).getName());
-        }
-    }
-
-    /**
-     * Throws an exception if one of the passed field is not set.
-     * @param messageOrBuilder the MessageOrBuilder to check on
-     * @param fields the fields to exist
-     * @throws IllegalArgumentException thrown if on the field is not set
-     */
-    protected void assertHasField(MessageOrBuilder messageOrBuilder, int... fields) throws IllegalArgumentException {
-        for (int aField : fields) {
-            assertHasField(messageOrBuilder, aField);
-        }
+    protected boolean hasField(MessageOrBuilder messageOrBuilder, int field) {
+        return messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field));
     }
 
     /**
      * this method returns a range of results from a passed query.
+     * @param <R> the type of the records
      * @param query the query to use
      * @param primaryKey the primary key used to index the records inside the range
      * @param start the exclusive start, when the associated record does not fulfill the conditions of the passed query
@@ -116,7 +102,6 @@ public abstract class AbstractOperations {
      *              right (next=false) of the range.
      * @param next whether the Range is right (true) or left of the primary key (false) assuming natural order
      * @param limit the max. amount of the range, may be smaller
-     * @param <R> the type of the records
      * @return an instance of Range
      * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
      */
