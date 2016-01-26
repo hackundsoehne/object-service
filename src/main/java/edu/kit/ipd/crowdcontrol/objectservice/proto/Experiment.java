@@ -26,6 +26,7 @@ public  final class Experiment extends
     answersPerWorker_ = 0;
     ratingsPerWorker_ = 0;
     ratingsPerAnswer_ = 0;
+    neededAnswers_ = 0;
     paymentBase_ = 0;
     paymentAnswer_ = 0;
     paymentRating_ = 0;
@@ -124,48 +125,53 @@ public  final class Experiment extends
           }
           case 96: {
 
-            paymentBase_ = input.readInt32();
+            neededAnswers_ = input.readInt32();
             break;
           }
           case 104: {
 
-            paymentAnswer_ = input.readInt32();
+            paymentBase_ = input.readInt32();
             break;
           }
           case 112: {
 
-            paymentRating_ = input.readInt32();
+            paymentAnswer_ = input.readInt32();
             break;
           }
-          case 122: {
-            if (!((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
-              constraints_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint>();
-              mutable_bitField0_ |= 0x00004000;
-            }
-            constraints_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.parser(), extensionRegistry));
+          case 120: {
+
+            paymentRating_ = input.readInt32();
             break;
           }
           case 130: {
             if (!((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
-              tags_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Tag>();
+              constraints_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint>();
               mutable_bitField0_ |= 0x00008000;
             }
-            tags_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.parser(), extensionRegistry));
+            constraints_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.parser(), extensionRegistry));
             break;
           }
           case 138: {
             if (!((mutable_bitField0_ & 0x00010000) == 0x00010000)) {
-              platforms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform>();
+              tags_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Tag>();
               mutable_bitField0_ |= 0x00010000;
             }
-            platforms_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.parser(), extensionRegistry));
+            tags_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.parser(), extensionRegistry));
             break;
           }
           case 146: {
             if (!((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
+              platforms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform>();
+              mutable_bitField0_ |= 0x00020000;
+            }
+            platforms_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.parser(), extensionRegistry));
+            break;
+          }
+          case 154: {
+            if (!((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
               placeholders_ = com.google.protobuf.MapField.newMapField(
                   PlaceholdersDefaultEntryHolder.defaultEntry);
-              mutable_bitField0_ |= 0x00020000;
+              mutable_bitField0_ |= 0x00040000;
             }
             com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
             placeholders = input.readMessage(
@@ -173,12 +179,12 @@ public  final class Experiment extends
             placeholders_.getMutableMap().put(placeholders.getKey(), placeholders.getValue());
             break;
           }
-          case 152: {
+          case 160: {
 
             workerQualityThreshold_ = input.readInt32();
             break;
           }
-          case 160: {
+          case 168: {
 
             templateId_ = input.readInt32();
             break;
@@ -192,13 +198,13 @@ public  final class Experiment extends
           new com.google.protobuf.InvalidProtocolBufferException(
               e.getMessage()).setUnfinishedMessage(this));
     } finally {
-      if (((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
+      if (((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
         constraints_ = java.util.Collections.unmodifiableList(constraints_);
       }
-      if (((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
+      if (((mutable_bitField0_ & 0x00010000) == 0x00010000)) {
         tags_ = java.util.Collections.unmodifiableList(tags_);
       }
-      if (((mutable_bitField0_ & 0x00010000) == 0x00010000)) {
+      if (((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
         platforms_ = java.util.Collections.unmodifiableList(platforms_);
       }
       makeExtensionsImmutable();
@@ -213,7 +219,7 @@ public  final class Experiment extends
   protected com.google.protobuf.MapField internalGetMapField(
       int number) {
     switch (number) {
-      case 18:
+      case 19:
         return internalGetPlaceholders();
       default:
         throw new RuntimeException(
@@ -585,139 +591,148 @@ public  final class Experiment extends
     return ratingsPerAnswer_;
   }
 
-  public static final int PAYMENT_BASE_FIELD_NUMBER = 12;
+  public static final int NEEDED_ANSWERS_FIELD_NUMBER = 12;
+  private int neededAnswers_;
+  /**
+   * <code>optional int32 needed_answers = 12;</code>
+   */
+  public int getNeededAnswers() {
+    return neededAnswers_;
+  }
+
+  public static final int PAYMENT_BASE_FIELD_NUMBER = 13;
   private int paymentBase_;
   /**
-   * <code>optional int32 payment_base = 12;</code>
+   * <code>optional int32 payment_base = 13;</code>
    */
   public int getPaymentBase() {
     return paymentBase_;
   }
 
-  public static final int PAYMENT_ANSWER_FIELD_NUMBER = 13;
+  public static final int PAYMENT_ANSWER_FIELD_NUMBER = 14;
   private int paymentAnswer_;
   /**
-   * <code>optional int32 payment_answer = 13;</code>
+   * <code>optional int32 payment_answer = 14;</code>
    */
   public int getPaymentAnswer() {
     return paymentAnswer_;
   }
 
-  public static final int PAYMENT_RATING_FIELD_NUMBER = 14;
+  public static final int PAYMENT_RATING_FIELD_NUMBER = 15;
   private int paymentRating_;
   /**
-   * <code>optional int32 payment_rating = 14;</code>
+   * <code>optional int32 payment_rating = 15;</code>
    */
   public int getPaymentRating() {
     return paymentRating_;
   }
 
-  public static final int CONSTRAINTS_FIELD_NUMBER = 15;
+  public static final int CONSTRAINTS_FIELD_NUMBER = 16;
   private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint> constraints_;
   /**
-   * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+   * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
    */
   public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint> getConstraintsList() {
     return constraints_;
   }
   /**
-   * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+   * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
    */
   public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOrBuilder> 
       getConstraintsOrBuilderList() {
     return constraints_;
   }
   /**
-   * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+   * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
    */
   public int getConstraintsCount() {
     return constraints_.size();
   }
   /**
-   * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+   * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
    */
   public edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint getConstraints(int index) {
     return constraints_.get(index);
   }
   /**
-   * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+   * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
    */
   public edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOrBuilder getConstraintsOrBuilder(
       int index) {
     return constraints_.get(index);
   }
 
-  public static final int TAGS_FIELD_NUMBER = 16;
+  public static final int TAGS_FIELD_NUMBER = 17;
   private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Tag> tags_;
   /**
-   * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+   * <code>repeated .crowdcontrol.Tag tags = 17;</code>
    */
   public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Tag> getTagsList() {
     return tags_;
   }
   /**
-   * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+   * <code>repeated .crowdcontrol.Tag tags = 17;</code>
    */
   public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.TagOrBuilder> 
       getTagsOrBuilderList() {
     return tags_;
   }
   /**
-   * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+   * <code>repeated .crowdcontrol.Tag tags = 17;</code>
    */
   public int getTagsCount() {
     return tags_.size();
   }
   /**
-   * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+   * <code>repeated .crowdcontrol.Tag tags = 17;</code>
    */
   public edu.kit.ipd.crowdcontrol.objectservice.proto.Tag getTags(int index) {
     return tags_.get(index);
   }
   /**
-   * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+   * <code>repeated .crowdcontrol.Tag tags = 17;</code>
    */
   public edu.kit.ipd.crowdcontrol.objectservice.proto.TagOrBuilder getTagsOrBuilder(
       int index) {
     return tags_.get(index);
   }
 
-  public static final int PLATFORMS_FIELD_NUMBER = 17;
+  public static final int PLATFORMS_FIELD_NUMBER = 18;
   private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> platforms_;
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
    */
   public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> getPlatformsList() {
     return platforms_;
   }
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
    */
   public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder> 
       getPlatformsOrBuilderList() {
     return platforms_;
   }
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
    */
   public int getPlatformsCount() {
     return platforms_.size();
   }
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
    */
   public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform getPlatforms(int index) {
     return platforms_.get(index);
   }
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
    */
   public edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder getPlatformsOrBuilder(
       int index) {
     return platforms_.get(index);
   }
 
-  public static final int PLACEHOLDERS_FIELD_NUMBER = 18;
+  public static final int PLACEHOLDERS_FIELD_NUMBER = 19;
   private static final class PlaceholdersDefaultEntryHolder {
     static final com.google.protobuf.MapEntry<
         java.lang.String, java.lang.String> defaultEntry =
@@ -740,26 +755,26 @@ public  final class Experiment extends
     return placeholders_;
   }
   /**
-   * <code>map&lt;string, string&gt; placeholders = 18;</code>
+   * <code>map&lt;string, string&gt; placeholders = 19;</code>
    */
 
   public java.util.Map<java.lang.String, java.lang.String> getPlaceholders() {
     return internalGetPlaceholders().getMap();
   }
 
-  public static final int WORKER_QUALITY_THRESHOLD_FIELD_NUMBER = 19;
+  public static final int WORKER_QUALITY_THRESHOLD_FIELD_NUMBER = 20;
   private int workerQualityThreshold_;
   /**
-   * <code>optional int32 worker_quality_threshold = 19;</code>
+   * <code>optional int32 worker_quality_threshold = 20;</code>
    */
   public int getWorkerQualityThreshold() {
     return workerQualityThreshold_;
   }
 
-  public static final int TEMPLATE_ID_FIELD_NUMBER = 20;
+  public static final int TEMPLATE_ID_FIELD_NUMBER = 21;
   private int templateId_;
   /**
-   * <code>optional int32 template_id = 20;</code>
+   * <code>optional int32 template_id = 21;</code>
    */
   public int getTemplateId() {
     return templateId_;
@@ -810,23 +825,26 @@ public  final class Experiment extends
     if (ratingsPerAnswer_ != 0) {
       output.writeInt32(11, ratingsPerAnswer_);
     }
+    if (neededAnswers_ != 0) {
+      output.writeInt32(12, neededAnswers_);
+    }
     if (paymentBase_ != 0) {
-      output.writeInt32(12, paymentBase_);
+      output.writeInt32(13, paymentBase_);
     }
     if (paymentAnswer_ != 0) {
-      output.writeInt32(13, paymentAnswer_);
+      output.writeInt32(14, paymentAnswer_);
     }
     if (paymentRating_ != 0) {
-      output.writeInt32(14, paymentRating_);
+      output.writeInt32(15, paymentRating_);
     }
     for (int i = 0; i < constraints_.size(); i++) {
-      output.writeMessage(15, constraints_.get(i));
+      output.writeMessage(16, constraints_.get(i));
     }
     for (int i = 0; i < tags_.size(); i++) {
-      output.writeMessage(16, tags_.get(i));
+      output.writeMessage(17, tags_.get(i));
     }
     for (int i = 0; i < platforms_.size(); i++) {
-      output.writeMessage(17, platforms_.get(i));
+      output.writeMessage(18, platforms_.get(i));
     }
     for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
          : internalGetPlaceholders().getMap().entrySet()) {
@@ -835,13 +853,13 @@ public  final class Experiment extends
           .setKey(entry.getKey())
           .setValue(entry.getValue())
           .build();
-      output.writeMessage(18, placeholders);
+      output.writeMessage(19, placeholders);
     }
     if (workerQualityThreshold_ != 0) {
-      output.writeInt32(19, workerQualityThreshold_);
+      output.writeInt32(20, workerQualityThreshold_);
     }
     if (templateId_ != 0) {
-      output.writeInt32(20, templateId_);
+      output.writeInt32(21, templateId_);
     }
   }
 
@@ -889,29 +907,33 @@ public  final class Experiment extends
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(11, ratingsPerAnswer_);
     }
+    if (neededAnswers_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(12, neededAnswers_);
+    }
     if (paymentBase_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(12, paymentBase_);
+        .computeInt32Size(13, paymentBase_);
     }
     if (paymentAnswer_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(13, paymentAnswer_);
+        .computeInt32Size(14, paymentAnswer_);
     }
     if (paymentRating_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(14, paymentRating_);
+        .computeInt32Size(15, paymentRating_);
     }
     for (int i = 0; i < constraints_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(15, constraints_.get(i));
+        .computeMessageSize(16, constraints_.get(i));
     }
     for (int i = 0; i < tags_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(16, tags_.get(i));
+        .computeMessageSize(17, tags_.get(i));
     }
     for (int i = 0; i < platforms_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(17, platforms_.get(i));
+        .computeMessageSize(18, platforms_.get(i));
     }
     for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
          : internalGetPlaceholders().getMap().entrySet()) {
@@ -921,15 +943,15 @@ public  final class Experiment extends
           .setValue(entry.getValue())
           .build();
       size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(18, placeholders);
+          .computeMessageSize(19, placeholders);
     }
     if (workerQualityThreshold_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(19, workerQualityThreshold_);
+        .computeInt32Size(20, workerQualityThreshold_);
     }
     if (templateId_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(20, templateId_);
+        .computeInt32Size(21, templateId_);
     }
     memoizedSize = size;
     return size;
@@ -1023,7 +1045,7 @@ public  final class Experiment extends
     protected com.google.protobuf.MapField internalGetMapField(
         int number) {
       switch (number) {
-        case 18:
+        case 19:
           return internalGetPlaceholders();
         default:
           throw new RuntimeException(
@@ -1034,7 +1056,7 @@ public  final class Experiment extends
     protected com.google.protobuf.MapField internalGetMutableMapField(
         int number) {
       switch (number) {
-        case 18:
+        case 19:
           return internalGetMutablePlaceholders();
         default:
           throw new RuntimeException(
@@ -1089,6 +1111,8 @@ public  final class Experiment extends
 
       ratingsPerAnswer_ = 0;
 
+      neededAnswers_ = 0;
+
       paymentBase_ = 0;
 
       paymentAnswer_ = 0;
@@ -1097,19 +1121,19 @@ public  final class Experiment extends
 
       if (constraintsBuilder_ == null) {
         constraints_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00008000);
       } else {
         constraintsBuilder_.clear();
       }
       if (tagsBuilder_ == null) {
         tags_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00010000);
       } else {
         tagsBuilder_.clear();
       }
       if (platformsBuilder_ == null) {
         platforms_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00020000);
       } else {
         platformsBuilder_.clear();
       }
@@ -1153,31 +1177,32 @@ public  final class Experiment extends
       result.answersPerWorker_ = answersPerWorker_;
       result.ratingsPerWorker_ = ratingsPerWorker_;
       result.ratingsPerAnswer_ = ratingsPerAnswer_;
+      result.neededAnswers_ = neededAnswers_;
       result.paymentBase_ = paymentBase_;
       result.paymentAnswer_ = paymentAnswer_;
       result.paymentRating_ = paymentRating_;
       if (constraintsBuilder_ == null) {
-        if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        if (((bitField0_ & 0x00008000) == 0x00008000)) {
           constraints_ = java.util.Collections.unmodifiableList(constraints_);
-          bitField0_ = (bitField0_ & ~0x00004000);
+          bitField0_ = (bitField0_ & ~0x00008000);
         }
         result.constraints_ = constraints_;
       } else {
         result.constraints_ = constraintsBuilder_.build();
       }
       if (tagsBuilder_ == null) {
-        if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        if (((bitField0_ & 0x00010000) == 0x00010000)) {
           tags_ = java.util.Collections.unmodifiableList(tags_);
-          bitField0_ = (bitField0_ & ~0x00008000);
+          bitField0_ = (bitField0_ & ~0x00010000);
         }
         result.tags_ = tags_;
       } else {
         result.tags_ = tagsBuilder_.build();
       }
       if (platformsBuilder_ == null) {
-        if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        if (((bitField0_ & 0x00020000) == 0x00020000)) {
           platforms_ = java.util.Collections.unmodifiableList(platforms_);
-          bitField0_ = (bitField0_ & ~0x00010000);
+          bitField0_ = (bitField0_ & ~0x00020000);
         }
         result.platforms_ = platforms_;
       } else {
@@ -1241,6 +1266,9 @@ public  final class Experiment extends
       if (other.getRatingsPerAnswer() != 0) {
         setRatingsPerAnswer(other.getRatingsPerAnswer());
       }
+      if (other.getNeededAnswers() != 0) {
+        setNeededAnswers(other.getNeededAnswers());
+      }
       if (other.getPaymentBase() != 0) {
         setPaymentBase(other.getPaymentBase());
       }
@@ -1254,7 +1282,7 @@ public  final class Experiment extends
         if (!other.constraints_.isEmpty()) {
           if (constraints_.isEmpty()) {
             constraints_ = other.constraints_;
-            bitField0_ = (bitField0_ & ~0x00004000);
+            bitField0_ = (bitField0_ & ~0x00008000);
           } else {
             ensureConstraintsIsMutable();
             constraints_.addAll(other.constraints_);
@@ -1267,7 +1295,7 @@ public  final class Experiment extends
             constraintsBuilder_.dispose();
             constraintsBuilder_ = null;
             constraints_ = other.constraints_;
-            bitField0_ = (bitField0_ & ~0x00004000);
+            bitField0_ = (bitField0_ & ~0x00008000);
             constraintsBuilder_ = 
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                  getConstraintsFieldBuilder() : null;
@@ -1280,7 +1308,7 @@ public  final class Experiment extends
         if (!other.tags_.isEmpty()) {
           if (tags_.isEmpty()) {
             tags_ = other.tags_;
-            bitField0_ = (bitField0_ & ~0x00008000);
+            bitField0_ = (bitField0_ & ~0x00010000);
           } else {
             ensureTagsIsMutable();
             tags_.addAll(other.tags_);
@@ -1293,7 +1321,7 @@ public  final class Experiment extends
             tagsBuilder_.dispose();
             tagsBuilder_ = null;
             tags_ = other.tags_;
-            bitField0_ = (bitField0_ & ~0x00008000);
+            bitField0_ = (bitField0_ & ~0x00010000);
             tagsBuilder_ = 
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                  getTagsFieldBuilder() : null;
@@ -1306,7 +1334,7 @@ public  final class Experiment extends
         if (!other.platforms_.isEmpty()) {
           if (platforms_.isEmpty()) {
             platforms_ = other.platforms_;
-            bitField0_ = (bitField0_ & ~0x00010000);
+            bitField0_ = (bitField0_ & ~0x00020000);
           } else {
             ensurePlatformsIsMutable();
             platforms_.addAll(other.platforms_);
@@ -1319,7 +1347,7 @@ public  final class Experiment extends
             platformsBuilder_.dispose();
             platformsBuilder_ = null;
             platforms_ = other.platforms_;
-            bitField0_ = (bitField0_ & ~0x00010000);
+            bitField0_ = (bitField0_ & ~0x00020000);
             platformsBuilder_ = 
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                  getPlatformsFieldBuilder() : null;
@@ -1900,15 +1928,41 @@ public  final class Experiment extends
       return this;
     }
 
+    private int neededAnswers_ ;
+    /**
+     * <code>optional int32 needed_answers = 12;</code>
+     */
+    public int getNeededAnswers() {
+      return neededAnswers_;
+    }
+    /**
+     * <code>optional int32 needed_answers = 12;</code>
+     */
+    public Builder setNeededAnswers(int value) {
+      
+      neededAnswers_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 needed_answers = 12;</code>
+     */
+    public Builder clearNeededAnswers() {
+      
+      neededAnswers_ = 0;
+      onChanged();
+      return this;
+    }
+
     private int paymentBase_ ;
     /**
-     * <code>optional int32 payment_base = 12;</code>
+     * <code>optional int32 payment_base = 13;</code>
      */
     public int getPaymentBase() {
       return paymentBase_;
     }
     /**
-     * <code>optional int32 payment_base = 12;</code>
+     * <code>optional int32 payment_base = 13;</code>
      */
     public Builder setPaymentBase(int value) {
       
@@ -1917,7 +1971,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>optional int32 payment_base = 12;</code>
+     * <code>optional int32 payment_base = 13;</code>
      */
     public Builder clearPaymentBase() {
       
@@ -1928,13 +1982,13 @@ public  final class Experiment extends
 
     private int paymentAnswer_ ;
     /**
-     * <code>optional int32 payment_answer = 13;</code>
+     * <code>optional int32 payment_answer = 14;</code>
      */
     public int getPaymentAnswer() {
       return paymentAnswer_;
     }
     /**
-     * <code>optional int32 payment_answer = 13;</code>
+     * <code>optional int32 payment_answer = 14;</code>
      */
     public Builder setPaymentAnswer(int value) {
       
@@ -1943,7 +1997,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>optional int32 payment_answer = 13;</code>
+     * <code>optional int32 payment_answer = 14;</code>
      */
     public Builder clearPaymentAnswer() {
       
@@ -1954,13 +2008,13 @@ public  final class Experiment extends
 
     private int paymentRating_ ;
     /**
-     * <code>optional int32 payment_rating = 14;</code>
+     * <code>optional int32 payment_rating = 15;</code>
      */
     public int getPaymentRating() {
       return paymentRating_;
     }
     /**
-     * <code>optional int32 payment_rating = 14;</code>
+     * <code>optional int32 payment_rating = 15;</code>
      */
     public Builder setPaymentRating(int value) {
       
@@ -1969,7 +2023,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>optional int32 payment_rating = 14;</code>
+     * <code>optional int32 payment_rating = 15;</code>
      */
     public Builder clearPaymentRating() {
       
@@ -1981,9 +2035,9 @@ public  final class Experiment extends
     private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint> constraints_ =
       java.util.Collections.emptyList();
     private void ensureConstraintsIsMutable() {
-      if (!((bitField0_ & 0x00004000) == 0x00004000)) {
+      if (!((bitField0_ & 0x00008000) == 0x00008000)) {
         constraints_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint>(constraints_);
-        bitField0_ |= 0x00004000;
+        bitField0_ |= 0x00008000;
        }
     }
 
@@ -1991,7 +2045,7 @@ public  final class Experiment extends
         edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint, edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOrBuilder> constraintsBuilder_;
 
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint> getConstraintsList() {
       if (constraintsBuilder_ == null) {
@@ -2001,7 +2055,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public int getConstraintsCount() {
       if (constraintsBuilder_ == null) {
@@ -2011,7 +2065,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint getConstraints(int index) {
       if (constraintsBuilder_ == null) {
@@ -2021,7 +2075,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public Builder setConstraints(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint value) {
@@ -2038,7 +2092,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public Builder setConstraints(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.Builder builderForValue) {
@@ -2052,7 +2106,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public Builder addConstraints(edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint value) {
       if (constraintsBuilder_ == null) {
@@ -2068,7 +2122,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public Builder addConstraints(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint value) {
@@ -2085,7 +2139,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public Builder addConstraints(
         edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.Builder builderForValue) {
@@ -2099,7 +2153,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public Builder addConstraints(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.Builder builderForValue) {
@@ -2113,7 +2167,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public Builder addAllConstraints(
         java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint> values) {
@@ -2128,12 +2182,12 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public Builder clearConstraints() {
       if (constraintsBuilder_ == null) {
         constraints_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         onChanged();
       } else {
         constraintsBuilder_.clear();
@@ -2141,7 +2195,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public Builder removeConstraints(int index) {
       if (constraintsBuilder_ == null) {
@@ -2154,14 +2208,14 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.Builder getConstraintsBuilder(
         int index) {
       return getConstraintsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOrBuilder getConstraintsOrBuilder(
         int index) {
@@ -2171,7 +2225,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOrBuilder> 
          getConstraintsOrBuilderList() {
@@ -2182,14 +2236,14 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.Builder addConstraintsBuilder() {
       return getConstraintsFieldBuilder().addBuilder(
           edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.Builder addConstraintsBuilder(
         int index) {
@@ -2197,7 +2251,7 @@ public  final class Experiment extends
           index, edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Constraint constraints = 15;</code>
+     * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
      */
     public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.Builder> 
          getConstraintsBuilderList() {
@@ -2210,7 +2264,7 @@ public  final class Experiment extends
         constraintsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
             edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint, edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOrBuilder>(
                 constraints_,
-                ((bitField0_ & 0x00004000) == 0x00004000),
+                ((bitField0_ & 0x00008000) == 0x00008000),
                 getParentForChildren(),
                 isClean());
         constraints_ = null;
@@ -2221,9 +2275,9 @@ public  final class Experiment extends
     private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Tag> tags_ =
       java.util.Collections.emptyList();
     private void ensureTagsIsMutable() {
-      if (!((bitField0_ & 0x00008000) == 0x00008000)) {
+      if (!((bitField0_ & 0x00010000) == 0x00010000)) {
         tags_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Tag>(tags_);
-        bitField0_ |= 0x00008000;
+        bitField0_ |= 0x00010000;
        }
     }
 
@@ -2231,7 +2285,7 @@ public  final class Experiment extends
         edu.kit.ipd.crowdcontrol.objectservice.proto.Tag, edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.TagOrBuilder> tagsBuilder_;
 
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Tag> getTagsList() {
       if (tagsBuilder_ == null) {
@@ -2241,7 +2295,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public int getTagsCount() {
       if (tagsBuilder_ == null) {
@@ -2251,7 +2305,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Tag getTags(int index) {
       if (tagsBuilder_ == null) {
@@ -2261,7 +2315,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public Builder setTags(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Tag value) {
@@ -2278,7 +2332,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public Builder setTags(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.Builder builderForValue) {
@@ -2292,7 +2346,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public Builder addTags(edu.kit.ipd.crowdcontrol.objectservice.proto.Tag value) {
       if (tagsBuilder_ == null) {
@@ -2308,7 +2362,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public Builder addTags(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Tag value) {
@@ -2325,7 +2379,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public Builder addTags(
         edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.Builder builderForValue) {
@@ -2339,7 +2393,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public Builder addTags(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.Builder builderForValue) {
@@ -2353,7 +2407,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public Builder addAllTags(
         java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Tag> values) {
@@ -2368,12 +2422,12 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public Builder clearTags() {
       if (tagsBuilder_ == null) {
         tags_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         onChanged();
       } else {
         tagsBuilder_.clear();
@@ -2381,7 +2435,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public Builder removeTags(int index) {
       if (tagsBuilder_ == null) {
@@ -2394,14 +2448,14 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.Builder getTagsBuilder(
         int index) {
       return getTagsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.TagOrBuilder getTagsOrBuilder(
         int index) {
@@ -2411,7 +2465,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.TagOrBuilder> 
          getTagsOrBuilderList() {
@@ -2422,14 +2476,14 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.Builder addTagsBuilder() {
       return getTagsFieldBuilder().addBuilder(
           edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.Builder addTagsBuilder(
         int index) {
@@ -2437,7 +2491,7 @@ public  final class Experiment extends
           index, edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Tag tags = 16;</code>
+     * <code>repeated .crowdcontrol.Tag tags = 17;</code>
      */
     public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.Builder> 
          getTagsBuilderList() {
@@ -2450,7 +2504,7 @@ public  final class Experiment extends
         tagsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
             edu.kit.ipd.crowdcontrol.objectservice.proto.Tag, edu.kit.ipd.crowdcontrol.objectservice.proto.Tag.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.TagOrBuilder>(
                 tags_,
-                ((bitField0_ & 0x00008000) == 0x00008000),
+                ((bitField0_ & 0x00010000) == 0x00010000),
                 getParentForChildren(),
                 isClean());
         tags_ = null;
@@ -2461,9 +2515,9 @@ public  final class Experiment extends
     private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> platforms_ =
       java.util.Collections.emptyList();
     private void ensurePlatformsIsMutable() {
-      if (!((bitField0_ & 0x00010000) == 0x00010000)) {
+      if (!((bitField0_ & 0x00020000) == 0x00020000)) {
         platforms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform>(platforms_);
-        bitField0_ |= 0x00010000;
+        bitField0_ |= 0x00020000;
        }
     }
 
@@ -2471,7 +2525,7 @@ public  final class Experiment extends
         edu.kit.ipd.crowdcontrol.objectservice.proto.Platform, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder> platformsBuilder_;
 
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> getPlatformsList() {
       if (platformsBuilder_ == null) {
@@ -2481,7 +2535,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public int getPlatformsCount() {
       if (platformsBuilder_ == null) {
@@ -2491,7 +2545,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform getPlatforms(int index) {
       if (platformsBuilder_ == null) {
@@ -2501,7 +2555,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public Builder setPlatforms(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform value) {
@@ -2518,7 +2572,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public Builder setPlatforms(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder builderForValue) {
@@ -2532,7 +2586,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public Builder addPlatforms(edu.kit.ipd.crowdcontrol.objectservice.proto.Platform value) {
       if (platformsBuilder_ == null) {
@@ -2548,7 +2602,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public Builder addPlatforms(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform value) {
@@ -2565,7 +2619,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public Builder addPlatforms(
         edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder builderForValue) {
@@ -2579,7 +2633,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public Builder addPlatforms(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder builderForValue) {
@@ -2593,7 +2647,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public Builder addAllPlatforms(
         java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> values) {
@@ -2608,12 +2662,12 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public Builder clearPlatforms() {
       if (platformsBuilder_ == null) {
         platforms_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00020000);
         onChanged();
       } else {
         platformsBuilder_.clear();
@@ -2621,7 +2675,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public Builder removePlatforms(int index) {
       if (platformsBuilder_ == null) {
@@ -2634,14 +2688,14 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder getPlatformsBuilder(
         int index) {
       return getPlatformsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder getPlatformsOrBuilder(
         int index) {
@@ -2651,7 +2705,7 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder> 
          getPlatformsOrBuilderList() {
@@ -2662,14 +2716,14 @@ public  final class Experiment extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder addPlatformsBuilder() {
       return getPlatformsFieldBuilder().addBuilder(
           edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder addPlatformsBuilder(
         int index) {
@@ -2677,7 +2731,7 @@ public  final class Experiment extends
           index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
+     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
      */
     public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder> 
          getPlatformsBuilderList() {
@@ -2690,7 +2744,7 @@ public  final class Experiment extends
         platformsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
             edu.kit.ipd.crowdcontrol.objectservice.proto.Platform, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder>(
                 platforms_,
-                ((bitField0_ & 0x00010000) == 0x00010000),
+                ((bitField0_ & 0x00020000) == 0x00020000),
                 getParentForChildren(),
                 isClean());
         platforms_ = null;
@@ -2721,20 +2775,20 @@ public  final class Experiment extends
       return placeholders_;
     }
     /**
-     * <code>map&lt;string, string&gt; placeholders = 18;</code>
+     * <code>map&lt;string, string&gt; placeholders = 19;</code>
      */
     public java.util.Map<java.lang.String, java.lang.String> getPlaceholders() {
       return internalGetPlaceholders().getMap();
     }
     /**
-     * <code>map&lt;string, string&gt; placeholders = 18;</code>
+     * <code>map&lt;string, string&gt; placeholders = 19;</code>
      */
     public java.util.Map<java.lang.String, java.lang.String>
     getMutablePlaceholders() {
       return internalGetMutablePlaceholders().getMutableMap();
     }
     /**
-     * <code>map&lt;string, string&gt; placeholders = 18;</code>
+     * <code>map&lt;string, string&gt; placeholders = 19;</code>
      */
     public Builder putAllPlaceholders(
         java.util.Map<java.lang.String, java.lang.String> values) {
@@ -2744,13 +2798,13 @@ public  final class Experiment extends
 
     private int workerQualityThreshold_ ;
     /**
-     * <code>optional int32 worker_quality_threshold = 19;</code>
+     * <code>optional int32 worker_quality_threshold = 20;</code>
      */
     public int getWorkerQualityThreshold() {
       return workerQualityThreshold_;
     }
     /**
-     * <code>optional int32 worker_quality_threshold = 19;</code>
+     * <code>optional int32 worker_quality_threshold = 20;</code>
      */
     public Builder setWorkerQualityThreshold(int value) {
       
@@ -2759,7 +2813,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>optional int32 worker_quality_threshold = 19;</code>
+     * <code>optional int32 worker_quality_threshold = 20;</code>
      */
     public Builder clearWorkerQualityThreshold() {
       
@@ -2770,13 +2824,13 @@ public  final class Experiment extends
 
     private int templateId_ ;
     /**
-     * <code>optional int32 template_id = 20;</code>
+     * <code>optional int32 template_id = 21;</code>
      */
     public int getTemplateId() {
       return templateId_;
     }
     /**
-     * <code>optional int32 template_id = 20;</code>
+     * <code>optional int32 template_id = 21;</code>
      */
     public Builder setTemplateId(int value) {
       
@@ -2785,7 +2839,7 @@ public  final class Experiment extends
       return this;
     }
     /**
-     * <code>optional int32 template_id = 20;</code>
+     * <code>optional int32 template_id = 21;</code>
      */
     public Builder clearTemplateId() {
       
