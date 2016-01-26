@@ -35,7 +35,7 @@ public class PopulationResource {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
-        return operations.getPopulationList(from, asc, 20)
+        return operations.getPopulationFrom(from, asc, 20)
                 .constructPaginated(PopulationList.newBuilder(), PopulationList.Builder::addAllItems);
     }
 
@@ -64,7 +64,7 @@ public class PopulationResource {
         Population population = request.attribute("input");
 
         try {
-            population = operations.createPopulation(population);
+            population = operations.insertPopulation(population);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Name and content must be set!");
         }
@@ -84,7 +84,7 @@ public class PopulationResource {
      * @return {@code null}.
      */
     public Population delete(Request request, Response response) {
-        boolean existed = operations.delete(getParamInt(request, "id"));
+        boolean existed = operations.deletePopulation(getParamInt(request, "id"));
 
         if (!existed) {
             throw new NotFoundException("Population does not exist!");
