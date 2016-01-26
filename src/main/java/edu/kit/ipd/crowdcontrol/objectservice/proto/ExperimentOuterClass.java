@@ -28,28 +28,29 @@ public final class ExperimentOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\020experiment.proto\022\014crowdcontrol\032\021answer" +
-      "_type.proto\032\020constraint.proto\032\020populatio" +
-      "n.proto\032\ttag.proto\"\356\005\n\nExperiment\022\n\n\002id\030" +
-      "\001 \001(\005\022\r\n\005title\030\002 \001(\t\022\023\n\013description\030\003 \001(" +
-      "\t\022-\n\005state\030\004 \001(\0162\036.crowdcontrol.Experime" +
-      "nt.State\022-\n\013answer_type\030\005 \001(\0162\030.crowdcon" +
-      "trol.AnswerType\022\036\n\026algorithm_task_choose" +
-      "r\030\006 \001(\t\022 \n\030algorithm_quality_answer\030\007 \001(" +
-      "\t\022 \n\030algorithm_quality_rating\030\010 \001(\t\022\032\n\022a" +
-      "nswers_per_worker\030\t \001(\005\022\032\n\022ratings_per_w",
-      "orker\030\n \001(\005\022\032\n\022ratings_per_answer\030\013 \001(\005\022" +
-      "\024\n\014payment_base\030\014 \001(\005\022\026\n\016payment_answer\030" +
-      "\r \001(\005\022\026\n\016payment_rating\030\016 \001(\005\022-\n\013constra" +
-      "ints\030\017 \003(\0132\030.crowdcontrol.Constraint\022\037\n\004" +
-      "tags\030\020 \003(\0132\021.crowdcontrol.Tag\022-\n\013populat" +
-      "ions\030\021 \003(\0132\030.crowdcontrol.Population\022@\n\014" +
-      "placeholders\030\022 \003(\0132*.crowdcontrol.Experi" +
-      "ment.PlaceholdersEntry\022\023\n\013template_id\030\023 " +
-      "\001(\005\0323\n\021PlaceholdersEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
-      "\005value\030\002 \001(\t:\0028\001\"I\n\005State\022\013\n\007INVALID\020\000\022\t",
-      "\n\005DRAFT\020\001\022\r\n\tPUBLISHED\020\002\022\014\n\010STOPPING\020\003\022\013" +
-      "\n\007STOPPED\020\004B0\n,edu.kit.ipd.crowdcontrol." +
-      "objectservice.protoP\001b\006proto3"
+      "_type.proto\032\020constraint.proto\032\016platform." +
+      "proto\032\ttag.proto\"\214\006\n\nExperiment\022\n\n\002id\030\001 " +
+      "\001(\005\022\r\n\005title\030\002 \001(\t\022\023\n\013description\030\003 \001(\t\022" +
+      "-\n\005state\030\004 \001(\0162\036.crowdcontrol.Experiment" +
+      ".State\022-\n\013answer_type\030\005 \001(\0162\030.crowdcontr" +
+      "ol.AnswerType\022\036\n\026algorithm_task_chooser\030" +
+      "\006 \001(\t\022 \n\030algorithm_quality_answer\030\007 \001(\t\022" +
+      " \n\030algorithm_quality_rating\030\010 \001(\t\022\032\n\022ans" +
+      "wers_per_worker\030\t \001(\005\022\032\n\022ratings_per_wor",
+      "ker\030\n \001(\005\022\032\n\022ratings_per_answer\030\013 \001(\005\022\024\n" +
+      "\014payment_base\030\014 \001(\005\022\026\n\016payment_answer\030\r " +
+      "\001(\005\022\026\n\016payment_rating\030\016 \001(\005\022-\n\013constrain" +
+      "ts\030\017 \003(\0132\030.crowdcontrol.Constraint\022\037\n\004ta" +
+      "gs\030\020 \003(\0132\021.crowdcontrol.Tag\022)\n\tplatforms" +
+      "\030\021 \003(\0132\026.crowdcontrol.Platform\022@\n\014placeh" +
+      "olders\030\022 \003(\0132*.crowdcontrol.Experiment.P" +
+      "laceholdersEntry\022 \n\030worker_quality_thres" +
+      "hold\030\023 \001(\005\022\023\n\013template_id\030\024 \001(\005\0323\n\021Place" +
+      "holdersEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t",
+      ":\0028\001\"I\n\005State\022\013\n\007INVALID\020\000\022\t\n\005DRAFT\020\001\022\r\n" +
+      "\tPUBLISHED\020\002\022\014\n\010STOPPING\020\003\022\013\n\007STOPPED\020\004B" +
+      "0\n,edu.kit.ipd.crowdcontrol.objectservic" +
+      "e.protoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -64,7 +65,7 @@ public final class ExperimentOuterClass {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerTypeOuterClass.getDescriptor(),
           edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOuterClass.getDescriptor(),
-          edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOuterClass.getDescriptor(),
+          edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOuterClass.getDescriptor(),
           edu.kit.ipd.crowdcontrol.objectservice.proto.TagOuterClass.getDescriptor(),
         }, assigner);
     internal_static_crowdcontrol_Experiment_descriptor =
@@ -72,7 +73,7 @@ public final class ExperimentOuterClass {
     internal_static_crowdcontrol_Experiment_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_crowdcontrol_Experiment_descriptor,
-        new java.lang.String[] { "Id", "Title", "Description", "State", "AnswerType", "AlgorithmTaskChooser", "AlgorithmQualityAnswer", "AlgorithmQualityRating", "AnswersPerWorker", "RatingsPerWorker", "RatingsPerAnswer", "PaymentBase", "PaymentAnswer", "PaymentRating", "Constraints", "Tags", "Populations", "Placeholders", "TemplateId", });
+        new java.lang.String[] { "Id", "Title", "Description", "State", "AnswerType", "AlgorithmTaskChooser", "AlgorithmQualityAnswer", "AlgorithmQualityRating", "AnswersPerWorker", "RatingsPerWorker", "RatingsPerAnswer", "PaymentBase", "PaymentAnswer", "PaymentRating", "Constraints", "Tags", "Platforms", "Placeholders", "WorkerQualityThreshold", "TemplateId", });
     internal_static_crowdcontrol_Experiment_PlaceholdersEntry_descriptor =
       internal_static_crowdcontrol_Experiment_descriptor.getNestedTypes().get(0);
     internal_static_crowdcontrol_Experiment_PlaceholdersEntry_fieldAccessorTable = new
@@ -81,7 +82,7 @@ public final class ExperimentOuterClass {
         new java.lang.String[] { "Key", "Value", });
     edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerTypeOuterClass.getDescriptor();
     edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOuterClass.getDescriptor();
-    edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOuterClass.getDescriptor();
+    edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOuterClass.getDescriptor();
     edu.kit.ipd.crowdcontrol.objectservice.proto.TagOuterClass.getDescriptor();
   }
 

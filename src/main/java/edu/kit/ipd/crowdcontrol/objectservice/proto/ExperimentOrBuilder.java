@@ -159,27 +159,27 @@ public interface ExperimentOrBuilder extends
       int index);
 
   /**
-   * <code>repeated .crowdcontrol.Population populations = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
    */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> 
-      getPopulationsList();
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> 
+      getPlatformsList();
   /**
-   * <code>repeated .crowdcontrol.Population populations = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index);
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Platform getPlatforms(int index);
   /**
-   * <code>repeated .crowdcontrol.Population populations = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
    */
-  int getPopulationsCount();
+  int getPlatformsCount();
   /**
-   * <code>repeated .crowdcontrol.Population populations = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
    */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
-      getPopulationsOrBuilderList();
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder> 
+      getPlatformsOrBuilderList();
   /**
-   * <code>repeated .crowdcontrol.Population populations = 17;</code>
+   * <code>repeated .crowdcontrol.Platform platforms = 17;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
+  edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder getPlatformsOrBuilder(
       int index);
 
   /**
@@ -189,7 +189,12 @@ public interface ExperimentOrBuilder extends
   getPlaceholders();
 
   /**
-   * <code>optional int32 template_id = 19;</code>
+   * <code>optional int32 worker_quality_threshold = 19;</code>
+   */
+  int getWorkerQualityThreshold();
+
+  /**
+   * <code>optional int32 template_id = 20;</code>
    */
   int getTemplateId();
 }
