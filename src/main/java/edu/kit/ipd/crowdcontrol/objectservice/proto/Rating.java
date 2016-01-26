@@ -15,7 +15,9 @@ public  final class Rating extends
     super(builder);
   }
   private Rating() {
+    experimentId_ = 0;
     rating_ = 0;
+    feedback_ = "";
     worker_ = 0;
     time_ = 0;
   }
@@ -46,15 +48,26 @@ public  final class Rating extends
           }
           case 8: {
 
-            rating_ = input.readInt32();
+            experimentId_ = input.readInt32();
             break;
           }
           case 16: {
 
+            rating_ = input.readInt32();
+            break;
+          }
+          case 26: {
+            String s = input.readStringRequireUtf8();
+
+            feedback_ = s;
+            break;
+          }
+          case 32: {
+
             worker_ = input.readInt32();
             break;
           }
-          case 24: {
+          case 40: {
 
             time_ = input.readInt32();
             break;
@@ -83,28 +96,71 @@ public  final class Rating extends
             edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder.class);
   }
 
-  public static final int RATING_FIELD_NUMBER = 1;
+  public static final int EXPERIMENT_ID_FIELD_NUMBER = 1;
+  private int experimentId_;
+  /**
+   * <code>optional int32 experiment_id = 1;</code>
+   */
+  public int getExperimentId() {
+    return experimentId_;
+  }
+
+  public static final int RATING_FIELD_NUMBER = 2;
   private int rating_;
   /**
-   * <code>optional int32 rating = 1;</code>
+   * <code>optional int32 rating = 2;</code>
    */
   public int getRating() {
     return rating_;
   }
 
-  public static final int WORKER_FIELD_NUMBER = 2;
+  public static final int FEEDBACK_FIELD_NUMBER = 3;
+  private volatile java.lang.Object feedback_;
+  /**
+   * <code>optional string feedback = 3;</code>
+   */
+  public java.lang.String getFeedback() {
+    java.lang.Object ref = feedback_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      feedback_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>optional string feedback = 3;</code>
+   */
+  public com.google.protobuf.ByteString
+      getFeedbackBytes() {
+    java.lang.Object ref = feedback_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      feedback_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int WORKER_FIELD_NUMBER = 4;
   private int worker_;
   /**
-   * <code>optional int32 worker = 2;</code>
+   * <code>optional int32 worker = 4;</code>
    */
   public int getWorker() {
     return worker_;
   }
 
-  public static final int TIME_FIELD_NUMBER = 3;
+  public static final int TIME_FIELD_NUMBER = 5;
   private int time_;
   /**
-   * <code>optional int32 time = 3;</code>
+   * <code>optional int32 time = 5;</code>
    */
   public int getTime() {
     return time_;
@@ -122,14 +178,20 @@ public  final class Rating extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    if (experimentId_ != 0) {
+      output.writeInt32(1, experimentId_);
+    }
     if (rating_ != 0) {
-      output.writeInt32(1, rating_);
+      output.writeInt32(2, rating_);
+    }
+    if (!getFeedbackBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 3, feedback_);
     }
     if (worker_ != 0) {
-      output.writeInt32(2, worker_);
+      output.writeInt32(4, worker_);
     }
     if (time_ != 0) {
-      output.writeInt32(3, time_);
+      output.writeInt32(5, time_);
     }
   }
 
@@ -138,17 +200,24 @@ public  final class Rating extends
     if (size != -1) return size;
 
     size = 0;
+    if (experimentId_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(1, experimentId_);
+    }
     if (rating_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(1, rating_);
+        .computeInt32Size(2, rating_);
+    }
+    if (!getFeedbackBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(3, feedback_);
     }
     if (worker_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(2, worker_);
+        .computeInt32Size(4, worker_);
     }
     if (time_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(3, time_);
+        .computeInt32Size(5, time_);
     }
     memoizedSize = size;
     return size;
@@ -261,7 +330,11 @@ public  final class Rating extends
     }
     public Builder clear() {
       super.clear();
+      experimentId_ = 0;
+
       rating_ = 0;
+
+      feedback_ = "";
 
       worker_ = 0;
 
@@ -289,7 +362,9 @@ public  final class Rating extends
 
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Rating buildPartial() {
       edu.kit.ipd.crowdcontrol.objectservice.proto.Rating result = new edu.kit.ipd.crowdcontrol.objectservice.proto.Rating(this);
+      result.experimentId_ = experimentId_;
       result.rating_ = rating_;
+      result.feedback_ = feedback_;
       result.worker_ = worker_;
       result.time_ = time_;
       onBuilt();
@@ -307,8 +382,15 @@ public  final class Rating extends
 
     public Builder mergeFrom(edu.kit.ipd.crowdcontrol.objectservice.proto.Rating other) {
       if (other == edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.getDefaultInstance()) return this;
+      if (other.getExperimentId() != 0) {
+        setExperimentId(other.getExperimentId());
+      }
       if (other.getRating() != 0) {
         setRating(other.getRating());
+      }
+      if (!other.getFeedback().isEmpty()) {
+        feedback_ = other.feedback_;
+        onChanged();
       }
       if (other.getWorker() != 0) {
         setWorker(other.getWorker());
@@ -342,15 +424,41 @@ public  final class Rating extends
       return this;
     }
 
+    private int experimentId_ ;
+    /**
+     * <code>optional int32 experiment_id = 1;</code>
+     */
+    public int getExperimentId() {
+      return experimentId_;
+    }
+    /**
+     * <code>optional int32 experiment_id = 1;</code>
+     */
+    public Builder setExperimentId(int value) {
+      
+      experimentId_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 experiment_id = 1;</code>
+     */
+    public Builder clearExperimentId() {
+      
+      experimentId_ = 0;
+      onChanged();
+      return this;
+    }
+
     private int rating_ ;
     /**
-     * <code>optional int32 rating = 1;</code>
+     * <code>optional int32 rating = 2;</code>
      */
     public int getRating() {
       return rating_;
     }
     /**
-     * <code>optional int32 rating = 1;</code>
+     * <code>optional int32 rating = 2;</code>
      */
     public Builder setRating(int value) {
       
@@ -359,7 +467,7 @@ public  final class Rating extends
       return this;
     }
     /**
-     * <code>optional int32 rating = 1;</code>
+     * <code>optional int32 rating = 2;</code>
      */
     public Builder clearRating() {
       
@@ -368,15 +476,84 @@ public  final class Rating extends
       return this;
     }
 
+    private java.lang.Object feedback_ = "";
+    /**
+     * <code>optional string feedback = 3;</code>
+     */
+    public java.lang.String getFeedback() {
+      java.lang.Object ref = feedback_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        feedback_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>optional string feedback = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFeedbackBytes() {
+      java.lang.Object ref = feedback_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        feedback_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>optional string feedback = 3;</code>
+     */
+    public Builder setFeedback(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      feedback_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string feedback = 3;</code>
+     */
+    public Builder clearFeedback() {
+      
+      feedback_ = getDefaultInstance().getFeedback();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string feedback = 3;</code>
+     */
+    public Builder setFeedbackBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      feedback_ = value;
+      onChanged();
+      return this;
+    }
+
     private int worker_ ;
     /**
-     * <code>optional int32 worker = 2;</code>
+     * <code>optional int32 worker = 4;</code>
      */
     public int getWorker() {
       return worker_;
     }
     /**
-     * <code>optional int32 worker = 2;</code>
+     * <code>optional int32 worker = 4;</code>
      */
     public Builder setWorker(int value) {
       
@@ -385,7 +562,7 @@ public  final class Rating extends
       return this;
     }
     /**
-     * <code>optional int32 worker = 2;</code>
+     * <code>optional int32 worker = 4;</code>
      */
     public Builder clearWorker() {
       
@@ -396,13 +573,13 @@ public  final class Rating extends
 
     private int time_ ;
     /**
-     * <code>optional int32 time = 3;</code>
+     * <code>optional int32 time = 5;</code>
      */
     public int getTime() {
       return time_;
     }
     /**
-     * <code>optional int32 time = 3;</code>
+     * <code>optional int32 time = 5;</code>
      */
     public Builder setTime(int value) {
       
@@ -411,7 +588,7 @@ public  final class Rating extends
       return this;
     }
     /**
-     * <code>optional int32 time = 3;</code>
+     * <code>optional int32 time = 5;</code>
      */
     public Builder clearTime() {
       
