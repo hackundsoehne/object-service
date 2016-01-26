@@ -59,11 +59,12 @@ public class Main {
     }
 
     private static void boot(DatabaseManager databaseManager) {
-
+        TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
+        NotificationRestOperations notificationRestOperations = new NotificationRestOperations(databaseManager.getContext());
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationRestOperations notificationRestOperations = new NotificationRestOperations(databaseManager.getContext());
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
-        WorkerOperations workerOperations = new WorkerOperations(context);
+        WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
 
         new Router(
                 new TemplateResource(templateOperations),
