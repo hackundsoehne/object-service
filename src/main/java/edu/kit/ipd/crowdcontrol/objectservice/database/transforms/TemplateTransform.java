@@ -2,13 +2,14 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.transforms;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 
 /**
  * Transforms template protocol buffers to database records.
  *
  * @author Niklas Keller
  */
-public class TemplateTransform {
+public class TemplateTransform extends AbstractTransform {
     /**
      * Converts a template record to its protobuf representation.
      *
@@ -36,19 +37,16 @@ public class TemplateTransform {
      *
      * @return Merged template record.
      */
-    public static TemplateRecord mergeRecord(TemplateRecord target, edu.kit.ipd.crowdcontrol.objectservice.proto.Template template) {
-        if (template.hasField(template.getDescriptorForType().findFieldByNumber(edu.kit.ipd.crowdcontrol.objectservice.proto.Template.NAME_FIELD_NUMBER))) {
-            target.setTitel(template.getName());
-        }
-
-        if (template.hasField(template.getDescriptorForType().findFieldByNumber(edu.kit.ipd.crowdcontrol.objectservice.proto.Template.CONTENT_FIELD_NUMBER))) {
-            target.setTemplate(template.getContent());
-        }
-
-        if (template.hasField(template.getDescriptorForType().findFieldByNumber(edu.kit.ipd.crowdcontrol.objectservice.proto.Template.ANSWER_TYPE_FIELD_NUMBER))) {
-            target.setAnswerType(template.getAnswerType().name());
-        }
-
-        return target;
+    public static TemplateRecord mergeRecord(TemplateRecord target, Template template) {
+        return merge(target, template, (fieldNumber, record) -> {
+            switch (fieldNumber) {
+                case Template.NAME_FIELD_NUMBER: record.setTitel(template.getName());
+                    break;
+                case Template.CONTENT_FIELD_NUMBER: record.setTemplate(template.getContent());
+                    break;
+                case Template.ANSWER_TYPE_FIELD_NUMBER: record.setAnswerType(template.getAnswerType().name());
+                    break;
+            }
+        });
     }
 }

@@ -8,7 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
  *
  * @author Niklas Keller
  */
-public class WorkerTransform {
+public class WorkerTransform extends AbstractTransform {
     /**
      * Converts a worker record to its protobuf representation.
      *
@@ -33,14 +33,13 @@ public class WorkerTransform {
      * @return Merged worker record.
      */
     public static WorkerRecord mergeRecord(WorkerRecord target, Worker worker) {
-        if (worker.hasField(worker.getDescriptorForType().findFieldByNumber(Worker.PLATFORM_FIELD_NUMBER))) {
-            target.setPlatform(worker.getPlatform());
-        }
-
-        if (worker.hasField(worker.getDescriptorForType().findFieldByNumber(Worker.EMAIL_FIELD_NUMBER))) {
-            target.setEmail(worker.getEmail());
-        }
-
-        return target;
+        return merge(target, worker, (field, record) -> {
+            switch (field) {
+                case Worker.PLATFORM_FIELD_NUMBER: record.setPlatform(worker.getPlatform());
+                    break;
+                case Worker.EMAIL_FIELD_NUMBER: record.setEmail(worker.getEmail());
+                    break;
+            }
+        });
     }
 }

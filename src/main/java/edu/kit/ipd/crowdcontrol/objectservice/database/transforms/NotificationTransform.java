@@ -8,7 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
  *
  * @author Niklas Keller
  */
-public class NotificationTransform {
+public class NotificationTransform extends AbstractTransform {
     /**
      * Converts a notification record to its protobuf representation.
      *
@@ -36,26 +36,19 @@ public class NotificationTransform {
      * @return Merged notification record.
      */
     public static NotificationRecord mergeRecord(NotificationRecord target, Notification notification) {
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.NAME_FIELD_NUMBER))) {
-            target.setName(notification.getName());
-        }
-
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.DESCRIPTION_FIELD_NUMBER))) {
-            target.setDescription(notification.getDescription());
-        }
-
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.QUERY_FIELD_NUMBER))) {
-            target.setQuery(notification.getQuery());
-        }
-
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.SEND_THRESHOLD_FIELD_NUMBER))) {
-            target.setSendthreshold(notification.getSendThreshold());
-        }
-
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.CHECK_PERIOD_FIELD_NUMBER))) {
-            target.setCheckperiod(notification.getCheckPeriod());
-        }
-
-        return target;
+        return merge(target, notification, (field, record) -> {
+            switch (field) {
+                case Notification.NAME_FIELD_NUMBER: record.setName(notification.getName());
+                    break;
+                case Notification.DESCRIPTION_FIELD_NUMBER: record.setDescription(notification.getDescription());
+                    break;
+                case Notification.QUERY_FIELD_NUMBER: record.setQuery(notification.getQuery());
+                    break;
+                case Notification.SEND_THRESHOLD_FIELD_NUMBER: record.setSendthreshold(notification.getSendThreshold());
+                    break;
+                case Notification.CHECK_PERIOD_FIELD_NUMBER: record.setCheckperiod(notification.getCheckPeriod());
+                    break;
+            }
+        });
     }
 }

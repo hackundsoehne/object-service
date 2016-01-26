@@ -8,7 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Platform;
  *
  * @author Niklas Keller
  */
-public class PlatformTransform {
+public class PlatformTransform extends AbstractTransform {
     /**
      * Converts a platform record to its protobuf representation.
      *
