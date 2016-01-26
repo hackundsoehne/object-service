@@ -16,10 +16,9 @@ public  final class Population extends
   }
   private Population() {
     id_ = 0;
-    name_ = "";
-    platform_ = "";
-    minimumRating_ = 0;
-    calibrations_ = java.util.Collections.emptyList();
+    question_ = "";
+    answers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    acceptedAnswers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
   }
 
   @java.lang.Override
@@ -54,26 +53,25 @@ public  final class Population extends
           case 18: {
             String s = input.readStringRequireUtf8();
 
-            name_ = s;
+            question_ = s;
             break;
           }
           case 26: {
             String s = input.readStringRequireUtf8();
-
-            platform_ = s;
-            break;
-          }
-          case 32: {
-
-            minimumRating_ = input.readInt32();
-            break;
-          }
-          case 42: {
-            if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-              calibrations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration>();
-              mutable_bitField0_ |= 0x00000010;
+            if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              answers_ = new com.google.protobuf.LazyStringArrayList();
+              mutable_bitField0_ |= 0x00000004;
             }
-            calibrations_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.parser(), extensionRegistry));
+            answers_.add(s);
+            break;
+          }
+          case 34: {
+            String s = input.readStringRequireUtf8();
+            if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+              acceptedAnswers_ = new com.google.protobuf.LazyStringArrayList();
+              mutable_bitField0_ |= 0x00000008;
+            }
+            acceptedAnswers_.add(s);
             break;
           }
         }
@@ -85,8 +83,11 @@ public  final class Population extends
           new com.google.protobuf.InvalidProtocolBufferException(
               e.getMessage()).setUnfinishedMessage(this));
     } finally {
-      if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-        calibrations_ = java.util.Collections.unmodifiableList(calibrations_);
+      if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+        answers_ = answers_.getUnmodifiableView();
+      }
+      if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+        acceptedAnswers_ = acceptedAnswers_.getUnmodifiableView();
       }
       makeExtensionsImmutable();
     }
@@ -113,116 +114,96 @@ public  final class Population extends
     return id_;
   }
 
-  public static final int NAME_FIELD_NUMBER = 2;
-  private volatile java.lang.Object name_;
+  public static final int QUESTION_FIELD_NUMBER = 2;
+  private volatile java.lang.Object question_;
   /**
-   * <code>optional string name = 2;</code>
+   * <code>optional string question = 2;</code>
    */
-  public java.lang.String getName() {
-    java.lang.Object ref = name_;
+  public java.lang.String getQuestion() {
+    java.lang.Object ref = question_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      name_ = s;
+      question_ = s;
       return s;
     }
   }
   /**
-   * <code>optional string name = 2;</code>
+   * <code>optional string question = 2;</code>
    */
   public com.google.protobuf.ByteString
-      getNameBytes() {
-    java.lang.Object ref = name_;
+      getQuestionBytes() {
+    java.lang.Object ref = question_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      name_ = b;
+      question_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
     }
   }
 
-  public static final int PLATFORM_FIELD_NUMBER = 3;
-  private volatile java.lang.Object platform_;
+  public static final int ANSWERS_FIELD_NUMBER = 3;
+  private com.google.protobuf.LazyStringList answers_;
   /**
-   * <code>optional string platform = 3;</code>
+   * <code>repeated string answers = 3;</code>
    */
-  public java.lang.String getPlatform() {
-    java.lang.Object ref = platform_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      platform_ = s;
-      return s;
-    }
+  public com.google.protobuf.ProtocolStringList
+      getAnswersList() {
+    return answers_;
   }
   /**
-   * <code>optional string platform = 3;</code>
+   * <code>repeated string answers = 3;</code>
+   */
+  public int getAnswersCount() {
+    return answers_.size();
+  }
+  /**
+   * <code>repeated string answers = 3;</code>
+   */
+  public java.lang.String getAnswers(int index) {
+    return answers_.get(index);
+  }
+  /**
+   * <code>repeated string answers = 3;</code>
    */
   public com.google.protobuf.ByteString
-      getPlatformBytes() {
-    java.lang.Object ref = platform_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      platform_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+      getAnswersBytes(int index) {
+    return answers_.getByteString(index);
   }
 
-  public static final int MINIMUM_RATING_FIELD_NUMBER = 4;
-  private int minimumRating_;
+  public static final int ACCEPTED_ANSWERS_FIELD_NUMBER = 4;
+  private com.google.protobuf.LazyStringList acceptedAnswers_;
   /**
-   * <code>optional int32 minimum_rating = 4;</code>
+   * <code>repeated string accepted_answers = 4;</code>
    */
-  public int getMinimumRating() {
-    return minimumRating_;
-  }
-
-  public static final int CALIBRATIONS_FIELD_NUMBER = 5;
-  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> calibrations_;
-  /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-   */
-  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> getCalibrationsList() {
-    return calibrations_;
+  public com.google.protobuf.ProtocolStringList
+      getAcceptedAnswersList() {
+    return acceptedAnswers_;
   }
   /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+   * <code>repeated string accepted_answers = 4;</code>
    */
-  public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> 
-      getCalibrationsOrBuilderList() {
-    return calibrations_;
+  public int getAcceptedAnswersCount() {
+    return acceptedAnswers_.size();
   }
   /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+   * <code>repeated string accepted_answers = 4;</code>
    */
-  public int getCalibrationsCount() {
-    return calibrations_.size();
+  public java.lang.String getAcceptedAnswers(int index) {
+    return acceptedAnswers_.get(index);
   }
   /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+   * <code>repeated string accepted_answers = 4;</code>
    */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration getCalibrations(int index) {
-    return calibrations_.get(index);
-  }
-  /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-   */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder getCalibrationsOrBuilder(
-      int index) {
-    return calibrations_.get(index);
+  public com.google.protobuf.ByteString
+      getAcceptedAnswersBytes(int index) {
+    return acceptedAnswers_.getByteString(index);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -240,17 +221,14 @@ public  final class Population extends
     if (id_ != 0) {
       output.writeInt32(1, id_);
     }
-    if (!getNameBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 2, name_);
+    if (!getQuestionBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 2, question_);
     }
-    if (!getPlatformBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 3, platform_);
+    for (int i = 0; i < answers_.size(); i++) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 3, answers_.getRaw(i));
     }
-    if (minimumRating_ != 0) {
-      output.writeInt32(4, minimumRating_);
-    }
-    for (int i = 0; i < calibrations_.size(); i++) {
-      output.writeMessage(5, calibrations_.get(i));
+    for (int i = 0; i < acceptedAnswers_.size(); i++) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 4, acceptedAnswers_.getRaw(i));
     }
   }
 
@@ -263,19 +241,24 @@ public  final class Population extends
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(1, id_);
     }
-    if (!getNameBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(2, name_);
+    if (!getQuestionBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(2, question_);
     }
-    if (!getPlatformBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(3, platform_);
+    {
+      int dataSize = 0;
+      for (int i = 0; i < answers_.size(); i++) {
+        dataSize += computeStringSizeNoTag(answers_.getRaw(i));
+      }
+      size += dataSize;
+      size += 1 * getAnswersList().size();
     }
-    if (minimumRating_ != 0) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(4, minimumRating_);
-    }
-    for (int i = 0; i < calibrations_.size(); i++) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, calibrations_.get(i));
+    {
+      int dataSize = 0;
+      for (int i = 0; i < acceptedAnswers_.size(); i++) {
+        dataSize += computeStringSizeNoTag(acceptedAnswers_.getRaw(i));
+      }
+      size += dataSize;
+      size += 1 * getAcceptedAnswersList().size();
     }
     memoizedSize = size;
     return size;
@@ -384,25 +367,18 @@ public  final class Population extends
     }
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        getCalibrationsFieldBuilder();
       }
     }
     public Builder clear() {
       super.clear();
       id_ = 0;
 
-      name_ = "";
+      question_ = "";
 
-      platform_ = "";
-
-      minimumRating_ = 0;
-
-      if (calibrationsBuilder_ == null) {
-        calibrations_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000010);
-      } else {
-        calibrationsBuilder_.clear();
-      }
+      answers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      bitField0_ = (bitField0_ & ~0x00000004);
+      acceptedAnswers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      bitField0_ = (bitField0_ & ~0x00000008);
       return this;
     }
 
@@ -428,18 +404,17 @@ public  final class Population extends
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
       result.id_ = id_;
-      result.name_ = name_;
-      result.platform_ = platform_;
-      result.minimumRating_ = minimumRating_;
-      if (calibrationsBuilder_ == null) {
-        if (((bitField0_ & 0x00000010) == 0x00000010)) {
-          calibrations_ = java.util.Collections.unmodifiableList(calibrations_);
-          bitField0_ = (bitField0_ & ~0x00000010);
-        }
-        result.calibrations_ = calibrations_;
-      } else {
-        result.calibrations_ = calibrationsBuilder_.build();
+      result.question_ = question_;
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        answers_ = answers_.getUnmodifiableView();
+        bitField0_ = (bitField0_ & ~0x00000004);
       }
+      result.answers_ = answers_;
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        acceptedAnswers_ = acceptedAnswers_.getUnmodifiableView();
+        bitField0_ = (bitField0_ & ~0x00000008);
+      }
+      result.acceptedAnswers_ = acceptedAnswers_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -459,42 +434,29 @@ public  final class Population extends
       if (other.getId() != 0) {
         setId(other.getId());
       }
-      if (!other.getName().isEmpty()) {
-        name_ = other.name_;
+      if (!other.getQuestion().isEmpty()) {
+        question_ = other.question_;
         onChanged();
       }
-      if (!other.getPlatform().isEmpty()) {
-        platform_ = other.platform_;
+      if (!other.answers_.isEmpty()) {
+        if (answers_.isEmpty()) {
+          answers_ = other.answers_;
+          bitField0_ = (bitField0_ & ~0x00000004);
+        } else {
+          ensureAnswersIsMutable();
+          answers_.addAll(other.answers_);
+        }
         onChanged();
       }
-      if (other.getMinimumRating() != 0) {
-        setMinimumRating(other.getMinimumRating());
-      }
-      if (calibrationsBuilder_ == null) {
-        if (!other.calibrations_.isEmpty()) {
-          if (calibrations_.isEmpty()) {
-            calibrations_ = other.calibrations_;
-            bitField0_ = (bitField0_ & ~0x00000010);
-          } else {
-            ensureCalibrationsIsMutable();
-            calibrations_.addAll(other.calibrations_);
-          }
-          onChanged();
+      if (!other.acceptedAnswers_.isEmpty()) {
+        if (acceptedAnswers_.isEmpty()) {
+          acceptedAnswers_ = other.acceptedAnswers_;
+          bitField0_ = (bitField0_ & ~0x00000008);
+        } else {
+          ensureAcceptedAnswersIsMutable();
+          acceptedAnswers_.addAll(other.acceptedAnswers_);
         }
-      } else {
-        if (!other.calibrations_.isEmpty()) {
-          if (calibrationsBuilder_.isEmpty()) {
-            calibrationsBuilder_.dispose();
-            calibrationsBuilder_ = null;
-            calibrations_ = other.calibrations_;
-            bitField0_ = (bitField0_ & ~0x00000010);
-            calibrationsBuilder_ = 
-              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                 getCalibrationsFieldBuilder() : null;
-          } else {
-            calibrationsBuilder_.addAllMessages(other.calibrations_);
-          }
-        }
+        onChanged();
       }
       onChanged();
       return this;
@@ -549,408 +511,261 @@ public  final class Population extends
       return this;
     }
 
-    private java.lang.Object name_ = "";
+    private java.lang.Object question_ = "";
     /**
-     * <code>optional string name = 2;</code>
+     * <code>optional string question = 2;</code>
      */
-    public java.lang.String getName() {
-      java.lang.Object ref = name_;
+    public java.lang.String getQuestion() {
+      java.lang.Object ref = question_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        name_ = s;
+        question_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>optional string name = 2;</code>
+     * <code>optional string question = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getNameBytes() {
-      java.lang.Object ref = name_;
+        getQuestionBytes() {
+      java.lang.Object ref = question_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        name_ = b;
+        question_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>optional string name = 2;</code>
+     * <code>optional string question = 2;</code>
      */
-    public Builder setName(
+    public Builder setQuestion(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
   
-      name_ = value;
+      question_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>optional string name = 2;</code>
+     * <code>optional string question = 2;</code>
      */
-    public Builder clearName() {
+    public Builder clearQuestion() {
       
-      name_ = getDefaultInstance().getName();
+      question_ = getDefaultInstance().getQuestion();
       onChanged();
       return this;
     }
     /**
-     * <code>optional string name = 2;</code>
+     * <code>optional string question = 2;</code>
      */
-    public Builder setNameBytes(
+    public Builder setQuestionBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
       
-      name_ = value;
+      question_ = value;
       onChanged();
       return this;
     }
 
-    private java.lang.Object platform_ = "";
-    /**
-     * <code>optional string platform = 3;</code>
-     */
-    public java.lang.String getPlatform() {
-      java.lang.Object ref = platform_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        platform_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>optional string platform = 3;</code>
-     */
-    public com.google.protobuf.ByteString
-        getPlatformBytes() {
-      java.lang.Object ref = platform_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        platform_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>optional string platform = 3;</code>
-     */
-    public Builder setPlatform(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      platform_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>optional string platform = 3;</code>
-     */
-    public Builder clearPlatform() {
-      
-      platform_ = getDefaultInstance().getPlatform();
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>optional string platform = 3;</code>
-     */
-    public Builder setPlatformBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
-      platform_ = value;
-      onChanged();
-      return this;
-    }
-
-    private int minimumRating_ ;
-    /**
-     * <code>optional int32 minimum_rating = 4;</code>
-     */
-    public int getMinimumRating() {
-      return minimumRating_;
-    }
-    /**
-     * <code>optional int32 minimum_rating = 4;</code>
-     */
-    public Builder setMinimumRating(int value) {
-      
-      minimumRating_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>optional int32 minimum_rating = 4;</code>
-     */
-    public Builder clearMinimumRating() {
-      
-      minimumRating_ = 0;
-      onChanged();
-      return this;
-    }
-
-    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> calibrations_ =
-      java.util.Collections.emptyList();
-    private void ensureCalibrationsIsMutable() {
-      if (!((bitField0_ & 0x00000010) == 0x00000010)) {
-        calibrations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration>(calibrations_);
-        bitField0_ |= 0x00000010;
+    private com.google.protobuf.LazyStringList answers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    private void ensureAnswersIsMutable() {
+      if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        answers_ = new com.google.protobuf.LazyStringArrayList(answers_);
+        bitField0_ |= 0x00000004;
        }
     }
+    /**
+     * <code>repeated string answers = 3;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getAnswersList() {
+      return answers_.getUnmodifiableView();
+    }
+    /**
+     * <code>repeated string answers = 3;</code>
+     */
+    public int getAnswersCount() {
+      return answers_.size();
+    }
+    /**
+     * <code>repeated string answers = 3;</code>
+     */
+    public java.lang.String getAnswers(int index) {
+      return answers_.get(index);
+    }
+    /**
+     * <code>repeated string answers = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getAnswersBytes(int index) {
+      return answers_.getByteString(index);
+    }
+    /**
+     * <code>repeated string answers = 3;</code>
+     */
+    public Builder setAnswers(
+        int index, java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAnswersIsMutable();
+      answers_.set(index, value);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string answers = 3;</code>
+     */
+    public Builder addAnswers(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAnswersIsMutable();
+      answers_.add(value);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string answers = 3;</code>
+     */
+    public Builder addAllAnswers(
+        java.lang.Iterable<java.lang.String> values) {
+      ensureAnswersIsMutable();
+      com.google.protobuf.AbstractMessageLite.Builder.addAll(
+          values, answers_);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string answers = 3;</code>
+     */
+    public Builder clearAnswers() {
+      answers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      bitField0_ = (bitField0_ & ~0x00000004);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>repeated string answers = 3;</code>
+     */
+    public Builder addAnswersBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      ensureAnswersIsMutable();
+      answers_.add(value);
+      onChanged();
+      return this;
+    }
 
-    private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> calibrationsBuilder_;
-
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> getCalibrationsList() {
-      if (calibrationsBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(calibrations_);
-      } else {
-        return calibrationsBuilder_.getMessageList();
-      }
+    private com.google.protobuf.LazyStringList acceptedAnswers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    private void ensureAcceptedAnswersIsMutable() {
+      if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+        acceptedAnswers_ = new com.google.protobuf.LazyStringArrayList(acceptedAnswers_);
+        bitField0_ |= 0x00000008;
+       }
     }
     /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+     * <code>repeated string accepted_answers = 4;</code>
      */
-    public int getCalibrationsCount() {
-      if (calibrationsBuilder_ == null) {
-        return calibrations_.size();
-      } else {
-        return calibrationsBuilder_.getCount();
-      }
+    public com.google.protobuf.ProtocolStringList
+        getAcceptedAnswersList() {
+      return acceptedAnswers_.getUnmodifiableView();
     }
     /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+     * <code>repeated string accepted_answers = 4;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration getCalibrations(int index) {
-      if (calibrationsBuilder_ == null) {
-        return calibrations_.get(index);
-      } else {
-        return calibrationsBuilder_.getMessage(index);
-      }
+    public int getAcceptedAnswersCount() {
+      return acceptedAnswers_.size();
     }
     /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+     * <code>repeated string accepted_answers = 4;</code>
      */
-    public Builder setCalibrations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration value) {
-      if (calibrationsBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureCalibrationsIsMutable();
-        calibrations_.set(index, value);
-        onChanged();
-      } else {
-        calibrationsBuilder_.setMessage(index, value);
-      }
+    public java.lang.String getAcceptedAnswers(int index) {
+      return acceptedAnswers_.get(index);
+    }
+    /**
+     * <code>repeated string accepted_answers = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getAcceptedAnswersBytes(int index) {
+      return acceptedAnswers_.getByteString(index);
+    }
+    /**
+     * <code>repeated string accepted_answers = 4;</code>
+     */
+    public Builder setAcceptedAnswers(
+        int index, java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAcceptedAnswersIsMutable();
+      acceptedAnswers_.set(index, value);
+      onChanged();
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+     * <code>repeated string accepted_answers = 4;</code>
      */
-    public Builder setCalibrations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder builderForValue) {
-      if (calibrationsBuilder_ == null) {
-        ensureCalibrationsIsMutable();
-        calibrations_.set(index, builderForValue.build());
-        onChanged();
-      } else {
-        calibrationsBuilder_.setMessage(index, builderForValue.build());
-      }
+    public Builder addAcceptedAnswers(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAcceptedAnswersIsMutable();
+      acceptedAnswers_.add(value);
+      onChanged();
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+     * <code>repeated string accepted_answers = 4;</code>
      */
-    public Builder addCalibrations(edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration value) {
-      if (calibrationsBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureCalibrationsIsMutable();
-        calibrations_.add(value);
-        onChanged();
-      } else {
-        calibrationsBuilder_.addMessage(value);
-      }
+    public Builder addAllAcceptedAnswers(
+        java.lang.Iterable<java.lang.String> values) {
+      ensureAcceptedAnswersIsMutable();
+      com.google.protobuf.AbstractMessageLite.Builder.addAll(
+          values, acceptedAnswers_);
+      onChanged();
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+     * <code>repeated string accepted_answers = 4;</code>
      */
-    public Builder addCalibrations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration value) {
-      if (calibrationsBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureCalibrationsIsMutable();
-        calibrations_.add(index, value);
-        onChanged();
-      } else {
-        calibrationsBuilder_.addMessage(index, value);
-      }
+    public Builder clearAcceptedAnswers() {
+      acceptedAnswers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      bitField0_ = (bitField0_ & ~0x00000008);
+      onChanged();
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+     * <code>repeated string accepted_answers = 4;</code>
      */
-    public Builder addCalibrations(
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder builderForValue) {
-      if (calibrationsBuilder_ == null) {
-        ensureCalibrationsIsMutable();
-        calibrations_.add(builderForValue.build());
-        onChanged();
-      } else {
-        calibrationsBuilder_.addMessage(builderForValue.build());
-      }
+    public Builder addAcceptedAnswersBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      ensureAcceptedAnswersIsMutable();
+      acceptedAnswers_.add(value);
+      onChanged();
       return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public Builder addCalibrations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder builderForValue) {
-      if (calibrationsBuilder_ == null) {
-        ensureCalibrationsIsMutable();
-        calibrations_.add(index, builderForValue.build());
-        onChanged();
-      } else {
-        calibrationsBuilder_.addMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public Builder addAllCalibrations(
-        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> values) {
-      if (calibrationsBuilder_ == null) {
-        ensureCalibrationsIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, calibrations_);
-        onChanged();
-      } else {
-        calibrationsBuilder_.addAllMessages(values);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public Builder clearCalibrations() {
-      if (calibrationsBuilder_ == null) {
-        calibrations_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000010);
-        onChanged();
-      } else {
-        calibrationsBuilder_.clear();
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public Builder removeCalibrations(int index) {
-      if (calibrationsBuilder_ == null) {
-        ensureCalibrationsIsMutable();
-        calibrations_.remove(index);
-        onChanged();
-      } else {
-        calibrationsBuilder_.remove(index);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder getCalibrationsBuilder(
-        int index) {
-      return getCalibrationsFieldBuilder().getBuilder(index);
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder getCalibrationsOrBuilder(
-        int index) {
-      if (calibrationsBuilder_ == null) {
-        return calibrations_.get(index);  } else {
-        return calibrationsBuilder_.getMessageOrBuilder(index);
-      }
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> 
-         getCalibrationsOrBuilderList() {
-      if (calibrationsBuilder_ != null) {
-        return calibrationsBuilder_.getMessageOrBuilderList();
-      } else {
-        return java.util.Collections.unmodifiableList(calibrations_);
-      }
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder addCalibrationsBuilder() {
-      return getCalibrationsFieldBuilder().addBuilder(
-          edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder addCalibrationsBuilder(
-        int index) {
-      return getCalibrationsFieldBuilder().addBuilder(
-          index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-     */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder> 
-         getCalibrationsBuilderList() {
-      return getCalibrationsFieldBuilder().getBuilderList();
-    }
-    private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> 
-        getCalibrationsFieldBuilder() {
-      if (calibrationsBuilder_ == null) {
-        calibrationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-            edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder>(
-                calibrations_,
-                ((bitField0_ & 0x00000010) == 0x00000010),
-                getParentForChildren(),
-                isClean());
-        calibrations_ = null;
-      }
-      return calibrationsBuilder_;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
