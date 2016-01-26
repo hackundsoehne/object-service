@@ -30,7 +30,7 @@ public class WorkerOperations extends AbstractOperations {
      *
      * @return the resulting WorkerRecord existing in the database
      */
-    public WorkerRecord createWorker(WorkerRecord workerRecord) {
+    public WorkerRecord insertWorker(WorkerRecord workerRecord) {
         workerRecord.setIdWorker(null);
 
         return create.transactionResult(conf -> {
@@ -57,7 +57,7 @@ public class WorkerOperations extends AbstractOperations {
      * <p>
      * The worker will be deleted, there is no way to pay him after this action.
      *
-     * @param workerRecord the worker to
+     * @param id the primary key of the worker to anonymize
      *
      * @throws IllegalArgumentException if the primary key is not set or the worker is not existing
      *                                  in the database
@@ -78,27 +78,28 @@ public class WorkerOperations extends AbstractOperations {
                                         .set(new WorkerRecord(null, "Anonymous Worker", toAnonymize.getPlatform(), null))
                                         .returning()
                                         .fetchOne()));
+        create.transaction(conf -> {
+            DSL.using(conf).deleteFrom(Tables.POPULATION_RESULT)
+                    .where(Tables.POPULATION_RESULT.WORKER.eq(toAnonymize.getIdWorker()))
+                    .execute();
 
-        create.deleteFrom(Tables.POPULATION_RESULT)
-                .where(Tables.POPULATION_RESULT.WORKER.eq(toAnonymize.getIdWorker()))
-                .execute();
+            DSL.using(conf).update(Tables.ANSWER)
+                    .set(Tables.ANSWER.WORKER_ID, anonWorker.getIdWorker())
+                    .where(Tables.ANSWER.WORKER_ID.eq(toAnonymize.getIdWorker()))
+                    .execute();
 
-        create.update(Tables.ANSWER)
-                .set(Tables.ANSWER.WORKER_ID, anonWorker.getIdWorker())
-                .where(Tables.ANSWER.WORKER_ID.eq(toAnonymize.getIdWorker()))
-                .execute();
+            DSL.using(conf).update(Tables.RATING)
+                    .set(Tables.RATING.WORKER_ID, anonWorker.getIdWorker())
+                    .where(Tables.ANSWER.WORKER_ID.eq(toAnonymize.getIdWorker()))
+                    .execute();
 
-        create.update(Tables.RATING)
-                .set(Tables.RATING.WORKER_ID, anonWorker.getIdWorker())
-                .where(Tables.ANSWER.WORKER_ID.eq(toAnonymize.getIdWorker()))
-                .execute();
+            DSL.using(conf).update(Tables.WORKER_BALANCE)
+                    .set(Tables.WORKER_BALANCE.WORKER, anonWorker.getIdWorker())
+                    .where(Tables.WORKER_BALANCE.WORKER.eq(anonWorker.getIdWorker()))
+                    .execute();
 
-        create.update(Tables.WORKER_BALANCE)
-                .set(Tables.WORKER_BALANCE.WORKER, anonWorker.getIdWorker())
-                .where(Tables.WORKER_BALANCE.WORKER.eq(anonWorker.getIdWorker()))
-                .execute();
-
-        create.executeDelete(toAnonymize);
+            DSL.using(conf).executeDelete(toAnonymize);
+        });
     }
 
     /**
@@ -150,7 +151,7 @@ public class WorkerOperations extends AbstractOperations {
      *
      * @return List of workers
      */
-    public Range<Worker, Integer> getWorkerList(int cursor, boolean next, int limit) {
+    public Range<Worker, Integer> getWorkersFrom(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, cursor, next, limit)
                 .map(WorkerTransform::toProto);
     }
@@ -165,7 +166,7 @@ public class WorkerOperations extends AbstractOperations {
      *
      * @throws IllegalArgumentException if the name or content is not set
      */
-    public Worker createWorker(Worker toStore, String identity) {
+    public Worker insertWorker(Worker toStore, String identity) {
         assertHasField(toStore, Worker.PLATFORM_FIELD_NUMBER);
 
         WorkerRecord record = WorkerTransform.mergeRecord(create.newRecord(WORKER), toStore);

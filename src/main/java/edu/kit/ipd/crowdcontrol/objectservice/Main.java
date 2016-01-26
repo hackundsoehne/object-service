@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRestOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
@@ -45,12 +45,15 @@ public class Main {
         String password = trimIfNotNull.apply(properties.getProperty("database.password"));
         String databasePool = trimIfNotNull.apply(properties.getProperty("database.poolName"));
 
+        String readOnlyUsername = trimIfNotNull.apply(properties.getProperty("database.readonly.username"));
+        String readOnlyPassword = trimIfNotNull.apply(properties.getProperty("database.readonly.password"));
+
         SQLDialect dialect = SQLDialect.valueOf(properties.getProperty("database.dialect").trim());
         DatabaseManager databaseManager = null;
         try {
             databaseManager = new DatabaseManager(username, password, url, databasePool, dialect);
             databaseManager.initDatabase();
-            boot(databaseManager);
+            boot(databaseManager, readOnlyUsername, readOnlyPassword);
         } catch (NamingException | SQLException e) {
             System.err.println("unable to establish database connection");
             e.printStackTrace();
@@ -58,11 +61,11 @@ public class Main {
         }
     }
 
-    private static void boot(DatabaseManager databaseManager) {
+    private static void boot(DatabaseManager databaseManager, String readOnlyDBUser, String readOnlyDBPassword) throws SQLException {
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationRestOperations notificationRestOperations = new NotificationRestOperations(databaseManager.getContext());
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
-        NotificationRestOperations notificationRestOperations = new NotificationRestOperations(databaseManager.getContext());
+        NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnlyDBUser, readOnlyDBPassword);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
         WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
 
