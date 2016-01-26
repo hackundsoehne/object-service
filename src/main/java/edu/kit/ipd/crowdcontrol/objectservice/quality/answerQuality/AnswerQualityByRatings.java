@@ -29,7 +29,7 @@ public class AnswerQualityByRatings implements AnswerQualityStrategy {
     @Override
     public int identifyAnswerQuality(AnswerRecord answer, List<RatingRecord> ratings, int maximumQuality, int minimumQuality)throws IllegalArgumentException{
 
-        int answerQuality = -1;
+        int answerQuality = 0;
         for (RatingRecord rating : ratings){
             if(rating.getRating() > 9 || rating.getRating() < 0){
                 throw new IllegalArgumentException("Error! Illegal rating value in "+this.getClass()+"! Expected value from 0 to 9" +
