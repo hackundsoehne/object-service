@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.WorkerList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
@@ -36,7 +37,7 @@ public class WorkerResource {
     public Worker identify(Request request, Response response) {
         try {
             return manager.getWorker(request.params("platform"), request.queryMap().toMap())
-                    .map(WorkerOperations::toProto)
+                    .map(WorkerTransform::toProto)
                     .orElseThrow(() -> new NotFoundException("Resource not found."));
         } catch (UnidentifiedWorkerException e) {
             throw new BadRequestException("Unidentified worker!");

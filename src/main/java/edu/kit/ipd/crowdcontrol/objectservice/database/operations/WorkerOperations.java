@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -160,7 +161,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Optional<Worker> identifyWorker(String platform, String identity) {
         return create.fetchOptional(WORKER, WORKER.PLATFORM.eq(platform).and(WORKER.IDENTIFICATION.eq(identity)))
-                .map(WorkerOperations::toProto);
+                .map(WorkerTransform::toProto);
     }
 
     /**
@@ -172,7 +173,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Optional<Worker> getWorkerProto(int id) {
         return create.fetchOptional(WORKER, WORKER.ID_WORKER.eq(id))
-                .map(WorkerOperations::toProto);
+                .map(WorkerTransform::toProto);
     }
 
     /**
@@ -186,7 +187,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Range<Worker, Integer> getWorkerList(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, cursor, next, limit)
-                .map(WorkerOperations::toProto);
+                .map(WorkerTransform::toProto);
     }
 
     /**
@@ -202,45 +203,10 @@ public class WorkerOperations extends AbstractOperations {
     public Worker createWorker(Worker toStore, String identity) {
         assertHasField(toStore, Worker.PLATFORM_FIELD_NUMBER);
 
-        WorkerRecord record = mergeRecord(create.newRecord(WORKER), toStore);
+        WorkerRecord record = WorkerTransform.mergeRecord(create.newRecord(WORKER), toStore);
         record.setIdentification(identity);
         record.store();
 
-        return toProto(record);
-    }
-
-    /**
-     * Converts a worker record to its protobuf representation.
-     *
-     * @param record worker record
-     *
-     * @return Worker.
-     */
-    public static Worker toProto(WorkerRecord record) {
-        return Worker.newBuilder()
-                .setId(record.getIdWorker())
-                .setPlatform(record.getPlatform())
-                .setEmail(record.getEmail())
-                .build();
-    }
-
-    /**
-     * Merges a record with the set properties of a protobuf worker.
-     *
-     * @param target record to merge into
-     * @param worker message to merge from
-     *
-     * @return Merged worker record.
-     */
-    public static WorkerRecord mergeRecord(WorkerRecord target, Worker worker) {
-        if (worker.hasField(worker.getDescriptorForType().findFieldByNumber(Worker.PLATFORM_FIELD_NUMBER))) {
-            target.setPlatform(worker.getPlatform());
-        }
-
-        if (worker.hasField(worker.getDescriptorForType().findFieldByNumber(Worker.EMAIL_FIELD_NUMBER))) {
-            target.setEmail(worker.getEmail());
-        }
-
-        return target;
+        return WorkerTransform.toProto(record);
     }
 }
