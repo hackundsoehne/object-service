@@ -33,7 +33,7 @@ public class TemplateOperations extends AbstractOperations {
      */
     public Range<Template, Integer> all(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(TEMPLATE), TEMPLATE.ID_TEMPLATE, cursor, next, limit)
-                .map(this::toProto);
+                .map(TemplateOperations::toProto);
     }
 
     /**
@@ -46,7 +46,7 @@ public class TemplateOperations extends AbstractOperations {
      */
     public Optional<Template> get(int id) {
         return create.fetchOptional(TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id))
-                .map(this::toProto);
+                .map(TemplateOperations::toProto);
     }
 
     /**
@@ -105,7 +105,14 @@ public class TemplateOperations extends AbstractOperations {
         return create.executeDelete(record, Tables.TEMPLATE.ID_TEMPLATE.eq(id)) == 1;
     }
 
-    private Template toProto(TemplateRecord record) {
+    /**
+     * Converts a template record to its protobuf representation.
+     *
+     * @param record template record
+     *
+     * @return Template.
+     */
+    public static Template toProto(TemplateRecord record) {
         AnswerType answerType = "IMAGE".equals(record.getAnswerType())
                 ? AnswerType.IMAGE
                 : AnswerType.TEXT;
@@ -117,7 +124,15 @@ public class TemplateOperations extends AbstractOperations {
                 .setAnswerType(answerType).build();
     }
 
-    private TemplateRecord mergeRecord(TemplateRecord target, Template template) {
+    /**
+     * Merges a record with the set properties of a protobuf template.
+     *
+     * @param target record to merge into
+     * @param template message to merge from
+     *
+     * @return Merged template record.
+     */
+    public static TemplateRecord mergeRecord(TemplateRecord target, Template template) {
         if (template.hasField(template.getDescriptorForType().findFieldByNumber(Template.NAME_FIELD_NUMBER))) {
             target.setTitel(template.getName());
         }
