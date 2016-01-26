@@ -32,11 +32,11 @@ public class PopulationOperations extends AbstractOperations {
     /**
      * Returns a range of populations starting from {@code cursor}.
      *
-     * @param cursor Pagination cursor.
-     * @param next   {@code true} for next, {@code false} for previous.
-     * @param limit  Number of records.
+     * @param cursor Pagination cursor
+     * @param next   {@code true} for next, {@code false} for previous
+     * @param limit  Number of records
      *
-     * @return List of populations.
+     * @return List of populations
      */
     public Range<Population, Integer> getPopulationFrom(int cursor, boolean next, int limit) {
         //join is more complicated and the performance gain would be negligible considering the the
@@ -54,9 +54,9 @@ public class PopulationOperations extends AbstractOperations {
     /**
      * Returns a single population.
      *
-     * @param id ID of the population.
+     * @param id ID of the population
      *
-     * @return The population.
+     * @return The population
      */
     public Optional<Population> getPopulation(int id) {
         //join is more complicated and the performance gain would be negligible considering the the
@@ -74,9 +74,9 @@ public class PopulationOperations extends AbstractOperations {
     /**
      * Creates a new population.
      *
-     * @param toStore Population to save.
+     * @param toStore Population to save
      *
-     * @return Population with ID assigned.
+     * @return Population with ID assigned
      *
      * @throws IllegalArgumentException if the name or content is not set
      */
@@ -104,18 +104,23 @@ public class PopulationOperations extends AbstractOperations {
     /**
      * Deletes a population.
      *
-     * @param id ID of the population.
+     * @param id ID of the population
      *
-     * @return {@code true} if deleted, {@code false} otherwise.
+     * @return {@code true} if deleted, {@code false} otherwise
+     * @throws IllegalArgumentException if the population is still in use
      */
-    public boolean deletePopulation(int id) {
+    public boolean deletePopulation(int id) throws IllegalArgumentException{
+        boolean isUsed = create.fetchExists(
+                DSL.select()
+                    .from(EXPERIMENTSPOPULATION)
+                    .join(POPULATION_ANSWER_OPTION).onKey()
+                    .where(POPULATION_ANSWER_OPTION.POPULATION.eq(id))
+        );
+        if (isUsed)
+            throw new IllegalArgumentException(String.format("Population %d is still in used", id));
+
         return create.deleteFrom(POPULATION)
                 .where(POPULATION.ID_POPULATION.eq(id))
-                .and(POPULATION.ID_POPULATION.notIn(
-                        DSL.select(POPULATION_ANSWER_OPTION.POPULATION)
-                                .from(EXPERIMENTSPOPULATION)
-                                .join(POPULATION_ANSWER_OPTION).onKey()
-                ))
                 .execute() == 1;
     }
 }
