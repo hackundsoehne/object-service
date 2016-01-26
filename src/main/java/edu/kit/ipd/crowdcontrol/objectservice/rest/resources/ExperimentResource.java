@@ -84,6 +84,9 @@ public class ExperimentResource {
      */
     public Experiment patch(Request request, Response response) {
         int id = getParamInt(request, "id");
+        Experiment experiment = request.attribute("input");
+
+
 
         if (!experimentOperations.updateExperiment(R(experimentOperations.getExperiment(id)))) {
             throw new InternalServerErrorException("Updating of the experiment failed!");
@@ -99,9 +102,6 @@ public class ExperimentResource {
      */
     public Experiment delete(Request request, Response response) {
         int id = getParamInt(request, "id");
-
-        /* check if experiment exists*/
-        R(experimentOperations.getExperiment(id));
 
         if (!experimentOperations.deleteExperiment(id)) {
             throw new InternalServerErrorException("Deleting experiment failed");

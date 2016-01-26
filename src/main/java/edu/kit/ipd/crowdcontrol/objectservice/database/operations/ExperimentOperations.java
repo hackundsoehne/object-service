@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -69,14 +70,6 @@ public class ExperimentOperations extends AbstractOperations {
 
     public Range<Experiment, Integer> getExperimentsFrom(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(EXPERIMENT), EXPERIMENT.ID_EXPERIMENT, cursor, next, limit)
-                .map(this::toProto);
-    }
-
-    public Experiment toProto(ExperimentRecord record) {
-        return null;
-    }
-
-    public ExperimentRecord toRecord(Experiment experiment) {
-        return null;
+                .map(ExperimentTransformer::toProto);
     }
 }
