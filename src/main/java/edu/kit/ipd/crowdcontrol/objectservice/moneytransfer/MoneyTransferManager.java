@@ -103,7 +103,7 @@ public class MoneyTransferManager {
                     "The giftcodes with corresponding amount of money first have to be bought, or if the amount of money missing is below 15ct, you have to complete more tasks to get the complete amount of money.<br/>";
             Iterator<GiftCodeRecord> it = giftCodes.iterator();
             while (it.hasNext()) {
-                message = message + it.next().getCode();
+                message = message + it.next().getCode() + "</br>";
             }
             try {
                 mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", message);

@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.mail.Authenticator;
+import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -35,51 +36,30 @@ public class MoneyTransferManagerTest {
     @Before
     public void setUp() throws Exception{
 
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.tls", "true");
-        props.put("mail.smtp.ssl.checkserveridentity", "true");
-        props.put("mail.store.protocol", "imap");
-        props.put("mail.imap.host", "imap.gmail.com");
-        props.put("mail.imap.port", "993");
-        props.put("mail.imap.ssl", "true");
-        props.put("mail.imap.ssl.enable", "true");
-        java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-        props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-
-        Properties properties = new Properties();
-        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/test/resources/gmailLogin.properties"));
-        properties.load(stream);
-        stream.close();
-        Authenticator auth = new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
-            }
-        };
-        props.put("sender", properties.getProperty("username"));
-        handler = new MailHandler(props, auth);
+        handler = mock(MailHandler.class);
         payops = mock(PaymentOperations.class);
         workerops = mock(WokerOperations.class);
-        String notificationMailAddress = properties.getProperty("username");
-        mng = new MoneyTransferManager(handler, payops, workerops, notificationMailAddress);
+        mng = new MoneyTransferManager(handler, payops, workerops, null);
     }
 
     @Test
     public void testPayOff() throws Exception {
         WorkerRecord worker0 = mock(WorkerRecord.class);
         WorkerRecord worker1 = mock(WorkerRecord.class);
-        List<WorkerRecord> workerlist = new LinkedList<WorkerRecord>();
-        workerlist.add(worker0);
-        workerlist.add(worker1);
-        when(workerops.getWorkersWithCreditBalanceGreaterThan(anyInt())).thenReturn(workerlist);
+        when(worker0.getEmail()).thenReturn("pseipd@gmail.com");
+        when(worker1.getEmail()).thenReturn("pseipd@gmail.com");
+        when(worker0.getCreditBalance()).thenReturn(30);
+        when(worker1.getCreditBalance()).thenReturn(30);
+        List<WorkerRecord> workerList = new LinkedList<WorkerRecord>();
+        workerList.add(worker0);
+        workerList.add(worker1);
+        when(workerops.getWorkersWithCreditBalanceGreaterThan(anyInt())).thenReturn(workerList);
         GiftCodeRecord code0 = mock(GiftCodeRecord.class);
         GiftCodeRecord code1 = mock(GiftCodeRecord.class);
         GiftCodeRecord code2 = mock(GiftCodeRecord.class);
-        //TODO: GiftCodeRecord.getCode();
+        when(code0.getCode()).thenReturn("qwer");
+        when(code1.getCode()).thenReturn("asdf");
+        when(code2.getCode()).thenReturn("yxcv");
         when(code0.getAmount()).thenReturn(30);
         when(code1.getAmount()).thenReturn(25);
         when(code2.getAmount()).thenReturn(10);
@@ -87,10 +67,18 @@ public class MoneyTransferManagerTest {
         codeList.addLast(code0);
         codeList.addLast(code1);
         codeList.addLast(code2);
-        when(payops.getUnusedGiftCodesDescending()).thenReturn(codeList);
+        doReturn(codeList.remove(code0)).when(payops).markGiftCodeAsUsed(code0, any());
+        doReturn(codeList.remove(code1)).when(payops).markGiftCodeAsUsed(code1, any());
+        doReturn(codeList.remove(code2)).when(payops).markGiftCodeAsUsed(code2, any());
+        String message = "Dear Worker, <br/>We thank you for your work and send you in this mail the the Amazon giftcodes you earned. " +
+                "You can redeem them <a href=\"https://www.amazon.de/gc/redeem/ref=gc_redeem_new_exp\">here!</a>" +
+                "Please note, that the amount of the giftcodes can be under the amount of money you earned. " +
+                "The giftcodes with corresponding amount of money first have to be bought, or if the amount of money missing is below 15ct, you have to complete more tasks to get the complete amount of money.<br/>" +
+                "qwer</br>";
+        verify(handler).sendMail(null,"Your Payment for your Crowdworking");
+        mng.payOff();
 
 
-        mng.logMoneyTransfer(0, 30);
 
     }
 }
