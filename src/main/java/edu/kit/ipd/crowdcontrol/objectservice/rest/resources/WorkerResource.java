@@ -100,12 +100,10 @@ public class WorkerResource {
      * @return {@code null}.
      */
     public Worker delete(Request request, Response response) {
-        boolean existed = false;
-
-        // TODO operations.anonymizeWorker(getParamInt(request, "id")); should accept int and return boolean
-
-        if (!existed) {
-            throw new NotFoundException("Worker does not exist!");
+        try {
+            operations.anonymizeWorker(getParamInt(request, "id"));
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundException("Resource not found.");
         }
 
         return null;
