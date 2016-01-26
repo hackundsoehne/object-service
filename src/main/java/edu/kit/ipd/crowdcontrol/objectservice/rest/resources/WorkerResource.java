@@ -54,7 +54,7 @@ public class WorkerResource {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
-        return operations.getWorkerList(from, asc, 20)
+        return operations.getWorkersFrom(from, asc, 20)
                 .constructPaginated(WorkerList.newBuilder(), WorkerList.Builder::addAllItems);
     }
 
@@ -85,7 +85,7 @@ public class WorkerResource {
             throw new BadRequestException("Unidentified worker!");
         }
 
-        worker = operations.createWorker(worker, identity);
+        worker = operations.insertWorker(worker, identity);
 
         response.status(201);
         response.header("Location", "/workers/" + worker.getId());

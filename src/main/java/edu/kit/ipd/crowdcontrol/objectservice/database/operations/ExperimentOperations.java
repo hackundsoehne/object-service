@@ -13,7 +13,7 @@ import java.util.Optional;
  * @version 1.0
  */
 public class ExperimentOperations extends AbstractOperations {
-    protected ExperimentOperations(DSLContext create) {
+    public ExperimentOperations(DSLContext create) {
         super(create);
     }
 

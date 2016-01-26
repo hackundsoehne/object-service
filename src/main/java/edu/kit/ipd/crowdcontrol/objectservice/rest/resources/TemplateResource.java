@@ -35,7 +35,7 @@ public class TemplateResource {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
-        return operations.all(from, asc, 20)
+        return operations.getTemplatesFrom(from, asc, 20)
                 .constructPaginated(TemplateList.newBuilder(), TemplateList.Builder::addAllItems);
     }
 
@@ -48,7 +48,7 @@ public class TemplateResource {
      * @return A single template.
      */
     public Template get(Request request, Response response) {
-        return operations.get(getParamInt(request, "id"))
+        return operations.getTemplate(getParamInt(request, "id"))
                 .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
 
@@ -63,7 +63,7 @@ public class TemplateResource {
     public Template put(Request request, Response response) {
         Template template = request.attribute("input");
         try {
-            template = operations.create(template);
+            template = operations.insertTemplate(template);
         } catch (IllegalArgumentException e) {
            throw new BadRequestException("Name and content must be set!");
         }
@@ -84,7 +84,7 @@ public class TemplateResource {
      */
     public Template patch(Request request, Response response) {
         Template template = request.attribute("input");
-        return operations.update(getParamInt(request, "id"), template);
+        return operations.updateTemplate(getParamInt(request, "id"), template);
     }
 
     /**
@@ -96,7 +96,7 @@ public class TemplateResource {
      * @return {@code null}.
      */
     public Template delete(Request request, Response response) {
-        boolean existed = operations.delete(getParamInt(request, "id"));
+        boolean existed = operations.deleteTemplate(getParamInt(request, "id"));
 
         if (!existed) {
             throw new NotFoundException("Template does not exist!");
