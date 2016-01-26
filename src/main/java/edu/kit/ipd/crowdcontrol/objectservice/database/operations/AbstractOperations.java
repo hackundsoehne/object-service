@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableRecordImpl;
@@ -36,11 +38,12 @@ public abstract class AbstractOperations {
      */
     protected <R> R doIfNotRunning(int experimentID, Function<Configuration, R> function) {
         return create.transactionResult(trans -> {
-            int running = DSL.using(trans)
-                    .fetchCount(
-                            Tables.TASK,
-                            Tables.TASK.EXPERIMENT.eq(experimentID).and(Tables.TASK.RUNNING.isTrue()));
-            if (running == 0) {
+            boolean running = DSL.using(trans).fetchExists(
+                    DSL.selectFrom(Tables.TASK)
+                            .where(Tables.TASK.EXPERIMENT.eq(experimentID))
+                            .and(Tables.TASK.STATUS.eq(TaskStatus.running).or(Tables.TASK.STATUS.eq(TaskStatus.stopping)))
+            );
+            if (!running) {
                 return function.apply(trans);
             } else {
                 //TODO other exception?
@@ -80,7 +83,18 @@ public abstract class AbstractOperations {
     }
 
     /**
+     * returns whether the MessageOrBuilder has the passed field.
+     * @param messageOrBuilder the MessageOrBuilder to check on
+     * @param field the field to exist
+     * @return tre if it has the field, false if not
+     */
+    protected boolean hasField(MessageOrBuilder messageOrBuilder, int field) {
+        return messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field));
+    }
+
+    /**
      * this method returns a range of results from a passed query.
+     * @param <R> the type of the records
      * @param query the query to use
      * @param primaryKey the primary key used to index the records inside the range
      * @param start the exclusive start, when the associated record does not fulfill the conditions of the passed query
@@ -88,7 +102,6 @@ public abstract class AbstractOperations {
      *              right (next=false) of the range.
      * @param next whether the Range is right (true) or left of the primary key (false) assuming natural order
      * @param limit the max. amount of the range, may be smaller
-     * @param <R> the type of the records
      * @return an instance of Range
      * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
      */
@@ -169,8 +182,9 @@ public abstract class AbstractOperations {
                 .fetch();
 
         int toSkip = 0;
-        if (results.get(0).getValue(primaryKey).equals(start)) {
-            toSkip = 1;
+
+        if (results.isNotEmpty() && results.get(0).getValue(primaryKey).equals(start)) {
+            toSkip++;
         }
 
         List<R> sortedResults = results.stream()
@@ -179,23 +193,21 @@ public abstract class AbstractOperations {
                 .sorted(Comparator.comparing(record -> record.getValue(primaryKey), sort))
                 .collect(Collectors.toList());
 
-        K leftLimit = null;
-        K rightLimit = null;
+        K left = null;
+        K right = null;
+
         if (!sortedResults.isEmpty()) {
-            leftLimit = sortedResults.get(0).getValue(primaryKey);
-            rightLimit = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
+            left = sortedResults.get(0).getValue(primaryKey);
+            right = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
         }
 
-        boolean hasStart = false;
-        if (!results.isEmpty()) {
-            hasStart = results.get(0).getValue(primaryKey).equals(start);
-        }
-        boolean end = results.size() == (limit + 2);
+        boolean hasPredecessors = !results.isEmpty() && results.get(0).getValue(primaryKey).equals(start);
+        boolean hasSuccessors = results.size() == (limit + 2);
 
         if (next) {
-            return new Range<>(sortedResults, leftLimit, rightLimit, hasStart, end);
+            return new Range<>(sortedResults, left, right, hasPredecessors, hasSuccessors);
         } else {
-            return new Range<>(sortedResults, leftLimit, rightLimit, end, hasStart);
+            return new Range<>(sortedResults, left, right, hasSuccessors, hasPredecessors);
         }
     }
 }

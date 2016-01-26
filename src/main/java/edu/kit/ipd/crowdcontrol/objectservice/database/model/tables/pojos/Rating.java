@@ -11,10 +11,10 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Rating implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1600818329;
+	private static final long serialVersionUID = 171337767;
 
 	private java.lang.Integer  idRating;
-	private java.lang.Integer  task;
+	private java.lang.Integer  experiment;
 	private java.lang.Integer  answerR;
 	private java.sql.Timestamp timestamp;
 	private java.lang.Integer  rating;
@@ -25,7 +25,7 @@ public class Rating implements java.io.Serializable {
 
 	public Rating(
 		java.lang.Integer  idRating,
-		java.lang.Integer  task,
+		java.lang.Integer  experiment,
 		java.lang.Integer  answerR,
 		java.sql.Timestamp timestamp,
 		java.lang.Integer  rating,
@@ -33,7 +33,7 @@ public class Rating implements java.io.Serializable {
 		java.lang.Integer  quality
 	) {
 		this.idRating = idRating;
-		this.task = task;
+		this.experiment = experiment;
 		this.answerR = answerR;
 		this.timestamp = timestamp;
 		this.rating = rating;
@@ -49,12 +49,12 @@ public class Rating implements java.io.Serializable {
 		this.idRating = idRating;
 	}
 
-	public java.lang.Integer getTask() {
-		return this.task;
+	public java.lang.Integer getExperiment() {
+		return this.experiment;
 	}
 
-	public void setTask(java.lang.Integer task) {
-		this.task = task;
+	public void setExperiment(java.lang.Integer experiment) {
+		this.experiment = experiment;
 	}
 
 	public java.lang.Integer getAnswerR() {

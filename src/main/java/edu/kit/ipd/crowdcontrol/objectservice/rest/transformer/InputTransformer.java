@@ -1,8 +1,10 @@
-package edu.kit.ipd.crowdcontrol.objectservice.rest;
+package edu.kit.ipd.crowdcontrol.objectservice.rest.transformer;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.UnsupportedMediaTypeException;
 import spark.Request;
 import spark.Response;
 import spark.Route;

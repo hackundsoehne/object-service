@@ -48,10 +48,10 @@ public class RatingDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.ob
 	}
 
 	/**
-	 * Fetch records that have <code>task IN (values)</code>
+	 * Fetch records that have <code>experiment IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByTask(java.lang.Integer... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.TASK, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByExperiment(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.EXPERIMENT, values);
 	}
 
 	/**

@@ -55,13 +55,6 @@ public class TaskDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.obje
 	}
 
 	/**
-	 * Fetch records that have <code>running IN (values)</code>
-	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByRunning(java.lang.Boolean... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.RUNNING, values);
-	}
-
-	/**
 	 * Fetch records that have <code>platform_data IN (values)</code>
 	 */
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByPlatformData(java.lang.String... values) {
@@ -76,9 +69,9 @@ public class TaskDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.obje
 	}
 
 	/**
-	 * Fetch records that have <code>stopping IN (values)</code>
+	 * Fetch records that have <code>status IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByStopping(java.lang.Boolean... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.STOPPING, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByStatus(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.STATUS, values);
 	}
 }

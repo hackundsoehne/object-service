@@ -1,9 +1,14 @@
-package edu.kit.ipd.crowdcontrol.objectservice.rest;
+package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
+
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
 /**
  * Handles requests to template resources.
@@ -11,6 +16,12 @@ import spark.Response;
  * @author Niklas Keller
  */
 public class TemplateResource {
+    private TemplateOperations operations;
+
+    public TemplateResource(TemplateOperations operations) {
+        this.operations = operations;
+    }
+
     /**
      * @param request
      *         Request provided by Spark.
@@ -19,12 +30,12 @@ public class TemplateResource {
      *
      * @return A list of all templates.
      */
-    public TemplateList all(Request request, Response response) {
-        return TemplateList.newBuilder()
-                .addItems(Template.newBuilder().setId(1).setContent("{{TEST}}").build())
-                .addItems(Template.newBuilder().setId(2).setContent("{{TEST}}").build())
-                .addItems(Template.newBuilder().setId(3).setContent("{{TEST}}").build())
-                .build();
+    public Paginated<Integer> all(Request request, Response response) {
+        int from = getQueryInt(request, "from", 0);
+        boolean asc = getQueryBool(request, "asc", true);
+
+        return operations.all(from, asc, 20)
+                .constructPaginated(TemplateList.newBuilder(), TemplateList.Builder::addAllItems);
     }
 
     /**
@@ -36,15 +47,8 @@ public class TemplateResource {
      * @return A single template.
      */
     public Template get(Request request, Response response) {
-        int id;
-
-        try {
-            id = Integer.parseInt(request.params(":id"));
-        } catch (NumberFormatException e) {
-            throw new BadRequestException(":id must be a valid integer.");
-        }
-
-        return Template.newBuilder().setId(id).setContent("{{TEST}}").build();
+        return operations.get(getParamInt(request, "id"))
+                .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
 
     /**
@@ -56,7 +60,13 @@ public class TemplateResource {
      * @return The created template.
      */
     public Template put(Request request, Response response) {
-        return request.attribute("input");
+        Template template = request.attribute("input");
+        template = operations.create(template);
+
+        response.status(201);
+        response.header("Location", "/notifications/" + template.getId());
+
+        return template;
     }
 
     /**
@@ -69,8 +79,7 @@ public class TemplateResource {
      */
     public Template patch(Request request, Response response) {
         Template template = request.attribute("input");
-        template = template.toBuilder().setId(12).build();
-        return template;
+        return operations.update(getParamInt(request, "id"), template);
     }
 
     /**
@@ -82,6 +91,12 @@ public class TemplateResource {
      * @return {@code null}.
      */
     public Template delete(Request request, Response response) {
+        boolean existed = operations.delete(getParamInt(request, "id"));
+
+        if (!existed) {
+            throw new NotFoundException("Template does not exist!");
+        }
+
         return null;
     }
 }

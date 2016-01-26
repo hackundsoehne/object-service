@@ -11,10 +11,9 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1264556305;
+	private static final long serialVersionUID = -1663005941;
 
 	private java.lang.Integer idExperiment;
-	private java.lang.String  ratingOptions;
 	private java.lang.String  titel;
 	private java.lang.String  description;
 	private java.lang.Integer ratingsPerAnswer;
@@ -32,7 +31,6 @@ public class Experiment implements java.io.Serializable {
 
 	public Experiment(
 		java.lang.Integer idExperiment,
-		java.lang.String  ratingOptions,
 		java.lang.String  titel,
 		java.lang.String  description,
 		java.lang.Integer ratingsPerAnswer,
@@ -47,7 +45,6 @@ public class Experiment implements java.io.Serializable {
 		java.lang.String  answerType
 	) {
 		this.idExperiment = idExperiment;
-		this.ratingOptions = ratingOptions;
 		this.titel = titel;
 		this.description = description;
 		this.ratingsPerAnswer = ratingsPerAnswer;
@@ -68,14 +65,6 @@ public class Experiment implements java.io.Serializable {
 
 	public void setIdExperiment(java.lang.Integer idExperiment) {
 		this.idExperiment = idExperiment;
-	}
-
-	public java.lang.String getRatingOptions() {
-		return this.ratingOptions;
-	}
-
-	public void setRatingOptions(java.lang.String ratingOptions) {
-		this.ratingOptions = ratingOptions;
 	}
 
 	public java.lang.String getTitel() {
