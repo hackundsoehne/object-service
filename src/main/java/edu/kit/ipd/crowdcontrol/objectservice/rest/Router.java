@@ -4,10 +4,12 @@ import com.google.protobuf.Message;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.WorkerResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.InputTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.OutputTransformer;
 import spark.Request;
@@ -31,14 +33,17 @@ public class Router implements SparkApplication {
     private final TemplateResource templateResource;
     private final NotificationResource notificationResource;
     private final PlatformResource platformResource;
+    private final WorkerResource workerResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
-    public Router(TemplateResource templateResource, NotificationResource notificationResource, PlatformResource platformResource) {
+    public Router(TemplateResource templateResource, NotificationResource notificationResource,
+                  PlatformResource platformResource, WorkerResource workerResource) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
+        this.workerResource = workerResource;
     }
 
     @Override
@@ -96,6 +101,12 @@ public class Router implements SparkApplication {
 
         get("/platforms", platformResource::all);
         get("/platforms/:id", platformResource::get);
+
+        get("/workers/:platform/identity", workerResource::identify);
+        put("/workers", workerResource::put, Worker.class);
+        get("/workers", workerResource::all);
+        get("/workers/:id", workerResource::get);
+        delete("/workers/:id", workerResource::delete);
     }
 
     /**
