@@ -1,6 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -29,7 +29,6 @@ public class DatabaseManager {
     private final DSLContext context;
     private final String url;
     private final DataSource ds;
-    private final Connection connection;
 
     /**
      * creates new DatabaseManager.
@@ -75,22 +74,21 @@ public class DatabaseManager {
         if (providedDBPoolName != null) {
             ds = (DataSource) new InitialContext().lookup(providedDBPoolName);
         } else {
-            ComboPooledDataSource cpds = new ComboPooledDataSource();
-            cpds.setJdbcUrl(url);
-            cpds.setUser(userName);
-            cpds.setPassword(password);
-            cpds.setMaxStatements(30);
-            ds = cpds;
+            //TODO performance tweaking maybe?
+            HikariDataSource hds = new HikariDataSource();
+            hds.setJdbcUrl(url);
+            hds.setUsername(userName);
+            hds.setPassword(password);
+            ds = hds;
         }
         this.ds = ds;
-        this.connection = ds.getConnection();
         context = DSL.using(this.ds, sqlDialect);
     }
 
     /**
      * initializes the database if not already initialized.
      */
-    public void initDatabase() {
+    public void initDatabase() throws SQLException {
         try (InputStream in = DatabaseManager.class.getResourceAsStream("/db.sql")) {
             String initScript = IOUtils.toString(in, "UTF-8");
             if (Boolean.getBoolean("dropSchema")) {
@@ -102,12 +100,12 @@ public class DatabaseManager {
             } catch (DataAccessException e) {
                 //TODO: need better idea, but meta() and systable are not working
                 String tables = initScript.substring(0, initScript.indexOf("DELIMITER $$"));
-                ScriptRunner scriptRunner = new ScriptRunner(connection);
+                ScriptRunner scriptRunner = new ScriptRunner(ds.getConnection());
                 scriptRunner.setDelimiter(";");
                 scriptRunner.runScript(new StringReader(tables));
                 String delimiter = "DELIMITER $$";
                 String trigger = initScript.substring(initScript.indexOf(delimiter) + delimiter.length(), initScript.lastIndexOf("DELIMITER ;"));
-                scriptRunner = new ScriptRunner(connection);
+                scriptRunner = new ScriptRunner(ds.getConnection());
                 scriptRunner.setDelimiter("$$");
                 scriptRunner.runScript(new StringReader(trigger));
 
@@ -130,8 +128,8 @@ public class DatabaseManager {
      * returns the Connection used to communicate with the database.
      * @return an instance of Connection
      */
-    public Connection getConnection() {
-        return connection;
+    public Connection getConnection() throws SQLException {
+        return ds.getConnection();
     }
 
     /**
