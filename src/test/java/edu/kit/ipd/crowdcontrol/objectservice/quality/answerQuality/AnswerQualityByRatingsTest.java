@@ -9,6 +9,8 @@ import org.junit.Test;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by lucaskrauss at 25.01.2016
  */
@@ -47,6 +49,16 @@ public class AnswerQualityByRatingsTest {
 
     @Test
     public void answerQualityIsAverageOfRatings(){
+
+        ratings.add(new RatingRecord(0,0,0,null,0,0,0));
+        ratings.add(new RatingRecord(0,0,0,null,2,0,0));
+        ratings.add(new RatingRecord(0,0,0,null,8,0,0));
+        ratings.add(new RatingRecord(0,0,0,null,6,0,0));
+
+        int answerQuality = identifier.identifyAnswerQuality(answer,ratings,maxQuality,minQuality);
+
+        assertEquals(answerQuality,4);
+
 
 
 
