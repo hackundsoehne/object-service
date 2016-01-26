@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.NotificationTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
@@ -27,7 +28,7 @@ public class NotificationRestOperations extends AbstractOperations {
      */
     public Range<Notification, Integer> getNotificationsFrom(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(NOTIFICATION), NOTIFICATION.ID_NOTIFICATION, cursor, next, limit)
-                .map(this::toProto);
+                .map(NotificationTransform::toProto);
     }
 
     /**
@@ -38,7 +39,7 @@ public class NotificationRestOperations extends AbstractOperations {
      */
     public Optional<Notification> getNotification(int id) {
         return create.fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
-                .map(this::toProto);
+                .map(NotificationTransform::toProto);
     }
 
     /**
@@ -58,10 +59,10 @@ public class NotificationRestOperations extends AbstractOperations {
                 Notification.CHECK_PERIOD_FIELD_NUMBER,
                 Notification.SEND_THRESHOLD_FIELD_NUMBER);
 
-        NotificationRecord record = toRecord(toStore);
+        NotificationRecord record = NotificationTransform.mergeRecord(create.newRecord(NOTIFICATION), toStore);
         record.store();
 
-        return toProto(record);
+        return NotificationTransform.toProto(record);
     }
 
     /**
@@ -72,15 +73,14 @@ public class NotificationRestOperations extends AbstractOperations {
      * @return the updated notification
      */
     public Notification updateNotification(int id, Notification notification) {
-        NotificationRecord notificationRecord = toRecord(notification);
-        notificationRecord.setIdNotification(id);
-        return create.update(NOTIFICATION)
-                .set(notificationRecord)
-                .where(NOTIFICATION.ID_NOTIFICATION.eq(id))
-                .returning()
-                .fetchOptional()
-                .map(this::toProto)
+        NotificationRecord record = create
+                .fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
                 .orElseThrow(() -> new NotFoundException("Notification does not exist!"));
+
+        record = NotificationTransform.mergeRecord(record, notification);
+        record.update();
+
+        return NotificationTransform.toProto(record);
     }
 
     /**
@@ -94,41 +94,5 @@ public class NotificationRestOperations extends AbstractOperations {
         record.setIdNotification(id);
 
         return create.executeDelete(record, NOTIFICATION.ID_NOTIFICATION.eq(id)) == 1;
-    }
-
-    private Notification toProto(NotificationRecord record) {
-        return Notification.newBuilder()
-                .setId(record.getIdNotification())
-                .setName(record.getName())
-                .setDescription(record.getDescription())
-                .setQuery(record.getQuery())
-                .setSendThreshold(record.getSendthreshold())
-                .setCheckPeriod(record.getCheckperiod())
-                .build();
-    }
-
-    private NotificationRecord toRecord(Notification notification) {
-        NotificationRecord target = create.newRecord(NOTIFICATION);
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.NAME_FIELD_NUMBER))) {
-            target.setName(notification.getName());
-        }
-
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.DESCRIPTION_FIELD_NUMBER))) {
-            target.setDescription(notification.getDescription());
-        }
-
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.QUERY_FIELD_NUMBER))) {
-            target.setQuery(notification.getQuery());
-        }
-
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.SEND_THRESHOLD_FIELD_NUMBER))) {
-            target.setSendthreshold(notification.getSendThreshold());
-        }
-
-        if (notification.hasField(notification.getDescriptorForType().findFieldByNumber(Notification.CHECK_PERIOD_FIELD_NUMBER))) {
-            target.setCheckperiod(notification.getCheckPeriod());
-        }
-
-        return target;
     }
 }

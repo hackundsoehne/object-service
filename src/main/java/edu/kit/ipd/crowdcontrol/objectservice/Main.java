@@ -1,13 +1,17 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRestOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.WorkerResource;
+import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 
 import javax.naming.NamingException;
@@ -57,14 +61,18 @@ public class Main {
 
     private static void boot(DatabaseManager databaseManager) {
 
-        TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
-        NotificationRestOperations notificationRestOperations = new NotificationRestOperations(databaseManager.getContext());
-        PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
+        PlatformManager platformManager = null; // TODO
+
+        TemplateOperations templateOperations = new TemplateOperations(context);
+        NotificationRestOperations notificationRestOperations = new NotificationRestOperations(context);
+        PlatformOperations platformOperations = new PlatformOperations(context);
+        WorkerOperations workerOperations = new WorkerOperations(context);
 
         new Router(
                 new TemplateResource(templateOperations),
                 new NotificationResource(notificationRestOperations),
-                new PlatformResource(platformOperations)
+                new PlatformResource(platformOperations),
+                new WorkerResource(workerOperations, platformManager)
         ).init();
     }
 }

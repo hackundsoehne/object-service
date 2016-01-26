@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.TemplateTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
@@ -33,7 +33,7 @@ public class TemplateOperations extends AbstractOperations {
      */
     public Range<Template, Integer> all(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(TEMPLATE), TEMPLATE.ID_TEMPLATE, cursor, next, limit)
-                .map(this::toProto);
+                .map(TemplateTransform::toProto);
     }
 
     /**
@@ -46,7 +46,7 @@ public class TemplateOperations extends AbstractOperations {
      */
     public Optional<Template> get(int id) {
         return create.fetchOptional(TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id))
-                .map(this::toProto);
+                .map(TemplateTransform::toProto);
     }
 
     /**
@@ -63,10 +63,10 @@ public class TemplateOperations extends AbstractOperations {
                 Template.NAME_FIELD_NUMBER,
                 Template.CONTENT_FIELD_NUMBER);
 
-        TemplateRecord record = mergeRecord(create.newRecord(TEMPLATE), toStore);
+        TemplateRecord record = TemplateTransform.mergeRecord(create.newRecord(TEMPLATE), toStore);
         record.store();
 
-        return toProto(record);
+        return TemplateTransform.toProto(record);
     }
 
     /**
@@ -84,10 +84,10 @@ public class TemplateOperations extends AbstractOperations {
                 .fetchOptional(TEMPLATE, TEMPLATE.ID_TEMPLATE.eq(id))
                 .orElseThrow(() -> new NotFoundException("Template does not exist!"));
 
-        record = mergeRecord(record, template);
+        record = TemplateTransform.mergeRecord(record, template);
         record.update();
 
-        return toProto(record);
+        return TemplateTransform.toProto(record);
     }
 
     /**
@@ -103,33 +103,5 @@ public class TemplateOperations extends AbstractOperations {
         record.setIdTemplate(id);
 
         return create.executeDelete(record, Tables.TEMPLATE.ID_TEMPLATE.eq(id)) == 1;
-    }
-
-    private Template toProto(TemplateRecord record) {
-        AnswerType answerType = "IMAGE".equals(record.getAnswerType())
-                ? AnswerType.IMAGE
-                : AnswerType.TEXT;
-
-        return Template.newBuilder()
-                .setId(record.getIdTemplate())
-                .setName(record.getTitel())
-                .setContent(record.getTemplate())
-                .setAnswerType(answerType).build();
-    }
-
-    private TemplateRecord mergeRecord(TemplateRecord target, Template template) {
-        if (template.hasField(template.getDescriptorForType().findFieldByNumber(Template.NAME_FIELD_NUMBER))) {
-            target.setTitel(template.getName());
-        }
-
-        if (template.hasField(template.getDescriptorForType().findFieldByNumber(Template.CONTENT_FIELD_NUMBER))) {
-            target.setTemplate(template.getContent());
-        }
-
-        if (template.hasField(template.getDescriptorForType().findFieldByNumber(Template.ANSWER_TYPE_FIELD_NUMBER))) {
-            target.setAnswerType(template.getAnswerType().name());
-        }
-
-        return target;
     }
 }
