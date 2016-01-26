@@ -95,17 +95,19 @@ public class DatabaseManager {
             String initScript = IOUtils.toString(in, "UTF-8");
             if (Boolean.getBoolean("dropSchema")) {
                 String drop = "DROP DATABASE `crowdcontrol`;";
-                context.fetch(drop);
+                context.execute(drop);
             }
             try {
                 context.selectFrom(Tables.EXPERIMENT).fetchAny();
             } catch (DataAccessException e) {
                 //TODO: need better idea, but meta() and systable are not working
                 String tables = initScript.substring(0, initScript.indexOf("DELIMITER $$"));
-                context.execute(tables);
-                String delimiter = "DELIMITER $$";
-                String trigger = initScript.substring(initScript.indexOf(delimiter) + delimiter.length(), initScript.length());
                 ScriptRunner scriptRunner = new ScriptRunner(connection);
+                scriptRunner.setDelimiter(";");
+                scriptRunner.runScript(new StringReader(tables));
+                String delimiter = "DELIMITER $$";
+                String trigger = initScript.substring(initScript.indexOf(delimiter) + delimiter.length(), initScript.lastIndexOf("DELIMITER ;"));
+                scriptRunner = new ScriptRunner(connection);
                 scriptRunner.setDelimiter("$$");
                 scriptRunner.runScript(new StringReader(trigger));
 
