@@ -69,15 +69,6 @@ public class WorkerRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 		return (java.lang.String) getValue(3);
 	}
 
-	public void setCreditBalance(java.lang.Integer amount) {
-		//TODO
-	}
-
-	public java.lang.Integer getCreditBalance() {
-		//TODO
-		return null;
-	}
-
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------

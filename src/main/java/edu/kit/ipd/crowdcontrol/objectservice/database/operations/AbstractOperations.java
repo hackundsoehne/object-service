@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableRecordImpl;
@@ -36,11 +38,12 @@ public abstract class AbstractOperations {
      */
     protected <R> R doIfNotRunning(int experimentID, Function<Configuration, R> function) {
         return create.transactionResult(trans -> {
-            int running = DSL.using(trans)
-                    .fetchCount(
-                            Tables.TASK,
-                            Tables.TASK.EXPERIMENT.eq(experimentID).and(Tables.TASK.RUNNING.isTrue()));
-            if (running == 0) {
+            boolean running = DSL.using(trans).fetchExists(
+                    DSL.selectFrom(Tables.TASK)
+                            .where(Tables.TASK.EXPERIMENT.eq(experimentID))
+                            .and(Tables.TASK.STATUS.eq(TaskStatus.running).or(Tables.TASK.STATUS.eq(TaskStatus.stopping)))
+            );
+            if (!running) {
                 return function.apply(trans);
             } else {
                 //TODO other exception?
@@ -77,6 +80,31 @@ public abstract class AbstractOperations {
         if (record.getValue(field) == null)
             throw new IllegalArgumentException("Record from Table: " + record.getTable().getName()
                     + " needs PrimaryKey for this action");
+    }
+
+    /**
+     * Throws an exception if the passed field is not set.
+     * @param messageOrBuilder the MessageOrBuilder to check on
+     * @param field the field to exist
+     * @throws IllegalArgumentException thrown if the field is not set
+     */
+    protected void assertHasField(MessageOrBuilder messageOrBuilder, int field) throws IllegalArgumentException {
+        if (!messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field))) {
+            throw new IllegalArgumentException("MessageOrBuilder must have field set: " +
+                    messageOrBuilder.getDescriptorForType().findFieldByNumber(field).getName());
+        }
+    }
+
+    /**
+     * Throws an exception if one of the passed field is not set.
+     * @param messageOrBuilder the MessageOrBuilder to check on
+     * @param fields the fields to exist
+     * @throws IllegalArgumentException thrown if on the field is not set
+     */
+    protected void assertHasField(MessageOrBuilder messageOrBuilder, int... fields) throws IllegalArgumentException {
+        for (int aField : fields) {
+            assertHasField(messageOrBuilder, aField);
+        }
     }
 
     /**
@@ -169,8 +197,9 @@ public abstract class AbstractOperations {
                 .fetch();
 
         int toSkip = 0;
-        if (results.get(0).getValue(primaryKey).equals(start)) {
-            toSkip = 1;
+
+        if (results.isNotEmpty() && results.get(0).getValue(primaryKey).equals(start)) {
+            toSkip++;
         }
 
         List<R> sortedResults = results.stream()
@@ -179,23 +208,21 @@ public abstract class AbstractOperations {
                 .sorted(Comparator.comparing(record -> record.getValue(primaryKey), sort))
                 .collect(Collectors.toList());
 
-        K leftLimit = null;
-        K rightLimit = null;
+        K left = null;
+        K right = null;
+
         if (!sortedResults.isEmpty()) {
-            leftLimit = sortedResults.get(0).getValue(primaryKey);
-            rightLimit = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
+            left = sortedResults.get(0).getValue(primaryKey);
+            right = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
         }
 
-        boolean hasStart = false;
-        if (!results.isEmpty()) {
-            hasStart = results.get(0).getValue(primaryKey).equals(start);
-        }
-        boolean end = results.size() == (limit + 2);
+        boolean hasPredecessors = !results.isEmpty() && results.get(0).getValue(primaryKey).equals(start);
+        boolean hasSuccessors = results.size() == (limit + 2);
 
         if (next) {
-            return new Range<>(sortedResults, leftLimit, rightLimit, hasStart, end);
+            return new Range<>(sortedResults, left, right, hasPredecessors, hasSuccessors);
         } else {
-            return new Range<>(sortedResults, leftLimit, rightLimit, end, hasStart);
+            return new Range<>(sortedResults, left, right, hasSuccessors, hasPredecessors);
         }
     }
 }

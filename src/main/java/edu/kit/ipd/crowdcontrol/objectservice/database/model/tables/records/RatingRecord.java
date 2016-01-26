@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class RatingRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord> implements org.jooq.Record7<java.lang.Integer, java.lang.Integer, java.lang.Integer, java.sql.Timestamp, java.lang.Integer, java.lang.Integer, java.lang.Integer> {
 
-	private static final long serialVersionUID = 5544309;
+	private static final long serialVersionUID = 499386029;
 
 	/**
 	 * Setter for <code>crowdcontrol.Rating.id_rating</code>.
@@ -28,16 +28,16 @@ public class RatingRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	}
 
 	/**
-	 * Setter for <code>crowdcontrol.Rating.task</code>.
+	 * Setter for <code>crowdcontrol.Rating.experiment</code>.
 	 */
-	public void setTask(java.lang.Integer value) {
+	public void setExperiment(java.lang.Integer value) {
 		setValue(1, value);
 	}
 
 	/**
-	 * Getter for <code>crowdcontrol.Rating.task</code>.
+	 * Getter for <code>crowdcontrol.Rating.experiment</code>.
 	 */
-	public java.lang.Integer getTask() {
+	public java.lang.Integer getExperiment() {
 		return (java.lang.Integer) getValue(1);
 	}
 
@@ -156,7 +156,7 @@ public class RatingRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	 */
 	@Override
 	public org.jooq.Field<java.lang.Integer> field2() {
-		return edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.TASK;
+		return edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.EXPERIMENT;
 	}
 
 	/**
@@ -212,7 +212,7 @@ public class RatingRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	 */
 	@Override
 	public java.lang.Integer value2() {
-		return getTask();
+		return getExperiment();
 	}
 
 	/**
@@ -269,7 +269,7 @@ public class RatingRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	 */
 	@Override
 	public RatingRecord value2(java.lang.Integer value) {
-		setTask(value);
+		setExperiment(value);
 		return this;
 	}
 
@@ -340,11 +340,11 @@ public class RatingRecord extends org.jooq.impl.UpdatableRecordImpl<edu.kit.ipd.
 	/**
 	 * Create a detached, initialised RatingRecord
 	 */
-	public RatingRecord(java.lang.Integer idRating, java.lang.Integer task, java.lang.Integer answerR, java.sql.Timestamp timestamp, java.lang.Integer rating, java.lang.Integer workerId, java.lang.Integer quality) {
+	public RatingRecord(java.lang.Integer idRating, java.lang.Integer experiment, java.lang.Integer answerR, java.sql.Timestamp timestamp, java.lang.Integer rating, java.lang.Integer workerId, java.lang.Integer quality) {
 		super(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING);
 
 		setValue(0, idRating);
-		setValue(1, task);
+		setValue(1, experiment);
 		setValue(2, answerR);
 		setValue(3, timestamp);
 		setValue(4, rating);

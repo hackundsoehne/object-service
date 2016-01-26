@@ -4,6 +4,9 @@ version '0.5-SNAPSHOT'
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'nu.studer.jooq'
+apply plugin: 'application'
+
+mainClassName = 'edu.kit.ipd.crowdcontrol.objectservice.Main'
 
 sourceCompatibility = 1.8
 
@@ -17,6 +20,7 @@ dependencies {
     compile 'org.jooq:jooq-meta:3.7.1'
     compile 'org.jooq:jool:0.9.7'
     compile 'mysql:mysql-connector-java:5.+'
+    compile 'com.mchange:c3p0:0.9.5.2'
     compile 'com.sparkjava:spark-core:2.3'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.mashape.unirest:unirest-java:1.4.7'
@@ -59,6 +63,7 @@ buildscript {
     }
 }
 
+//jooq database-model generation
 jooq {
     sample(sourceSets.main) {
         jdbc {
