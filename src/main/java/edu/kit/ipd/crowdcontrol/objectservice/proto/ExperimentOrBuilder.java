@@ -164,27 +164,27 @@ public interface ExperimentOrBuilder extends
       int index);
 
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Platform platforms = 18;</code>
    */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> 
-      getPlatformPopulationsList();
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Platform> 
+      getPlatformsList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Platform platforms = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getPlatformPopulations(int index);
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Platform getPlatforms(int index);
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Platform platforms = 18;</code>
    */
-  int getPlatformPopulationsCount();
+  int getPlatformsCount();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Platform platforms = 18;</code>
    */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
-      getPlatformPopulationsOrBuilderList();
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformOrBuilder> 
+      getPlatformsOrBuilderList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Platform platforms = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder getPlatformPopulationsOrBuilder(
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformOrBuilder getPlatformsOrBuilder(
       int index);
 
   /**
