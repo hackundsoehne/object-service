@@ -2,11 +2,11 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
-import java.util.List;
 import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKER;
@@ -32,16 +32,19 @@ public class WorkerOperations extends AbstractOperations {
      */
     public WorkerRecord createWorker(WorkerRecord workerRecord) {
         workerRecord.setIdWorker(null);
+
         return create.transactionResult(conf -> {
             boolean existing = DSL.using(conf).fetchExists(
                     DSL.selectFrom(Tables.WORKER)
                             .where(Tables.WORKER.PLATFORM.eq(workerRecord.getPlatform()))
                             .and(Tables.WORKER.IDENTIFICATION.eq(workerRecord.getIdentification()))
             );
+
             if (existing) {
                 throw new IllegalArgumentException("worker with the same platform and identification is" +
                         "already existing");
             }
+
             return create.insertInto(Tables.WORKER)
                     .set(workerRecord)
                     .returning()
@@ -50,19 +53,7 @@ public class WorkerOperations extends AbstractOperations {
     }
 
     /**
-     * deletes a worker.
-     *
-     * @param workerRecord the record to delete, the ID must be set
-     *
-     * @return true if deleted
-     */
-    public boolean deleteWorker(WorkerRecord workerRecord) throws IllegalArgumentException {
-        assertHasPrimaryKey(workerRecord);
-        return create.executeDelete(workerRecord) == 1;
-    }
-
-    /**
-     * deletes the worker and assigns all his work to the anonymous worker.
+     * Deletes the worker and assigns all his work to the anonymous worker.
      * <p>
      * The worker will be deleted, there is no way to pay him after this action.
      *
@@ -71,13 +62,11 @@ public class WorkerOperations extends AbstractOperations {
      * @throws IllegalArgumentException if the primary key is not set or the worker is not existing
      *                                  in the database
      */
-    public void anonymizeWorker(WorkerRecord workerRecord) throws IllegalArgumentException {
-        assertHasPrimaryKey(workerRecord);
-
+    public void anonymizeWorker(int id) throws IllegalArgumentException {
         WorkerRecord toAnonymize = create.selectFrom(Tables.WORKER)
-                .where(Tables.WORKER.ID_WORKER.eq(workerRecord.getIdWorker()))
+                .where(Tables.WORKER.ID_WORKER.eq(id))
                 .fetchOptional()
-                .orElseThrow(() -> new IllegalArgumentException("worker: " + workerRecord.getIdWorker() + " is not existing"));
+                .orElseThrow(() -> new IllegalArgumentException("worker: " + id + " is not existing"));
 
         WorkerRecord anonWorker = create.transactionResult(configuration ->
                 DSL.using(configuration).selectFrom(Tables.WORKER)
@@ -141,29 +130,6 @@ public class WorkerOperations extends AbstractOperations {
     }
 
     /**
-     * returns all the workers existing in the database
-     *
-     * @return a list with all the workers
-     */
-    public List<WorkerRecord> getAllWorkers() {
-        return create.selectFrom(Tables.WORKER)
-                .fetch();
-    }
-
-    /**
-     * Returns a single worker based on his identity and platform.
-     *
-     * @param platform Platform of the worker
-     * @param identity Identity of the worker
-     *
-     * @return the worker or empty if not found
-     */
-    public Optional<Worker> identifyWorker(String platform, String identity) {
-        return create.fetchOptional(WORKER, WORKER.PLATFORM.eq(platform).and(WORKER.IDENTIFICATION.eq(identity)))
-                .map(WorkerOperations::toProto);
-    }
-
-    /**
      * Returns a single worker.
      *
      * @param id ID of the worker
@@ -172,7 +138,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Optional<Worker> getWorkerProto(int id) {
         return create.fetchOptional(WORKER, WORKER.ID_WORKER.eq(id))
-                .map(WorkerOperations::toProto);
+                .map(WorkerTransform::toProto);
     }
 
     /**
@@ -186,7 +152,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Range<Worker, Integer> getWorkerList(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, cursor, next, limit)
-                .map(WorkerOperations::toProto);
+                .map(WorkerTransform::toProto);
     }
 
     /**
@@ -202,45 +168,10 @@ public class WorkerOperations extends AbstractOperations {
     public Worker createWorker(Worker toStore, String identity) {
         assertHasField(toStore, Worker.PLATFORM_FIELD_NUMBER);
 
-        WorkerRecord record = mergeRecord(create.newRecord(WORKER), toStore);
+        WorkerRecord record = WorkerTransform.mergeRecord(create.newRecord(WORKER), toStore);
         record.setIdentification(identity);
         record.store();
 
-        return toProto(record);
-    }
-
-    /**
-     * Converts a worker record to its protobuf representation.
-     *
-     * @param record worker record
-     *
-     * @return Worker.
-     */
-    public static Worker toProto(WorkerRecord record) {
-        return Worker.newBuilder()
-                .setId(record.getIdWorker())
-                .setPlatform(record.getPlatform())
-                .setEmail(record.getEmail())
-                .build();
-    }
-
-    /**
-     * Merges a record with the set properties of a protobuf worker.
-     *
-     * @param target record to merge into
-     * @param worker message to merge from
-     *
-     * @return Merged worker record.
-     */
-    public static WorkerRecord mergeRecord(WorkerRecord target, Worker worker) {
-        if (worker.hasField(worker.getDescriptorForType().findFieldByNumber(Worker.PLATFORM_FIELD_NUMBER))) {
-            target.setPlatform(worker.getPlatform());
-        }
-
-        if (worker.hasField(worker.getDescriptorForType().findFieldByNumber(Worker.EMAIL_FIELD_NUMBER))) {
-            target.setEmail(worker.getEmail());
-        }
-
-        return target;
+        return WorkerTransform.toProto(record);
     }
 }
