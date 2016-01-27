@@ -24,7 +24,7 @@ public class MoneyTransferManager {
 
     MailHandler mailHandler;
     PaymentOperations paymentOperations;
-    WokerOperations wokerOperations;
+    WorkerOperations workerOperations;
 
     int payOffThreshold;
     int minGiftCodesCount;
@@ -32,9 +32,9 @@ public class MoneyTransferManager {
     String notificationTextHTML;
 
 
-    public MoneyTransferManager(MailHandler mailHandler, PaymentOperations paymentOperations, WokerOperations workerOperations, String notificationMailAddress) throws MessagingException {
+    public MoneyTransferManager(MailHandler mailHandler, PaymentOperations paymentOperations, WorkerOperations workerOperations, String notificationMailAddress) throws MessagingException {
         this.mailHandler = mailHandler;
-        this.wokerOperations = workerOperations;
+        this.workerOperations = workerOperations;
         this.paymentOperations = paymentOperations;
         this.minGiftCodesCount = 10;
         this.payOffThreshold = 0;
@@ -48,7 +48,7 @@ public class MoneyTransferManager {
      * @param amount   the amount of money in ct
      */
     public void logMoneyTransfer(int workerID, int amount) {
-        WorkerRecord worker = wokerOperations.getWorker(workerID);
+        WorkerRecord worker = workerOperations.getWorker(workerID);
         worker.setCreditBalance(worker.getCreditBalance() + amount);
     }
 
@@ -56,7 +56,7 @@ public class MoneyTransferManager {
      * Pays all workers depending on their logged money transfers.
      */
     public void payOff() {
-        List<WorkerRecord> workers = wokerOperations.getWorkersWithCreditBalanceGreaterThan(payOffThreshold);
+        List<WorkerRecord> workers = workerOperations.getWorkersWithCreditBalanceGreaterThan(payOffThreshold);
         Iterator<WorkerRecord> workerIt = workers.iterator();
         List<GiftCodeRecord> giftCodes = paymentOperations.getUnusedGiftCodesDescending();
 

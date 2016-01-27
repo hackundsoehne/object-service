@@ -7,6 +7,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Paym
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PaymentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WokerOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import org.jooq.util.derby.sys.Sys;
 import org.junit.Before;
@@ -33,15 +35,15 @@ public class MoneyTransferManagerTest {
 
     MoneyTransferManager mng;
     MailHandler handler;
-    PaymentOperations payops;
-    WokerOperations workerops;
+    WorkerBalanceOperations payops;
+    WorkerOperations workerops;
 
     @Before
     public void setUp() throws Exception{
 
         handler = mock(MailHandler.class);
-        payops = mock(PaymentOperations.class);
-        workerops = mock(WokerOperations.class);
+        payops = mock(WorkerBalanceOperations.class);
+        workerops = mock(WorkerOperations.class);
         mng = new MoneyTransferManager(handler, payops, workerops, null);
     }
 
