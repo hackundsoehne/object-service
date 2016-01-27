@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRestOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
@@ -11,14 +11,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResourc
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.WorkerResource;
-import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 
 import javax.naming.NamingException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.function.Function;
@@ -48,29 +45,29 @@ public class Main {
         String password = trimIfNotNull.apply(properties.getProperty("database.password"));
         String databasePool = trimIfNotNull.apply(properties.getProperty("database.poolName"));
 
+        String readOnlyUsername = trimIfNotNull.apply(properties.getProperty("database.readonly.username"));
+        String readOnlyPassword = trimIfNotNull.apply(properties.getProperty("database.readonly.password"));
+
         SQLDialect dialect = SQLDialect.valueOf(properties.getProperty("database.dialect").trim());
         DatabaseManager databaseManager = null;
         try {
             databaseManager = new DatabaseManager(username, password, url, databasePool, dialect);
+            databaseManager.initDatabase();
+            boot(databaseManager, readOnlyUsername, readOnlyPassword);
         } catch (NamingException | SQLException e) {
             System.err.println("unable to establish database connection");
             e.printStackTrace();
             System.exit(-1);
         }
-
-        databaseManager.initDatabase();
-        boot(databaseManager.getConnection());
     }
 
-    private static void boot(Connection connection) {
-        DSLContext context = DSL.using(connection, SQLDialect.MYSQL);
-
+    private static void boot(DatabaseManager databaseManager, String readOnlyDBUser, String readOnlyDBPassword) throws SQLException {
         PlatformManager platformManager = null; // TODO
 
-        TemplateOperations templateOperations = new TemplateOperations(context);
-        NotificationRestOperations notificationRestOperations = new NotificationRestOperations(context);
-        PlatformOperations platformOperations = new PlatformOperations(context);
-        WorkerOperations workerOperations = new WorkerOperations(context);
+        TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
+        NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnlyDBUser, readOnlyDBPassword);
+        PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
+        WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
 
         new Router(
                 new TemplateResource(templateOperations),
