@@ -15,7 +15,17 @@ import java.util.stream.Collectors;
 /**
  * Created by marcel on 26.01.16.
  */
-public class ExperimentTransform extends AbstractTransform {
+public class ExperimentTransform extends AbstractTransform
+{
+    /**
+     * Convert a experiment record to a proto object with the given additional infos
+     * @param record The Database record to use
+     * @param state state of the experiment
+     * @param constraintRecords constraints of a experiment
+     * @param platforms populations on the platform to use
+     * @param tagRecords tags which are saved for a experiment
+     * @return the experiment object with the given data
+     */
     public static Experiment toProto(ExperimentRecord record, Experiment.State state,
                                      List<ConstraintRecord> constraintRecords,
                                      List<Experiment.PlatformPopulation> platforms,
@@ -38,13 +48,17 @@ public class ExperimentTransform extends AbstractTransform {
                 .setPaymentRating(record.getBonusRating())
                 .setState(state)
                 .putAllPlaceholders(new Gson().fromJson(record.getTemplateData(), type))
-                .addAllConstraints(constraintRecords.stream().map(TagConstraintTransform::toContrainsProto).collect(Collectors.toList()))
+                .addAllConstraints(constraintRecords.stream().map(TagConstraintTransform::toConstraintsProto).collect(Collectors.toList()))
                 .addAllPlatformPopulations(platforms)
                 .addAllTags(tagRecords.stream().map(TagConstraintTransform::toTagProto).collect(Collectors.toList()))
                 .build();
     }
 
-
+    /**
+     * Creates a new record  from the data of a experiment
+     * @param experiment
+     * @return
+     */
     public static ExperimentRecord toRecord(Experiment experiment) {
         return new ExperimentRecord(experiment.getId(),
                 experiment.getTitle(),
@@ -70,6 +84,12 @@ public class ExperimentTransform extends AbstractTransform {
         return answerType.name();
     }
 
+    /**
+     * Merge the data from a experiment proto object into a existing record
+     * @param record_ The original record to merge into
+     * @param experiment the experiment to merge
+     * @return A merged experiment record
+     */
     public static ExperimentRecord mergeProto(ExperimentRecord record_, Experiment experiment) {
         return merge(record_, experiment, (integer, record) -> {
             switch (integer) {

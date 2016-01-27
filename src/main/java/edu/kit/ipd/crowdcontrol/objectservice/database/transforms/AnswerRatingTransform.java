@@ -21,6 +21,7 @@ public class AnswerRatingTransform {
      */
     public static Answer toAnswerProto(AnswerRecord answerRecord, List<RatingRecord> ratings) {
         return Answer.newBuilder()
+                .setExperimentId(answerRecord.getExperiment())
                 .setContent(answerRecord.getAnswer())
                 .setId(answerRecord.getIdAnswer())
                 .setQuality(answerRecord.getQuality())
@@ -63,6 +64,7 @@ public class AnswerRatingTransform {
 
     /**
      * Converts a rating from a protobuf object into a record
+     * The Quality of a RatingRecord cannot be set and is set to 0
      * @param rating The informations to use from protobuf
      * @param answerId the answer which was rated for
      * @param experimentId the experiment of the answer
@@ -74,8 +76,9 @@ public class AnswerRatingTransform {
                 answerId,
                 new Timestamp(rating.getTime()),
                 rating.getRating(),
+                rating.getFeedback(),
                 rating.getWorker(),
-                0);
+                rating.getQuality());
 
     }
 }
