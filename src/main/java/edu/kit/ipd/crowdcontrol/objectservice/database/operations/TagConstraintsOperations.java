@@ -34,4 +34,12 @@ public class TagConstraintsOperations extends AbstractOperations {
     public List<ConstraintRecord> getConstraints(int experimentId) {
         return null;
     }
+
+    public void deleteAllTags(int experiment) {
+
+    }
+
+    public void deleteAllConstraint(int experiment) {
+
+    }
 }
