@@ -6,7 +6,7 @@ import javax.mail.Message;
  */
 public class MailParser {
 
-    protected static GiftCode parserMail(Message msg) {
+    protected static GiftCode parseMail(Message msg) {
         return null;
     }
 }
