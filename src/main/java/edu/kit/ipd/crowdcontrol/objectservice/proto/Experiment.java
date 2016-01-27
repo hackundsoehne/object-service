@@ -32,7 +32,7 @@ public  final class Experiment extends
     paymentRating_ = 0;
     constraints_ = java.util.Collections.emptyList();
     tags_ = java.util.Collections.emptyList();
-    platforms_ = java.util.Collections.emptyList();
+    platformPopulations_ = java.util.Collections.emptyList();
     workerQualityThreshold_ = 0;
     templateId_ = 0;
   }
@@ -161,10 +161,10 @@ public  final class Experiment extends
           }
           case 146: {
             if (!((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
-              platforms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform>();
+              platformPopulations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation>();
               mutable_bitField0_ |= 0x00020000;
             }
-            platforms_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.parser(), extensionRegistry));
+            platformPopulations_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.parser(), extensionRegistry));
             break;
           }
           case 154: {
@@ -205,7 +205,7 @@ public  final class Experiment extends
         tags_ = java.util.Collections.unmodifiableList(tags_);
       }
       if (((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
-        platforms_ = java.util.Collections.unmodifiableList(platforms_);
+        platformPopulations_ = java.util.Collections.unmodifiableList(platformPopulations_);
       }
       makeExtensionsImmutable();
     }
@@ -350,6 +350,820 @@ public  final class Experiment extends
     }
 
     // @@protoc_insertion_point(enum_scope:crowdcontrol.Experiment.State)
+  }
+
+  public interface PlatformPopulationOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:crowdcontrol.Experiment.PlatformPopulation)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional string platform_id = 1;</code>
+     */
+    java.lang.String getPlatformId();
+    /**
+     * <code>optional string platform_id = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getPlatformIdBytes();
+
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> 
+        getPopulationsList();
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index);
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    int getPopulationsCount();
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
+        getPopulationsOrBuilderList();
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
+        int index);
+  }
+  /**
+   * Protobuf type {@code crowdcontrol.Experiment.PlatformPopulation}
+   */
+  public  static final class PlatformPopulation extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:crowdcontrol.Experiment.PlatformPopulation)
+      PlatformPopulationOrBuilder {
+    // Use PlatformPopulation.newBuilder() to construct.
+    private PlatformPopulation(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private PlatformPopulation() {
+      platformId_ = "";
+      populations_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
+    private PlatformPopulation(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
+      int mutable_bitField0_ = 0;
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!input.skipField(tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              String s = input.readStringRequireUtf8();
+
+              platformId_ = s;
+              break;
+            }
+            case 18: {
+              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+                populations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Population>();
+                mutable_bitField0_ |= 0x00000002;
+              }
+              populations_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Population.parser(), extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw new RuntimeException(e.setUnfinishedMessage(this));
+      } catch (java.io.IOException e) {
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
+      } finally {
+        if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+          populations_ = java.util.Collections.unmodifiableList(populations_);
+        }
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int PLATFORM_ID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object platformId_;
+    /**
+     * <code>optional string platform_id = 1;</code>
+     */
+    public java.lang.String getPlatformId() {
+      java.lang.Object ref = platformId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        platformId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>optional string platform_id = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPlatformIdBytes() {
+      java.lang.Object ref = platformId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        platformId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int POPULATIONS_FIELD_NUMBER = 2;
+    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> populations_;
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> getPopulationsList() {
+      return populations_;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
+        getPopulationsOrBuilderList() {
+      return populations_;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    public int getPopulationsCount() {
+      return populations_.size();
+    }
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index) {
+      return populations_.get(index);
+    }
+    /**
+     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
+        int index) {
+      return populations_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getPlatformIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, platformId_);
+      }
+      for (int i = 0; i < populations_.size(); i++) {
+        output.writeMessage(2, populations_.get(i));
+      }
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getPlatformIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, platformId_);
+      }
+      for (int i = 0; i < populations_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, populations_.get(i));
+      }
+      memoizedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code crowdcontrol.Experiment.PlatformPopulation}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:crowdcontrol.Experiment.PlatformPopulation)
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder.class);
+      }
+
+      // Construct using edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getPopulationsFieldBuilder();
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        platformId_ = "";
+
+        if (populationsBuilder_ == null) {
+          populations_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+        } else {
+          populationsBuilder_.clear();
+        }
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_descriptor;
+      }
+
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getDefaultInstanceForType() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.getDefaultInstance();
+      }
+
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation build() {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation buildPartial() {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation result = new edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        result.platformId_ = platformId_;
+        if (populationsBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) == 0x00000002)) {
+            populations_ = java.util.Collections.unmodifiableList(populations_);
+            bitField0_ = (bitField0_ & ~0x00000002);
+          }
+          result.populations_ = populations_;
+        } else {
+          result.populations_ = populationsBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation) {
+          return mergeFrom((edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation other) {
+        if (other == edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.getDefaultInstance()) return this;
+        if (!other.getPlatformId().isEmpty()) {
+          platformId_ = other.platformId_;
+          onChanged();
+        }
+        if (populationsBuilder_ == null) {
+          if (!other.populations_.isEmpty()) {
+            if (populations_.isEmpty()) {
+              populations_ = other.populations_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+            } else {
+              ensurePopulationsIsMutable();
+              populations_.addAll(other.populations_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.populations_.isEmpty()) {
+            if (populationsBuilder_.isEmpty()) {
+              populationsBuilder_.dispose();
+              populationsBuilder_ = null;
+              populations_ = other.populations_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+              populationsBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getPopulationsFieldBuilder() : null;
+            } else {
+              populationsBuilder_.addAllMessages(other.populations_);
+            }
+          }
+        }
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object platformId_ = "";
+      /**
+       * <code>optional string platform_id = 1;</code>
+       */
+      public java.lang.String getPlatformId() {
+        java.lang.Object ref = platformId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          platformId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string platform_id = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPlatformIdBytes() {
+        java.lang.Object ref = platformId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          platformId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string platform_id = 1;</code>
+       */
+      public Builder setPlatformId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        platformId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string platform_id = 1;</code>
+       */
+      public Builder clearPlatformId() {
+        
+        platformId_ = getDefaultInstance().getPlatformId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string platform_id = 1;</code>
+       */
+      public Builder setPlatformIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        platformId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> populations_ =
+        java.util.Collections.emptyList();
+      private void ensurePopulationsIsMutable() {
+        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+          populations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Population>(populations_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> populationsBuilder_;
+
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> getPopulationsList() {
+        if (populationsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(populations_);
+        } else {
+          return populationsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public int getPopulationsCount() {
+        if (populationsBuilder_ == null) {
+          return populations_.size();
+        } else {
+          return populationsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index) {
+        if (populationsBuilder_ == null) {
+          return populations_.get(index);
+        } else {
+          return populationsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public Builder setPopulations(
+          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
+        if (populationsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePopulationsIsMutable();
+          populations_.set(index, value);
+          onChanged();
+        } else {
+          populationsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public Builder setPopulations(
+          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
+        if (populationsBuilder_ == null) {
+          ensurePopulationsIsMutable();
+          populations_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          populationsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public Builder addPopulations(edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
+        if (populationsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePopulationsIsMutable();
+          populations_.add(value);
+          onChanged();
+        } else {
+          populationsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public Builder addPopulations(
+          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
+        if (populationsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePopulationsIsMutable();
+          populations_.add(index, value);
+          onChanged();
+        } else {
+          populationsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public Builder addPopulations(
+          edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
+        if (populationsBuilder_ == null) {
+          ensurePopulationsIsMutable();
+          populations_.add(builderForValue.build());
+          onChanged();
+        } else {
+          populationsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public Builder addPopulations(
+          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
+        if (populationsBuilder_ == null) {
+          ensurePopulationsIsMutable();
+          populations_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          populationsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public Builder addAllPopulations(
+          java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Population> values) {
+        if (populationsBuilder_ == null) {
+          ensurePopulationsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, populations_);
+          onChanged();
+        } else {
+          populationsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public Builder clearPopulations() {
+        if (populationsBuilder_ == null) {
+          populations_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+        } else {
+          populationsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public Builder removePopulations(int index) {
+        if (populationsBuilder_ == null) {
+          ensurePopulationsIsMutable();
+          populations_.remove(index);
+          onChanged();
+        } else {
+          populationsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder getPopulationsBuilder(
+          int index) {
+        return getPopulationsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
+          int index) {
+        if (populationsBuilder_ == null) {
+          return populations_.get(index);  } else {
+          return populationsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
+           getPopulationsOrBuilderList() {
+        if (populationsBuilder_ != null) {
+          return populationsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(populations_);
+        }
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder addPopulationsBuilder() {
+        return getPopulationsFieldBuilder().addBuilder(
+            edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder addPopulationsBuilder(
+          int index) {
+        return getPopulationsFieldBuilder().addBuilder(
+            index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       */
+      public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder> 
+           getPopulationsBuilderList() {
+        return getPopulationsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
+          getPopulationsFieldBuilder() {
+        if (populationsBuilder_ == null) {
+          populationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>(
+                  populations_,
+                  ((bitField0_ & 0x00000002) == 0x00000002),
+                  getParentForChildren(),
+                  isClean());
+          populations_ = null;
+        }
+        return populationsBuilder_;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:crowdcontrol.Experiment.PlatformPopulation)
+    }
+
+    // @@protoc_insertion_point(class_scope:crowdcontrol.Experiment.PlatformPopulation)
+    private static final edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation();
+    }
+
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<PlatformPopulation>
+        PARSER = new com.google.protobuf.AbstractParser<PlatformPopulation>() {
+      public PlatformPopulation parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        try {
+          return new PlatformPopulation(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
+      }
+    };
+
+    public static com.google.protobuf.Parser<PlatformPopulation> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PlatformPopulation> getParserForType() {
+      return PARSER;
+    }
+
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   private int bitField0_;
@@ -697,39 +1511,39 @@ public  final class Experiment extends
     return tags_.get(index);
   }
 
-  public static final int PLATFORMS_FIELD_NUMBER = 18;
-  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> platforms_;
+  public static final int PLATFORM_POPULATIONS_FIELD_NUMBER = 18;
+  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> platformPopulations_;
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> getPlatformsList() {
-    return platforms_;
+  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> getPlatformPopulationsList() {
+    return platformPopulations_;
   }
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder> 
-      getPlatformsOrBuilderList() {
-    return platforms_;
+  public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
+      getPlatformPopulationsOrBuilderList() {
+    return platformPopulations_;
   }
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  public int getPlatformsCount() {
-    return platforms_.size();
+  public int getPlatformPopulationsCount() {
+    return platformPopulations_.size();
   }
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform getPlatforms(int index) {
-    return platforms_.get(index);
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getPlatformPopulations(int index) {
+    return platformPopulations_.get(index);
   }
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder getPlatformsOrBuilder(
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder getPlatformPopulationsOrBuilder(
       int index) {
-    return platforms_.get(index);
+    return platformPopulations_.get(index);
   }
 
   public static final int PLACEHOLDERS_FIELD_NUMBER = 19;
@@ -843,8 +1657,8 @@ public  final class Experiment extends
     for (int i = 0; i < tags_.size(); i++) {
       output.writeMessage(17, tags_.get(i));
     }
-    for (int i = 0; i < platforms_.size(); i++) {
-      output.writeMessage(18, platforms_.get(i));
+    for (int i = 0; i < platformPopulations_.size(); i++) {
+      output.writeMessage(18, platformPopulations_.get(i));
     }
     for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
          : internalGetPlaceholders().getMap().entrySet()) {
@@ -931,9 +1745,9 @@ public  final class Experiment extends
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(17, tags_.get(i));
     }
-    for (int i = 0; i < platforms_.size(); i++) {
+    for (int i = 0; i < platformPopulations_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(18, platforms_.get(i));
+        .computeMessageSize(18, platformPopulations_.get(i));
     }
     for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
          : internalGetPlaceholders().getMap().entrySet()) {
@@ -1084,7 +1898,7 @@ public  final class Experiment extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         getConstraintsFieldBuilder();
         getTagsFieldBuilder();
-        getPlatformsFieldBuilder();
+        getPlatformPopulationsFieldBuilder();
       }
     }
     public Builder clear() {
@@ -1131,11 +1945,11 @@ public  final class Experiment extends
       } else {
         tagsBuilder_.clear();
       }
-      if (platformsBuilder_ == null) {
-        platforms_ = java.util.Collections.emptyList();
+      if (platformPopulationsBuilder_ == null) {
+        platformPopulations_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00020000);
       } else {
-        platformsBuilder_.clear();
+        platformPopulationsBuilder_.clear();
       }
       internalGetMutablePlaceholders().clear();
       workerQualityThreshold_ = 0;
@@ -1199,14 +2013,14 @@ public  final class Experiment extends
       } else {
         result.tags_ = tagsBuilder_.build();
       }
-      if (platformsBuilder_ == null) {
+      if (platformPopulationsBuilder_ == null) {
         if (((bitField0_ & 0x00020000) == 0x00020000)) {
-          platforms_ = java.util.Collections.unmodifiableList(platforms_);
+          platformPopulations_ = java.util.Collections.unmodifiableList(platformPopulations_);
           bitField0_ = (bitField0_ & ~0x00020000);
         }
-        result.platforms_ = platforms_;
+        result.platformPopulations_ = platformPopulations_;
       } else {
-        result.platforms_ = platformsBuilder_.build();
+        result.platformPopulations_ = platformPopulationsBuilder_.build();
       }
       result.placeholders_ = internalGetPlaceholders();
       result.placeholders_.makeImmutable();
@@ -1330,29 +2144,29 @@ public  final class Experiment extends
           }
         }
       }
-      if (platformsBuilder_ == null) {
-        if (!other.platforms_.isEmpty()) {
-          if (platforms_.isEmpty()) {
-            platforms_ = other.platforms_;
+      if (platformPopulationsBuilder_ == null) {
+        if (!other.platformPopulations_.isEmpty()) {
+          if (platformPopulations_.isEmpty()) {
+            platformPopulations_ = other.platformPopulations_;
             bitField0_ = (bitField0_ & ~0x00020000);
           } else {
-            ensurePlatformsIsMutable();
-            platforms_.addAll(other.platforms_);
+            ensurePlatformPopulationsIsMutable();
+            platformPopulations_.addAll(other.platformPopulations_);
           }
           onChanged();
         }
       } else {
-        if (!other.platforms_.isEmpty()) {
-          if (platformsBuilder_.isEmpty()) {
-            platformsBuilder_.dispose();
-            platformsBuilder_ = null;
-            platforms_ = other.platforms_;
+        if (!other.platformPopulations_.isEmpty()) {
+          if (platformPopulationsBuilder_.isEmpty()) {
+            platformPopulationsBuilder_.dispose();
+            platformPopulationsBuilder_ = null;
+            platformPopulations_ = other.platformPopulations_;
             bitField0_ = (bitField0_ & ~0x00020000);
-            platformsBuilder_ = 
+            platformPopulationsBuilder_ = 
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                 getPlatformsFieldBuilder() : null;
+                 getPlatformPopulationsFieldBuilder() : null;
           } else {
-            platformsBuilder_.addAllMessages(other.platforms_);
+            platformPopulationsBuilder_.addAllMessages(other.platformPopulations_);
           }
         }
       }
@@ -2512,244 +3326,244 @@ public  final class Experiment extends
       return tagsBuilder_;
     }
 
-    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> platforms_ =
+    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> platformPopulations_ =
       java.util.Collections.emptyList();
-    private void ensurePlatformsIsMutable() {
+    private void ensurePlatformPopulationsIsMutable() {
       if (!((bitField0_ & 0x00020000) == 0x00020000)) {
-        platforms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform>(platforms_);
+        platformPopulations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation>(platformPopulations_);
         bitField0_ |= 0x00020000;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Platform, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder> platformsBuilder_;
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> platformPopulationsBuilder_;
 
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> getPlatformsList() {
-      if (platformsBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(platforms_);
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> getPlatformPopulationsList() {
+      if (platformPopulationsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(platformPopulations_);
       } else {
-        return platformsBuilder_.getMessageList();
+        return platformPopulationsBuilder_.getMessageList();
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public int getPlatformsCount() {
-      if (platformsBuilder_ == null) {
-        return platforms_.size();
+    public int getPlatformPopulationsCount() {
+      if (platformPopulationsBuilder_ == null) {
+        return platformPopulations_.size();
       } else {
-        return platformsBuilder_.getCount();
+        return platformPopulationsBuilder_.getCount();
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform getPlatforms(int index) {
-      if (platformsBuilder_ == null) {
-        return platforms_.get(index);
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getPlatformPopulations(int index) {
+      if (platformPopulationsBuilder_ == null) {
+        return platformPopulations_.get(index);
       } else {
-        return platformsBuilder_.getMessage(index);
+        return platformPopulationsBuilder_.getMessage(index);
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public Builder setPlatforms(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform value) {
-      if (platformsBuilder_ == null) {
+    public Builder setPlatformPopulations(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation value) {
+      if (platformPopulationsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePlatformsIsMutable();
-        platforms_.set(index, value);
+        ensurePlatformPopulationsIsMutable();
+        platformPopulations_.set(index, value);
         onChanged();
       } else {
-        platformsBuilder_.setMessage(index, value);
+        platformPopulationsBuilder_.setMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public Builder setPlatforms(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder builderForValue) {
-      if (platformsBuilder_ == null) {
-        ensurePlatformsIsMutable();
-        platforms_.set(index, builderForValue.build());
+    public Builder setPlatformPopulations(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder builderForValue) {
+      if (platformPopulationsBuilder_ == null) {
+        ensurePlatformPopulationsIsMutable();
+        platformPopulations_.set(index, builderForValue.build());
         onChanged();
       } else {
-        platformsBuilder_.setMessage(index, builderForValue.build());
+        platformPopulationsBuilder_.setMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public Builder addPlatforms(edu.kit.ipd.crowdcontrol.objectservice.proto.Platform value) {
-      if (platformsBuilder_ == null) {
+    public Builder addPlatformPopulations(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation value) {
+      if (platformPopulationsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePlatformsIsMutable();
-        platforms_.add(value);
+        ensurePlatformPopulationsIsMutable();
+        platformPopulations_.add(value);
         onChanged();
       } else {
-        platformsBuilder_.addMessage(value);
+        platformPopulationsBuilder_.addMessage(value);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public Builder addPlatforms(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform value) {
-      if (platformsBuilder_ == null) {
+    public Builder addPlatformPopulations(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation value) {
+      if (platformPopulationsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePlatformsIsMutable();
-        platforms_.add(index, value);
+        ensurePlatformPopulationsIsMutable();
+        platformPopulations_.add(index, value);
         onChanged();
       } else {
-        platformsBuilder_.addMessage(index, value);
+        platformPopulationsBuilder_.addMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public Builder addPlatforms(
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder builderForValue) {
-      if (platformsBuilder_ == null) {
-        ensurePlatformsIsMutable();
-        platforms_.add(builderForValue.build());
+    public Builder addPlatformPopulations(
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder builderForValue) {
+      if (platformPopulationsBuilder_ == null) {
+        ensurePlatformPopulationsIsMutable();
+        platformPopulations_.add(builderForValue.build());
         onChanged();
       } else {
-        platformsBuilder_.addMessage(builderForValue.build());
+        platformPopulationsBuilder_.addMessage(builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public Builder addPlatforms(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder builderForValue) {
-      if (platformsBuilder_ == null) {
-        ensurePlatformsIsMutable();
-        platforms_.add(index, builderForValue.build());
+    public Builder addPlatformPopulations(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder builderForValue) {
+      if (platformPopulationsBuilder_ == null) {
+        ensurePlatformPopulationsIsMutable();
+        platformPopulations_.add(index, builderForValue.build());
         onChanged();
       } else {
-        platformsBuilder_.addMessage(index, builderForValue.build());
+        platformPopulationsBuilder_.addMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public Builder addAllPlatforms(
-        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> values) {
-      if (platformsBuilder_ == null) {
-        ensurePlatformsIsMutable();
+    public Builder addAllPlatformPopulations(
+        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> values) {
+      if (platformPopulationsBuilder_ == null) {
+        ensurePlatformPopulationsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, platforms_);
+            values, platformPopulations_);
         onChanged();
       } else {
-        platformsBuilder_.addAllMessages(values);
+        platformPopulationsBuilder_.addAllMessages(values);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public Builder clearPlatforms() {
-      if (platformsBuilder_ == null) {
-        platforms_ = java.util.Collections.emptyList();
+    public Builder clearPlatformPopulations() {
+      if (platformPopulationsBuilder_ == null) {
+        platformPopulations_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00020000);
         onChanged();
       } else {
-        platformsBuilder_.clear();
+        platformPopulationsBuilder_.clear();
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public Builder removePlatforms(int index) {
-      if (platformsBuilder_ == null) {
-        ensurePlatformsIsMutable();
-        platforms_.remove(index);
+    public Builder removePlatformPopulations(int index) {
+      if (platformPopulationsBuilder_ == null) {
+        ensurePlatformPopulationsIsMutable();
+        platformPopulations_.remove(index);
         onChanged();
       } else {
-        platformsBuilder_.remove(index);
+        platformPopulationsBuilder_.remove(index);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder getPlatformsBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder getPlatformPopulationsBuilder(
         int index) {
-      return getPlatformsFieldBuilder().getBuilder(index);
+      return getPlatformPopulationsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder getPlatformsOrBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder getPlatformPopulationsOrBuilder(
         int index) {
-      if (platformsBuilder_ == null) {
-        return platforms_.get(index);  } else {
-        return platformsBuilder_.getMessageOrBuilder(index);
+      if (platformPopulationsBuilder_ == null) {
+        return platformPopulations_.get(index);  } else {
+        return platformPopulationsBuilder_.getMessageOrBuilder(index);
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder> 
-         getPlatformsOrBuilderList() {
-      if (platformsBuilder_ != null) {
-        return platformsBuilder_.getMessageOrBuilderList();
+    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
+         getPlatformPopulationsOrBuilderList() {
+      if (platformPopulationsBuilder_ != null) {
+        return platformPopulationsBuilder_.getMessageOrBuilderList();
       } else {
-        return java.util.Collections.unmodifiableList(platforms_);
+        return java.util.Collections.unmodifiableList(platformPopulations_);
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder addPlatformsBuilder() {
-      return getPlatformsFieldBuilder().addBuilder(
-          edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.getDefaultInstance());
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder addPlatformPopulationsBuilder() {
+      return getPlatformPopulationsFieldBuilder().addBuilder(
+          edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder addPlatformsBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder addPlatformPopulationsBuilder(
         int index) {
-      return getPlatformsFieldBuilder().addBuilder(
-          index, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.getDefaultInstance());
+      return getPlatformPopulationsFieldBuilder().addBuilder(
+          index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
      */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder> 
-         getPlatformsBuilderList() {
-      return getPlatformsFieldBuilder().getBuilderList();
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder> 
+         getPlatformPopulationsBuilderList() {
+      return getPlatformPopulationsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Platform, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder> 
-        getPlatformsFieldBuilder() {
-      if (platformsBuilder_ == null) {
-        platformsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-            edu.kit.ipd.crowdcontrol.objectservice.proto.Platform, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder>(
-                platforms_,
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
+        getPlatformPopulationsFieldBuilder() {
+      if (platformPopulationsBuilder_ == null) {
+        platformPopulationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder>(
+                platformPopulations_,
                 ((bitField0_ & 0x00020000) == 0x00020000),
                 getParentForChildren(),
                 isClean());
-        platforms_ = null;
+        platformPopulations_ = null;
       }
-      return platformsBuilder_;
+      return platformPopulationsBuilder_;
     }
 
     private com.google.protobuf.MapField<

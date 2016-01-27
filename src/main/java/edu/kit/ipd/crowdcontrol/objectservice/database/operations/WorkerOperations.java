@@ -81,7 +81,8 @@ public class WorkerOperations extends AbstractOperations {
      * <p>
      * The worker will be deleted, there is no way to pay him after this action.
      *
-     * @param id the primary key of the worker
+     * @param id the primary key of the worker to anonymize
+     *
      * @throws IllegalArgumentException if the primary key is not set or the worker is not existing
      *                                  in the database
      */

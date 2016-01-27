@@ -6,10 +6,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Popu
 import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.PopulationTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Population;
 import org.jooq.DSLContext;
-import org.jooq.Result;
 import org.jooq.impl.DSL;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,23 +80,23 @@ public class PopulationOperations extends AbstractOperations {
      */
     public Population insertPopulation(Population toStore) throws IllegalArgumentException {
         assertHasField(toStore,
+                Population.NAME_FIELD_NUMBER,
                 Population.QUESTION_FIELD_NUMBER,
                 Population.ANSWERS_FIELD_NUMBER);
 
         PopulationRecord population = PopulationTransform.mergeRecord(create.newRecord(POPULATION), toStore);
         population.store();
 
-        int[] primaryKey = toStore.getAnswersList().stream()
+        toStore.getAnswersList().stream()
                 .map(s -> new PopulationAnswerOptionRecord(null, population.getIdPopulation(), s))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), create::batchInsert))
                 .execute();
 
-        Result<PopulationAnswerOptionRecord> answerRecords = create
-                .selectFrom(POPULATION_ANSWER_OPTION)
-                .where(POPULATION_ANSWER_OPTION.ID_POPULATION_ANSWER_OPTION.in(Arrays.asList(primaryKey)))
+        List<PopulationAnswerOptionRecord> answers = create.selectFrom(POPULATION_ANSWER_OPTION)
+                .where(POPULATION_ANSWER_OPTION.POPULATION.eq(population.getIdPopulation()))
                 .fetch();
 
-        return PopulationTransform.toProto(population, answerRecords);
+        return PopulationTransform.toProto(population, answers);
     }
 
     /**

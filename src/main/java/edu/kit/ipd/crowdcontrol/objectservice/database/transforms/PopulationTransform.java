@@ -23,7 +23,8 @@ public class PopulationTransform extends AbstractTransform {
     public static Population toProto(PopulationRecord record, List<PopulationAnswerOptionRecord> options) {
         return Population.newBuilder()
                 .setId(record.getIdPopulation())
-                .setQuestion(record.getName())
+                .setName(record.getName())
+                .setQuestion(record.getProperty())
                 .addAllAnswers(options.stream().map(PopulationAnswerOptionRecord::getAnswer).collect(Collectors.toList()))
                 .build();
     }
@@ -39,8 +40,10 @@ public class PopulationTransform extends AbstractTransform {
     public static PopulationRecord mergeRecord(PopulationRecord target, Population population) {
         return merge(target, population, (fieldNumber, record) -> {
             switch (fieldNumber) {
+                case Population.NAME_FIELD_NUMBER:
+                    record.setName(population.getName());
                 case Population.QUESTION_FIELD_NUMBER:
-                    record.setName(population.getQuestion());
+                    record.setProperty(population.getQuestion());
                     break;
             }
         });

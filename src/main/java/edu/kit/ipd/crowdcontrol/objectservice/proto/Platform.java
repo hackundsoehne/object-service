@@ -17,7 +17,6 @@ public  final class Platform extends
   private Platform() {
     id_ = "";
     name_ = "";
-    populations_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -56,14 +55,6 @@ public  final class Platform extends
             name_ = s;
             break;
           }
-          case 26: {
-            if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-              populations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Population>();
-              mutable_bitField0_ |= 0x00000004;
-            }
-            populations_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Population.parser(), extensionRegistry));
-            break;
-          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -73,9 +64,6 @@ public  final class Platform extends
           new com.google.protobuf.InvalidProtocolBufferException(
               e.getMessage()).setUnfinishedMessage(this));
     } finally {
-      if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-        populations_ = java.util.Collections.unmodifiableList(populations_);
-      }
       makeExtensionsImmutable();
     }
   }
@@ -91,7 +79,6 @@ public  final class Platform extends
             edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Platform.Builder.class);
   }
 
-  private int bitField0_;
   public static final int ID_FIELD_NUMBER = 1;
   private volatile java.lang.Object id_;
   /**
@@ -160,41 +147,6 @@ public  final class Platform extends
     }
   }
 
-  public static final int POPULATIONS_FIELD_NUMBER = 3;
-  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> populations_;
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> getPopulationsList() {
-    return populations_;
-  }
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
-      getPopulationsOrBuilderList() {
-    return populations_;
-  }
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  public int getPopulationsCount() {
-    return populations_.size();
-  }
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index) {
-    return populations_.get(index);
-  }
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
-      int index) {
-    return populations_.get(index);
-  }
-
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -213,9 +165,6 @@ public  final class Platform extends
     if (!getNameBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessage.writeString(output, 2, name_);
     }
-    for (int i = 0; i < populations_.size(); i++) {
-      output.writeMessage(3, populations_.get(i));
-    }
   }
 
   public int getSerializedSize() {
@@ -228,10 +177,6 @@ public  final class Platform extends
     }
     if (!getNameBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(2, name_);
-    }
-    for (int i = 0; i < populations_.size(); i++) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, populations_.get(i));
     }
     memoizedSize = size;
     return size;
@@ -340,7 +285,6 @@ public  final class Platform extends
     }
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        getPopulationsFieldBuilder();
       }
     }
     public Builder clear() {
@@ -349,12 +293,6 @@ public  final class Platform extends
 
       name_ = "";
 
-      if (populationsBuilder_ == null) {
-        populations_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000004);
-      } else {
-        populationsBuilder_.clear();
-      }
       return this;
     }
 
@@ -377,20 +315,8 @@ public  final class Platform extends
 
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Platform buildPartial() {
       edu.kit.ipd.crowdcontrol.objectservice.proto.Platform result = new edu.kit.ipd.crowdcontrol.objectservice.proto.Platform(this);
-      int from_bitField0_ = bitField0_;
-      int to_bitField0_ = 0;
       result.id_ = id_;
       result.name_ = name_;
-      if (populationsBuilder_ == null) {
-        if (((bitField0_ & 0x00000004) == 0x00000004)) {
-          populations_ = java.util.Collections.unmodifiableList(populations_);
-          bitField0_ = (bitField0_ & ~0x00000004);
-        }
-        result.populations_ = populations_;
-      } else {
-        result.populations_ = populationsBuilder_.build();
-      }
-      result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
     }
@@ -413,32 +339,6 @@ public  final class Platform extends
       if (!other.getName().isEmpty()) {
         name_ = other.name_;
         onChanged();
-      }
-      if (populationsBuilder_ == null) {
-        if (!other.populations_.isEmpty()) {
-          if (populations_.isEmpty()) {
-            populations_ = other.populations_;
-            bitField0_ = (bitField0_ & ~0x00000004);
-          } else {
-            ensurePopulationsIsMutable();
-            populations_.addAll(other.populations_);
-          }
-          onChanged();
-        }
-      } else {
-        if (!other.populations_.isEmpty()) {
-          if (populationsBuilder_.isEmpty()) {
-            populationsBuilder_.dispose();
-            populationsBuilder_ = null;
-            populations_ = other.populations_;
-            bitField0_ = (bitField0_ & ~0x00000004);
-            populationsBuilder_ = 
-              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                 getPopulationsFieldBuilder() : null;
-          } else {
-            populationsBuilder_.addAllMessages(other.populations_);
-          }
-        }
       }
       onChanged();
       return this;
@@ -465,7 +365,6 @@ public  final class Platform extends
       }
       return this;
     }
-    private int bitField0_;
 
     private java.lang.Object id_ = "";
     /**
@@ -603,246 +502,6 @@ public  final class Platform extends
       name_ = value;
       onChanged();
       return this;
-    }
-
-    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> populations_ =
-      java.util.Collections.emptyList();
-    private void ensurePopulationsIsMutable() {
-      if (!((bitField0_ & 0x00000004) == 0x00000004)) {
-        populations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Population>(populations_);
-        bitField0_ |= 0x00000004;
-       }
-    }
-
-    private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> populationsBuilder_;
-
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> getPopulationsList() {
-      if (populationsBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(populations_);
-      } else {
-        return populationsBuilder_.getMessageList();
-      }
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public int getPopulationsCount() {
-      if (populationsBuilder_ == null) {
-        return populations_.size();
-      } else {
-        return populationsBuilder_.getCount();
-      }
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index) {
-      if (populationsBuilder_ == null) {
-        return populations_.get(index);
-      } else {
-        return populationsBuilder_.getMessage(index);
-      }
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public Builder setPopulations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
-      if (populationsBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensurePopulationsIsMutable();
-        populations_.set(index, value);
-        onChanged();
-      } else {
-        populationsBuilder_.setMessage(index, value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public Builder setPopulations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
-      if (populationsBuilder_ == null) {
-        ensurePopulationsIsMutable();
-        populations_.set(index, builderForValue.build());
-        onChanged();
-      } else {
-        populationsBuilder_.setMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public Builder addPopulations(edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
-      if (populationsBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensurePopulationsIsMutable();
-        populations_.add(value);
-        onChanged();
-      } else {
-        populationsBuilder_.addMessage(value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public Builder addPopulations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
-      if (populationsBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensurePopulationsIsMutable();
-        populations_.add(index, value);
-        onChanged();
-      } else {
-        populationsBuilder_.addMessage(index, value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public Builder addPopulations(
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
-      if (populationsBuilder_ == null) {
-        ensurePopulationsIsMutable();
-        populations_.add(builderForValue.build());
-        onChanged();
-      } else {
-        populationsBuilder_.addMessage(builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public Builder addPopulations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
-      if (populationsBuilder_ == null) {
-        ensurePopulationsIsMutable();
-        populations_.add(index, builderForValue.build());
-        onChanged();
-      } else {
-        populationsBuilder_.addMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public Builder addAllPopulations(
-        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Population> values) {
-      if (populationsBuilder_ == null) {
-        ensurePopulationsIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, populations_);
-        onChanged();
-      } else {
-        populationsBuilder_.addAllMessages(values);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public Builder clearPopulations() {
-      if (populationsBuilder_ == null) {
-        populations_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000004);
-        onChanged();
-      } else {
-        populationsBuilder_.clear();
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public Builder removePopulations(int index) {
-      if (populationsBuilder_ == null) {
-        ensurePopulationsIsMutable();
-        populations_.remove(index);
-        onChanged();
-      } else {
-        populationsBuilder_.remove(index);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder getPopulationsBuilder(
-        int index) {
-      return getPopulationsFieldBuilder().getBuilder(index);
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
-        int index) {
-      if (populationsBuilder_ == null) {
-        return populations_.get(index);  } else {
-        return populationsBuilder_.getMessageOrBuilder(index);
-      }
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
-         getPopulationsOrBuilderList() {
-      if (populationsBuilder_ != null) {
-        return populationsBuilder_.getMessageOrBuilderList();
-      } else {
-        return java.util.Collections.unmodifiableList(populations_);
-      }
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder addPopulationsBuilder() {
-      return getPopulationsFieldBuilder().addBuilder(
-          edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder addPopulationsBuilder(
-        int index) {
-      return getPopulationsFieldBuilder().addBuilder(
-          index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .crowdcontrol.Population populations = 3;</code>
-     */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder> 
-         getPopulationsBuilderList() {
-      return getPopulationsFieldBuilder().getBuilderList();
-    }
-    private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
-        getPopulationsFieldBuilder() {
-      if (populationsBuilder_ == null) {
-        populationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-            edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>(
-                populations_,
-                ((bitField0_ & 0x00000004) == 0x00000004),
-                getParentForChildren(),
-                isClean());
-        populations_ = null;
-      }
-      return populationsBuilder_;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
