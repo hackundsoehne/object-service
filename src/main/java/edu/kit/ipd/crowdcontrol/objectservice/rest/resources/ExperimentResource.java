@@ -64,13 +64,11 @@ public class ExperimentResource {
         boolean asc = getQueryBool(request, "asc", true);
 
         return experimentOperations.getExperimentsFrom(from, asc, 20)
-                .map(experimentRecord -> {
-                    Experiment.State state = Experiment.State.DRAFT;
-                    return ExperimentTransform.toProto(experimentRecord, state,
-                            Collections.emptyList(),
-                            Collections.emptyList(),
-                            Collections.emptyList());
-                })
+                .map(experimentRecord -> ExperimentTransform.toProto(experimentRecord,
+                        experimentOperations.getExperimentState(experimentRecord.getIdExperiment()),
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        Collections.emptyList()))
                 .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
     }
 
@@ -95,7 +93,6 @@ public class ExperimentResource {
                                 platformCalibrations.getPlatformId()+"", false); /*FIXME*/
                         result.add(pops);
                     });
-
                 })
         );
 
