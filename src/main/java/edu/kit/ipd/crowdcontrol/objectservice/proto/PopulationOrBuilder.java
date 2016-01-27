@@ -13,49 +13,59 @@ public interface PopulationOrBuilder extends
   int getId();
 
   /**
-   * <code>optional string question = 2;</code>
+   * <code>optional string name = 2;</code>
+   */
+  java.lang.String getName();
+  /**
+   * <code>optional string name = 2;</code>
+   */
+  com.google.protobuf.ByteString
+      getNameBytes();
+
+  /**
+   * <code>optional string question = 3;</code>
    */
   java.lang.String getQuestion();
   /**
-   * <code>optional string question = 2;</code>
+   * <code>optional string question = 3;</code>
    */
   com.google.protobuf.ByteString
       getQuestionBytes();
 
   /**
-   * <code>repeated string answers = 3;</code>
+   * <code>repeated string answers = 4;</code>
    */
   com.google.protobuf.ProtocolStringList
       getAnswersList();
   /**
-   * <code>repeated string answers = 3;</code>
+   * <code>repeated string answers = 4;</code>
    */
   int getAnswersCount();
   /**
-   * <code>repeated string answers = 3;</code>
+   * <code>repeated string answers = 4;</code>
    */
   java.lang.String getAnswers(int index);
   /**
-   * <code>repeated string answers = 3;</code>
+   * <code>repeated string answers = 4;</code>
    */
   com.google.protobuf.ByteString
       getAnswersBytes(int index);
 
   /**
-   * <code>repeated string accepted_answers = 4;</code>
+   * <code>repeated string accepted_answers = 5;</code>
    */
   com.google.protobuf.ProtocolStringList
       getAcceptedAnswersList();
   /**
-   * <code>repeated string accepted_answers = 4;</code>
+   * <code>repeated string accepted_answers = 5;</code>
    */
   int getAcceptedAnswersCount();
   /**
-   * <code>repeated string accepted_answers = 4;</code>
+   * <code>repeated string accepted_answers = 5;</code>
    */
   java.lang.String getAcceptedAnswers(int index);
   /**
-   * <code>repeated string accepted_answers = 4;</code>
+   * <code>repeated string accepted_answers = 5;</code>
    */
   com.google.protobuf.ByteString
       getAcceptedAnswersBytes(int index);

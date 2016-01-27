@@ -33,7 +33,12 @@ public interface RatingOrBuilder extends
   int getWorker();
 
   /**
-   * <code>optional int32 time = 5;</code>
+   * <code>optional int32 quality = 5;</code>
+   */
+  int getQuality();
+
+  /**
+   * <code>optional int32 time = 6;</code>
    */
   int getTime();
 }
