@@ -164,27 +164,27 @@ public interface ExperimentOrBuilder extends
       int index);
 
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> 
-      getPlatformsList();
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> 
+      getPlatformPopulationsList();
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Platform getPlatforms(int index);
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getPlatformPopulations(int index);
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  int getPlatformsCount();
+  int getPlatformPopulationsCount();
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder> 
-      getPlatformsOrBuilderList();
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
+      getPlatformPopulationsOrBuilderList();
   /**
-   * <code>repeated .crowdcontrol.Platform platforms = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOrBuilder getPlatformsOrBuilder(
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder getPlatformPopulationsOrBuilder(
       int index);
 
   /**

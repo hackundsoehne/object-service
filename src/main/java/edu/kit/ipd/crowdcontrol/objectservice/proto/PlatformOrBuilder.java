@@ -26,28 +26,4 @@ public interface PlatformOrBuilder extends
    */
   com.google.protobuf.ByteString
       getNameBytes();
-
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> 
-      getPopulationsList();
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index);
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  int getPopulationsCount();
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
-      getPopulationsOrBuilderList();
-  /**
-   * <code>repeated .crowdcontrol.Population populations = 3;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
-      int index);
 }
