@@ -68,8 +68,12 @@ public class ExperimentOperations extends AbstractOperations {
         });
     }
 
-    public Range<Experiment, Integer> getExperimentsFrom(int cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(EXPERIMENT), EXPERIMENT.ID_EXPERIMENT, cursor, next, limit)
-                .map(ExperimentTransformer::toProto);
+    public Experiment.State getExperimentState(int id) {
+        //TODO leander
+        return Experiment.State.DRAFT;
+    }
+
+    public Range<ExperimentRecord, Integer> getExperimentsFrom(int cursor, boolean next, int limit) {
+        return getNextRange(create.selectFrom(EXPERIMENT), EXPERIMENT.ID_EXPERIMENT, cursor, next, limit);
     }
 }
