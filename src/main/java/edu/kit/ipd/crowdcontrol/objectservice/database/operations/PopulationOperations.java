@@ -112,9 +112,9 @@ public class PopulationOperations extends AbstractOperations {
     public boolean deletePopulation(int id) throws IllegalArgumentException{
         boolean isUsed = create.fetchExists(
                 DSL.select()
-                        .from(EXPERIMENTSPOPULATION)
-                        .join(POPULATION_ANSWER_OPTION).onKey()
-                        .where(POPULATION_ANSWER_OPTION.POPULATION.eq(id))
+                    .from(EXPERIMENTSPOPULATION)
+                    .join(POPULATION_ANSWER_OPTION).onKey()
+                    .where(POPULATION_ANSWER_OPTION.POPULATION.eq(id))
         );
 
         if (isUsed) {
