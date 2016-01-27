@@ -29,11 +29,13 @@ public class Main {
         }
 
         Function<String, String> trimIfNotNull = s -> {
-            if (s != null)
+            if (s != null) {
                 return s.trim();
-            else
-                return s;
+            } else {
+                return null;
+            }
         };
+
         String url = trimIfNotNull.apply(properties.getProperty("database.url"));
         String username = trimIfNotNull.apply(properties.getProperty("database.username"));
         String password = trimIfNotNull.apply(properties.getProperty("database.password"));
@@ -44,12 +46,13 @@ public class Main {
 
         SQLDialect dialect = SQLDialect.valueOf(properties.getProperty("database.dialect").trim());
         DatabaseManager databaseManager = null;
+
         try {
             databaseManager = new DatabaseManager(username, password, url, databasePool, dialect);
             databaseManager.initDatabase();
             boot(databaseManager, readOnlyUsername, readOnlyPassword);
         } catch (NamingException | SQLException e) {
-            System.err.println("unable to establish database connection");
+            System.err.println("Unable to establish database connection.");
             e.printStackTrace();
             System.exit(-1);
         }
@@ -62,7 +65,7 @@ public class Main {
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnlyDBUser, readOnlyDBPassword);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
         WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
-        PopulationOperations populationOperations = new PopulationOperations(context);
+        PopulationOperations populationOperations = new PopulationOperations(databaseManager.getContext());
 
         new Router(
                 new TemplateResource(templateOperations),
