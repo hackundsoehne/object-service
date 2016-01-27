@@ -1,8 +1,14 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.AnswerRatingTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.ExperimentTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.TagConstraintTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Answer;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
@@ -10,7 +16,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getParamInt;
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getQueryBool;
@@ -20,12 +27,20 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getQueryIn
  * Created by marcel on 25.01.16.
  */
 public class ExperimentResource {
-    private ExperimentOperations experimentOperations;
-    private AnswerRatingOperations answerRatingOperations;
+    private final ExperimentOperations experimentOperations;
+    private final AnswerRatingOperations answerRatingOperations;
+    private final PopulationOperations populationOperations;
+    private final TagConstraintsOperations tagConstraintsOperations;
+    private final WorkerOperations workerOperations;
+    private final PlatformOperations platformOperations;
 
-    public ExperimentResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations) {
+    public ExperimentResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations, PopulationOperations populationOperations, TagConstraintsOperations tagConstraintsOperations, WorkerOperations workerOperations, PlatformOperations platformOperations) {
         this.experimentOperations = experimentOperations;
         this.answerRatingOperations = answerRatingOperations;
+        this.populationOperations = populationOperations;
+        this.tagConstraintsOperations = tagConstraintsOperations;
+        this.workerOperations = workerOperations;
+        this.platformOperations = platformOperations;
     }
 
     /**
@@ -35,7 +50,7 @@ public class ExperimentResource {
      * @return The type which was in the optional
      */
     private <U> U R(Optional<U> c) {
-        return c.orElseThrow(() -> new NotFoundException("Experiment not found!"));
+        return c.orElseThrow(() -> new NotFoundException("Resource not found!"));
     }
 
     /**
@@ -49,7 +64,42 @@ public class ExperimentResource {
         boolean asc = getQueryBool(request, "asc", true);
 
         return experimentOperations.getExperimentsFrom(from, asc, 20)
+                .map(experimentRecord -> {
+                    Experiment.State state = Experiment.State.DRAFT;
+                    return ExperimentTransform.toProto(experimentRecord, state,
+                            Collections.emptyList(),
+                            Collections.emptyList(),
+                            Collections.emptyList());
+                })
                 .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
+    }
+
+    private List<ExperimentspopulationRecord> convertToRecords(Experiment experiment) {
+        List<Experiment.PlatformPopulation> populations = experiment.getPlatformPopulationsList();
+        List<ExperimentspopulationRecord> result = new ArrayList<>();
+
+        populations.forEach(platformPopulation ->
+                platformPopulation.getPopulationsList().forEach(population -> {
+
+                    //check if this population exists
+                    if (!populationOperations.getPopulation(population.getId()).isPresent())
+                        throw new IllegalArgumentException("Population "+population.getId()+" does not exists");
+
+                    //go throuw all possible answers and add them
+                    population.getAcceptedAnswersList().forEach(s ->
+                    {
+                        ExperimentspopulationRecord pops = new ExperimentspopulationRecord("", experiment.getId(),
+                                R(populationOperations.getPopulationsAnswerOptionFromPopulation(
+                                        population.getId(), s))
+                                        .getIdPopulationAnswerOption(),
+                                platformPopulation.getPlatformId()+"", false); /*FIXME*/
+                        result.add(pops);
+                    });
+
+                })
+        );
+
+        return result;
     }
 
     /**
@@ -60,9 +110,31 @@ public class ExperimentResource {
      */
     public Experiment put(Request request, Response response) {
         Experiment experiment = request.attribute("input");
-        int id = experimentOperations.insertNewExperiment(experimentOperations.toRecord(experiment));
 
-        return experimentOperations.toProto(R(experimentOperations.getExperiment(id)));
+        ExperimentRecord record = ExperimentTransform.toRecord(experiment);
+        List<TagRecord> tags = TagConstraintTransform.getTags(experiment);
+        List<ConstraintRecord> constraints = TagConstraintTransform.getConstraints(experiment);
+        List<ExperimentspopulationRecord> populations = convertToRecords(experiment);
+
+        int id = experimentOperations.insertNewExperiment(record);
+
+        tags = tags.stream()
+                .map(tagRecord -> tagConstraintsOperations.createTag(tagRecord))
+                .collect(Collectors.toList());
+
+        constraints = constraints.stream()
+                .map(constraintRecord -> tagConstraintsOperations.createConstraint(constraintRecord))
+                .collect(Collectors.toList());
+
+        populations.forEach(experimentspopulationRecord ->
+            populationOperations.insertExperimentPopulation(experimentspopulationRecord)
+        );
+
+        return ExperimentTransform.toProto(R(experimentOperations.getExperiment(id)),
+                experimentOperations.getExperimentState(id),
+                constraints,
+                getPlatforms(id),
+                tags);
     }
 
     /**
@@ -73,7 +145,54 @@ public class ExperimentResource {
      */
     public Experiment get(Request request, Response response) {
         int id = getParamInt(request, "id");
-        return experimentOperations.toProto(R(experimentOperations.getExperiment(id)));
+        ExperimentRecord experimentRecord = R(experimentOperations.getExperiment(id));
+        Experiment.State state = experimentOperations.getExperimentState(id);
+        List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
+        List<ConstraintRecord> constraintRecords = tagConstraintsOperations.getConstraints(id);
+        List<Experiment.PlatformPopulation> platforms = getPlatforms(id);
+
+        return ExperimentTransform.toProto(experimentRecord,
+                state,
+                constraintRecords,
+                platforms,
+                tagRecords);
+    }
+
+    /**
+     * Will take the id of an experiment and return the platform tree with
+     * all published platforms with the according populations
+     * @param id
+     * @return
+     */
+    private List<Experiment.PlatformPopulation> getPlatforms(int id) {
+        List<Experiment.PlatformPopulation> platforms = new ArrayList<>();
+        List<ExperimentspopulationRecord> records = experimentOperations.getPopulations(id);
+        Map<String, List<Population>> convert = new HashMap<>();
+
+        //build the list of populations / platforms
+        records.forEach(experimentspopulationRecord -> {
+            //fetch the answeroption which is used as answer to get to the acutal population
+            PopulationAnswerOptionRecord a =
+                    R(populationOperations.getPopulationAnswerOption(experimentspopulationRecord.getAnswer()));
+            Population pop = R(populationOperations.getPopulation(a.getPopulation()));
+
+            //add the population to the correct platform
+            List<Population> pops = convert.get(experimentspopulationRecord.getReferencedPlatform());
+            if (pops == null) {
+                pops = new ArrayList<>();
+                convert.put(experimentspopulationRecord.getReferencedPlatform(), pops);
+            }
+            pops.add(pop);
+        });
+
+        convert.forEach((s, populations) -> {
+            platforms.add(Experiment.PlatformPopulation.newBuilder()
+                    //.setPlatformId(s)
+                    .addAllPopulations(populations)
+                    .build());
+        });
+
+        return platforms;
     }
 
     /**
@@ -85,13 +204,55 @@ public class ExperimentResource {
     public Experiment patch(Request request, Response response) {
         int id = getParamInt(request, "id");
         Experiment experiment = request.attribute("input");
+        ExperimentRecord original = R(experimentOperations.getExperiment(id));
 
+        if (experiment.getState() != experimentOperations.getExperimentState(id)) {
+            final int[] count = {0};
 
+            experiment.getAllFields().forEach((fieldDescriptor, o) -> count[0]++);
 
-        if (!experimentOperations.updateExperiment(R(experimentOperations.getExperiment(id)))) {
-            throw new InternalServerErrorException("Updating of the experiment failed!");
+            if (count[0] > 1)
+                throw new IllegalStateException("if you change the state nothing else can be changed");
+        } else {
+            ExperimentRecord experimentRecord = ExperimentTransform.mergeProto(original, experiment);
+            experimentRecord.setIdExperiment(id);
+
+            //update tags if they were updated
+            List<TagRecord> tags = TagConstraintTransform.getTags(experiment);
+            if (!tags.isEmpty()) {
+                tagConstraintsOperations.deleteAllTags(id);
+                tags.forEach(tagRecord -> tagConstraintsOperations.createTag(tagRecord));
+            }
+
+            //update constraints if they were changed
+            List<ConstraintRecord> constraints = TagConstraintTransform.getConstraints(experiment);
+            if (!constraints.isEmpty()) {
+                tagConstraintsOperations.deleteAllConstraint(id);
+                constraints.forEach(constraintRecord -> tagConstraintsOperations.createConstraint(constraintRecord));
+            }
+
+            //update population records from the experiment
+            List<ExperimentspopulationRecord> records = convertToRecords(experiment);
+            if (!records.isEmpty()) {
+                populationOperations.deleteAllExperimentPopulation(id);
+                records.forEach(experimentspopulationRecord -> populationOperations.insertExperimentPopulation(experimentspopulationRecord));
+            }
+
+            //update the experiment itself
+            experimentOperations.updateExperiment(experimentRecord);
         }
-        return experimentOperations.toProto(R(experimentOperations.getExperiment(id)));
+        List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
+        List<ConstraintRecord> constraintRecords = tagConstraintsOperations.getConstraints(id);
+        List<Experiment.PlatformPopulation> platforms = getPlatforms(id);
+
+        //TODO update signal
+
+        return ExperimentTransform.toProto(
+                R(experimentOperations.getExperiment(id)),
+                experimentOperations.getExperimentState(id),
+                constraintRecords,
+                platforms,
+                tagRecords);
     }
 
     /**
@@ -104,8 +265,9 @@ public class ExperimentResource {
         int id = getParamInt(request, "id");
 
         if (!experimentOperations.deleteExperiment(id)) {
-            throw new InternalServerErrorException("Deleting experiment failed");
+            throw new InternalServerErrorException("Resource not found!");
         }
+
         return null;
     }
 
@@ -120,9 +282,9 @@ public class ExperimentResource {
         boolean asc = getQueryBool(request, "asc", true);
         int experimentId = getParamInt(request, "id");
 
-        return R(answerRatingOperations.getAnswersFrom(experimentId, from, asc, 20))
-                .map(answerRecord -> answerRatingOperations
-                    .toAnswerProto(answerRecord, answerRatingOperations.getRatings(answerRecord.getIdAnswer())))
+        return answerRatingOperations.getAnswersFrom(experimentId, from, asc, 20)
+                .map(answerRecord -> AnswerRatingTransform.toAnswerProto(answerRecord,
+                        answerRatingOperations.getRatings(answerRecord.getIdAnswer())))
                 .constructPaginated(AnswerList.newBuilder(), AnswerList.Builder::addAllItems);
     }
 
@@ -136,14 +298,33 @@ public class ExperimentResource {
         int experimentId = getParamInt(request, "id");
         Answer answer = request.attribute("input");
 
-        if (answer.getRatingsCount() != 0) throw new BadRequestException("A answer Resource can not have ratings while creating!");
+        //throw on ratings in the answer
+        if (answer.getRatingsCount() != 0)
+            throw new BadRequestException("A answer Resource can not have ratings while creating!");
 
-        int id = answerRatingOperations.insertNewAnswer(answerRatingOperations.toAnswerRecord(answer, experimentId));
+        //the worker of this rating does not exist
+        if (!workerOperations.getWorker(answer.getWorker()).isPresent())
+            throw new BadRequestException("The given worker does not exists!");
 
-        return answerRatingOperations.toAnswerProto(
-                R(answerRatingOperations.getAnswer(experimentId, id)),
-                answerRatingOperations.getRatings(id)
+        //check that the experiment really exists
+        if (!experimentOperations.getExperiment(answer.getExperimentId()).isPresent())
+            throw new BadRequestException("Experiment does not exists!");
+
+        //check that the experiment id does not differ
+        if (experimentId != answer.getExperimentId())
+            throw new BadRequestException("Experiment id of call and object are differing");
+
+        if (answer.getQuality() != 0)
+            throw new BadRequestException("Quality cannot be set at creation");
+
+        AnswerRecord record = answerRatingOperations.insertNewAnswer(
+                AnswerRatingTransform.toAnswerRecord(answer, experimentId)
         );
+
+        response.status(201);
+        response.header("Location","/experiment/"+experimentId+"/answers/"+answer.getId()+"");
+
+        return AnswerRatingTransform.toAnswerProto(record,Collections.emptyList());
     }
 
     /**
@@ -155,11 +336,13 @@ public class ExperimentResource {
     public Answer getAnswer(Request request, Response response) {
         int experimentId = getParamInt(request, "id");
         int answerId = getParamInt(request, "aid");
+        AnswerRecord record = R(answerRatingOperations.getAnswer(answerId));
 
-        return answerRatingOperations.toAnswerProto(
-                R(answerRatingOperations.getAnswer(experimentId, answerId)),
-                answerRatingOperations.getRatings(answerId)
-        );
+        if (experimentId != record.getExperiment())
+            throw new IllegalArgumentException("Answer not found for the given experiment");
+
+        return AnswerRatingTransform.toAnswerProto (record,
+                answerRatingOperations.getRatings(answerId));
     }
 
     /**
@@ -173,10 +356,16 @@ public class ExperimentResource {
         int answerId = getParamInt(request, "aid");
         Rating rating = request.attribute("input");
 
-        int id = answerRatingOperations.insertNewRating(
-                    answerRatingOperations.toRatingRecord(rating, answerId, experimentId)
+        if (rating.getQuality() != 0) {
+            throw new IllegalArgumentException("Quality cannot be set when creating a Rating");
+        }
+
+        RatingRecord r = answerRatingOperations.insertNewRating(
+                    AnswerRatingTransform.toRatingRecord(rating, answerId, experimentId)
                 );
 
-        return answerRatingOperations.toRatingProto(R(answerRatingOperations.getRating(id)));
+        response.status(201);
+
+        return AnswerRatingTransform.toRatingProto(r);
     }
 }

@@ -68,6 +68,7 @@ public class Main {
         PopulationOperations populationOperations = new PopulationOperations(databaseManager.getContext());
         ExperimentOperations experimentOperations = new ExperimentOperations(databaseManager.getContext());
         AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext());
+        TagConstraintsOperations tagConstraintsOperations = new TagConstraintsOperations(databaseManager.getContext());
 
         new Router(
                 new TemplateResource(templateOperations),
@@ -75,7 +76,7 @@ public class Main {
                 new PlatformResource(platformOperations),
                 new WorkerResource(workerOperations, platformManager),
                 new PopulationResource(populationOperations),
-                new ExperimentResource(experimentOperations, answerRatingOperations)
+                new ExperimentResource(experimentOperations, answerRatingOperations, populationOperations, tagConstraintsOperations, workerOperations, platformOperations)
         ).init();
     }
 }
