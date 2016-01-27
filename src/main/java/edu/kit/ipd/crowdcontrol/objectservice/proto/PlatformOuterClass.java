@@ -22,10 +22,11 @@ public final class PlatformOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016platform.proto\022\014crowdcontrol\"$\n\010Platfo" +
-      "rm\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\tB0\n,edu.kit." +
-      "ipd.crowdcontrol.objectservice.protoP\001b\006" +
-      "proto3"
+      "\n\016platform.proto\022\014crowdcontrol\032\020populati" +
+      "on.proto\"S\n\010Platform\022\n\n\002id\030\001 \001(\t\022\014\n\004name" +
+      "\030\002 \001(\t\022-\n\013populations\030\003 \003(\0132\030.crowdcontr" +
+      "ol.PopulationB0\n,edu.kit.ipd.crowdcontro" +
+      "l.objectservice.protoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -38,13 +39,15 @@ public final class PlatformOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOuterClass.getDescriptor(),
         }, assigner);
     internal_static_crowdcontrol_Platform_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_crowdcontrol_Platform_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_crowdcontrol_Platform_descriptor,
-        new java.lang.String[] { "Id", "Name", });
+        new java.lang.String[] { "Id", "Name", "Populations", });
+    edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOuterClass.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)
