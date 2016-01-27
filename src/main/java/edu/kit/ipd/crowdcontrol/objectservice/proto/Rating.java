@@ -19,6 +19,7 @@ public  final class Rating extends
     rating_ = 0;
     feedback_ = "";
     worker_ = 0;
+    quality_ = 0;
     time_ = 0;
   }
 
@@ -68,6 +69,11 @@ public  final class Rating extends
             break;
           }
           case 40: {
+
+            quality_ = input.readInt32();
+            break;
+          }
+          case 48: {
 
             time_ = input.readInt32();
             break;
@@ -157,10 +163,19 @@ public  final class Rating extends
     return worker_;
   }
 
-  public static final int TIME_FIELD_NUMBER = 5;
+  public static final int QUALITY_FIELD_NUMBER = 5;
+  private int quality_;
+  /**
+   * <code>optional int32 quality = 5;</code>
+   */
+  public int getQuality() {
+    return quality_;
+  }
+
+  public static final int TIME_FIELD_NUMBER = 6;
   private int time_;
   /**
-   * <code>optional int32 time = 5;</code>
+   * <code>optional int32 time = 6;</code>
    */
   public int getTime() {
     return time_;
@@ -190,8 +205,11 @@ public  final class Rating extends
     if (worker_ != 0) {
       output.writeInt32(4, worker_);
     }
+    if (quality_ != 0) {
+      output.writeInt32(5, quality_);
+    }
     if (time_ != 0) {
-      output.writeInt32(5, time_);
+      output.writeInt32(6, time_);
     }
   }
 
@@ -215,9 +233,13 @@ public  final class Rating extends
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(4, worker_);
     }
+    if (quality_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(5, quality_);
+    }
     if (time_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(5, time_);
+        .computeInt32Size(6, time_);
     }
     memoizedSize = size;
     return size;
@@ -338,6 +360,8 @@ public  final class Rating extends
 
       worker_ = 0;
 
+      quality_ = 0;
+
       time_ = 0;
 
       return this;
@@ -366,6 +390,7 @@ public  final class Rating extends
       result.rating_ = rating_;
       result.feedback_ = feedback_;
       result.worker_ = worker_;
+      result.quality_ = quality_;
       result.time_ = time_;
       onBuilt();
       return result;
@@ -394,6 +419,9 @@ public  final class Rating extends
       }
       if (other.getWorker() != 0) {
         setWorker(other.getWorker());
+      }
+      if (other.getQuality() != 0) {
+        setQuality(other.getQuality());
       }
       if (other.getTime() != 0) {
         setTime(other.getTime());
@@ -571,15 +599,41 @@ public  final class Rating extends
       return this;
     }
 
+    private int quality_ ;
+    /**
+     * <code>optional int32 quality = 5;</code>
+     */
+    public int getQuality() {
+      return quality_;
+    }
+    /**
+     * <code>optional int32 quality = 5;</code>
+     */
+    public Builder setQuality(int value) {
+      
+      quality_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 quality = 5;</code>
+     */
+    public Builder clearQuality() {
+      
+      quality_ = 0;
+      onChanged();
+      return this;
+    }
+
     private int time_ ;
     /**
-     * <code>optional int32 time = 5;</code>
+     * <code>optional int32 time = 6;</code>
      */
     public int getTime() {
       return time_;
     }
     /**
-     * <code>optional int32 time = 5;</code>
+     * <code>optional int32 time = 6;</code>
      */
     public Builder setTime(int value) {
       
@@ -588,7 +642,7 @@ public  final class Rating extends
       return this;
     }
     /**
-     * <code>optional int32 time = 5;</code>
+     * <code>optional int32 time = 6;</code>
      */
     public Builder clearTime() {
       
