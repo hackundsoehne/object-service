@@ -90,7 +90,7 @@ public class ExperimentResource {
                                 R(calibrationOperations.getCalibrationAnswerOptionFromCalibrations(
                                         calibration.getId(), s))
                                         .getIdCalibrationAnswerOption(),
-                                platformCalibrations.getPlatformId()+"", false); /*FIXME*/
+                                platformCalibrations.getPlatformId(), false);
                         result.add(pops);
                     });
                 })
