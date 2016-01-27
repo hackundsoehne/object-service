@@ -31,6 +31,7 @@ public class WorkerBalanceOperations extends AbstractOperations {
                 .where(GIFT_CODE.ID_GIFT_CODE.notIn(
                         DSL.select(WORKER_BALANCE.GIFT_CODE).from(WORKER_BALANCE).where(WORKER_BALANCE.GIFT_CODE.isNotNull()))
                 )
+                .orderBy(GIFT_CODE.AMOUNT.desc())
                 .fetch();
     }
 
