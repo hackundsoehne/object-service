@@ -1,14 +1,13 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import org.jooq.util.derby.sys.Sys;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.PasswordAuthentication;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
+import javax.mail.*;
+import javax.mail.internet.MimeMessage;
+import java.io.*;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -28,9 +27,27 @@ public class MailParserTest {
         boolean msgCorrect;
         Message[] msgs = handler.fetchFolder("inbox");
         for (int i = 0; i < msgs.length; i++) {
-            System.out.println(msgs[i].getContentType());
+            Multipart parts = (Multipart) msgs[i].getContent();
+            BodyPart body = parts.getBodyPart(0);
+            Multipart innermsg = (Multipart) body.getContent();
+            BodyPart textBody = innermsg.getBodyPart(0);
+            StringBuilder message = new StringBuilder();
+            String messageLine= new String();
+            InputStream inputStream = textBody.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            while ((messageLine = bufferedReader.readLine()) != null) {
+                message.append(messageLine);
+                message.append(System.getProperty("line.separator"));
+            }
+            //System.out.println(message);
+            String giftCode = message.toString().split("Gutscheincode: ")[1];
+            giftCode = giftCode.split("Ablaufdatum:")[0];
+            String amount = message.toString().split("Betrag: ")[1];
+            amount = amount.split(" €")[0];
+            amount = amount.split(",")[0].concat(amount.split(",")[1]);
             if(msgs[i].getContentType()==null){}
         }
+
     }
 
     @Before
@@ -48,7 +65,7 @@ public class MailParserTest {
         props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
         Properties properties = new Properties();
-        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/integration-test/resources/gmailLogin.properties"));
+        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/test/resources/gmailLogin.properties"));
         properties.load(stream);
         stream.close();
         Authenticator auth = new Authenticator() {

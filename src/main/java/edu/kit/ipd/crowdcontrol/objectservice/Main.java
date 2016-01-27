@@ -59,6 +59,7 @@ public class Main {
     }
 
     private static void boot(DatabaseManager databaseManager, String readOnlyDBUser, String readOnlyDBPassword) throws SQLException {
+        PlatformManager platformManager = null; // TODO
 
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnlyDBUser, readOnlyDBPassword);

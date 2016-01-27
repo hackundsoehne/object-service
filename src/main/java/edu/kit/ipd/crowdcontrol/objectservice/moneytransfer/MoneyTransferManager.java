@@ -7,9 +7,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperatio
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import org.jooq.Result;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
@@ -52,6 +54,22 @@ public class MoneyTransferManager {
      * Pays all workers depending on their logged money transfers.
      */
     public void payOff() {
+        //Fetch new GiftCodes
+        Message[] messages = new Message[0];
+        try {
+            messages = mailHandler.fetchUnseen("inbox");
+        } catch (MessagingException e){
+            e.printStackTrace();
+        }
+        for (int i = 0; i < messages.length; i++) {
+            try {
+                GiftCodeRecord rec = MailParser.parseMail(messages[i]);
+                workerBalanceOperations.addGiftCode(rec.getCode(), rec.getAmount());
+            } catch (MessagingException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //Choose giftcodes and pay workers
         Result<WorkerRecord> workers = workerOperations.getWorkerWithCreditBalanceGreaterOrEqual(payOffThreshold);
         Iterator<WorkerRecord> workerIt = workers.iterator();
         List<GiftCodeRecord> giftCodes = workerBalanceOperations.getUnusedGiftCodes();
@@ -66,6 +84,7 @@ public class MoneyTransferManager {
         if (giftCodes.size() < minGiftCodesCount) {
             notificationTextHTML = notificationTextHTML + "There are less than " + minGiftCodesCount + " giftcodes in the database. It is recommended to add more.<br/>";
         }
+        //Send notification to scientist
         sendNotification();
     }
 
@@ -79,7 +98,7 @@ public class MoneyTransferManager {
             }
             GiftCodeRecord nextCode = giftCodesIt.next();
             if (nextCode.getAmount() <= creditBalance) {
-                workerBalanceOperations.addDebit(worker.getIdWorker(), nextCode.getAmount(), nextCode.getCode());
+                //workerBalanceOperations.addDebit(worker.getIdWorker(), nextCode.getAmount(), nextCode.getCode());
                 payedCodes.add(nextCode);
             }
         }
