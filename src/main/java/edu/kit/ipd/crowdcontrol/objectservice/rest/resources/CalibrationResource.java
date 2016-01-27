@@ -1,6 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PopulationOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.CalibrationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Population;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
@@ -13,14 +13,14 @@ import spark.Response;
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
 /**
- * Handles requests to population resources.
+ * Handles requests to calibration resources.
  *
  * @author Niklas Keller
  */
-public class PopulationResource {
-    private PopulationOperations operations;
+public class CalibrationResource {
+    private CalibrationOperations operations;
 
-    public PopulationResource(PopulationOperations operations) {
+    public CalibrationResource(CalibrationOperations operations) {
         this.operations = operations;
     }
 
@@ -28,13 +28,13 @@ public class PopulationResource {
      * @param request  request provided by Spark
      * @param response response provided by Spark
      *
-     * @return A list of all populations.
+     * @return a list of all calibrations.
      */
     public Paginated<Integer> all(Request request, Response response) {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
-        return operations.getPopulationFrom(from, asc, 20)
+        return operations.getCalibrationsFrom(from, asc, 20)
                 .constructPaginated(PopulationList.newBuilder(), PopulationList.Builder::addAllItems);
     }
 
@@ -42,10 +42,10 @@ public class PopulationResource {
      * @param request  request provided by Spark
      * @param response response provided by Spark
      *
-     * @return A single population.
+     * @return a single calibration.
      */
     public Population get(Request request, Response response) {
-        return operations.getPopulation(getParamInt(request, "id"))
+        return operations.getCalibration(getParamInt(request, "id"))
                 .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
 
@@ -53,19 +53,19 @@ public class PopulationResource {
      * @param request  request provided by Spark
      * @param response response provided by Spark
      *
-     * @return The created population.
+     * @return the created calibration.
      */
     public Population put(Request request, Response response) {
         Population population = request.attribute("input");
 
         try {
-            population = operations.insertPopulation(population);
+            population = operations.insertCalibration(population);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Name and content must be set!");
         }
 
         response.status(201);
-        response.header("Location", "/populations/" + population.getId());
+        response.header("Location", "/calibrations/" + population.getId());
 
         return population;
     }
@@ -78,15 +78,15 @@ public class PopulationResource {
      */
     public Population delete(Request request, Response response) {
         try {
-            boolean existed = operations.deletePopulation(getParamInt(request, "id"));
+            boolean existed = operations.deleteCalibration(getParamInt(request, "id"));
 
             if (!existed) {
-                throw new NotFoundException("Population does not exist!");
+                throw new NotFoundException("Calibration does not exist!");
             }
 
             return null;
         } catch (IllegalArgumentException e) {
-            throw new ConflictException("Population is still in use and can't be deleted.");
+            throw new ConflictException("Calibration is still in use and can't be deleted.");
         }
     }
 }

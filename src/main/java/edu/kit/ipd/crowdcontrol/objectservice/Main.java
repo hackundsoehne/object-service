@@ -65,7 +65,7 @@ public class Main {
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnlyDBUser, readOnlyDBPassword);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
         WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
-        PopulationOperations populationOperations = new PopulationOperations(databaseManager.getContext());
+        CalibrationOperations calibrationOperations = new CalibrationOperations(databaseManager.getContext());
         ExperimentOperations experimentOperations = new ExperimentOperations(databaseManager.getContext());
         AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext());
         TagConstraintsOperations tagConstraintsOperations = new TagConstraintsOperations(databaseManager.getContext());
@@ -75,8 +75,8 @@ public class Main {
                 new NotificationResource(notificationRestOperations),
                 new PlatformResource(platformOperations),
                 new WorkerResource(workerOperations, platformManager),
-                new PopulationResource(populationOperations),
-                new ExperimentResource(experimentOperations, answerRatingOperations, populationOperations, tagConstraintsOperations, workerOperations, platformOperations)
+                new CalibrationResource(calibrationOperations),
+                new ExperimentResource(experimentOperations, answerRatingOperations, calibrationOperations, tagConstraintsOperations, workerOperations, platformOperations)
         ).init();
     }
 }

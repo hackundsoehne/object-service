@@ -37,7 +37,7 @@ public class Router implements SparkApplication {
     private final NotificationResource notificationResource;
     private final PlatformResource platformResource;
     private final WorkerResource workerResource;
-    private final PopulationResource populationResource;
+    private final CalibrationResource calibrationResource;
     private final ExperimentResource experimentResource;
 
     /**
@@ -45,12 +45,12 @@ public class Router implements SparkApplication {
      */
     public Router(TemplateResource templateResource, NotificationResource notificationResource,
                   PlatformResource platformResource, WorkerResource workerResource,
-                  PopulationResource populationResource,
+                  CalibrationResource calibrationResource,
                   ExperimentResource experimentResource) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
-        this.populationResource = populationResource;
+        this.calibrationResource = calibrationResource;
         this.workerResource = workerResource;
         this.experimentResource = experimentResource;
     }
@@ -111,10 +111,10 @@ public class Router implements SparkApplication {
         get("/platforms", platformResource::all);
         get("/platforms/:id", platformResource::get);
 
-        put("/populations", populationResource::put, Population.class);
-        get("/populations", populationResource::all);
-        get("/populations/:id", populationResource::get);
-        delete("/populations/:id", populationResource::delete);
+        put("/calibrations", calibrationResource::put, Population.class);
+        get("/calibrations", calibrationResource::all);
+        get("/calibrations/:id", calibrationResource::get);
+        delete("/calibrations/:id", calibrationResource::delete);
 
         get("/workers/:platform/identity", workerResource::identify);
         put("/workers", workerResource::put, Worker.class);

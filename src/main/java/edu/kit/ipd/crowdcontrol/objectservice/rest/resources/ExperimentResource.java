@@ -29,15 +29,15 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getQueryIn
 public class ExperimentResource {
     private final ExperimentOperations experimentOperations;
     private final AnswerRatingOperations answerRatingOperations;
-    private final PopulationOperations populationOperations;
+    private final CalibrationOperations calibrationOperations;
     private final TagConstraintsOperations tagConstraintsOperations;
     private final WorkerOperations workerOperations;
     private final PlatformOperations platformOperations;
 
-    public ExperimentResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations, PopulationOperations populationOperations, TagConstraintsOperations tagConstraintsOperations, WorkerOperations workerOperations, PlatformOperations platformOperations) {
+    public ExperimentResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations, CalibrationOperations calibrationOperations, TagConstraintsOperations tagConstraintsOperations, WorkerOperations workerOperations, PlatformOperations platformOperations) {
         this.experimentOperations = experimentOperations;
         this.answerRatingOperations = answerRatingOperations;
-        this.populationOperations = populationOperations;
+        this.calibrationOperations = calibrationOperations;
         this.tagConstraintsOperations = tagConstraintsOperations;
         this.workerOperations = workerOperations;
         this.platformOperations = platformOperations;
@@ -74,25 +74,25 @@ public class ExperimentResource {
                 .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
     }
 
-    private List<ExperimentspopulationRecord> convertToRecords(Experiment experiment) {
-        List<Experiment.PlatformPopulation> populations = experiment.getPlatformPopulationsList();
-        List<ExperimentspopulationRecord> result = new ArrayList<>();
+    private List<ExperimentsCalibrationRecord> convertToRecords(Experiment experiment) {
+        List<Experiment.PlatformPopulation> calibrations = experiment.getPlatformPopulationsList();
+        List<ExperimentsCalibrationRecord> result = new ArrayList<>();
 
-        populations.forEach(platformPopulation ->
-                platformPopulation.getPopulationsList().forEach(population -> {
+        calibrations.forEach(platformCalibrations ->
+                platformCalibrations.getPopulationsList().forEach(calibration -> {
 
-                    //check if this population exists
-                    if (!populationOperations.getPopulation(population.getId()).isPresent())
-                        throw new IllegalArgumentException("Population "+population.getId()+" does not exists");
+                    //check if this calibration exists
+                    if (!calibrationOperations.getCalibration(calibration.getId()).isPresent())
+                        throw new IllegalArgumentException("Calibration "+calibration.getId()+" does not exists");
 
-                    //go throuw all possible answers and add them
-                    population.getAcceptedAnswersList().forEach(s ->
+                    //go through all possible answers and add them
+                    calibration.getAcceptedAnswersList().forEach(s ->
                     {
-                        ExperimentspopulationRecord pops = new ExperimentspopulationRecord("", experiment.getId(),
-                                R(populationOperations.getPopulationsAnswerOptionFromPopulation(
-                                        population.getId(), s))
-                                        .getIdPopulationAnswerOption(),
-                                platformPopulation.getPlatformId()+"", false); /*FIXME*/
+                        ExperimentsCalibrationRecord pops = new ExperimentsCalibrationRecord(null, experiment.getId(),
+                                R(calibrationOperations.getPopulationsAnswerOptionFromPopulation(
+                                        calibration.getId(), s))
+                                        .getIdCalibrationAnswerOption(),
+                                platformCalibrations.getPlatformId()+"", false); /*FIXME*/
                         result.add(pops);
                     });
 
@@ -114,7 +114,7 @@ public class ExperimentResource {
         ExperimentRecord record = ExperimentTransform.toRecord(experiment);
         List<TagRecord> tags = TagConstraintTransform.getTags(experiment);
         List<ConstraintRecord> constraints = TagConstraintTransform.getConstraints(experiment);
-        List<ExperimentspopulationRecord> populations = convertToRecords(experiment);
+        List<ExperimentsCalibrationRecord> calibrations = convertToRecords(experiment);
 
         int id = experimentOperations.insertNewExperiment(record);
 
@@ -126,8 +126,8 @@ public class ExperimentResource {
                 .map(constraintRecord -> tagConstraintsOperations.createConstraint(constraintRecord))
                 .collect(Collectors.toList());
 
-        populations.forEach(experimentspopulationRecord ->
-            populationOperations.insertExperimentPopulation(experimentspopulationRecord)
+        calibrations.forEach(ExperimentsCalibrationRecord ->
+            calibrationOperations.insertExperimentPopulation(ExperimentsCalibrationRecord)
         );
 
         return ExperimentTransform.toProto(R(experimentOperations.getExperiment(id)),
@@ -160,35 +160,35 @@ public class ExperimentResource {
 
     /**
      * Will take the id of an experiment and return the platform tree with
-     * all published platforms with the according populations
+     * all published platforms with the according calibrations
      * @param id
      * @return
      */
     private List<Experiment.PlatformPopulation> getPlatforms(int id) {
         List<Experiment.PlatformPopulation> platforms = new ArrayList<>();
-        List<ExperimentspopulationRecord> records = experimentOperations.getPopulations(id);
+        List<ExperimentsCalibrationRecord> records = experimentOperations.getPopulations(id);
         Map<String, List<Population>> convert = new HashMap<>();
 
-        //build the list of populations / platforms
-        records.forEach(experimentspopulationRecord -> {
-            //fetch the answeroption which is used as answer to get to the acutal population
-            PopulationAnswerOptionRecord a =
-                    R(populationOperations.getPopulationAnswerOption(experimentspopulationRecord.getAnswer()));
-            Population pop = R(populationOperations.getPopulation(a.getPopulation()));
+        //build the list of calibrations / platforms
+        records.forEach(ExperimentsCalibrationRecord -> {
+            //fetch the answeroption which is used as answer to get to the actual calibration
+            CalibrationAnswerOptionRecord a =
+                    R(calibrationOperations.getCalibrationAnswerOption(ExperimentsCalibrationRecord.getAnswer()));
+            Population pop = R(calibrationOperations.getCalibration(a.getCalibration()));
 
-            //add the population to the correct platform
-            List<Population> pops = convert.get(experimentspopulationRecord.getReferencedPlatform());
+            //add the calibration to the correct platform
+            List<Population> pops = convert.get(ExperimentsCalibrationRecord.getReferencedPlatform());
             if (pops == null) {
                 pops = new ArrayList<>();
-                convert.put(experimentspopulationRecord.getReferencedPlatform(), pops);
+                convert.put(ExperimentsCalibrationRecord.getReferencedPlatform(), pops);
             }
             pops.add(pop);
         });
 
-        convert.forEach((s, populations) -> {
+        convert.forEach((s, calibrations) -> {
             platforms.add(Experiment.PlatformPopulation.newBuilder()
                     //.setPlatformId(s)
-                    .addAllPopulations(populations)
+                    .addAllPopulations(calibrations)
                     .build());
         });
 
@@ -231,11 +231,11 @@ public class ExperimentResource {
                 constraints.forEach(constraintRecord -> tagConstraintsOperations.createConstraint(constraintRecord));
             }
 
-            //update population records from the experiment
-            List<ExperimentspopulationRecord> records = convertToRecords(experiment);
+            //update calibration records from the experiment
+            List<ExperimentsCalibrationRecord> records = convertToRecords(experiment);
             if (!records.isEmpty()) {
-                populationOperations.deleteAllExperimentPopulation(id);
-                records.forEach(experimentspopulationRecord -> populationOperations.insertExperimentPopulation(experimentspopulationRecord));
+                calibrationOperations.deleteAllExperimentCalibration(id);
+                records.forEach(ExperimentsCalibrationRecord -> calibrationOperations.insertExperimentPopulation(ExperimentsCalibrationRecord));
             }
 
             //update the experiment itself
