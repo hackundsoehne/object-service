@@ -119,11 +119,11 @@ public class ExperimentResource {
         int id = experimentOperations.insertNewExperiment(record);
 
         tags = tags.stream()
-                .map(tagRecord -> tagConstraintsOperations.createTag(tagRecord))
+                .map(tagRecord -> tagConstraintsOperations.insertTag(tagRecord))
                 .collect(Collectors.toList());
 
         constraints = constraints.stream()
-                .map(constraintRecord -> tagConstraintsOperations.createConstraint(constraintRecord))
+                .map(constraintRecord -> tagConstraintsOperations.insertConstraint(constraintRecord))
                 .collect(Collectors.toList());
 
         calibrations.forEach(ExperimentsCalibrationRecord ->
@@ -221,14 +221,14 @@ public class ExperimentResource {
             List<TagRecord> tags = TagConstraintTransform.getTags(experiment);
             if (!tags.isEmpty()) {
                 tagConstraintsOperations.deleteAllTags(id);
-                tags.forEach(tagRecord -> tagConstraintsOperations.createTag(tagRecord));
+                tags.forEach(tagRecord -> tagConstraintsOperations.insertTag(tagRecord));
             }
 
             //update constraints if they were changed
             List<ConstraintRecord> constraints = TagConstraintTransform.getConstraints(experiment);
             if (!constraints.isEmpty()) {
                 tagConstraintsOperations.deleteAllConstraint(id);
-                constraints.forEach(constraintRecord -> tagConstraintsOperations.createConstraint(constraintRecord));
+                constraints.forEach(constraintRecord -> tagConstraintsOperations.insertConstraint(constraintRecord));
             }
 
             //update calibration records from the experiment
