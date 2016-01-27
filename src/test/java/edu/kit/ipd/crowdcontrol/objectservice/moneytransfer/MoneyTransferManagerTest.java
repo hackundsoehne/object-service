@@ -55,7 +55,7 @@ public class MoneyTransferManagerTest {
         worker0.setEmail("pseipd@gmail.com");
         worker1.setEmail("pseipd@gmail.com");
 
-        worker0.setCreditBalance(30);
+        payops.addCredit(worker0.getIdWorker(),30, 0);
         worker1.setCreditBalance(30);
         System.out.println(worker0.getCreditBalance());
 

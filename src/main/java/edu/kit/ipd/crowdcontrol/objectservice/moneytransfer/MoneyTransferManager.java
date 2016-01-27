@@ -4,13 +4,12 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Gift
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PaymentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WokerOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import javax.mail.Authenticator;
 import javax.mail.MessagingException;
@@ -23,7 +22,7 @@ import javax.mail.MessagingException;
 public class MoneyTransferManager {
 
     MailHandler mailHandler;
-    PaymentOperations paymentOperations;
+    WorkerBalanceOperations workerBalanceOperations;
     WorkerOperations workerOperations;
 
     int payOffThreshold;
@@ -32,10 +31,10 @@ public class MoneyTransferManager {
     String notificationTextHTML;
 
 
-    public MoneyTransferManager(MailHandler mailHandler, PaymentOperations paymentOperations, WorkerOperations workerOperations, String notificationMailAddress) throws MessagingException {
+    public MoneyTransferManager(MailHandler mailHandler, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, String notificationMailAddress) throws MessagingException {
         this.mailHandler = mailHandler;
         this.workerOperations = workerOperations;
-        this.paymentOperations = paymentOperations;
+        this.workerBalanceOperations = workerBalanceOperations;
         this.minGiftCodesCount = 10;
         this.payOffThreshold = 0;
         this.notificationMailAddress = notificationMailAddress;
@@ -47,9 +46,8 @@ public class MoneyTransferManager {
      * @param workerID the id of the worker, who gets the money
      * @param amount   the amount of money in ct
      */
-    public void logMoneyTransfer(int workerID, int amount) {
-        WorkerRecord worker = workerOperations.getWorker(workerID);
-        worker.setCreditBalance(worker.getCreditBalance() + amount);
+    public void logMoneyTransfer(int workerID, int amount, int expID) {
+        workerBalanceOperations.addCredit(workerID, amount, expID);
     }
 
     /**
@@ -58,13 +56,13 @@ public class MoneyTransferManager {
     public void payOff() {
         List<WorkerRecord> workers = workerOperations.getWorkersWithCreditBalanceGreaterThan(payOffThreshold);
         Iterator<WorkerRecord> workerIt = workers.iterator();
-        List<GiftCodeRecord> giftCodes = paymentOperations.getUnusedGiftCodesDescending();
+        List<GiftCodeRecord> giftCodes = workerBalanceOperations.getUnusedGiftCodes();
 
         while (workerIt.hasNext()) {
             WorkerRecord worker = workerIt.next();
             List<GiftCodeRecord> payedCodesForWorker = chooseGiftCodes(worker, giftCodes);
 
-            giftCodes = paymentOperations.getUnusedGiftCodesDescending();
+            giftCodes = workerBalanceOperations.getUnusedGiftCodesDescending();
             payWorker(worker, payedCodesForWorker);
         }
         if (giftCodes.size() < minGiftCodesCount) {
@@ -84,7 +82,7 @@ public class MoneyTransferManager {
             GiftCodeRecord nextCode = giftCodesIt.next();
             if (nextCode.getAmount() <= creditBalance) {
                 creditBalance -= nextCode.getAmount();
-                paymentOperations.markGiftCodeAsUsed(nextCode, worker);
+                workerBalanceOperations.markGiftCodeAsUsed(nextCode, worker);
                 payedCodes.add(nextCode);
             }
         }
