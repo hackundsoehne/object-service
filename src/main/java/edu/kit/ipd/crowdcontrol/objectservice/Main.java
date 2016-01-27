@@ -2,15 +2,9 @@ package edu.kit.ipd.crowdcontrol.objectservice;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.WorkerResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.jooq.SQLDialect;
 
 import javax.naming.NamingException;
@@ -68,12 +62,14 @@ public class Main {
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnlyDBUser, readOnlyDBPassword);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
         WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
+        PopulationOperations populationOperations = new PopulationOperations(context);
 
         new Router(
                 new TemplateResource(templateOperations),
                 new NotificationResource(notificationRestOperations),
                 new PlatformResource(platformOperations),
-                new WorkerResource(workerOperations, platformManager)
+                new WorkerResource(workerOperations, platformManager),
+                new PopulationResource(populationOperations)
         ).init();
     }
 }

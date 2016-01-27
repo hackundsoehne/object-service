@@ -39,8 +39,8 @@ public class PopulationOperations extends AbstractOperations {
      * @return List of populations
      */
     public Range<Population, Integer> getPopulationFrom(int cursor, boolean next, int limit) {
-        //join is more complicated and the performance gain would be negligible considering the the
-        //expected moderate usage
+        // Join is more complicated and the performance gain would be negligible considering the the
+        // expected moderate usage
         return getNextRange(create.selectFrom(POPULATION), POPULATION.ID_POPULATION, cursor, next, limit)
                 .map(populationRecord -> {
                     List<PopulationAnswerOptionRecord> answers = create.selectFrom(POPULATION_ANSWER_OPTION)
@@ -59,8 +59,8 @@ public class PopulationOperations extends AbstractOperations {
      * @return The population
      */
     public Optional<Population> getPopulation(int id) {
-        //join is more complicated and the performance gain would be negligible considering the the
-        //expected moderate usage
+        // Join is more complicated and the performance gain would be negligible considering the the
+        // expected moderate usage
         return create.fetchOptional(POPULATION, Tables.POPULATION.ID_POPULATION.eq(id))
                 .map(populationRecord -> {
                     List<PopulationAnswerOptionRecord> answers = create.selectFrom(POPULATION_ANSWER_OPTION)
@@ -112,12 +112,14 @@ public class PopulationOperations extends AbstractOperations {
     public boolean deletePopulation(int id) throws IllegalArgumentException{
         boolean isUsed = create.fetchExists(
                 DSL.select()
-                    .from(EXPERIMENTSPOPULATION)
-                    .join(POPULATION_ANSWER_OPTION).onKey()
-                    .where(POPULATION_ANSWER_OPTION.POPULATION.eq(id))
+                        .from(EXPERIMENTSPOPULATION)
+                        .join(POPULATION_ANSWER_OPTION).onKey()
+                        .where(POPULATION_ANSWER_OPTION.POPULATION.eq(id))
         );
-        if (isUsed)
+
+        if (isUsed) {
             throw new IllegalArgumentException(String.format("Population %d is still in used", id));
+        }
 
         return create.deleteFrom(POPULATION)
                 .where(POPULATION.ID_POPULATION.eq(id))
