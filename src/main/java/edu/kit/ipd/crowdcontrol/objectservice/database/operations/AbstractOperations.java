@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
@@ -83,18 +84,36 @@ public abstract class AbstractOperations {
     }
 
     /**
-     * returns whether the MessageOrBuilder has the passed field.
+     * Throws an exception if the passed field is not set.
      * @param messageOrBuilder the MessageOrBuilder to check on
      * @param field the field to exist
-     * @return tre if it has the field, false if not
+     * @throws IllegalArgumentException thrown if the field is not set
      */
-    protected boolean hasField(MessageOrBuilder messageOrBuilder, int field) {
-        return messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field));
+    protected void assertHasField(MessageOrBuilder messageOrBuilder, int field) throws IllegalArgumentException {
+        Descriptors.FieldDescriptor fieldDescriptor = messageOrBuilder.getDescriptorForType().findFieldByNumber(field);
+        if (!fieldDescriptor.isRepeated() && !messageOrBuilder.hasField(fieldDescriptor)) {
+            throw new IllegalArgumentException("MessageOrBuilder must have field set: " +
+                    fieldDescriptor.getName());
+        } else if (fieldDescriptor.isRepeated() && ((List) messageOrBuilder.getField(fieldDescriptor)).isEmpty()) {
+            throw new IllegalArgumentException("MessageOrBuilder must have non-empty field: " +
+                    messageOrBuilder.getDescriptorForType().findFieldByNumber(field).getName());
+        }
+    }
+
+    /**
+     * Throws an exception if one of the passed field is not set.
+     * @param messageOrBuilder the MessageOrBuilder to check on
+     * @param fields the fields to exist
+     * @throws IllegalArgumentException thrown if on the field is not set
+     */
+    protected void assertHasField(MessageOrBuilder messageOrBuilder, int... fields) throws IllegalArgumentException {
+        for (int aField : fields) {
+            assertHasField(messageOrBuilder, aField);
+        }
     }
 
     /**
      * this method returns a range of results from a passed query.
-     * @param <R> the type of the records
      * @param query the query to use
      * @param primaryKey the primary key used to index the records inside the range
      * @param start the exclusive start, when the associated record does not fulfill the conditions of the passed query
@@ -102,11 +121,12 @@ public abstract class AbstractOperations {
      *              right (next=false) of the range.
      * @param next whether the Range is right (true) or left of the primary key (false) assuming natural order
      * @param limit the max. amount of the range, may be smaller
+     * @param <R> the type of the records
      * @return an instance of Range
      * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
      */
     protected <R extends org.jooq.Record> Range<R, Integer> getNextRange(SelectWhereStep<R> query, Field<Integer> primaryKey,
-                                                                      Integer start, boolean next, int limit) {
+                                                                         Integer start, boolean next, int limit) {
         return getNextRange(query, primaryKey, start, next, limit, Comparator.naturalOrder());
     }
 
@@ -144,7 +164,7 @@ public abstract class AbstractOperations {
      * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
      */
     protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectWhereStep<R> query, Field<K> primaryKey,
-                                                            K start, boolean next, int limit, Comparator<K> sort) {
+                                                                      K start, boolean next, int limit, Comparator<K> sort) {
         return getNextRange(query.where(true), primaryKey, start, next, limit, sort);
     }
 
@@ -167,10 +187,10 @@ public abstract class AbstractOperations {
      * @return an instance of Range
      */
     protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectConditionStep<R> query, Field<K> primaryKey,
-                                                            K start, boolean next, int limit, Comparator<K> sort) {
+                                                                      K start, boolean next, int limit, Comparator<K> sort) {
         Condition primaryKeyCondition = next
-                            ? primaryKey.greaterOrEqual(start)
-                            : primaryKey.lessOrEqual(start);
+                ? primaryKey.greaterOrEqual(start)
+                : primaryKey.lessOrEqual(start);
 
         SortField<K> sortField = next
                 ? primaryKey.asc()
