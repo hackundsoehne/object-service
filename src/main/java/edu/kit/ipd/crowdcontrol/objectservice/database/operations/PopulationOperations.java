@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.PopulationAnswerOption;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentspopulationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PopulationAnswerOptionRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.PopulationTransform;
@@ -122,5 +124,44 @@ public class PopulationOperations extends AbstractOperations {
         return create.deleteFrom(POPULATION)
                 .where(POPULATION.ID_POPULATION.eq(id))
                 .execute() == 1;
+    }
+
+    /**
+     * Delete all experiment populations of a experiment
+     * @param id The experiment id to use
+     */
+    public void deleteAllExperimentPopulation(int id) {
+
+    }
+
+    /**
+     * Insert a new population in the database
+     * @param experimentspopulationRecord The record to use
+     * @return The new inserted record
+     */
+    public ExperimentspopulationRecord insertExperimentPopulation(ExperimentspopulationRecord experimentspopulationRecord) {
+        //TODO FIXME
+        return null;
+    }
+
+    /**
+     * Returns a populationansweroption with the given id
+     * @param id the id
+     * @return a value if one can be found or empty if not
+     */
+    public Optional<PopulationAnswerOptionRecord> getPopulationAnswerOption(int id) {
+        //TODO FIXME
+        return null;
+    }
+
+    /**
+     * Get a AnswerOption from a population with the given answer
+     * @param population The population this is a answer from
+     * @param answer The answer which should be found
+     * @return A record if one is found
+     */
+    public Optional<PopulationAnswerOptionRecord> getPopulationsAnswerOptionFromPopulation(int population, String answer) {
+        //TODO FIXME
+        return null;
     }
 }

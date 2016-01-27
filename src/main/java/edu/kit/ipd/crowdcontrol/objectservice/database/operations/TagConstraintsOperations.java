@@ -14,7 +14,7 @@ import java.util.Optional;
  * Created by marcel on 27.01.16.
  */
 public class TagConstraintsOperations extends AbstractOperations {
-    protected TagConstraintsOperations(DSLContext create) {
+    public TagConstraintsOperations(DSLContext create) {
         super(create);
     }
 

@@ -2,10 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.transforms;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ConstraintRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TagRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.tools.json.JSONObject;
@@ -18,12 +15,13 @@ import java.util.stream.Collectors;
 /**
  * Created by marcel on 26.01.16.
  */
-public class ExperimentTransformer extends AbstractTransform {
+public class ExperimentTransform extends AbstractTransform {
     public static Experiment toProto(ExperimentRecord record, Experiment.State state,
                                      List<ConstraintRecord> constraintRecords,
-                                     List<PopulationRecord> populationRecords,
+                                     List<Experiment.PlatformPopulation> platforms,
                                      List<TagRecord> tagRecords) {
         Type type = new TypeToken<Map<String, String>>(){}.getType();
+        //lets build here the tree of populations a platforms
         return Experiment.newBuilder()
                 .setId(record.getIdExperiment())
                 .setDescription(record.getDescription())
@@ -40,9 +38,9 @@ public class ExperimentTransformer extends AbstractTransform {
                 .setPaymentRating(record.getBonusRating())
                 .setState(state)
                 .putAllPlaceholders(new Gson().fromJson(record.getTemplateData(), type))
-                .addAllConstraints(constraintRecords.stream().map(ConstraintsTransformer::toProto).collect(Collectors.toList()))
-                .addAllPopulations(populationRecords.stream().map(PopulationTransformer::toProto).collect(Collectors.toList()))
-                .addAllTags(tagRecords.stream().map(TagTransformer::toProto).collect(Collectors.toList()))
+                .addAllConstraints(constraintRecords.stream().map(TagConstraintTransform::toContrainsProto).collect(Collectors.toList()))
+                .addAllPlatformPopulations(platforms)
+                .addAllTags(tagRecords.stream().map(TagConstraintTransform::toTagProto).collect(Collectors.toList()))
                 .build();
     }
 
@@ -51,7 +49,7 @@ public class ExperimentTransformer extends AbstractTransform {
         return new ExperimentRecord(experiment.getId(),
                 experiment.getTitle(),
                 experiment.getDescription(),
-                -1,
+                experiment.getNeededAnswers(),
                 experiment.getRatingsPerAnswer(),
                 experiment.getAnswersPerWorker(),
                 experiment.getRatingsPerWorker(),
@@ -63,7 +61,8 @@ public class ExperimentTransformer extends AbstractTransform {
                 experiment.getPaymentAnswer(),
                 experiment.getPaymentRating(),
                 (new JSONObject(experiment.getPlaceholders())).toString(),
-                experiment.getTemplateId());
+                experiment.getTemplateId(),
+                experiment.getWorkerQualityThreshold());
     }
 
     private static String transform(AnswerType answerType) {
@@ -90,7 +89,7 @@ public class ExperimentTransformer extends AbstractTransform {
                     record.setAnwersPerWorker(experiment.getAnswersPerWorker());
                     break;
                 case Experiment.CONSTRAINTS_FIELD_NUMBER:
-                    //
+                    // has to be done manual with Constraints Transformer
                     break;
                 case Experiment.DESCRIPTION_FIELD_NUMBER:
                     record.setDescription(experiment.getDescription());
@@ -110,17 +109,19 @@ public class ExperimentTransformer extends AbstractTransform {
                 case Experiment.PLACEHOLDERS_FIELD_NUMBER:
                     record.setTemplateData(new JSONObject(experiment.getPlaceholders()).toString());
                     break;
-                case Experiment.POPULATIONS_FIELD_NUMBER:
-                    //
+                case Experiment.PLATFORM_POPULATIONS_FIELD_NUMBER:
+                    // has to be done manual with PopulationsTransformer
                     break;
                 case Experiment.RATINGS_PER_ANSWER_FIELD_NUMBER:
                     record.setRatingsPerAnswer(experiment.getRatingsPerAnswer());
                     break;
                 case Experiment.STATE_FIELD_NUMBER:
-                    //
+                    // this is not merged into the database this event will
+                    // start the platforms to populate this experiment
+                    // which results in entrys in the database which will mark the experiment as published
                     break;
                 case Experiment.TAGS_FIELD_NUMBER:
-                    //
+                    // has to be done manual with TagConstraintTransform
                     break;
                 case Experiment.TEMPLATE_ID_FIELD_NUMBER:
                     record.setTemplate(experiment.getTemplateId());

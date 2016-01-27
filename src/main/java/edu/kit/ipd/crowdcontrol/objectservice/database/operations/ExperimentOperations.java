@@ -2,11 +2,12 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.ExperimentTransformer;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentspopulationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
+import java.util.List;
 import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.EXPERIMENT;
@@ -68,9 +69,24 @@ public class ExperimentOperations extends AbstractOperations {
         });
     }
 
+    /**
+     * Give the state of a experiment
+     * @param id The id of the experiment to use
+     * @return
+     */
     public Experiment.State getExperimentState(int id) {
         //TODO leander
         return Experiment.State.DRAFT;
+    }
+
+    /**
+     * returns all populations of a experiment
+     * @param id
+     * @return
+     */
+    public List<ExperimentspopulationRecord> getPopulations(int id) {
+        //TODO leander
+        return null;
     }
 
     public Range<ExperimentRecord, Integer> getExperimentsFrom(int cursor, boolean next, int limit) {
