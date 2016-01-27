@@ -5,6 +5,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.AnswerRatingTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.ExperimentTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.TagConstraintTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Answer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
@@ -126,21 +128,18 @@ public class ExperimentResource {
         calibrations.forEach(calibrationOperations::insertExperimentCalibration
         );
 
-        return ExperimentTransform.toProto(R(experimentOperations.getExperiment(id)),
-                experimentOperations.getExperimentState(id),
-                constraints,
-                getPlatforms(id),
-                tags);
+        Experiment exp = ExperimentTransform.toProto(R(experimentOperations.getExperiment(id)),
+                            experimentOperations.getExperimentState(id),
+                            constraints,
+                            getPlatforms(id),
+                            tags);
+
+        EventManager.EXPERIMENT_CREATE.emit(exp);
+
+        return exp;
     }
 
-    /**
-     * Returns a experiment which was specified by :id
-     * @param request  Request provided by Spark.
-     * @param response Response provided by Spark.
-     * @return The experiment if it was found
-     */
-    public Experiment get(Request request, Response response) {
-        int id = getParamInt(request, "id");
+    public Experiment fetchExperiment(int id) {
         ExperimentRecord experimentRecord = R(experimentOperations.getExperiment(id));
         Experiment.State state = experimentOperations.getExperimentState(id);
         List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
@@ -152,6 +151,18 @@ public class ExperimentResource {
                 constraintRecords,
                 platforms,
                 tagRecords);
+    }
+
+    /**
+     * Returns a experiment which was specified by :id
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @return The experiment if it was found
+     */
+    public Experiment get(Request request, Response response) {
+        int id = getParamInt(request, "id");
+
+        return fetchExperiment(id);
     }
 
     /**
@@ -198,6 +209,7 @@ public class ExperimentResource {
     public Experiment patch(Request request, Response response) {
         int id = getParamInt(request, "id");
         Experiment experiment = request.attribute("input");
+        Experiment old = fetchExperiment(id);
         ExperimentRecord original = R(experimentOperations.getExperiment(id));
 
         if (experiment.getState() != experimentOperations.getExperimentState(id)) {
@@ -235,18 +247,12 @@ public class ExperimentResource {
             //update the experiment itself
             experimentOperations.updateExperiment(experimentRecord);
         }
-        List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
-        List<ConstraintRecord> constraintRecords = tagConstraintsOperations.getConstraints(id);
-        List<Experiment.PlatformPopulation> platforms = getPlatforms(id);
 
-        //TODO update signal
+        Experiment neww = fetchExperiment(id);
 
-        return ExperimentTransform.toProto(
-                R(experimentOperations.getExperiment(id)),
-                experimentOperations.getExperimentState(id),
-                constraintRecords,
-                platforms,
-                tagRecords);
+        EventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(old, neww));
+
+        return neww;
     }
 
     /**
@@ -257,10 +263,13 @@ public class ExperimentResource {
      */
     public Experiment delete(Request request, Response response) {
         int id = getParamInt(request, "id");
+        Experiment experiment = fetchExperiment(id);
 
         if (!experimentOperations.deleteExperiment(id)) {
             throw new InternalServerErrorException("Resource not found!");
         }
+
+        EventManager.EXPERIMENT_DELETE.emit(experiment);
 
         return null;
     }
@@ -318,7 +327,11 @@ public class ExperimentResource {
         response.status(201);
         response.header("Location","/experiment/"+experimentId+"/answers/"+answer.getId()+"");
 
-        return AnswerRatingTransform.toAnswerProto(record,Collections.emptyList());
+        answer = AnswerRatingTransform.toAnswerProto(record,Collections.emptyList());
+
+        EventManager.ANSWER_CREATE.emit(answer);
+
+        return answer;
     }
 
     /**
@@ -360,6 +373,10 @@ public class ExperimentResource {
 
         response.status(201);
 
-        return AnswerRatingTransform.toRatingProto(r);
+        rating = AnswerRatingTransform.toRatingProto(r);
+
+        EventManager.RATINGS_CREATE.emit(rating);
+
+        return rating;
     }
 }
