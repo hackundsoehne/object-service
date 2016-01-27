@@ -1,6 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationRestOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.NotificationList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
@@ -12,9 +12,9 @@ import spark.Response;
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
 public class NotificationResource {
-    private NotificationRestOperations operations;
+    private NotificationOperations operations;
 
-    public NotificationResource(NotificationRestOperations operations) {
+    public NotificationResource(NotificationOperations operations) {
         this.operations = operations;
     }
 

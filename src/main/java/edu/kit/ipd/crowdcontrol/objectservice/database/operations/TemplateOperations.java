@@ -31,7 +31,7 @@ public class TemplateOperations extends AbstractOperations {
      *
      * @return List of templates.
      */
-    public Range<Template, Integer> all(int cursor, boolean next, int limit) {
+    public Range<Template, Integer> getTemplatesFrom(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(TEMPLATE), TEMPLATE.ID_TEMPLATE, cursor, next, limit)
                 .map(TemplateTransform::toProto);
     }
@@ -44,7 +44,7 @@ public class TemplateOperations extends AbstractOperations {
      *
      * @return The template.
      */
-    public Optional<Template> get(int id) {
+    public Optional<Template> getTemplate(int id) {
         return create.fetchOptional(TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id))
                 .map(TemplateTransform::toProto);
     }
@@ -58,7 +58,7 @@ public class TemplateOperations extends AbstractOperations {
      * @return Template with ID assigned.
      * @throws IllegalArgumentException if the name or content is not set
      */
-    public Template create(Template toStore) throws IllegalArgumentException {
+    public Template insertTemplate(Template toStore) throws IllegalArgumentException {
         assertHasField(toStore,
                 Template.NAME_FIELD_NUMBER,
                 Template.CONTENT_FIELD_NUMBER);
@@ -79,7 +79,7 @@ public class TemplateOperations extends AbstractOperations {
      *
      * @return Updated template.
      */
-    public Template update(int id, Template template) {
+    public Template updateTemplate(int id, Template template) {
         TemplateRecord record = create
                 .fetchOptional(TEMPLATE, TEMPLATE.ID_TEMPLATE.eq(id))
                 .orElseThrow(() -> new NotFoundException("Template does not exist!"));
@@ -98,7 +98,7 @@ public class TemplateOperations extends AbstractOperations {
      *
      * @return {@code true} if deleted, {@code false} otherwise.
      */
-    public boolean delete(int id) {
+    public boolean deleteTemplate(int id) {
         TemplateRecord record = create.newRecord(Tables.TEMPLATE);
         record.setIdTemplate(id);
 

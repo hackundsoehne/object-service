@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Population extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord> {
 
-	private static final long serialVersionUID = -1907960815;
+	private static final long serialVersionUID = 309633744;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Population</code>
@@ -35,11 +35,6 @@ public class Population extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol
 	 * The column <code>crowdcontrol.Population.property</code>.
 	 */
 	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord, java.lang.String> PROPERTY = createField("property", org.jooq.impl.SQLDataType.VARCHAR.length(191).nullable(false), this, "");
-
-	/**
-	 * The column <code>crowdcontrol.Population.description</code>.
-	 */
-	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PopulationRecord, java.lang.String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.CLOB.length(65535), this, "");
 
 	/**
 	 * The column <code>crowdcontrol.Population.name</code>.

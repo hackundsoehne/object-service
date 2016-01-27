@@ -55,13 +55,6 @@ public class PopulationDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontro
 	}
 
 	/**
-	 * Fetch records that have <code>description IN (values)</code>
-	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Population> fetchByDescription(java.lang.String... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Population.POPULATION.DESCRIPTION, values);
-	}
-
-	/**
 	 * Fetch records that have <code>name IN (values)</code>
 	 */
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Population> fetchByName(java.lang.String... values) {

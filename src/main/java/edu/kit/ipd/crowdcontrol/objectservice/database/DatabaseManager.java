@@ -1,20 +1,23 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.zaxxer.hikari.HikariDataSource;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import org.apache.commons.io.IOUtils;
+import org.apache.ibatis.jdbc.ScriptRunner;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Initializes and holds the connection to the database and eventually the database itself.
@@ -26,7 +29,6 @@ public class DatabaseManager {
     private final DSLContext context;
     private final String url;
     private final DataSource ds;
-    private final Connection connection;
 
     /**
      * creates new DatabaseManager.
@@ -72,31 +74,41 @@ public class DatabaseManager {
         if (providedDBPoolName != null) {
             ds = (DataSource) new InitialContext().lookup(providedDBPoolName);
         } else {
-            ComboPooledDataSource cpds = new ComboPooledDataSource();
-            cpds.setJdbcUrl(url);
-            cpds.setUser(userName);
-            cpds.setPassword(password);
-            cpds.setMaxStatements(30);
-            ds = cpds;
+            //TODO performance tweaking maybe?
+            HikariDataSource hds = new HikariDataSource();
+            hds.setJdbcUrl(url);
+            hds.setUsername(userName);
+            hds.setPassword(password);
+            ds = hds;
         }
         this.ds = ds;
-        this.connection = ds.getConnection();
         context = DSL.using(this.ds, sqlDialect);
     }
 
     /**
      * initializes the database if not already initialized.
      */
-    public void initDatabase() {
-        try {
-            String initScript = Files.lines(new File("db.sql").toPath())
-                    .collect(Collectors.joining(System.getProperty("line.separator")));
+    public void initDatabase() throws SQLException {
+        try (InputStream in = DatabaseManager.class.getResourceAsStream("/db.sql")) {
+            String initScript = IOUtils.toString(in, "UTF-8");
             if (Boolean.getBoolean("dropSchema")) {
                 String drop = "DROP DATABASE `crowdcontrol`;";
-                context.fetch(drop);
+                context.execute(drop);
             }
-            if (context.meta().getSchemas().stream().noneMatch(schema -> schema.getName().equals("crowdcontrol"))) {
-                context.fetch(initScript);
+            try {
+                context.selectFrom(Tables.EXPERIMENT).fetchAny();
+            } catch (DataAccessException e) {
+                //TODO: need better idea, but meta() and systable are not working
+                String tables = initScript.substring(0, initScript.indexOf("DELIMITER $$"));
+                ScriptRunner scriptRunner = new ScriptRunner(ds.getConnection());
+                scriptRunner.setDelimiter(";");
+                scriptRunner.runScript(new StringReader(tables));
+                String delimiter = "DELIMITER $$";
+                String trigger = initScript.substring(initScript.indexOf(delimiter) + delimiter.length(), initScript.lastIndexOf("DELIMITER ;"));
+                scriptRunner = new ScriptRunner(ds.getConnection());
+                scriptRunner.setDelimiter("$$");
+                scriptRunner.runScript(new StringReader(trigger));
+
             }
         } catch (IOException e) {
             System.err.println("unable to read database-init script");
@@ -116,8 +128,8 @@ public class DatabaseManager {
      * returns the Connection used to communicate with the database.
      * @return an instance of Connection
      */
-    public Connection getConnection() {
-        return connection;
+    public Connection getConnection() throws SQLException {
+        return ds.getConnection();
     }
 
     /**
