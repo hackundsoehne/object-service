@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentspopulationRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -21,8 +21,6 @@ public class ExperimentOperations extends AbstractOperations {
     public ExperimentOperations(DSLContext create) {
         super(create);
     }
-
-    //TODO need the protobuf for "real" methods
     /**
      * inserts the Experiment into the database
      * @param experimentRecord the record to insert
@@ -80,11 +78,11 @@ public class ExperimentOperations extends AbstractOperations {
     }
 
     /**
-     * returns all populations of a experiment
+     * returns all calibrations of a experiment
      * @param id
      * @return
      */
-    public List<ExperimentspopulationRecord> getPopulations(int id) {
+    public List<ExperimentsCalibrationRecord> getCalibrations(int id) {
         //TODO leander
         return null;
     }

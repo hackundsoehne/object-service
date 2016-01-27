@@ -17,8 +17,8 @@ public class EventManager {
     public static final EventObservable<Template> TEMPLATE_CREATE = new EventObservable<>();
     public static final EventObservable<ChangeEvent<Template>> TEMPLATE_UPDATE = new EventObservable<>();
     public static final EventObservable<Template> TEMPLATE_DELETE = new EventObservable<>();
-    public static final EventObservable<Population> POPULATION_CREATE = new EventObservable<>();
-    public static final EventObservable<Population> POPULATION_UPDATE = new EventObservable<>();
+    public static final EventObservable<calibration> POPULATION_CREATE = new EventObservable<>();
+    public static final EventObservable<calibration> POPULATION_UPDATE = new EventObservable<>();
     public static final EventObservable<Notification> NOTIFICATION_CREATE = new EventObservable<>();
     public static final EventObservable<ChangeEvent<Notification>> NOTIFICATION_UPDATE = new EventObservable<>();
     public static final EventObservable<Notification> NOTIFICATION_DELETE = new EventObservable<>();

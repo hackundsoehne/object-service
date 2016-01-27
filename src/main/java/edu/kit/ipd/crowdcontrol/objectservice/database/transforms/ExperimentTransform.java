@@ -22,7 +22,7 @@ public class ExperimentTransform extends AbstractTransform
      * @param record The Database record to use
      * @param state state of the experiment
      * @param constraintRecords constraints of a experiment
-     * @param platforms populations on the platform to use
+     * @param platforms calibrations on the platform to use
      * @param tagRecords tags which are saved for a experiment
      * @return the experiment object with the given data
      */
@@ -31,7 +31,7 @@ public class ExperimentTransform extends AbstractTransform
                                      List<Experiment.PlatformPopulation> platforms,
                                      List<TagRecord> tagRecords) {
         Type type = new TypeToken<Map<String, String>>(){}.getType();
-        //lets build here the tree of populations a platforms
+        //lets build here the tree of calibrations a platforms
         return Experiment.newBuilder()
                 .setId(record.getIdExperiment())
                 .setDescription(record.getDescription())
@@ -130,7 +130,7 @@ public class ExperimentTransform extends AbstractTransform
                     record.setTemplateData(new JSONObject(experiment.getPlaceholders()).toString());
                     break;
                 case Experiment.PLATFORM_POPULATIONS_FIELD_NUMBER:
-                    // has to be done manual with PopulationsTransformer
+                    // has to be done manual with CalibrationsTransformer
                     break;
                 case Experiment.RATINGS_PER_ANSWER_FIELD_NUMBER:
                     record.setRatingsPerAnswer(experiment.getRatingsPerAnswer());

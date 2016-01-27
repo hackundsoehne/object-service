@@ -369,12 +369,12 @@ public  final class Experiment extends
     /**
      * <code>repeated .crowdcontrol.Population populations = 2;</code>
      */
-    java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> 
+    java.util.List<calibration>
         getPopulationsList();
     /**
      * <code>repeated .crowdcontrol.Population populations = 2;</code>
      */
-    edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index);
+    calibration getPopulations(int index);
     /**
      * <code>repeated .crowdcontrol.Population populations = 2;</code>
      */
@@ -438,10 +438,10 @@ public  final class Experiment extends
             }
             case 18: {
               if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                populations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Population>();
+                populations_ = new java.util.ArrayList<calibration>();
                 mutable_bitField0_ |= 0x00000002;
               }
-              populations_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Population.parser(), extensionRegistry));
+              populations_.add(input.readMessage(calibration.parser(), extensionRegistry));
               break;
             }
           }
@@ -507,11 +507,11 @@ public  final class Experiment extends
     }
 
     public static final int POPULATIONS_FIELD_NUMBER = 2;
-    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> populations_;
+    private java.util.List<calibration> populations_;
     /**
      * <code>repeated .crowdcontrol.Population populations = 2;</code>
      */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> getPopulationsList() {
+    public java.util.List<calibration> getPopulationsList() {
       return populations_;
     }
     /**
@@ -530,7 +530,7 @@ public  final class Experiment extends
     /**
      * <code>repeated .crowdcontrol.Population populations = 2;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index) {
+    public calibration getPopulations(int index) {
       return populations_.get(index);
     }
     /**
@@ -869,22 +869,22 @@ public  final class Experiment extends
         return this;
       }
 
-      private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> populations_ =
+      private java.util.List<calibration> populations_ =
         java.util.Collections.emptyList();
       private void ensurePopulationsIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          populations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Population>(populations_);
+          populations_ = new java.util.ArrayList<calibration>(populations_);
           bitField0_ |= 0x00000002;
          }
       }
 
       private com.google.protobuf.RepeatedFieldBuilder<
-          edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> populationsBuilder_;
+              calibration, calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> populationsBuilder_;
 
       /**
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
-      public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> getPopulationsList() {
+      public java.util.List<calibration> getPopulationsList() {
         if (populationsBuilder_ == null) {
           return java.util.Collections.unmodifiableList(populations_);
         } else {
@@ -904,7 +904,7 @@ public  final class Experiment extends
       /**
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
-      public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getPopulations(int index) {
+      public calibration getPopulations(int index) {
         if (populationsBuilder_ == null) {
           return populations_.get(index);
         } else {
@@ -915,7 +915,7 @@ public  final class Experiment extends
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
       public Builder setPopulations(
-          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
+          int index, calibration value) {
         if (populationsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -932,7 +932,7 @@ public  final class Experiment extends
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
       public Builder setPopulations(
-          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
+          int index, calibration.Builder builderForValue) {
         if (populationsBuilder_ == null) {
           ensurePopulationsIsMutable();
           populations_.set(index, builderForValue.build());
@@ -945,7 +945,7 @@ public  final class Experiment extends
       /**
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
-      public Builder addPopulations(edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
+      public Builder addPopulations(calibration value) {
         if (populationsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -962,7 +962,7 @@ public  final class Experiment extends
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
       public Builder addPopulations(
-          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
+          int index, calibration value) {
         if (populationsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -979,7 +979,7 @@ public  final class Experiment extends
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
       public Builder addPopulations(
-          edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
+          calibration.Builder builderForValue) {
         if (populationsBuilder_ == null) {
           ensurePopulationsIsMutable();
           populations_.add(builderForValue.build());
@@ -993,7 +993,7 @@ public  final class Experiment extends
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
       public Builder addPopulations(
-          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
+          int index, calibration.Builder builderForValue) {
         if (populationsBuilder_ == null) {
           ensurePopulationsIsMutable();
           populations_.add(index, builderForValue.build());
@@ -1007,7 +1007,7 @@ public  final class Experiment extends
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
       public Builder addAllPopulations(
-          java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Population> values) {
+          java.lang.Iterable<? extends calibration> values) {
         if (populationsBuilder_ == null) {
           ensurePopulationsIsMutable();
           com.google.protobuf.AbstractMessageLite.Builder.addAll(
@@ -1047,7 +1047,7 @@ public  final class Experiment extends
       /**
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
-      public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder getPopulationsBuilder(
+      public calibration.Builder getPopulationsBuilder(
           int index) {
         return getPopulationsFieldBuilder().getBuilder(index);
       }
@@ -1075,31 +1075,31 @@ public  final class Experiment extends
       /**
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
-      public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder addPopulationsBuilder() {
+      public calibration.Builder addPopulationsBuilder() {
         return getPopulationsFieldBuilder().addBuilder(
-            edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance());
+            calibration.getDefaultInstance());
       }
       /**
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
-      public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder addPopulationsBuilder(
+      public calibration.Builder addPopulationsBuilder(
           int index) {
         return getPopulationsFieldBuilder().addBuilder(
-            index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance());
+            index, calibration.getDefaultInstance());
       }
       /**
        * <code>repeated .crowdcontrol.Population populations = 2;</code>
        */
-      public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder> 
+      public java.util.List<calibration.Builder>
            getPopulationsBuilderList() {
         return getPopulationsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
+              calibration, calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>
           getPopulationsFieldBuilder() {
         if (populationsBuilder_ == null) {
           populationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>(
+                  calibration, calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>(
                   populations_,
                   ((bitField0_ & 0x00000002) == 0x00000002),
                   getParentForChildren(),

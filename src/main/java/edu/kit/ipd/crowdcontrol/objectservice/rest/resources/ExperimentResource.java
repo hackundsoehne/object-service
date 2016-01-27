@@ -89,7 +89,7 @@ public class ExperimentResource {
                     calibration.getAcceptedAnswersList().forEach(s ->
                     {
                         ExperimentsCalibrationRecord pops = new ExperimentsCalibrationRecord(null, experiment.getId(),
-                                R(calibrationOperations.getPopulationsAnswerOptionFromPopulation(
+                                R(calibrationOperations.getCalibrationAnswerOptionFromCalibrations(
                                         calibration.getId(), s))
                                         .getIdCalibrationAnswerOption(),
                                 platformCalibrations.getPlatformId()+"", false); /*FIXME*/
@@ -127,7 +127,7 @@ public class ExperimentResource {
                 .collect(Collectors.toList());
 
         calibrations.forEach(ExperimentsCalibrationRecord ->
-            calibrationOperations.insertExperimentPopulation(ExperimentsCalibrationRecord)
+            calibrationOperations.insertExperimentCalibration(ExperimentsCalibrationRecord)
         );
 
         return ExperimentTransform.toProto(R(experimentOperations.getExperiment(id)),
@@ -166,18 +166,18 @@ public class ExperimentResource {
      */
     private List<Experiment.PlatformPopulation> getPlatforms(int id) {
         List<Experiment.PlatformPopulation> platforms = new ArrayList<>();
-        List<ExperimentsCalibrationRecord> records = experimentOperations.getPopulations(id);
-        Map<String, List<Population>> convert = new HashMap<>();
+        List<ExperimentsCalibrationRecord> records = experimentOperations.getCalibrations(id);
+        Map<String, List<calibration>> convert = new HashMap<>();
 
         //build the list of calibrations / platforms
         records.forEach(ExperimentsCalibrationRecord -> {
             //fetch the answeroption which is used as answer to get to the actual calibration
             CalibrationAnswerOptionRecord a =
                     R(calibrationOperations.getCalibrationAnswerOption(ExperimentsCalibrationRecord.getAnswer()));
-            Population pop = R(calibrationOperations.getCalibration(a.getCalibration()));
+            calibration pop = R(calibrationOperations.getCalibration(a.getCalibration()));
 
             //add the calibration to the correct platform
-            List<Population> pops = convert.get(ExperimentsCalibrationRecord.getReferencedPlatform());
+            List<calibration> pops = convert.get(ExperimentsCalibrationRecord.getReferencedPlatform());
             if (pops == null) {
                 pops = new ArrayList<>();
                 convert.put(ExperimentsCalibrationRecord.getReferencedPlatform(), pops);
@@ -235,7 +235,7 @@ public class ExperimentResource {
             List<ExperimentsCalibrationRecord> records = convertToRecords(experiment);
             if (!records.isEmpty()) {
                 calibrationOperations.deleteAllExperimentCalibration(id);
-                records.forEach(ExperimentsCalibrationRecord -> calibrationOperations.insertExperimentPopulation(ExperimentsCalibrationRecord));
+                records.forEach(ExperimentsCalibrationRecord -> calibrationOperations.insertExperimentCalibration(ExperimentsCalibrationRecord));
             }
 
             //update the experiment itself

@@ -10,12 +10,12 @@ public interface PopulationListOrBuilder extends
   /**
    * <code>repeated .crowdcontrol.Population items = 1;</code>
    */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> 
+  java.util.List<calibration>
       getItemsList();
   /**
    * <code>repeated .crowdcontrol.Population items = 1;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Population getItems(int index);
+  calibration getItems(int index);
   /**
    * <code>repeated .crowdcontrol.Population items = 1;</code>
    */

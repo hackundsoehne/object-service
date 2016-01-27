@@ -103,8 +103,8 @@ public class WorkerOperations extends AbstractOperations {
                                         .returning()
                                         .fetchOne()));
         create.transaction(conf -> {
-            DSL.using(conf).deleteFrom(Tables.POPULATION_RESULT)
-                    .where(Tables.POPULATION_RESULT.WORKER.eq(toAnonymize.getIdWorker()))
+            DSL.using(conf).deleteFrom(Tables.CALIBRATION_RESULT)
+                    .where(Tables.CALIBRATION_RESULT.WORKER.eq(toAnonymize.getIdWorker()))
                     .execute();
 
             DSL.using(conf).update(Tables.ANSWER)

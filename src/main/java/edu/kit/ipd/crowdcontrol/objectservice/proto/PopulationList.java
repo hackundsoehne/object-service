@@ -44,10 +44,10 @@ public  final class PopulationList extends
           }
           case 10: {
             if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-              items_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Population>();
+              items_ = new java.util.ArrayList<calibration>();
               mutable_bitField0_ |= 0x00000001;
             }
-            items_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Population.parser(), extensionRegistry));
+            items_.add(input.readMessage(calibration.parser(), extensionRegistry));
             break;
           }
         }
@@ -78,11 +78,11 @@ public  final class PopulationList extends
   }
 
   public static final int ITEMS_FIELD_NUMBER = 1;
-  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> items_;
+  private java.util.List<calibration> items_;
   /**
    * <code>repeated .crowdcontrol.Population items = 1;</code>
    */
-  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> getItemsList() {
+  public java.util.List<calibration> getItemsList() {
     return items_;
   }
   /**
@@ -101,7 +101,7 @@ public  final class PopulationList extends
   /**
    * <code>repeated .crowdcontrol.Population items = 1;</code>
    */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getItems(int index) {
+  public calibration getItems(int index) {
     return items_.get(index);
   }
   /**
@@ -356,22 +356,22 @@ public  final class PopulationList extends
     }
     private int bitField0_;
 
-    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> items_ =
+    private java.util.List<calibration> items_ =
       java.util.Collections.emptyList();
     private void ensureItemsIsMutable() {
       if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-        items_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Population>(items_);
+        items_ = new java.util.ArrayList<calibration>(items_);
         bitField0_ |= 0x00000001;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> itemsBuilder_;
+            calibration, calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> itemsBuilder_;
 
     /**
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population> getItemsList() {
+    public java.util.List<calibration> getItemsList() {
       if (itemsBuilder_ == null) {
         return java.util.Collections.unmodifiableList(items_);
       } else {
@@ -391,7 +391,7 @@ public  final class PopulationList extends
     /**
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getItems(int index) {
+    public calibration getItems(int index) {
       if (itemsBuilder_ == null) {
         return items_.get(index);
       } else {
@@ -402,7 +402,7 @@ public  final class PopulationList extends
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
     public Builder setItems(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
+        int index, calibration value) {
       if (itemsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -419,7 +419,7 @@ public  final class PopulationList extends
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
     public Builder setItems(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
+        int index, calibration.Builder builderForValue) {
       if (itemsBuilder_ == null) {
         ensureItemsIsMutable();
         items_.set(index, builderForValue.build());
@@ -432,7 +432,7 @@ public  final class PopulationList extends
     /**
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
-    public Builder addItems(edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
+    public Builder addItems(calibration value) {
       if (itemsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -449,7 +449,7 @@ public  final class PopulationList extends
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
     public Builder addItems(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population value) {
+        int index, calibration value) {
       if (itemsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -466,7 +466,7 @@ public  final class PopulationList extends
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
     public Builder addItems(
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
+        calibration.Builder builderForValue) {
       if (itemsBuilder_ == null) {
         ensureItemsIsMutable();
         items_.add(builderForValue.build());
@@ -480,7 +480,7 @@ public  final class PopulationList extends
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
     public Builder addItems(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder builderForValue) {
+        int index, calibration.Builder builderForValue) {
       if (itemsBuilder_ == null) {
         ensureItemsIsMutable();
         items_.add(index, builderForValue.build());
@@ -494,7 +494,7 @@ public  final class PopulationList extends
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
     public Builder addAllItems(
-        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Population> values) {
+        java.lang.Iterable<? extends calibration> values) {
       if (itemsBuilder_ == null) {
         ensureItemsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
@@ -534,7 +534,7 @@ public  final class PopulationList extends
     /**
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder getItemsBuilder(
+    public calibration.Builder getItemsBuilder(
         int index) {
       return getItemsFieldBuilder().getBuilder(index);
     }
@@ -562,31 +562,31 @@ public  final class PopulationList extends
     /**
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder addItemsBuilder() {
+    public calibration.Builder addItemsBuilder() {
       return getItemsFieldBuilder().addBuilder(
-          edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance());
+          calibration.getDefaultInstance());
     }
     /**
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder addItemsBuilder(
+    public calibration.Builder addItemsBuilder(
         int index) {
       return getItemsFieldBuilder().addBuilder(
-          index, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance());
+          index, calibration.getDefaultInstance());
     }
     /**
      * <code>repeated .crowdcontrol.Population items = 1;</code>
      */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder> 
+    public java.util.List<calibration.Builder>
          getItemsBuilderList() {
       return getItemsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
+            calibration, calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>
         getItemsFieldBuilder() {
       if (itemsBuilder_ == null) {
         itemsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-            edu.kit.ipd.crowdcontrol.objectservice.proto.Population, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>(
+                calibration, calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>(
                 items_,
                 ((bitField0_ & 0x00000001) == 0x00000001),
                 getParentForChildren(),

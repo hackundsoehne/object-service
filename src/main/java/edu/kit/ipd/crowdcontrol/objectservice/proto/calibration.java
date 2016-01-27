@@ -6,15 +6,15 @@ package edu.kit.ipd.crowdcontrol.objectservice.proto;
 /**
  * Protobuf type {@code crowdcontrol.Population}
  */
-public  final class Population extends
+public  final class calibration extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:crowdcontrol.Population)
     PopulationOrBuilder {
   // Use Population.newBuilder() to construct.
-  private Population(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+  private calibration(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
   }
-  private Population() {
+  private calibration() {
     id_ = 0;
     name_ = "";
     question_ = "";
@@ -27,7 +27,7 @@ public  final class Population extends
   getUnknownFields() {
     return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
   }
-  private Population(
+  private calibration(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
     this();
@@ -108,7 +108,7 @@ public  final class Population extends
       internalGetFieldAccessorTable() {
     return edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOuterClass.internal_static_crowdcontrol_Population_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            edu.kit.ipd.crowdcontrol.objectservice.proto.Population.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder.class);
+            calibration.class, calibration.Builder.class);
   }
 
   private int bitField0_;
@@ -312,53 +312,53 @@ public  final class Population extends
   }
 
   private static final long serialVersionUID = 0L;
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseFrom(
+  public static calibration parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseFrom(
+  public static calibration parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseFrom(byte[] data)
+  public static calibration parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseFrom(
+  public static calibration parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseFrom(java.io.InputStream input)
+  public static calibration parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return PARSER.parseFrom(input);
   }
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseFrom(
+  public static calibration parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return PARSER.parseFrom(input, extensionRegistry);
   }
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseDelimitedFrom(java.io.InputStream input)
+  public static calibration parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return PARSER.parseDelimitedFrom(input);
   }
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseDelimitedFrom(
+  public static calibration parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return PARSER.parseDelimitedFrom(input, extensionRegistry);
   }
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseFrom(
+  public static calibration parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return PARSER.parseFrom(input);
   }
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population parseFrom(
+  public static calibration parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -369,7 +369,7 @@ public  final class Population extends
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(edu.kit.ipd.crowdcontrol.objectservice.proto.Population prototype) {
+  public static Builder newBuilder(calibration prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   public Builder toBuilder() {
@@ -399,7 +399,7 @@ public  final class Population extends
         internalGetFieldAccessorTable() {
       return edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOuterClass.internal_static_crowdcontrol_Population_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              edu.kit.ipd.crowdcontrol.objectservice.proto.Population.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Population.Builder.class);
+              calibration.class, calibration.Builder.class);
     }
 
     // Construct using edu.kit.ipd.crowdcontrol.objectservice.proto.Population.newBuilder()
@@ -436,20 +436,20 @@ public  final class Population extends
       return edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOuterClass.internal_static_crowdcontrol_Population_descriptor;
     }
 
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getDefaultInstanceForType() {
-      return edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance();
+    public calibration getDefaultInstanceForType() {
+      return calibration.getDefaultInstance();
     }
 
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population build() {
-      edu.kit.ipd.crowdcontrol.objectservice.proto.Population result = buildPartial();
+    public calibration build() {
+      calibration result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
       return result;
     }
 
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Population buildPartial() {
-      edu.kit.ipd.crowdcontrol.objectservice.proto.Population result = new edu.kit.ipd.crowdcontrol.objectservice.proto.Population(this);
+    public calibration buildPartial() {
+      calibration result = new calibration(this);
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
       result.id_ = id_;
@@ -471,16 +471,16 @@ public  final class Population extends
     }
 
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof edu.kit.ipd.crowdcontrol.objectservice.proto.Population) {
-        return mergeFrom((edu.kit.ipd.crowdcontrol.objectservice.proto.Population)other);
+      if (other instanceof calibration) {
+        return mergeFrom((calibration)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(edu.kit.ipd.crowdcontrol.objectservice.proto.Population other) {
-      if (other == edu.kit.ipd.crowdcontrol.objectservice.proto.Population.getDefaultInstance()) return this;
+    public Builder mergeFrom(calibration other) {
+      if (other == calibration.getDefaultInstance()) return this;
       if (other.getId() != 0) {
         setId(other.getId());
       }
@@ -524,11 +524,11 @@ public  final class Population extends
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      edu.kit.ipd.crowdcontrol.objectservice.proto.Population parsedMessage = null;
+      calibration parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (edu.kit.ipd.crowdcontrol.objectservice.proto.Population) e.getUnfinishedMessage();
+        parsedMessage = (calibration) e.getUnfinishedMessage();
         throw e;
       } finally {
         if (parsedMessage != null) {
@@ -905,23 +905,23 @@ public  final class Population extends
   }
 
   // @@protoc_insertion_point(class_scope:crowdcontrol.Population)
-  private static final edu.kit.ipd.crowdcontrol.objectservice.proto.Population DEFAULT_INSTANCE;
+  private static final calibration DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new edu.kit.ipd.crowdcontrol.objectservice.proto.Population();
+    DEFAULT_INSTANCE = new calibration();
   }
 
-  public static edu.kit.ipd.crowdcontrol.objectservice.proto.Population getDefaultInstance() {
+  public static calibration getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<Population>
-      PARSER = new com.google.protobuf.AbstractParser<Population>() {
-    public Population parsePartialFrom(
+  private static final com.google.protobuf.Parser<calibration>
+      PARSER = new com.google.protobuf.AbstractParser<calibration>() {
+    public calibration parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       try {
-        return new Population(input, extensionRegistry);
+        return new calibration(input, extensionRegistry);
       } catch (RuntimeException e) {
         if (e.getCause() instanceof
             com.google.protobuf.InvalidProtocolBufferException) {
@@ -933,16 +933,16 @@ public  final class Population extends
     }
   };
 
-  public static com.google.protobuf.Parser<Population> parser() {
+  public static com.google.protobuf.Parser<calibration> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<Population> getParserForType() {
+  public com.google.protobuf.Parser<calibration> getParserForType() {
     return PARSER;
   }
 
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.Population getDefaultInstanceForType() {
+  public calibration getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 
