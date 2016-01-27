@@ -116,15 +116,14 @@ public class ExperimentResource {
         int id = experimentOperations.insertNewExperiment(record);
 
         tags = tags.stream()
-                .map(tagRecord -> tagConstraintsOperations.insertTag(tagRecord))
+                .map(tagConstraintsOperations::insertTag)
                 .collect(Collectors.toList());
 
         constraints = constraints.stream()
-                .map(constraintRecord -> tagConstraintsOperations.insertConstraint(constraintRecord))
+                .map(tagConstraintsOperations::insertConstraint)
                 .collect(Collectors.toList());
 
-        calibrations.forEach(ExperimentsCalibrationRecord ->
-            calibrationOperations.insertExperimentCalibration(ExperimentsCalibrationRecord)
+        calibrations.forEach(calibrationOperations::insertExperimentCalibration
         );
 
         return ExperimentTransform.toProto(R(experimentOperations.getExperiment(id)),
@@ -158,8 +157,8 @@ public class ExperimentResource {
     /**
      * Will take the id of an experiment and return the platform tree with
      * all published platforms with the according calibrations
-     * @param id
-     * @return
+     * @param id the id of the experiment
+     * @return returns a list of populations with a platform
      */
     private List<Experiment.PlatformPopulation> getPlatforms(int id) {
         List<Experiment.PlatformPopulation> platforms = new ArrayList<>();
@@ -182,12 +181,10 @@ public class ExperimentResource {
             pops.add(pop);
         });
 
-        convert.forEach((s, calibrations) -> {
-            platforms.add(Experiment.PlatformPopulation.newBuilder()
-                    //.setPlatformId(s)
-                    .addAllPopulations(calibrations)
-                    .build());
-        });
+        convert.forEach((s, calibrations) -> platforms.add(Experiment.PlatformPopulation.newBuilder()
+                //.setPlatformId(s)
+                .addAllPopulations(calibrations)
+                .build()));
 
         return platforms;
     }
@@ -218,21 +215,21 @@ public class ExperimentResource {
             List<TagRecord> tags = TagConstraintTransform.getTags(experiment);
             if (!tags.isEmpty()) {
                 tagConstraintsOperations.deleteAllTags(id);
-                tags.forEach(tagRecord -> tagConstraintsOperations.insertTag(tagRecord));
+                tags.forEach(tagConstraintsOperations::insertTag);
             }
 
             //update constraints if they were changed
             List<ConstraintRecord> constraints = TagConstraintTransform.getConstraints(experiment);
             if (!constraints.isEmpty()) {
                 tagConstraintsOperations.deleteAllConstraint(id);
-                constraints.forEach(constraintRecord -> tagConstraintsOperations.insertConstraint(constraintRecord));
+                constraints.forEach(tagConstraintsOperations::insertConstraint);
             }
 
             //update calibration records from the experiment
             List<ExperimentsCalibrationRecord> records = convertToRecords(experiment);
             if (!records.isEmpty()) {
                 calibrationOperations.deleteAllExperimentCalibration(id);
-                records.forEach(ExperimentsCalibrationRecord -> calibrationOperations.insertExperimentCalibration(ExperimentsCalibrationRecord));
+                records.forEach(calibrationOperations::insertExperimentCalibration);
             }
 
             //update the experiment itself
