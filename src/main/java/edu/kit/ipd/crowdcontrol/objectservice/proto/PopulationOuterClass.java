@@ -22,11 +22,11 @@ public final class PopulationOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020population.proto\022\014crowdcontrol\"U\n\nPopu" +
-      "lation\022\n\n\002id\030\001 \001(\005\022\020\n\010question\030\002 \001(\t\022\017\n\007" +
-      "answers\030\003 \003(\t\022\030\n\020accepted_answers\030\004 \003(\tB" +
-      "0\n,edu.kit.ipd.crowdcontrol.objectservic" +
-      "e.protoP\001b\006proto3"
+      "\n\020population.proto\022\014crowdcontrol\"c\n\nPopu" +
+      "lation\022\n\n\002id\030\001 \001(\005\022\014\n\004name\030\002 \001(\t\022\020\n\010ques" +
+      "tion\030\003 \001(\t\022\017\n\007answers\030\004 \003(\t\022\030\n\020accepted_" +
+      "answers\030\005 \003(\tB0\n,edu.kit.ipd.crowdcontro" +
+      "l.objectservice.protoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -45,7 +45,7 @@ public final class PopulationOuterClass {
     internal_static_crowdcontrol_Population_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_crowdcontrol_Population_descriptor,
-        new java.lang.String[] { "Id", "Question", "Answers", "AcceptedAnswers", });
+        new java.lang.String[] { "Id", "Name", "Question", "Answers", "AcceptedAnswers", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
