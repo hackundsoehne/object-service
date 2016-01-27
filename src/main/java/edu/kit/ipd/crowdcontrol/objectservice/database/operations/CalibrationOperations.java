@@ -127,21 +127,25 @@ public class CalibrationOperations extends AbstractOperations {
     }
 
     /**
-     * Delete all experiment calibrations of a experiment
-     * @param id The experiment id to use
+     * Delete all experiment calibrations
+     * @param id the primary key of the experiment
      */
     public void deleteAllExperimentCalibration(int id) {
-
+        create.deleteFrom(EXPERIMENTS_CALIBRATION)
+                .where(EXPERIMENTS_CALIBRATION.REFERNCED_EXPERIMENT.eq(id))
+                .execute();
     }
 
     /**
-     * Insert a new calibration in the database
-     * @param experimentsCalibrationRecord The record to use
+     * Insert a new experimentsCalibrationRecord in the database
+     * @param experimentsCalibrationRecord the record to use
      * @return The new inserted record
      */
     public ExperimentsCalibrationRecord insertExperimentCalibration(ExperimentsCalibrationRecord experimentsCalibrationRecord) {
-        //TODO FIXME
-        return null;
+        return create.insertInto(EXPERIMENTS_CALIBRATION)
+                .set(experimentsCalibrationRecord)
+                .returning()
+                .fetchOne();
     }
 
     /**
@@ -150,8 +154,8 @@ public class CalibrationOperations extends AbstractOperations {
      * @return a value if one can be found or empty if not
      */
     public Optional<CalibrationAnswerOptionRecord> getCalibrationAnswerOption(int id) {
-        //TODO FIXME
-        return null;
+        return create.fetchOptional(CALIBRATION_ANSWER_OPTION,
+                CALIBRATION_ANSWER_OPTION.ID_CALIBRATION_ANSWER_OPTION.eq(id));
     }
 
     /**
@@ -161,7 +165,9 @@ public class CalibrationOperations extends AbstractOperations {
      * @return A record if one is found
      */
     public Optional<CalibrationAnswerOptionRecord> getCalibrationAnswerOptionFromCalibrations(int calibration, String answer) {
-        //TODO FIXME
-        return null;
+        return create.selectFrom(CALIBRATION_ANSWER_OPTION)
+                .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(calibration))
+                .and(CALIBRATION_ANSWER_OPTION.ANSWER.eq(answer))
+                .fetchOptional();
     }
 }
