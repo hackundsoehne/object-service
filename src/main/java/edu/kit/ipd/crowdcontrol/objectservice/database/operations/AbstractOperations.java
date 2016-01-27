@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
@@ -89,8 +90,12 @@ public abstract class AbstractOperations {
      * @throws IllegalArgumentException thrown if the field is not set
      */
     protected void assertHasField(MessageOrBuilder messageOrBuilder, int field) throws IllegalArgumentException {
-        if (!messageOrBuilder.hasField(messageOrBuilder.getDescriptorForType().findFieldByNumber(field))) {
+        Descriptors.FieldDescriptor fieldDescriptor = messageOrBuilder.getDescriptorForType().findFieldByNumber(field);
+        if (!fieldDescriptor.isRepeated() && !messageOrBuilder.hasField(fieldDescriptor)) {
             throw new IllegalArgumentException("MessageOrBuilder must have field set: " +
+                    fieldDescriptor.getName());
+        } else if (fieldDescriptor.isRepeated() && ((List) messageOrBuilder.getField(fieldDescriptor)).isEmpty()) {
+            throw new IllegalArgumentException("MessageOrBuilder must have non-empty field: " +
                     messageOrBuilder.getDescriptorForType().findFieldByNumber(field).getName());
         }
     }

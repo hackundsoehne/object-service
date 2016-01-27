@@ -4,12 +4,18 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
+import org.jooq.AggregateFunction;
 import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKER;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKER_BALANCE;
 
 /**
  * Responsible for the operations involving the worker-table.
@@ -27,7 +33,6 @@ public class WorkerOperations extends AbstractOperations {
      * inserts the WorkerRecord into the database.
      *
      * @param workerRecord the record to insert
-     *
      * @return the resulting WorkerRecord existing in the database
      */
     public WorkerRecord insertWorker(WorkerRecord workerRecord) {
@@ -50,6 +55,25 @@ public class WorkerOperations extends AbstractOperations {
                     .returning()
                     .fetchOne();
         });
+    }
+
+    /**
+     * returns all the worker with the Credit-Balance greater or equal than the passed balance.
+     * The workers then get sorted by their latest transaction, where the worker with the oldest latest transaction
+     * comes first.
+     * @param balance the balance to check for
+     * @return a list of workers
+     */
+    public Result<WorkerRecord> getWorkerWithCreditBalanceGreaterOrEqual(int balance) {
+        Field<BigDecimal> sum = DSL.sum(WORKER_BALANCE.TRANSACTION_VALUE).as("sum");
+        AggregateFunction<Timestamp> latestTransaction = DSL.max(WORKER_BALANCE.TIMESTAMP);
+        return create.select(sum)
+                .from(WORKER_BALANCE)
+                .join(WORKER).onKey()
+                .where(sum.greaterOrEqual(new BigDecimal(balance)))
+                .groupBy(WORKER.fields())
+                .orderBy(latestTransaction.asc())
+                .fetchInto(WORKER);
     }
 
     /**
@@ -107,7 +131,6 @@ public class WorkerOperations extends AbstractOperations {
      *
      * @param platform       the platform the wanted worker is working on
      * @param identification the platform-specific identification
-     *
      * @return the found worker or empty
      */
     public Optional<WorkerRecord> getWorker(String platform, String identification) {
@@ -121,7 +144,6 @@ public class WorkerOperations extends AbstractOperations {
      * finds the worker with the passed workerId in the database
      *
      * @param workerID the primary-key of the worker
-     *
      * @return the found worker or empty
      */
     public Optional<WorkerRecord> getWorker(int workerID) {
@@ -134,7 +156,6 @@ public class WorkerOperations extends AbstractOperations {
      * Returns a single worker.
      *
      * @param id ID of the worker
-     *
      * @return the worker or empty if not found
      */
     public Optional<Worker> getWorkerProto(int id) {
@@ -148,7 +169,6 @@ public class WorkerOperations extends AbstractOperations {
      * @param cursor Pagination cursor
      * @param next   {@code true} for next, {@code false} for previous
      * @param limit  Number of records
-     *
      * @return List of workers
      */
     public Range<Worker, Integer> getWorkersFrom(int cursor, boolean next, int limit) {
@@ -161,9 +181,7 @@ public class WorkerOperations extends AbstractOperations {
      *
      * @param toStore  worker to save
      * @param identity identity of the worker
-     *
      * @return Worker with ID assigned
-     *
      * @throws IllegalArgumentException if the name or content is not set
      */
     public Worker insertWorker(Worker toStore, String identity) {

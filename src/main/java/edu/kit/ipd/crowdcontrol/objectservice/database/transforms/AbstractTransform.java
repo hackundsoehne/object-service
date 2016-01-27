@@ -22,7 +22,7 @@ public abstract class AbstractTransform {
      */
     protected static  <X, Y extends MessageOrBuilder> X merge(X x, Y y, BiConsumer<Integer, X> combine) {
         y.getDescriptorForType().getFields().stream()
-                .filter(y::hasField)
+                .filter(field -> field.isRepeated() || y.hasField(field))
                 .map(Descriptors.FieldDescriptor::getNumber)
                 .forEach(number -> combine.accept(number, x));
         return x;
