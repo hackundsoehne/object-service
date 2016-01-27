@@ -1,15 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import com.google.protobuf.Message;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.*;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.WorkerResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.InputTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.OutputTransformer;
 import spark.Request;
@@ -34,15 +28,18 @@ public class Router implements SparkApplication {
     private final NotificationResource notificationResource;
     private final PlatformResource platformResource;
     private final WorkerResource workerResource;
+    private final PopulationResource populationResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
     public Router(TemplateResource templateResource, NotificationResource notificationResource,
-                  PlatformResource platformResource, WorkerResource workerResource) {
+                  PlatformResource platformResource, WorkerResource workerResource,
+                  PopulationResource populationResource) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
+        this.populationResource = populationResource;
         this.workerResource = workerResource;
     }
 
@@ -101,6 +98,11 @@ public class Router implements SparkApplication {
 
         get("/platforms", platformResource::all);
         get("/platforms/:id", platformResource::get);
+
+        put("/populations", populationResource::put, Population.class);
+        get("/populations", populationResource::all);
+        get("/populations/:id", populationResource::get);
+        delete("/populations/:id", populationResource::delete);
 
         get("/workers/:platform/identity", workerResource::identify);
         put("/workers", workerResource::put, Worker.class);
