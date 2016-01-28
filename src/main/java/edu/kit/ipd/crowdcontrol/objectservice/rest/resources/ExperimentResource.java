@@ -285,6 +285,30 @@ public class ExperimentResource {
                 records.forEach(calibrationOperations::insertExperimentCalibration);
             }
 
+            if (!old.getAlgorithmTaskChooser().getName().equals(experimentRecord.getAlgorithmTaskChooser())) {
+                algorithmsOperations.deleteTaskChooserParams(id);
+            }
+
+            experiment.getAlgorithmTaskChooser().getParametersList().forEach(param -> {
+                algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue());
+            });
+
+            if (!old.getAlgorithmQualityAnswer().getName().equals(experimentRecord.getAlgorithmQualityAnswer())) {
+                algorithmsOperations.deleteAnswerQualityParams(id);
+            }
+
+            experiment.getAlgorithmQualityAnswer().getParametersList().forEach(param -> {
+                algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue());
+            });
+
+            if (!old.getAlgorithmQualityRating().getName().equals(experimentRecord.getAlgorithmQualityRating())) {
+                algorithmsOperations.deleteRatingQualityParams(id);
+            }
+
+            experiment.getAlgorithmQualityRating().getParametersList().forEach(param -> {
+                algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue());
+            });
+
             //update the experiment itself
             experimentOperations.updateExperiment(experimentRecord);
 
