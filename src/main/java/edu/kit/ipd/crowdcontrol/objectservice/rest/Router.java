@@ -127,7 +127,7 @@ public class Router implements SparkApplication {
         get("/experiments/:id", experimentResource::get);
         patch("/experiments/:id", experimentResource::patch, Experiment.class);
         delete("/experiments/:id", experimentResource::delete);
-        put("/experiments/:id/answers", experimentResource::putAnswer, Experiment.class);
+        put("/experiments/:id/answers", experimentResource::putAnswer, Answer.class);
         get("/experiments/:id/answers", experimentResource::getAnswers);
         get("/experiments/:id/answers/:aid", experimentResource::getAnswer);
         put("/experiments/:id/answers/:aid/rating", experimentResource::putRating, Rating.class);
