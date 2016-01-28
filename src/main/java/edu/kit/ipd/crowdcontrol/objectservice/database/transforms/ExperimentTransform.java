@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.transforms;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.tools.json.JSONObject;
@@ -29,7 +30,13 @@ public class ExperimentTransform extends AbstractTransform
     public static Experiment toProto(ExperimentRecord record, Experiment.State state,
                                      List<ConstraintRecord> constraintRecords,
                                      List<Experiment.PlatformCalibrations> platforms,
-                                     List<TagRecord> tagRecords) {
+                                     List<TagRecord> tagRecords,
+                                     AlgorithmTaskChooserRecord taskChooserRecord,
+                                     Map<AlgorithmAnswerQualityParamRecord, ChosenTaskChooserParamRecord> taskChooserParams,
+                                     AlgorithmAnswerQualityRecord answerQualityRecord,
+                                     Map<AlgorithmAnswerQualityParamRecord, ChosenAnswerQualityParamRecord> answerQualityParams,
+                                     AlgorithmRatingQualityRecord ratingQualityRecord,
+                                     Map<AlgorithmRatingQualityParamRecord, ChosenRatingQualityParamRecord> ratingQualityParams) {
         Type type = new TypeToken<Map<String, String>>(){}.getType();
         //lets build here the tree of calibrations a platforms
         return Experiment.newBuilder()
@@ -40,17 +47,80 @@ public class ExperimentTransform extends AbstractTransform
                 .setAnswersPerWorker(record.getAnwersPerWorker())
                 .setRatingsPerWorker(record.getRatingsPerWorker())
                 .setAnswerType(AnswerType.valueOf(record.getAnswerType()))
-                .setAlgorithmTaskChooser(record.getAlgorithmTaskChooser())
-                .setAlgorithmQualityAnswer(record.getAlgorithmQualityAnswer())
-                .setAlgorithmQualityRating(record.getAlgorithmQualityRating())
+                .setAlgorithmTaskChooser(toTaskChooserProto(taskChooserRecord, taskChooserParams))
+                .setAlgorithmQualityAnswer(toAnswerQualityProto(answerQualityRecord, answerQualityParams))
+                .setAlgorithmQualityRating(toRatingQualityProto(ratingQualityRecord, ratingQualityParams))
                 .setPaymentBase(record.getBasePayment())
                 .setPaymentAnswer(record.getBonusAnswer())
                 .setPaymentRating(record.getBonusRating())
                 .setState(state)
                 .putAllPlaceholders(new Gson().fromJson(record.getTemplateData(), type))
                 .addAllConstraints(constraintRecords.stream().map(TagConstraintTransform::toConstraintsProto).collect(Collectors.toList()))
-                .addAllPlatformPopulations(platforms)
+                .addAllPlatformCalibrations(platforms)
                 .addAllTags(tagRecords.stream().map(TagConstraintTransform::toTagProto).collect(Collectors.toList()))
+                .build();
+    }
+
+    private static AlgorithmOption toTaskChooserProto(AlgorithmTaskChooserRecord taskChooserRecord,
+                                               Map<AlgorithmAnswerQualityParamRecord, ChosenTaskChooserParamRecord> taskChooserParams) {
+        List<AlgorithmOption.AlgorithmParameter> parameters = taskChooserParams.entrySet().stream()
+                .map(entry -> AlgorithmOption.AlgorithmParameter.newBuilder()
+                        .setDescription(entry.getKey().getDescription())
+                        .setId(entry.getKey().getIdAlgorithmAnswerQualityParam())
+                        .setRegex(entry.getKey().getRegex())
+                        .setValue(
+                                entry.getValue() == null ? null
+                                        : entry.getValue().getValue()
+                        )
+                        .build()
+                )
+                .collect(Collectors.toList());
+        return AlgorithmOption.newBuilder()
+                .setName(taskChooserRecord.getIdTaskChooser())
+                .setDescription(taskChooserRecord.getDescription())
+                .addAllParameters(parameters)
+                .build();
+    }
+
+    private static AlgorithmOption toAnswerQualityProto(AlgorithmAnswerQualityRecord answerQualityRecord,
+                                                        Map<AlgorithmAnswerQualityParamRecord, ChosenAnswerQualityParamRecord> answerQualityParams) {
+        List<AlgorithmOption.AlgorithmParameter> parameters = answerQualityParams.entrySet().stream()
+                .map(entry -> AlgorithmOption.AlgorithmParameter.newBuilder()
+                        .setDescription(entry.getKey().getDescription())
+                        .setId(entry.getKey().getIdAlgorithmAnswerQualityParam())
+                        .setRegex(entry.getKey().getRegex())
+                        .setValue(
+                                entry.getValue() == null ? null
+                                        : entry.getValue().getValue()
+                        )
+                        .build()
+                )
+                .collect(Collectors.toList());
+        return AlgorithmOption.newBuilder()
+                .setName(answerQualityRecord.getIdAlgorithmAnswerQuality())
+                .setDescription(answerQualityRecord.getDescription())
+                .addAllParameters(parameters)
+                .build();
+    }
+
+    private static AlgorithmOption toRatingQualityProto(AlgorithmRatingQualityRecord ratingQualityRecord,
+                                                        Map<AlgorithmRatingQualityParamRecord, ChosenRatingQualityParamRecord> ratingQualityParams) {
+        List<AlgorithmOption.AlgorithmParameter> parameters = ratingQualityParams.entrySet().stream()
+                .map(entry -> AlgorithmOption.AlgorithmParameter.newBuilder()
+                        .setDescription(entry.getKey().getDescription())
+                        .setId(entry.getKey().getIdAlgorithmRatingQualityParam())
+                        .setRegex(entry.getKey().getRegex())
+                        .setValue(
+                                entry.getValue() == null ? null
+                                        : entry.getValue().getValue()
+                        )
+                        .build()
+                )
+                .collect(Collectors.toList());
+        return AlgorithmOption.newBuilder()
+                .setName(ratingQualityRecord.getIdAlgorithmRatingQuality())
+                .setDescription(ratingQualityRecord.getDescription())
+                .addAllParameters(parameters)
                 .build();
     }
 
@@ -68,9 +138,9 @@ public class ExperimentTransform extends AbstractTransform
                 experiment.getAnswersPerWorker(),
                 experiment.getRatingsPerWorker(),
                 transform(experiment.getAnswerType()),
-                experiment.getAlgorithmTaskChooser(),
-                experiment.getAlgorithmQualityAnswer(),
-                experiment.getAlgorithmQualityRating(),
+                experiment.getAlgorithmTaskChooser().getName(),
+                experiment.getAlgorithmQualityAnswer().getName(),
+                experiment.getAlgorithmQualityRating().getName(),
                 experiment.getPaymentBase(),
                 experiment.getPaymentAnswer(),
                 experiment.getPaymentRating(),
@@ -94,13 +164,16 @@ public class ExperimentTransform extends AbstractTransform
         return merge(record_, experiment, (integer, record) -> {
             switch (integer) {
                 case Experiment.ALGORITHM_QUALITY_ANSWER_FIELD_NUMBER:
-                    record.setAlgorithmQualityAnswer(experiment.getAlgorithmQualityAnswer());
+                    //the parameters have to be done with the AlgorithmOptionTransform
+                    record.setAlgorithmQualityAnswer(experiment.getAlgorithmQualityAnswer().getName());
                     break;
                 case Experiment.ALGORITHM_QUALITY_RATING_FIELD_NUMBER:
-                    record.setAlgorithmQualityRating(experiment.getAlgorithmQualityRating());
+                    //the parameters have to be done with the AlgorithmOptionTransform
+                    record.setAlgorithmQualityRating(experiment.getAlgorithmQualityRating().getName());
                     break;
                 case Experiment.ALGORITHM_TASK_CHOOSER_FIELD_NUMBER:
-                    record.setAlgorithmTaskChooser(experiment.getAlgorithmTaskChooser());
+                    //the parameters have to be done with the AlgorithmOptionTransform
+                    record.setAlgorithmTaskChooser(experiment.getAlgorithmTaskChooser().getName());
                     break;
                 case Experiment.ANSWER_TYPE_FIELD_NUMBER:
                     record.setAnswerType(transform(experiment.getAnswerType()));
