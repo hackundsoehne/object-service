@@ -213,8 +213,10 @@ public class ExperimentResource {
                 throw new IllegalStateException("if you change the state nothing else can be changed");
 
             if (!experiment.getState().equals(Experiment.State.PUBLISHED)
-                    && !experiment.getState().equals(Experiment.State.STOPPING))
-                throw new IllegalArgumentException("Only Publish and Creativ_Stop is allowed as state change");
+                    && !experiment.getState().equals(Experiment.State.CREATIVE_STOPPED))
+                throw new IllegalArgumentException("Only "+ Experiment.State.PUBLISHED.name()+
+                        " and " +Experiment.State.CREATIVE_STOPPED.name()+
+                        " is allowed as state change");
 
             if (experiment.getState().equals(Experiment.State.PUBLISHED)
                     && experimentOperations.verifyExperimentForPublishing(id)) {
