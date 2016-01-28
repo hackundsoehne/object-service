@@ -173,27 +173,27 @@ public interface ExperimentOrBuilder extends
       int index);
 
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations> 
-      getPlatformCalibrationsList();
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population> 
+      getPopulationsList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations getPlatformCalibrations(int index);
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population getPopulations(int index);
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  int getPlatformCalibrationsCount();
+  int getPopulationsCount();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder> 
-      getPlatformCalibrationsOrBuilderList();
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PopulationOrBuilder> 
+      getPopulationsOrBuilderList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder getPlatformCalibrationsOrBuilder(
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PopulationOrBuilder getPopulationsOrBuilder(
       int index);
 
   /**

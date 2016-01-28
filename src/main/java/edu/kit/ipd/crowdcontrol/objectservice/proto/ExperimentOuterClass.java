@@ -19,10 +19,10 @@ public final class ExperimentOuterClass {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_crowdcontrol_Experiment_PlaceholdersEntry_fieldAccessorTable;
   static com.google.protobuf.Descriptors.Descriptor
-    internal_static_crowdcontrol_Experiment_PlatformCalibrations_descriptor;
+    internal_static_crowdcontrol_Experiment_Population_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_crowdcontrol_Experiment_PlatformCalibrations_fieldAccessorTable;
+      internal_static_crowdcontrol_Experiment_Population_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -35,7 +35,7 @@ public final class ExperimentOuterClass {
       "\n\020experiment.proto\022\014crowdcontrol\032\021answer" +
       "_type.proto\032\020constraint.proto\032\021calibrati" +
       "on.proto\032\ttag.proto\032\026algorithm_option.pr" +
-      "oto\"\211\010\n\nExperiment\022\n\n\002id\030\001 \001(\005\022\r\n\005title\030" +
+      "oto\"\353\007\n\nExperiment\022\n\n\002id\030\001 \001(\005\022\r\n\005title\030" +
       "\002 \001(\t\022\023\n\013description\030\003 \001(\t\022-\n\005state\030\004 \001(" +
       "\0162\036.crowdcontrol.Experiment.State\022-\n\013ans" +
       "wer_type\030\005 \001(\0162\030.crowdcontrol.AnswerType" +
@@ -50,19 +50,18 @@ public final class ExperimentOuterClass {
       "\001(\005\022\026\n\016payment_answer\030\016 \001(\005\022\026\n\016payment_r" +
       "ating\030\017 \001(\005\022-\n\013constraints\030\020 \003(\0132\030.crowd" +
       "control.Constraint\022\037\n\004tags\030\021 \003(\0132\021.crowd" +
-      "control.Tag\022L\n\025platform_calibrations\030\022 \003" +
-      "(\0132-.crowdcontrol.Experiment.PlatformCal",
-      "ibrations\022@\n\014placeholders\030\023 \003(\0132*.crowdc" +
-      "ontrol.Experiment.PlaceholdersEntry\022 \n\030w" +
-      "orker_quality_threshold\030\024 \001(\005\022\023\n\013templat" +
-      "e_id\030\025 \001(\005\0323\n\021PlaceholdersEntry\022\013\n\003key\030\001" +
-      " \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032[\n\024PlatformCalib" +
-      "rations\022\023\n\013platform_id\030\001 \001(\t\022.\n\013calibrat" +
-      "ion\030\002 \003(\0132\031.crowdcontrol.Calibration\"Q\n\005" +
-      "State\022\013\n\007INVALID\020\000\022\t\n\005DRAFT\020\001\022\r\n\tPUBLISH" +
-      "ED\020\002\022\024\n\020CREATIVE_STOPPED\020\003\022\013\n\007STOPPED\020\004B" +
-      "0\n,edu.kit.ipd.crowdcontrol.objectservic",
-      "e.protoP\001b\006proto3"
+      "control.Tag\0228\n\013populations\030\022 \003(\0132#.crowd" +
+      "control.Experiment.Population\022@\n\014placeho",
+      "lders\030\023 \003(\0132*.crowdcontrol.Experiment.Pl" +
+      "aceholdersEntry\022 \n\030worker_quality_thresh" +
+      "old\030\024 \001(\005\022\023\n\013template_id\030\025 \001(\005\0323\n\021Placeh" +
+      "oldersEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:" +
+      "\0028\001\032Q\n\nPopulation\022\023\n\013platform_id\030\001 \001(\t\022." +
+      "\n\013calibration\030\002 \003(\0132\031.crowdcontrol.Calib" +
+      "ration\"Q\n\005State\022\013\n\007INVALID\020\000\022\t\n\005DRAFT\020\001\022" +
+      "\r\n\tPUBLISHED\020\002\022\024\n\020CREATIVE_STOPPED\020\003\022\013\n\007" +
+      "STOPPED\020\004B0\n,edu.kit.ipd.crowdcontrol.ob" +
+      "jectservice.protoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -86,18 +85,18 @@ public final class ExperimentOuterClass {
     internal_static_crowdcontrol_Experiment_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_crowdcontrol_Experiment_descriptor,
-        new java.lang.String[] { "Id", "Title", "Description", "State", "AnswerType", "AlgorithmTaskChooser", "AlgorithmQualityAnswer", "AlgorithmQualityRating", "AnswersPerWorker", "RatingsPerWorker", "RatingsPerAnswer", "NeededAnswers", "PaymentBase", "PaymentAnswer", "PaymentRating", "Constraints", "Tags", "PlatformCalibrations", "Placeholders", "WorkerQualityThreshold", "TemplateId", });
+        new java.lang.String[] { "Id", "Title", "Description", "State", "AnswerType", "AlgorithmTaskChooser", "AlgorithmQualityAnswer", "AlgorithmQualityRating", "AnswersPerWorker", "RatingsPerWorker", "RatingsPerAnswer", "NeededAnswers", "PaymentBase", "PaymentAnswer", "PaymentRating", "Constraints", "Tags", "Populations", "Placeholders", "WorkerQualityThreshold", "TemplateId", });
     internal_static_crowdcontrol_Experiment_PlaceholdersEntry_descriptor =
       internal_static_crowdcontrol_Experiment_descriptor.getNestedTypes().get(0);
     internal_static_crowdcontrol_Experiment_PlaceholdersEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_crowdcontrol_Experiment_PlaceholdersEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_crowdcontrol_Experiment_PlatformCalibrations_descriptor =
+    internal_static_crowdcontrol_Experiment_Population_descriptor =
       internal_static_crowdcontrol_Experiment_descriptor.getNestedTypes().get(1);
-    internal_static_crowdcontrol_Experiment_PlatformCalibrations_fieldAccessorTable = new
+    internal_static_crowdcontrol_Experiment_Population_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_crowdcontrol_Experiment_PlatformCalibrations_descriptor,
+        internal_static_crowdcontrol_Experiment_Population_descriptor,
         new java.lang.String[] { "PlatformId", "Calibration", });
     edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerTypeOuterClass.getDescriptor();
     edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOuterClass.getDescriptor();
