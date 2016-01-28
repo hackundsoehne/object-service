@@ -217,6 +217,10 @@ public class ExperimentResource {
                 throw new IllegalStateException("experiment lacks information needed for publishing");
             }
         } else {
+            if (!old.getState().equals(Experiment.State.DRAFT)) {
+                throw new IllegalStateException("When an experiment is running, only the state is allowed to be changed.");
+            }
+
             ExperimentRecord experimentRecord = ExperimentTransform.mergeProto(original, experiment);
             experimentRecord.setIdExperiment(id);
 
@@ -262,8 +266,12 @@ public class ExperimentResource {
         int id = getParamInt(request, "id");
         Experiment experiment = fetchExperiment(id);
 
-        if (!experimentOperations.deleteExperiment(id)) {
-            throw new InternalServerErrorException("Resource not found!");
+        try {
+            if (!experimentOperations.deleteExperiment(id)) {
+                throw new InternalServerErrorException("Resource not found!");
+            }
+        } catch (IllegalStateException e) {
+            throw new BadRequestException("Deleting an experiment is not allowed while it is still running.");
         }
 
         EventManager.EXPERIMENT_DELETE.emit(experiment);
