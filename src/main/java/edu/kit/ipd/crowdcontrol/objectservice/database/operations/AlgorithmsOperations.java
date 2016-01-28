@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.util.Map;
 import java.util.Optional;
@@ -80,5 +81,80 @@ public class AlgorithmsOperations extends AbstractOperations {
                 .and(ALGORITHM_RATING_QUALITY_PARAM.ALGORITHM.eq(ratingQualityID))
                 .groupBy(ALGORITHM_RATING_QUALITY_PARAM.fields())
                 .fetchMap(ALGORITHM_RATING_QUALITY_PARAM, record -> record.getValue(CHOSEN_RATING_QUALITY_PARAM.VALUE));
+    }
+
+    public void deleteTaskChooserParams(int experimentId) {
+        create.deleteFrom(CHOSEN_TASK_CHOOSER_PARAM)
+                .where(CHOSEN_TASK_CHOOSER_PARAM.EXPERIMENT.eq(experimentId));
+    }
+
+    public void deleteAnswerQualityParams(int experimentId) {
+        create.deleteFrom(CHOSEN_ANSWER_QUALITY_PARAM)
+                .where(CHOSEN_ANSWER_QUALITY_PARAM.EXPERIMENT.eq(experimentId));
+    }
+
+    public void deleteRatingQualityParams(int experimentId) {
+        create.deleteFrom(CHOSEN_RATING_QUALITY_PARAM)
+                .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(experimentId));
+    }
+
+    public void storeTaskChooserParam(int experimentID, int paramId, String value) {
+        ChosenTaskChooserParamRecord record = new ChosenTaskChooserParamRecord(null, value, experimentID, paramId);
+        create.transaction(config -> {
+            Optional<ChosenTaskChooserParamRecord> existing = DSL.using(config).selectFrom(CHOSEN_TASK_CHOOSER_PARAM)
+                    .where(CHOSEN_TASK_CHOOSER_PARAM.EXPERIMENT.eq(experimentID))
+                    .and(CHOSEN_TASK_CHOOSER_PARAM.PARAM.eq(paramId))
+                    .fetchOptional();
+
+            if (!existing.isPresent()) {
+                DSL.using(config).executeInsert(record);
+            } else if (!existing.get().getValue().equals(value)) {
+                DSL.using(config).update(CHOSEN_TASK_CHOOSER_PARAM)
+                        .set(record)
+                        .where(CHOSEN_TASK_CHOOSER_PARAM.EXPERIMENT.eq(experimentID))
+                        .and(CHOSEN_TASK_CHOOSER_PARAM.PARAM.eq(paramId))
+                        .execute();
+            }
+        });
+    }
+
+    public void storeAnswerQualityParam(int experimentID, int paramId, String value) {
+        ChosenAnswerQualityParamRecord record = new ChosenAnswerQualityParamRecord(null, value, experimentID, paramId);
+        create.transaction(config -> {
+            Optional<ChosenAnswerQualityParamRecord> existing = DSL.using(config).selectFrom(CHOSEN_ANSWER_QUALITY_PARAM)
+                    .where(CHOSEN_ANSWER_QUALITY_PARAM.EXPERIMENT.eq(experimentID))
+                    .and(CHOSEN_ANSWER_QUALITY_PARAM.PARAM.eq(paramId))
+                    .fetchOptional();
+
+            if (!existing.isPresent()) {
+                DSL.using(config).executeInsert(record);
+            } else if (!existing.get().getValue().equals(value)) {
+                DSL.using(config).update(CHOSEN_ANSWER_QUALITY_PARAM)
+                        .set(record)
+                        .where(CHOSEN_ANSWER_QUALITY_PARAM.EXPERIMENT.eq(experimentID))
+                        .and(CHOSEN_ANSWER_QUALITY_PARAM.PARAM.eq(paramId))
+                        .execute();
+            }
+        });
+    }
+
+    public void storeRatingQualityParam(int experimentID, int paramId, String value) {
+        ChosenRatingQualityParamRecord record = new ChosenRatingQualityParamRecord(null, value, experimentID, paramId);
+        create.transaction(config -> {
+            Optional<ChosenRatingQualityParamRecord> existing = DSL.using(config).selectFrom(CHOSEN_RATING_QUALITY_PARAM)
+                    .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(experimentID))
+                    .and(CHOSEN_RATING_QUALITY_PARAM.PARAM.eq(paramId))
+                    .fetchOptional();
+
+            if (!existing.isPresent()) {
+                DSL.using(config).executeInsert(record);
+            } else if (!existing.get().getValue().equals(value)) {
+                DSL.using(config).update(CHOSEN_RATING_QUALITY_PARAM)
+                        .set(record)
+                        .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(experimentID))
+                        .and(CHOSEN_RATING_QUALITY_PARAM.PARAM.eq(paramId))
+                        .execute();
+            }
+        });
     }
 }

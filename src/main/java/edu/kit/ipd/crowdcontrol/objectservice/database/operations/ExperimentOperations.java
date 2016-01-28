@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
@@ -38,8 +37,8 @@ public class ExperimentOperations extends AbstractOperations {
      * @return the optional experiment
      */
     public Optional<ExperimentRecord> getExperiment(int id) {
-        return create.selectFrom(Tables.EXPERIMENT)
-                .where(Tables.EXPERIMENT.ID_EXPERIMENT.eq(id))
+        return create.selectFrom(EXPERIMENT)
+                .where(EXPERIMENT.ID_EXPERIMENT.eq(id))
                 .fetchOptional();
     }
 
@@ -63,8 +62,8 @@ public class ExperimentOperations extends AbstractOperations {
     public boolean deleteExperiment(int id) throws IllegalStateException {
         return doIfNotRunning(id, trans -> {
             int deleted = DSL.using(trans)
-                    .deleteFrom(Tables.EXPERIMENT)
-                    .where(Tables.EXPERIMENT.ID_EXPERIMENT.eq(id))
+                    .deleteFrom(EXPERIMENT)
+                    .where(EXPERIMENT.ID_EXPERIMENT.eq(id))
                     .execute();
             return deleted == 1;
         });
