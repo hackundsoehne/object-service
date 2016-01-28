@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.AnswerRatingTransform;
@@ -35,13 +34,15 @@ public class ExperimentResource {
     private final CalibrationOperations calibrationOperations;
     private final TagConstraintsOperations tagConstraintsOperations;
     private final WorkerOperations workerOperations;
+    private final AlgorithmsOperations algorithmsOperations;
 
-    public ExperimentResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations, CalibrationOperations calibrationOperations, TagConstraintsOperations tagConstraintsOperations, WorkerOperations workerOperations) {
+    public ExperimentResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations, CalibrationOperations calibrationOperations, TagConstraintsOperations tagConstraintsOperations, WorkerOperations workerOperations, AlgorithmsOperations algorithmsOperations) {
         this.experimentOperations = experimentOperations;
         this.answerRatingOperations = answerRatingOperations;
         this.calibrationOperations = calibrationOperations;
         this.tagConstraintsOperations = tagConstraintsOperations;
         this.workerOperations = workerOperations;
+        this.algorithmsOperations = algorithmsOperations;
     }
 
     /**
@@ -67,10 +68,7 @@ public class ExperimentResource {
         return experimentOperations.getExperimentsFrom(from, asc, 20)
                 .map(experimentRecord -> ExperimentTransform.toProto(
                         experimentRecord,
-                        experimentOperations.getExperimentState(experimentRecord.getIdExperiment()),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        Collections.emptyList())
+                        experimentOperations.getExperimentState(experimentRecord.getIdExperiment()))
                 )
                 .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
     }
@@ -127,13 +125,7 @@ public class ExperimentResource {
 
         convertToCalibrationRecords(experiment).forEach(calibrationOperations::insertExperimentCalibration);
 
-        Experiment exp = ExperimentTransform.toProto(
-                getOrThrow(experimentOperations.getExperiment(id)),
-                experimentOperations.getExperimentState(id),
-                constraints,
-                getPlatforms(id),
-                tags
-        );
+        Experiment exp = fetchExperiment(id);
 
         EventManager.EXPERIMENT_CREATE.emit(exp);
 
@@ -146,12 +138,33 @@ public class ExperimentResource {
         List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
         List<ConstraintRecord> constraintRecords = tagConstraintsOperations.getConstraints(id);
         List<Experiment.PlatformCalibrations> platforms = getPlatforms(id);
+        AlgorithmTaskChooserRecord taskChooserRecord = getOrThrow(
+                algorithmsOperations.getTaskChooser(experimentRecord.getAlgorithmTaskChooser())
+        );
+        Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams = algorithmsOperations.getTaskChooserParams(
+                experimentRecord.getAlgorithmTaskChooser(), experimentRecord.getIdExperiment());
+        AlgorithmAnswerQualityRecord answerQualityRecord = getOrThrow(
+                algorithmsOperations.getAnswerQualityRecord(experimentRecord.getAlgorithmQualityAnswer())
+        );
+        Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams = algorithmsOperations.getAnswerQualityParams(
+                experimentRecord.getAlgorithmQualityAnswer(), experimentRecord.getIdExperiment());
+        AlgorithmRatingQualityRecord ratingQualityRecord = getOrThrow(
+                algorithmsOperations.getRatingQualityRecord(experimentRecord.getAlgorithmQualityRating())
+        );
+        Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams =
+                algorithmsOperations.getRatingQualityParams(experimentRecord.getAlgorithmQualityRating(), experimentRecord.getIdExperiment());
 
         return ExperimentTransform.toProto(experimentRecord,
                 state,
                 constraintRecords,
                 platforms,
-                tagRecords);
+                tagRecords,
+                taskChooserRecord,
+                taskChooserParams,
+                answerQualityRecord,
+                answerQualityParams,
+                ratingQualityRecord,
+                ratingQualityParams);
     }
 
     /**
