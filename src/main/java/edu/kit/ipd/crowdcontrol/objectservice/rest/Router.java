@@ -111,7 +111,7 @@ public class Router implements SparkApplication {
         get("/platforms", platformResource::all);
         get("/platforms/:id", platformResource::get);
 
-        put("/calibrations", calibrationResource::put, calibration.class);
+        put("/calibrations", calibrationResource::put, Calibration.class);
         get("/calibrations", calibrationResource::all);
         get("/calibrations/:id", calibrationResource::get);
         delete("/calibrations/:id", calibrationResource::delete);

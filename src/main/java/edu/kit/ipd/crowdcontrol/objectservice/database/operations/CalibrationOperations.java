@@ -5,7 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Cali
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.CalibrationTransform;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.calibration;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
@@ -37,7 +37,7 @@ public class CalibrationOperations extends AbstractOperations {
      * @param limit  Number of records
      * @return List of calibrations
      */
-    public Range<calibration, Integer> getCalibrationsFrom(int cursor, boolean next, int limit) {
+    public Range<Calibration, Integer> getCalibrationsFrom(int cursor, boolean next, int limit) {
         // Join is more complicated and the performance gain would be negligible considering the the
         // expected moderate usage
         return getNextRange(create.selectFrom(CALIBRATION), CALIBRATION.ID_CALIBRATION, cursor, next, limit)
@@ -57,7 +57,7 @@ public class CalibrationOperations extends AbstractOperations {
      *
      * @return The calibration
      */
-    public Optional<calibration> getCalibration(int id) {
+    public Optional<Calibration> getCalibration(int id) {
         // Join is more complicated and the performance gain would be negligible considering the the
         // expected moderate usage
         return create.fetchOptional(CALIBRATION, Tables.CALIBRATION.ID_CALIBRATION.eq(id))
@@ -79,11 +79,11 @@ public class CalibrationOperations extends AbstractOperations {
      *
      * @throws IllegalArgumentException if the name or content is not set
      */
-    public calibration insertCalibration(calibration toStore) throws IllegalArgumentException {
+    public Calibration insertCalibration(Calibration toStore) throws IllegalArgumentException {
         assertHasField(toStore,
-                calibration.NAME_FIELD_NUMBER,
-                calibration.QUESTION_FIELD_NUMBER,
-                calibration.ANSWERS_FIELD_NUMBER);
+                Calibration.NAME_FIELD_NUMBER,
+                Calibration.QUESTION_FIELD_NUMBER,
+                Calibration.ANSWERS_FIELD_NUMBER);
 
         CalibrationRecord calibration = CalibrationTransform.mergeRecord(create.newRecord(CALIBRATION), toStore);
         calibration.store();

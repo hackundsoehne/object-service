@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.AnswerRatingTransform;
@@ -8,6 +9,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.TagConstraintT
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Answer;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
@@ -73,8 +78,8 @@ public class ExperimentResource {
     private List<ExperimentsCalibrationRecord> convertToCalibrationRecords(Experiment experiment) {
         List<ExperimentsCalibrationRecord> calibrationRecords = new ArrayList<>();
 
-        for (Experiment.PlatformPopulation platformPopulation : experiment.getPlatformPopulationsList()) {
-            for (calibration calibration : platformPopulation.getPopulationsList()) {
+        for (Experiment.PlatformCalibrations platformPopulation : experiment.getPlatformCalibrationsList()) {
+            for (Calibration calibration : platformPopulation.getCalibrationList()) {
                 if (!calibrationOperations.getCalibration(calibration.getId()).isPresent())
                     throw new IllegalArgumentException("Calibration " + calibration.getId() + " does not exists");
 
@@ -140,7 +145,7 @@ public class ExperimentResource {
         Experiment.State state = experimentOperations.getExperimentState(id);
         List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
         List<ConstraintRecord> constraintRecords = tagConstraintsOperations.getConstraints(id);
-        List<Experiment.PlatformPopulation> platforms = getPlatforms(id);
+        List<Experiment.PlatformCalibrations> platforms = getPlatforms(id);
 
         return ExperimentTransform.toProto(experimentRecord,
                 state,
@@ -167,19 +172,19 @@ public class ExperimentResource {
      * @param id the id of the experiment
      * @return returns a list of populations with a platform
      */
-    private List<Experiment.PlatformPopulation> getPlatforms(int id) {
+    private List<Experiment.PlatformCalibrations> getPlatforms(int id) {
 
-        Function<ExperimentsCalibrationRecord, calibration> toCalibration = record -> {
+        Function<ExperimentsCalibrationRecord, Calibration> toCalibration = record -> {
             CalibrationAnswerOptionRecord a = getOrThrow(
                     calibrationOperations.getCalibrationAnswerOption(record.getAnswer())
             );
             return getOrThrow(calibrationOperations.getCalibration(a.getCalibration()));
         };
 
-        Function<Map.Entry<String, List<calibration>>, Experiment.PlatformPopulation> toPopulation = entry ->
-                Experiment.PlatformPopulation.newBuilder()
+        Function<Map.Entry<String, List<Calibration>>, Experiment.PlatformCalibrations> toPopulation = entry ->
+                Experiment.PlatformCalibrations.newBuilder()
                 //.setPlatformId(entry.getKey)
-                .addAllPopulations(entry.getValue())
+                .addAllCalibration(entry.getValue())
                 .build();
 
         return experimentOperations.getCalibrations(id).stream()

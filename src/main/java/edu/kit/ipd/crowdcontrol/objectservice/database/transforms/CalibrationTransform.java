@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.transforms;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationAnswerOptionRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.calibration;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,8 +20,8 @@ public class CalibrationTransform extends AbstractTransform {
      *
      * @return calibration.
      */
-    public static calibration toProto(CalibrationRecord record, List<CalibrationAnswerOptionRecord> options) {
-        return calibration.newBuilder()
+    public static Calibration toProto(CalibrationRecord record, List<CalibrationAnswerOptionRecord> options) {
+        return Calibration.newBuilder()
                 .setId(record.getIdCalibration())
                 .setName(record.getName())
                 .setQuestion(record.getProperty())
@@ -37,12 +37,12 @@ public class CalibrationTransform extends AbstractTransform {
      *
      * @return Merged calibration record.
      */
-    public static CalibrationRecord mergeRecord(CalibrationRecord target, calibration calibration) {
+    public static CalibrationRecord mergeRecord(CalibrationRecord target, Calibration calibration) {
         return merge(target, calibration, (fieldNumber, record) -> {
             switch (fieldNumber) {
-                case edu.kit.ipd.crowdcontrol.objectservice.proto.calibration.NAME_FIELD_NUMBER:
+                case Calibration.NAME_FIELD_NUMBER:
                     record.setName(calibration.getName());
-                case edu.kit.ipd.crowdcontrol.objectservice.proto.calibration.QUESTION_FIELD_NUMBER:
+                case Calibration.QUESTION_FIELD_NUMBER:
                     record.setProperty(calibration.getQuestion());
                     break;
             }

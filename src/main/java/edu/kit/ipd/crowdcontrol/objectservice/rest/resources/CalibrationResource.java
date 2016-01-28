@@ -1,8 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.CalibrationOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.calibration;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationList;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.ConflictException;
@@ -35,7 +35,7 @@ public class CalibrationResource {
         boolean asc = getQueryBool(request, "asc", true);
 
         return operations.getCalibrationsFrom(from, asc, 20)
-                .constructPaginated(PopulationList.newBuilder(), PopulationList.Builder::addAllItems);
+                .constructPaginated(CalibrationList.newBuilder(), CalibrationList.Builder::addAllItems);
     }
 
     /**
@@ -44,7 +44,7 @@ public class CalibrationResource {
      *
      * @return a single calibration.
      */
-    public calibration get(Request request, Response response) {
+    public Calibration get(Request request, Response response) {
         return operations.getCalibration(getParamInt(request, "id"))
                 .orElseThrow(() -> new NotFoundException("Resource not found."));
     }
@@ -55,8 +55,8 @@ public class CalibrationResource {
      *
      * @return the created calibration.
      */
-    public calibration put(Request request, Response response) {
-        calibration calibration = request.attribute("input");
+    public Calibration put(Request request, Response response) {
+        Calibration calibration = request.attribute("input");
 
         try {
             calibration = operations.insertCalibration(calibration);
@@ -76,7 +76,7 @@ public class CalibrationResource {
      *
      * @return {@code null}.
      */
-    public calibration delete(Request request, Response response) {
+    public Calibration delete(Request request, Response response) {
         try {
             boolean existed = operations.deleteCalibration(getParamInt(request, "id"));
 

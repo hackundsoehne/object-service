@@ -28,7 +28,7 @@ public class ExperimentTransform extends AbstractTransform
      */
     public static Experiment toProto(ExperimentRecord record, Experiment.State state,
                                      List<ConstraintRecord> constraintRecords,
-                                     List<Experiment.PlatformPopulation> platforms,
+                                     List<Experiment.PlatformCalibrations> platforms,
                                      List<TagRecord> tagRecords) {
         Type type = new TypeToken<Map<String, String>>(){}.getType();
         //lets build here the tree of calibrations a platforms
@@ -129,7 +129,7 @@ public class ExperimentTransform extends AbstractTransform
                 case Experiment.PLACEHOLDERS_FIELD_NUMBER:
                     record.setTemplateData(new JSONObject(experiment.getPlaceholders()).toString());
                     break;
-                case Experiment.PLATFORM_POPULATIONS_FIELD_NUMBER:
+                case Experiment.PLATFORM_CALIBRATIONS_FIELD_NUMBER:
                     // has to be done manual with CalibrationsTransformer
                     break;
                 case Experiment.RATINGS_PER_ANSWER_FIELD_NUMBER:
