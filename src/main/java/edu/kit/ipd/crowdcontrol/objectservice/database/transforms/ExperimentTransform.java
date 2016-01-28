@@ -16,8 +16,34 @@ import java.util.stream.Collectors;
 /**
  * Created by marcel on 26.01.16.
  */
-public class ExperimentTransform extends AbstractTransform
-{
+public class ExperimentTransform extends AbstractTransform {
+    /**
+     * Convert a experiment record to a proto object with the given additional infos
+     * @param record The Database record to use
+     * @param state state of the experiment
+     * @return the experiment object with the given data
+     */
+    public static Experiment toProto(ExperimentRecord record, Experiment.State state) {
+        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        return Experiment.newBuilder()
+                .setId(record.getIdExperiment())
+                .setDescription(record.getDescription())
+                        /*.set*/
+                .setRatingsPerAnswer(record.getRatingsPerAnswer())
+                .setAnswersPerWorker(record.getAnwersPerWorker())
+                .setRatingsPerWorker(record.getRatingsPerWorker())
+                .setAnswerType(AnswerType.valueOf(record.getAnswerType()))
+                .setAlgorithmTaskChooser(AlgorithmOption.newBuilder().setName(record.getAlgorithmTaskChooser()).build())
+                .setAlgorithmQualityAnswer(AlgorithmOption.newBuilder().setName(record.getAlgorithmQualityAnswer()).build())
+                .setAlgorithmQualityRating(AlgorithmOption.newBuilder().setName(record.getAlgorithmQualityRating()).build())
+                .setPaymentBase(record.getBasePayment())
+                .setPaymentAnswer(record.getBonusAnswer())
+                .setPaymentRating(record.getBonusRating())
+                .setState(state)
+                .putAllPlaceholders(new Gson().fromJson(record.getTemplateData(), type))
+                .build();
+    }
+
     /**
      * Convert a experiment record to a proto object with the given additional infos
      * @param record The Database record to use
@@ -32,102 +58,26 @@ public class ExperimentTransform extends AbstractTransform
                                      List<Experiment.PlatformCalibrations> platforms,
                                      List<TagRecord> tagRecords,
                                      AlgorithmTaskChooserRecord taskChooserRecord,
-                                     Map<AlgorithmAnswerQualityParamRecord, ChosenTaskChooserParamRecord> taskChooserParams,
+                                     Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams,
                                      AlgorithmAnswerQualityRecord answerQualityRecord,
-                                     Map<AlgorithmAnswerQualityParamRecord, ChosenAnswerQualityParamRecord> answerQualityParams,
+                                     Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams,
                                      AlgorithmRatingQualityRecord ratingQualityRecord,
-                                     Map<AlgorithmRatingQualityParamRecord, ChosenRatingQualityParamRecord> ratingQualityParams) {
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
-        //lets build here the tree of calibrations a platforms
-        return Experiment.newBuilder()
-                .setId(record.getIdExperiment())
-                .setDescription(record.getDescription())
-                /*.set*/
-                .setRatingsPerAnswer(record.getRatingsPerAnswer())
-                .setAnswersPerWorker(record.getAnwersPerWorker())
-                .setRatingsPerWorker(record.getRatingsPerWorker())
-                .setAnswerType(AnswerType.valueOf(record.getAnswerType()))
-                .setAlgorithmTaskChooser(toTaskChooserProto(taskChooserRecord, taskChooserParams))
-                .setAlgorithmQualityAnswer(toAnswerQualityProto(answerQualityRecord, answerQualityParams))
-                .setAlgorithmQualityRating(toRatingQualityProto(ratingQualityRecord, ratingQualityParams))
-                .setPaymentBase(record.getBasePayment())
-                .setPaymentAnswer(record.getBonusAnswer())
-                .setPaymentRating(record.getBonusRating())
-                .setState(state)
-                .putAllPlaceholders(new Gson().fromJson(record.getTemplateData(), type))
+                                     Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
+        return toProto(record, state).toBuilder()
+                        /*.set*/
+                .setAlgorithmTaskChooser(AlgorithmsTransform.toTaskChooserProto(taskChooserRecord, taskChooserParams))
+                .setAlgorithmQualityAnswer(AlgorithmsTransform.toAnswerQualityProto(answerQualityRecord, answerQualityParams))
+                .setAlgorithmQualityRating(AlgorithmsTransform.toRatingQualityProto(ratingQualityRecord, ratingQualityParams))
                 .addAllConstraints(constraintRecords.stream().map(TagConstraintTransform::toConstraintsProto).collect(Collectors.toList()))
                 .addAllPlatformCalibrations(platforms)
                 .addAllTags(tagRecords.stream().map(TagConstraintTransform::toTagProto).collect(Collectors.toList()))
                 .build();
     }
 
-    private static AlgorithmOption toTaskChooserProto(AlgorithmTaskChooserRecord taskChooserRecord,
-                                               Map<AlgorithmAnswerQualityParamRecord, ChosenTaskChooserParamRecord> taskChooserParams) {
-        List<AlgorithmOption.AlgorithmParameter> parameters = taskChooserParams.entrySet().stream()
-                .map(entry -> AlgorithmOption.AlgorithmParameter.newBuilder()
-                        .setDescription(entry.getKey().getDescription())
-                        .setId(entry.getKey().getIdAlgorithmAnswerQualityParam())
-                        .setRegex(entry.getKey().getRegex())
-                        .setValue(
-                                entry.getValue() == null ? null
-                                        : entry.getValue().getValue()
-                        )
-                        .build()
-                )
-                .collect(Collectors.toList());
-        return AlgorithmOption.newBuilder()
-                .setName(taskChooserRecord.getIdTaskChooser())
-                .setDescription(taskChooserRecord.getDescription())
-                .addAllParameters(parameters)
-                .build();
-    }
-
-    private static AlgorithmOption toAnswerQualityProto(AlgorithmAnswerQualityRecord answerQualityRecord,
-                                                        Map<AlgorithmAnswerQualityParamRecord, ChosenAnswerQualityParamRecord> answerQualityParams) {
-        List<AlgorithmOption.AlgorithmParameter> parameters = answerQualityParams.entrySet().stream()
-                .map(entry -> AlgorithmOption.AlgorithmParameter.newBuilder()
-                        .setDescription(entry.getKey().getDescription())
-                        .setId(entry.getKey().getIdAlgorithmAnswerQualityParam())
-                        .setRegex(entry.getKey().getRegex())
-                        .setValue(
-                                entry.getValue() == null ? null
-                                        : entry.getValue().getValue()
-                        )
-                        .build()
-                )
-                .collect(Collectors.toList());
-        return AlgorithmOption.newBuilder()
-                .setName(answerQualityRecord.getIdAlgorithmAnswerQuality())
-                .setDescription(answerQualityRecord.getDescription())
-                .addAllParameters(parameters)
-                .build();
-    }
-
-    private static AlgorithmOption toRatingQualityProto(AlgorithmRatingQualityRecord ratingQualityRecord,
-                                                        Map<AlgorithmRatingQualityParamRecord, ChosenRatingQualityParamRecord> ratingQualityParams) {
-        List<AlgorithmOption.AlgorithmParameter> parameters = ratingQualityParams.entrySet().stream()
-                .map(entry -> AlgorithmOption.AlgorithmParameter.newBuilder()
-                        .setDescription(entry.getKey().getDescription())
-                        .setId(entry.getKey().getIdAlgorithmRatingQualityParam())
-                        .setRegex(entry.getKey().getRegex())
-                        .setValue(
-                                entry.getValue() == null ? null
-                                        : entry.getValue().getValue()
-                        )
-                        .build()
-                )
-                .collect(Collectors.toList());
-        return AlgorithmOption.newBuilder()
-                .setName(ratingQualityRecord.getIdAlgorithmRatingQuality())
-                .setDescription(ratingQualityRecord.getDescription())
-                .addAllParameters(parameters)
-                .build();
-    }
-
     /**
      * Creates a new record  from the data of a experiment
-     * @param experiment
-     * @return
+     * @param experiment the protobuf to generate the record from
+     * @return a record
      */
     public static ExperimentRecord toRecord(Experiment experiment) {
         return new ExperimentRecord(experiment.getId(),
