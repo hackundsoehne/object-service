@@ -69,7 +69,7 @@ public class Main {
         ExperimentOperations experimentOperations = new ExperimentOperations(databaseManager.getContext());
         AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext());
         TagConstraintsOperations tagConstraintsOperations = new TagConstraintsOperations(databaseManager.getContext());
-        AlgorithmsOperations algorithmsOperations = new AlgorithmsOperations(databaseManager.getContext());
+        AlgorithmOperations algorithmsOperations = new AlgorithmOperations(databaseManager.getContext());
 
         new Router(
                 new TemplateResource(templateOperations),

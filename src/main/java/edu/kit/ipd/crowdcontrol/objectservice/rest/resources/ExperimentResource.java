@@ -34,9 +34,9 @@ public class ExperimentResource {
     private final CalibrationOperations calibrationOperations;
     private final TagConstraintsOperations tagConstraintsOperations;
     private final WorkerOperations workerOperations;
-    private final AlgorithmsOperations algorithmsOperations;
+    private final AlgorithmOperations algorithmsOperations;
 
-    public ExperimentResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations, CalibrationOperations calibrationOperations, TagConstraintsOperations tagConstraintsOperations, WorkerOperations workerOperations, AlgorithmsOperations algorithmsOperations) {
+    public ExperimentResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations, CalibrationOperations calibrationOperations, TagConstraintsOperations tagConstraintsOperations, WorkerOperations workerOperations, AlgorithmOperations algorithmsOperations) {
         this.experimentOperations = experimentOperations;
         this.answerRatingOperations = answerRatingOperations;
         this.calibrationOperations = calibrationOperations;

@@ -10,17 +10,17 @@ import java.util.Optional;
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
 /**
- * this class is concerned with all the queries concerning the Algorithms-Tables
+ * this class is concerned with all the queries concerning the Algorithm-Tables
  * @author LeanderK
  * @version 1.0
  */
-public class AlgorithmsOperations extends AbstractOperations {
+public class AlgorithmOperations extends AbstractOperations {
     /**
      * creates a new AlgorithmsOperations
      *
      * @param create the context to use to communicate with the database
      */
-    public AlgorithmsOperations(DSLContext create) {
+    public AlgorithmOperations(DSLContext create) {
         super(create);
     }
 
