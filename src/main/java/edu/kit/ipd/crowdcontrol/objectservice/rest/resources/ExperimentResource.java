@@ -76,7 +76,7 @@ public class ExperimentResource {
     private List<ExperimentsCalibrationRecord> convertToCalibrationRecords(Experiment experiment) {
         List<ExperimentsCalibrationRecord> calibrationRecords = new ArrayList<>();
 
-        for (Experiment.PlatformCalibrations platformPopulation : experiment.getPlatformCalibrationsList()) {
+        for (Experiment.Population platformPopulation : experiment.getPopulationsList()) {
             for (Calibration calibration : platformPopulation.getCalibrationList()) {
                 if (!calibrationOperations.getCalibration(calibration.getId()).isPresent())
                     throw new IllegalArgumentException("Calibration " + calibration.getId() + " does not exists");
@@ -137,7 +137,7 @@ public class ExperimentResource {
         Experiment.State state = experimentOperations.getExperimentState(id);
         List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
         List<ConstraintRecord> constraintRecords = tagConstraintsOperations.getConstraints(id);
-        List<Experiment.PlatformCalibrations> platforms = getPlatforms(id);
+        List<Experiment.Population> platforms = getPlatforms(id);
         AlgorithmTaskChooserRecord taskChooserRecord = getOrThrow(
                 algorithmsOperations.getTaskChooser(experimentRecord.getAlgorithmTaskChooser())
         );
@@ -185,7 +185,7 @@ public class ExperimentResource {
      * @param id the id of the experiment
      * @return returns a list of populations with a platform
      */
-    private List<Experiment.PlatformCalibrations> getPlatforms(int id) {
+    private List<Experiment.Population> getPlatforms(int id) {
 
         Function<ExperimentsCalibrationRecord, Calibration> toCalibration = record -> {
             CalibrationAnswerOptionRecord a = getOrThrow(
@@ -194,8 +194,8 @@ public class ExperimentResource {
             return getOrThrow(calibrationOperations.getCalibration(a.getCalibration()));
         };
 
-        Function<Map.Entry<String, List<Calibration>>, Experiment.PlatformCalibrations> toPopulation = entry ->
-                Experiment.PlatformCalibrations.newBuilder()
+        Function<Map.Entry<String, List<Calibration>>, Experiment.Population> toPopulation = entry ->
+                Experiment.Population.newBuilder()
                 //.setPlatformId(entry.getKey)
                 .addAllCalibration(entry.getValue())
                 .build();
