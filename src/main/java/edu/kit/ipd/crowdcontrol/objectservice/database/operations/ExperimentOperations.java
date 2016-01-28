@@ -85,7 +85,7 @@ public class ExperimentOperations extends AbstractOperations {
         } else if (taskStatuses.contains(TaskStatus.running)) {
             return Experiment.State.PUBLISHED;
         } else if (taskStatuses.contains(TaskStatus.stopping)) {
-            return Experiment.State.STOPPING;
+            return Experiment.State.CREATIVE_STOPPED;
         } else if (taskStatuses.contains(TaskStatus.stopped)) {
             return Experiment.State.STOPPED;
         } else {
