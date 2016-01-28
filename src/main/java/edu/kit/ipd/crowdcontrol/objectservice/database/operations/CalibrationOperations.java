@@ -35,7 +35,6 @@ public class CalibrationOperations extends AbstractOperations {
      * @param cursor Pagination cursor
      * @param next   {@code true} for next, {@code false} for previous
      * @param limit  Number of records
-     *
      * @return List of calibrations
      */
     public Range<calibration, Integer> getCalibrationsFrom(int cursor, boolean next, int limit) {
