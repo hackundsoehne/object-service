@@ -63,10 +63,12 @@ public class MoneyTransferManager {
         }
         for (int i = 0; i < messages.length; i++) {
             try {
-                GiftCodeRecord rec = MailParser.parseMail(messages[i]);
+                GiftCodeRecord rec = MailParser.parseAmazonGiftCode(messages[i]);
                 workerBalanceOperations.addGiftCode(rec.getCode(), rec.getAmount());
             } catch (MessagingException | IOException e) {
                 e.printStackTrace();
+            } catch (AmazonMailFormatChangedException e) {
+                //TODO : Notification + mark Mails as unseen
             }
         }
         //Choose giftcodes and pay workers
