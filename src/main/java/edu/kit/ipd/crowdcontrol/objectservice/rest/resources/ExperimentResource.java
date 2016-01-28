@@ -211,7 +211,6 @@ public class ExperimentResource {
             if (size > 1)
                 throw new IllegalStateException("if you change the state nothing else can be changed");
         } else {
-            //TODO refactor into method
             ExperimentRecord experimentRecord = ExperimentTransform.mergeProto(original, experiment);
             experimentRecord.setIdExperiment(id);
 
