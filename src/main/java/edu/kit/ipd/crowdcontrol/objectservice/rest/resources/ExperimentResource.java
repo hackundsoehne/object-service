@@ -46,7 +46,7 @@ public class ExperimentResource {
      * @return The type which was in the optional
      */
     private <U> U getOrThrow(Optional<U> c) {
-        return c.orElseThrow(() -> new NotFoundException("Resource not found!"));
+        return c.orElseThrow(NotFoundException::new);
     }
 
     /**
