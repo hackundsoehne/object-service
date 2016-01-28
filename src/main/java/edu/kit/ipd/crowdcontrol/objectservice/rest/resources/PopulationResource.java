@@ -28,7 +28,7 @@ public class PopulationResource {
      * @param request  request provided by Spark
      * @param response response provided by Spark
      *
-     * @return A list of all populations.
+     * @return List of populations.
      */
     public Paginated<Integer> all(Request request, Response response) {
         int from = getQueryInt(request, "from", 0);
@@ -42,18 +42,18 @@ public class PopulationResource {
      * @param request  request provided by Spark
      * @param response response provided by Spark
      *
-     * @return A single population.
+     * @return Single population.
      */
     public Population get(Request request, Response response) {
         return operations.getPopulation(getParamInt(request, "id"))
-                .orElseThrow(() -> new NotFoundException("Resource not found."));
+                .orElseThrow(NotFoundException::new);
     }
 
     /**
      * @param request  request provided by Spark
      * @param response response provided by Spark
      *
-     * @return The created population.
+     * @return Created population.
      */
     public Population put(Request request, Response response) {
         Population population = request.attribute("input");
@@ -61,7 +61,7 @@ public class PopulationResource {
         try {
             population = operations.insertPopulation(population);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Name and content must be set!");
+            throw new BadRequestException("Missing at least one required parameter.");
         }
 
         response.status(201);
@@ -81,7 +81,7 @@ public class PopulationResource {
             boolean existed = operations.deletePopulation(getParamInt(request, "id"));
 
             if (!existed) {
-                throw new NotFoundException("Population does not exist!");
+                throw new NotFoundException();
             }
 
             return null;
