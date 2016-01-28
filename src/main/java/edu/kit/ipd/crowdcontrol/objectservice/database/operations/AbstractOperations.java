@@ -48,7 +48,6 @@ public abstract class AbstractOperations {
             if (!running) {
                 return function.apply(trans);
             } else {
-                //TODO other exception?
                 throw new IllegalStateException("Experiment is running: " + experimentID);
             }
         });
@@ -72,7 +71,6 @@ public abstract class AbstractOperations {
             if (running) {
                 return function.apply(trans);
             } else {
-                //TODO other exception?
                 throw new IllegalStateException("Experiment is running: " + experimentID);
             }
         });
