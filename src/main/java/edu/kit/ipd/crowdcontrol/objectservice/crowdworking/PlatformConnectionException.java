@@ -1,6 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 /**
+ * PlatformConnectionException can be thrown when an error occurs that is related to the connection to a Platform.
+ * It can be used as a wrapper for checked exceptions.
+ *
  * @author Simon Korz
  * @version 1.0
  */

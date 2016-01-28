@@ -74,7 +74,7 @@ public class PyBossaPlatform implements Platform {
                 idTask2 = ids[1];
             }
         } else {
-            throw new PlatformResponseException(response.getBody().getObject()
+            throw new PlatformTaskException(response.getBody().getObject()
                     .optString("exception_msg", "getIdTasks failed"));
         }
 
@@ -106,7 +106,7 @@ public class PyBossaPlatform implements Platform {
             if (response.getStatus() == 200) {
                 ids[i] = response.getBody().getObject().getString("id");
             } else {
-                throw new PlatformResponseException(response.getBody().getObject()
+                throw new PlatformTaskException(response.getBody().getObject()
                         .optString("exception_msg", "createIdTasks failed"));
             }
         }
@@ -183,7 +183,7 @@ public class PyBossaPlatform implements Platform {
             if (response.getStatus() == 200) {
                 taskID = response.getBody().getObject().getString("id");
             } else {
-                throw new PlatformResponseException(response.getBody().getObject()
+                throw new PlatformTaskException(response.getBody().getObject()
                         .optString("exception_msg", "Publishing task failed"));
             }
             return taskID;
@@ -251,7 +251,7 @@ public class PyBossaPlatform implements Platform {
             if (response.getStatus() == 200) {
                 return id;
             } else {
-                throw new PlatformResponseException(response.getBody().getObject()
+                throw new PlatformTaskException(response.getBody().getObject()
                         .optString("exception_msg", "Updating task failed"));
             }
         });
