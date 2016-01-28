@@ -4,10 +4,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentification;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.json.JSONObject;
 
@@ -20,13 +17,27 @@ import java.util.concurrent.CompletableFuture;
  * @version 1.0
  */
 public class PyBossaPlatform implements Platform {
-    private String workerServiceUrl;
-    private String apiKey;
-    private String apiUrl;
-    private String name;
-    private String projectID;
+    private final String workerServiceUrl;
+    private final String apiKey;
+    private final String apiUrl;
+    private final String taskUrl;
+    private final String name;
+    private final String projectID;
+    private final Boolean calibsAllowed;
     private int idTask1;
     private int idTask2;
+
+    public PyBossaPlatform(String workerServiceUrl, String apiKey, String apiUrl, String name, String projectID, Boolean calibsAllowed) {
+        this.workerServiceUrl = workerServiceUrl;
+        this.apiKey = apiKey;
+        this.apiUrl = apiUrl;
+        this.name = name;
+        this.projectID = projectID;
+        this.calibsAllowed = calibsAllowed;
+
+        taskUrl = apiUrl + "/task";
+        initIdTasks();
+    }
 
     /**
      * if the Platform has his own payment service the implementation can return not none.
@@ -59,10 +70,6 @@ public class PyBossaPlatform implements Platform {
         return this.name;
     }
 
-    private String publishTask() {
-        return null;
-    }
-
     /**
      * Publish a passed experiment on the platform
      *
@@ -71,40 +78,40 @@ public class PyBossaPlatform implements Platform {
      * Or finish with a exception if the publishing failed.
      */
     public CompletableFuture<String> publishTask(Experiment experiment) {
-        CompletableFuture<String> cf = new CompletableFuture<>();
+        return CompletableFuture.supplyAsync(() -> {
+            JsonNode jsonTask = new JsonNode("");
 
-        CompletableFuture.supplyAsync(this::publishTask);
+            jsonTask.getObject().append("project_id", projectID)
+                    .append("info", new JSONObject()
+                            .append("url", workerServiceUrl)
+                            .append("expID", experiment.getId())
+                            .append("platformName", name)
+                            .append("idTask1", idTask1)
+                            .append("idTask2", idTask2)
+                    )
+                    .append("priority_0", 1)
+                    .append("n_answers", experiment.getNeededAnswers());
 
-        JsonNode jsonTask = new JsonNode("");
+            HttpResponse<JsonNode> response;
+            try {
+                response = Unirest.post(taskUrl)
+                        .header("Content-Type", "application/json")
+                        .queryString("api_key", apiKey)
+                        .body(jsonTask)
+                        .asJson();
+            } catch (UnirestException e) {
+                throw new PlatformConnectionException(e);
+            }
 
-        jsonTask.getObject().append("project_id", projectID)
-                .append("info", new JSONObject()
-                        .append("url", workerServiceUrl)
-                        .append("expID", experiment.getId())
-                        .append("platformName", name)
-                        .append("idTask1", idTask1)
-                        .append("idTask2", idTask2)
-                )
-                .append("priority_0", 1);
-
-        HttpResponse<JsonNode> response;
-        try {
-            response = Unirest.post(apiUrl + "task")
-                    .header("Content-Type", "application/json")
-                    .queryString("api_key", apiKey)
-                    .body(jsonTask)
-                    .asJson();
-        } catch (UnirestException e) {
-            // TODO error handling
-            e.printStackTrace();
-        }
-
-        String taskID = response.getBody().getObject().getString("id")
-
-        CompletableFu
-
-
-        return cf;
+            String taskID = null;
+            if (response.getStatus() == 200) {
+                taskID = response.getBody().getObject().getString("id");
+            } else {
+                throw new PlatformPublishException(response.getBody().getObject()
+                        .optString("exception_msg", "Publishing task failed"));
+            }
+            return taskID;
+        });
     }
 
     /**
@@ -114,7 +121,21 @@ public class PyBossaPlatform implements Platform {
      * @return true on success, false or a exception if it failed
      */
     public CompletableFuture<Boolean> unpublishTask(String id) {
-        return null;
+        return CompletableFuture.supplyAsync(() -> {
+            HttpResponse<JsonNode> response;
+            try {
+                response = Unirest.delete(taskUrl + "/{taskId}")
+                        .header("Content-Type", "application/json")
+                        .routeParam("taskId", id)
+                        .queryString("api_key", apiKey)
+                        .asJson();
+            } catch (UnirestException e) {
+                throw new PlatformConnectionException(e);
+            }
+
+            // if response status is 204 the task was successfully deleted
+            return response.getStatus() == 204;
+        });
     }
 
     /**
@@ -134,38 +155,49 @@ public class PyBossaPlatform implements Platform {
      * @return true or false
      */
     public Boolean isCalibrationAllowed() {
-        return null;
+        return this.calibsAllowed;
     }
 
-    private void initProject() {
-        HttpResponse<JsonNode> response = Unirest.get(apiUrl + "task")
-                .queryString("api_key", apiKey)
-                .queryString("project_id", projectID)
-                .asJson();
+//    private void initIdsTasks() {
+//        HttpResponse<JsonNode> response = null;
+//        try {
+//            response = Unirest.get(apiUrl + "task")
+//                    .queryString("api_key", apiKey)
+//                    .queryString("project_id", projectID)
+//                    .asJson();
+//        } catch (UnirestException e) {
+//            e.printStackTrace();
+//        }
+//
+//        JsonNode json = response.getBody();
+//
+//        if (json.isArray() && json.getArray().length() < 2) {
+//
+//        }
+//    }
 
-        JsonNode json = response.getBody();
+    private void initIdTasks() {
+        JsonNode jsonTask = new JsonNode("");
+        jsonTask.getObject()
+                .append("project_id", projectID)
+                .append("priority_0", 0);
 
-        if (json.isArray() && json.getArray().length() < 2) {
-
+        try {
+            HttpResponse<JsonNode> postResponse = Unirest.post(apiUrl + "task")
+                    .header("Content-Type", "application/json")
+                    .queryString("api_key", apiKey)
+                    .body(jsonTask)
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
         }
     }
 
-    private void initIdTasks() {
-        JsonNode jsonTask = new JsonNode();
-        jsonTask.getObject().append("project_id", projectID)
-                .append("info", new JSONObject()
-                        .append("idTask"))
-                .append("priority_0", 0);
-
-        HttpResponse<JsonNode> postResponse = Unirest.post(apiUrl + "task")
-                .header("Content-Type", "application/json")
-                .queryString("api_key", apiKey)
-                .body(jsonTask)
-                .asJson();
-    }
-
-    private void sdpublishTask(Experiment experiment) {
-
-
-    }
+//    private String appendName(String id) {
+//        return this.name + ":" + id;
+//    }
+//
+//    private String stripName(String uniqueId) {
+//
+//    }
 }
