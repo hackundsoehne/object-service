@@ -51,34 +51,43 @@ public interface ExperimentOrBuilder extends
   edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType getAnswerType();
 
   /**
-   * <code>optional string algorithm_task_chooser = 6;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
    */
-  java.lang.String getAlgorithmTaskChooser();
+  boolean hasAlgorithmTaskChooser();
   /**
-   * <code>optional string algorithm_task_chooser = 6;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
    */
-  com.google.protobuf.ByteString
-      getAlgorithmTaskChooserBytes();
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmTaskChooser();
+  /**
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmTaskChooserOrBuilder();
 
   /**
-   * <code>optional string algorithm_quality_answer = 7;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
    */
-  java.lang.String getAlgorithmQualityAnswer();
+  boolean hasAlgorithmQualityAnswer();
   /**
-   * <code>optional string algorithm_quality_answer = 7;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
    */
-  com.google.protobuf.ByteString
-      getAlgorithmQualityAnswerBytes();
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmQualityAnswer();
+  /**
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmQualityAnswerOrBuilder();
 
   /**
-   * <code>optional string algorithm_quality_rating = 8;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
    */
-  java.lang.String getAlgorithmQualityRating();
+  boolean hasAlgorithmQualityRating();
   /**
-   * <code>optional string algorithm_quality_rating = 8;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
    */
-  com.google.protobuf.ByteString
-      getAlgorithmQualityRatingBytes();
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmQualityRating();
+  /**
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmQualityRatingOrBuilder();
 
   /**
    * <code>optional int32 answers_per_worker = 9;</code>
@@ -164,27 +173,27 @@ public interface ExperimentOrBuilder extends
       int index);
 
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> 
-      getPlatformPopulationsList();
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations> 
+      getPlatformCalibrationsList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getPlatformPopulations(int index);
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations getPlatformCalibrations(int index);
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  int getPlatformPopulationsCount();
+  int getPlatformCalibrationsCount();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
-      getPlatformPopulationsOrBuilderList();
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder> 
+      getPlatformCalibrationsOrBuilderList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder getPlatformPopulationsOrBuilder(
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder getPlatformCalibrationsOrBuilder(
       int index);
 
   /**

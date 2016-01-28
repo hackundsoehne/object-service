@@ -20,9 +20,6 @@ public  final class Experiment extends
     description_ = "";
     state_ = 0;
     answerType_ = 0;
-    algorithmTaskChooser_ = "";
-    algorithmQualityAnswer_ = "";
-    algorithmQualityRating_ = "";
     answersPerWorker_ = 0;
     ratingsPerWorker_ = 0;
     ratingsPerAnswer_ = 0;
@@ -32,7 +29,7 @@ public  final class Experiment extends
     paymentRating_ = 0;
     constraints_ = java.util.Collections.emptyList();
     tags_ = java.util.Collections.emptyList();
-    platformPopulations_ = java.util.Collections.emptyList();
+    platformCalibrations_ = java.util.Collections.emptyList();
     workerQualityThreshold_ = 0;
     templateId_ = 0;
   }
@@ -91,21 +88,42 @@ public  final class Experiment extends
             break;
           }
           case 50: {
-            String s = input.readStringRequireUtf8();
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder subBuilder = null;
+            if (algorithmTaskChooser_ != null) {
+              subBuilder = algorithmTaskChooser_.toBuilder();
+            }
+            algorithmTaskChooser_ = input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(algorithmTaskChooser_);
+              algorithmTaskChooser_ = subBuilder.buildPartial();
+            }
 
-            algorithmTaskChooser_ = s;
             break;
           }
           case 58: {
-            String s = input.readStringRequireUtf8();
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder subBuilder = null;
+            if (algorithmQualityAnswer_ != null) {
+              subBuilder = algorithmQualityAnswer_.toBuilder();
+            }
+            algorithmQualityAnswer_ = input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(algorithmQualityAnswer_);
+              algorithmQualityAnswer_ = subBuilder.buildPartial();
+            }
 
-            algorithmQualityAnswer_ = s;
             break;
           }
           case 66: {
-            String s = input.readStringRequireUtf8();
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder subBuilder = null;
+            if (algorithmQualityRating_ != null) {
+              subBuilder = algorithmQualityRating_.toBuilder();
+            }
+            algorithmQualityRating_ = input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(algorithmQualityRating_);
+              algorithmQualityRating_ = subBuilder.buildPartial();
+            }
 
-            algorithmQualityRating_ = s;
             break;
           }
           case 72: {
@@ -161,10 +179,10 @@ public  final class Experiment extends
           }
           case 146: {
             if (!((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
-              platformPopulations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation>();
+              platformCalibrations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations>();
               mutable_bitField0_ |= 0x00020000;
             }
-            platformPopulations_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.parser(), extensionRegistry));
+            platformCalibrations_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.parser(), extensionRegistry));
             break;
           }
           case 154: {
@@ -205,7 +223,7 @@ public  final class Experiment extends
         tags_ = java.util.Collections.unmodifiableList(tags_);
       }
       if (((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
-        platformPopulations_ = java.util.Collections.unmodifiableList(platformPopulations_);
+        platformCalibrations_ = java.util.Collections.unmodifiableList(platformCalibrations_);
       }
       makeExtensionsImmutable();
     }
@@ -352,8 +370,8 @@ public  final class Experiment extends
     // @@protoc_insertion_point(enum_scope:crowdcontrol.Experiment.State)
   }
 
-  public interface PlatformPopulationOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:crowdcontrol.Experiment.PlatformPopulation)
+  public interface PlatformCalibrationsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:crowdcontrol.Experiment.PlatformCalibrations)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -367,43 +385,43 @@ public  final class Experiment extends
         getPlatformIdBytes();
 
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    java.util.List<calibration>
-        getPopulationsList();
+    java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> 
+        getCalibrationList();
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    calibration getPopulations(int index);
+    edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration getCalibration(int index);
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    int getPopulationsCount();
+    int getCalibrationCount();
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
-        getPopulationsOrBuilderList();
+    java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> 
+        getCalibrationOrBuilderList();
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
+    edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder getCalibrationOrBuilder(
         int index);
   }
   /**
-   * Protobuf type {@code crowdcontrol.Experiment.PlatformPopulation}
+   * Protobuf type {@code crowdcontrol.Experiment.PlatformCalibrations}
    */
-  public  static final class PlatformPopulation extends
+  public  static final class PlatformCalibrations extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:crowdcontrol.Experiment.PlatformPopulation)
-      PlatformPopulationOrBuilder {
-    // Use PlatformPopulation.newBuilder() to construct.
-    private PlatformPopulation(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      // @@protoc_insertion_point(message_implements:crowdcontrol.Experiment.PlatformCalibrations)
+      PlatformCalibrationsOrBuilder {
+    // Use PlatformCalibrations.newBuilder() to construct.
+    private PlatformCalibrations(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
     }
-    private PlatformPopulation() {
+    private PlatformCalibrations() {
       platformId_ = "";
-      populations_ = java.util.Collections.emptyList();
+      calibration_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -411,7 +429,7 @@ public  final class Experiment extends
     getUnknownFields() {
       return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
-    private PlatformPopulation(
+    private PlatformCalibrations(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
@@ -438,10 +456,10 @@ public  final class Experiment extends
             }
             case 18: {
               if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                populations_ = new java.util.ArrayList<calibration>();
+                calibration_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration>();
                 mutable_bitField0_ |= 0x00000002;
               }
-              populations_.add(input.readMessage(calibration.parser(), extensionRegistry));
+              calibration_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.parser(), extensionRegistry));
               break;
             }
           }
@@ -454,21 +472,21 @@ public  final class Experiment extends
                 e.getMessage()).setUnfinishedMessage(this));
       } finally {
         if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-          populations_ = java.util.Collections.unmodifiableList(populations_);
+          calibration_ = java.util.Collections.unmodifiableList(calibration_);
         }
         makeExtensionsImmutable();
       }
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_descriptor;
+      return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformCalibrations_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_fieldAccessorTable
+      return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformCalibrations_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder.class);
+              edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder.class);
     }
 
     private int bitField0_;
@@ -506,39 +524,39 @@ public  final class Experiment extends
       }
     }
 
-    public static final int POPULATIONS_FIELD_NUMBER = 2;
-    private java.util.List<calibration> populations_;
+    public static final int CALIBRATION_FIELD_NUMBER = 2;
+    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> calibration_;
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    public java.util.List<calibration> getPopulationsList() {
-      return populations_;
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> getCalibrationList() {
+      return calibration_;
     }
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
-        getPopulationsOrBuilderList() {
-      return populations_;
+    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> 
+        getCalibrationOrBuilderList() {
+      return calibration_;
     }
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    public int getPopulationsCount() {
-      return populations_.size();
+    public int getCalibrationCount() {
+      return calibration_.size();
     }
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    public calibration getPopulations(int index) {
-      return populations_.get(index);
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration getCalibration(int index) {
+      return calibration_.get(index);
     }
     /**
-     * <code>repeated .crowdcontrol.Population populations = 2;</code>
+     * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder getCalibrationOrBuilder(
         int index) {
-      return populations_.get(index);
+      return calibration_.get(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -556,8 +574,8 @@ public  final class Experiment extends
       if (!getPlatformIdBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessage.writeString(output, 1, platformId_);
       }
-      for (int i = 0; i < populations_.size(); i++) {
-        output.writeMessage(2, populations_.get(i));
+      for (int i = 0; i < calibration_.size(); i++) {
+        output.writeMessage(2, calibration_.get(i));
       }
     }
 
@@ -569,62 +587,62 @@ public  final class Experiment extends
       if (!getPlatformIdBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(1, platformId_);
       }
-      for (int i = 0; i < populations_.size(); i++) {
+      for (int i = 0; i < calibration_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, populations_.get(i));
+          .computeMessageSize(2, calibration_.get(i));
       }
       memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(byte[] data)
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(java.io.InputStream input)
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseDelimitedFrom(java.io.InputStream input)
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input);
     }
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseDelimitedFrom(
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parseFrom(
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -635,7 +653,7 @@ public  final class Experiment extends
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation prototype) {
+    public static Builder newBuilder(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() {
@@ -650,25 +668,25 @@ public  final class Experiment extends
       return builder;
     }
     /**
-     * Protobuf type {@code crowdcontrol.Experiment.PlatformPopulation}
+     * Protobuf type {@code crowdcontrol.Experiment.PlatformCalibrations}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:crowdcontrol.Experiment.PlatformPopulation)
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder {
+        // @@protoc_insertion_point(builder_implements:crowdcontrol.Experiment.PlatformCalibrations)
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_descriptor;
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformCalibrations_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_fieldAccessorTable
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformCalibrations_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder.class);
+                edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder.class);
       }
 
-      // Construct using edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.newBuilder()
+      // Construct using edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -680,52 +698,52 @@ public  final class Experiment extends
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getPopulationsFieldBuilder();
+          getCalibrationFieldBuilder();
         }
       }
       public Builder clear() {
         super.clear();
         platformId_ = "";
 
-        if (populationsBuilder_ == null) {
-          populations_ = java.util.Collections.emptyList();
+        if (calibrationBuilder_ == null) {
+          calibration_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000002);
         } else {
-          populationsBuilder_.clear();
+          calibrationBuilder_.clear();
         }
         return this;
       }
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformPopulation_descriptor;
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_PlatformCalibrations_descriptor;
       }
 
-      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getDefaultInstanceForType() {
-        return edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.getDefaultInstance();
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations getDefaultInstanceForType() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.getDefaultInstance();
       }
 
-      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation build() {
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation result = buildPartial();
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations build() {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation buildPartial() {
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation result = new edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation(this);
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations buildPartial() {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations result = new edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         result.platformId_ = platformId_;
-        if (populationsBuilder_ == null) {
+        if (calibrationBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002)) {
-            populations_ = java.util.Collections.unmodifiableList(populations_);
+            calibration_ = java.util.Collections.unmodifiableList(calibration_);
             bitField0_ = (bitField0_ & ~0x00000002);
           }
-          result.populations_ = populations_;
+          result.calibration_ = calibration_;
         } else {
-          result.populations_ = populationsBuilder_.build();
+          result.calibration_ = calibrationBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -733,43 +751,43 @@ public  final class Experiment extends
       }
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation) {
-          return mergeFrom((edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation)other);
+        if (other instanceof edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations) {
+          return mergeFrom((edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation other) {
-        if (other == edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.getDefaultInstance()) return this;
+      public Builder mergeFrom(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations other) {
+        if (other == edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.getDefaultInstance()) return this;
         if (!other.getPlatformId().isEmpty()) {
           platformId_ = other.platformId_;
           onChanged();
         }
-        if (populationsBuilder_ == null) {
-          if (!other.populations_.isEmpty()) {
-            if (populations_.isEmpty()) {
-              populations_ = other.populations_;
+        if (calibrationBuilder_ == null) {
+          if (!other.calibration_.isEmpty()) {
+            if (calibration_.isEmpty()) {
+              calibration_ = other.calibration_;
               bitField0_ = (bitField0_ & ~0x00000002);
             } else {
-              ensurePopulationsIsMutable();
-              populations_.addAll(other.populations_);
+              ensureCalibrationIsMutable();
+              calibration_.addAll(other.calibration_);
             }
             onChanged();
           }
         } else {
-          if (!other.populations_.isEmpty()) {
-            if (populationsBuilder_.isEmpty()) {
-              populationsBuilder_.dispose();
-              populationsBuilder_ = null;
-              populations_ = other.populations_;
+          if (!other.calibration_.isEmpty()) {
+            if (calibrationBuilder_.isEmpty()) {
+              calibrationBuilder_.dispose();
+              calibrationBuilder_ = null;
+              calibration_ = other.calibration_;
               bitField0_ = (bitField0_ & ~0x00000002);
-              populationsBuilder_ = 
+              calibrationBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getPopulationsFieldBuilder() : null;
+                   getCalibrationFieldBuilder() : null;
             } else {
-              populationsBuilder_.addAllMessages(other.populations_);
+              calibrationBuilder_.addAllMessages(other.calibration_);
             }
           }
         }
@@ -785,11 +803,11 @@ public  final class Experiment extends
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation parsedMessage = null;
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation) e.getUnfinishedMessage();
+          parsedMessage = (edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -869,244 +887,244 @@ public  final class Experiment extends
         return this;
       }
 
-      private java.util.List<calibration> populations_ =
+      private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> calibration_ =
         java.util.Collections.emptyList();
-      private void ensurePopulationsIsMutable() {
+      private void ensureCalibrationIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          populations_ = new java.util.ArrayList<calibration>(populations_);
+          calibration_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration>(calibration_);
           bitField0_ |= 0x00000002;
          }
       }
 
       private com.google.protobuf.RepeatedFieldBuilder<
-              calibration, calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> populationsBuilder_;
+          edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> calibrationBuilder_;
 
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public java.util.List<calibration> getPopulationsList() {
-        if (populationsBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(populations_);
+      public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> getCalibrationList() {
+        if (calibrationBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(calibration_);
         } else {
-          return populationsBuilder_.getMessageList();
+          return calibrationBuilder_.getMessageList();
         }
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public int getPopulationsCount() {
-        if (populationsBuilder_ == null) {
-          return populations_.size();
+      public int getCalibrationCount() {
+        if (calibrationBuilder_ == null) {
+          return calibration_.size();
         } else {
-          return populationsBuilder_.getCount();
+          return calibrationBuilder_.getCount();
         }
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public calibration getPopulations(int index) {
-        if (populationsBuilder_ == null) {
-          return populations_.get(index);
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration getCalibration(int index) {
+        if (calibrationBuilder_ == null) {
+          return calibration_.get(index);
         } else {
-          return populationsBuilder_.getMessage(index);
+          return calibrationBuilder_.getMessage(index);
         }
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public Builder setPopulations(
-          int index, calibration value) {
-        if (populationsBuilder_ == null) {
+      public Builder setCalibration(
+          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration value) {
+        if (calibrationBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensurePopulationsIsMutable();
-          populations_.set(index, value);
+          ensureCalibrationIsMutable();
+          calibration_.set(index, value);
           onChanged();
         } else {
-          populationsBuilder_.setMessage(index, value);
+          calibrationBuilder_.setMessage(index, value);
         }
         return this;
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public Builder setPopulations(
-          int index, calibration.Builder builderForValue) {
-        if (populationsBuilder_ == null) {
-          ensurePopulationsIsMutable();
-          populations_.set(index, builderForValue.build());
+      public Builder setCalibration(
+          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder builderForValue) {
+        if (calibrationBuilder_ == null) {
+          ensureCalibrationIsMutable();
+          calibration_.set(index, builderForValue.build());
           onChanged();
         } else {
-          populationsBuilder_.setMessage(index, builderForValue.build());
+          calibrationBuilder_.setMessage(index, builderForValue.build());
         }
         return this;
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public Builder addPopulations(calibration value) {
-        if (populationsBuilder_ == null) {
+      public Builder addCalibration(edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration value) {
+        if (calibrationBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensurePopulationsIsMutable();
-          populations_.add(value);
+          ensureCalibrationIsMutable();
+          calibration_.add(value);
           onChanged();
         } else {
-          populationsBuilder_.addMessage(value);
+          calibrationBuilder_.addMessage(value);
         }
         return this;
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public Builder addPopulations(
-          int index, calibration value) {
-        if (populationsBuilder_ == null) {
+      public Builder addCalibration(
+          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration value) {
+        if (calibrationBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensurePopulationsIsMutable();
-          populations_.add(index, value);
+          ensureCalibrationIsMutable();
+          calibration_.add(index, value);
           onChanged();
         } else {
-          populationsBuilder_.addMessage(index, value);
+          calibrationBuilder_.addMessage(index, value);
         }
         return this;
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public Builder addPopulations(
-          calibration.Builder builderForValue) {
-        if (populationsBuilder_ == null) {
-          ensurePopulationsIsMutable();
-          populations_.add(builderForValue.build());
+      public Builder addCalibration(
+          edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder builderForValue) {
+        if (calibrationBuilder_ == null) {
+          ensureCalibrationIsMutable();
+          calibration_.add(builderForValue.build());
           onChanged();
         } else {
-          populationsBuilder_.addMessage(builderForValue.build());
+          calibrationBuilder_.addMessage(builderForValue.build());
         }
         return this;
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public Builder addPopulations(
-          int index, calibration.Builder builderForValue) {
-        if (populationsBuilder_ == null) {
-          ensurePopulationsIsMutable();
-          populations_.add(index, builderForValue.build());
+      public Builder addCalibration(
+          int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder builderForValue) {
+        if (calibrationBuilder_ == null) {
+          ensureCalibrationIsMutable();
+          calibration_.add(index, builderForValue.build());
           onChanged();
         } else {
-          populationsBuilder_.addMessage(index, builderForValue.build());
+          calibrationBuilder_.addMessage(index, builderForValue.build());
         }
         return this;
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public Builder addAllPopulations(
-          java.lang.Iterable<? extends calibration> values) {
-        if (populationsBuilder_ == null) {
-          ensurePopulationsIsMutable();
+      public Builder addAllCalibration(
+          java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> values) {
+        if (calibrationBuilder_ == null) {
+          ensureCalibrationIsMutable();
           com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, populations_);
+              values, calibration_);
           onChanged();
         } else {
-          populationsBuilder_.addAllMessages(values);
+          calibrationBuilder_.addAllMessages(values);
         }
         return this;
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public Builder clearPopulations() {
-        if (populationsBuilder_ == null) {
-          populations_ = java.util.Collections.emptyList();
+      public Builder clearCalibration() {
+        if (calibrationBuilder_ == null) {
+          calibration_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000002);
           onChanged();
         } else {
-          populationsBuilder_.clear();
+          calibrationBuilder_.clear();
         }
         return this;
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public Builder removePopulations(int index) {
-        if (populationsBuilder_ == null) {
-          ensurePopulationsIsMutable();
-          populations_.remove(index);
+      public Builder removeCalibration(int index) {
+        if (calibrationBuilder_ == null) {
+          ensureCalibrationIsMutable();
+          calibration_.remove(index);
           onChanged();
         } else {
-          populationsBuilder_.remove(index);
+          calibrationBuilder_.remove(index);
         }
         return this;
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public calibration.Builder getPopulationsBuilder(
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder getCalibrationBuilder(
           int index) {
-        return getPopulationsFieldBuilder().getBuilder(index);
+        return getCalibrationFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder getPopulationsOrBuilder(
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder getCalibrationOrBuilder(
           int index) {
-        if (populationsBuilder_ == null) {
-          return populations_.get(index);  } else {
-          return populationsBuilder_.getMessageOrBuilder(index);
+        if (calibrationBuilder_ == null) {
+          return calibration_.get(index);  } else {
+          return calibrationBuilder_.getMessageOrBuilder(index);
         }
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder> 
-           getPopulationsOrBuilderList() {
-        if (populationsBuilder_ != null) {
-          return populationsBuilder_.getMessageOrBuilderList();
+      public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> 
+           getCalibrationOrBuilderList() {
+        if (calibrationBuilder_ != null) {
+          return calibrationBuilder_.getMessageOrBuilderList();
         } else {
-          return java.util.Collections.unmodifiableList(populations_);
+          return java.util.Collections.unmodifiableList(calibration_);
         }
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public calibration.Builder addPopulationsBuilder() {
-        return getPopulationsFieldBuilder().addBuilder(
-            calibration.getDefaultInstance());
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder addCalibrationBuilder() {
+        return getCalibrationFieldBuilder().addBuilder(
+            edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.getDefaultInstance());
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public calibration.Builder addPopulationsBuilder(
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder addCalibrationBuilder(
           int index) {
-        return getPopulationsFieldBuilder().addBuilder(
-            index, calibration.getDefaultInstance());
+        return getCalibrationFieldBuilder().addBuilder(
+            index, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.getDefaultInstance());
       }
       /**
-       * <code>repeated .crowdcontrol.Population populations = 2;</code>
+       * <code>repeated .crowdcontrol.Calibration calibration = 2;</code>
        */
-      public java.util.List<calibration.Builder>
-           getPopulationsBuilderList() {
-        return getPopulationsFieldBuilder().getBuilderList();
+      public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder> 
+           getCalibrationBuilderList() {
+        return getCalibrationFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-              calibration, calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>
-          getPopulationsFieldBuilder() {
-        if (populationsBuilder_ == null) {
-          populationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-                  calibration, calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.PopulationOrBuilder>(
-                  populations_,
+          edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> 
+          getCalibrationFieldBuilder() {
+        if (calibrationBuilder_ == null) {
+          calibrationBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration, edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder>(
+                  calibration_,
                   ((bitField0_ & 0x00000002) == 0x00000002),
                   getParentForChildren(),
                   isClean());
-          populations_ = null;
+          calibration_ = null;
         }
-        return populationsBuilder_;
+        return calibrationBuilder_;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -1119,27 +1137,27 @@ public  final class Experiment extends
       }
 
 
-      // @@protoc_insertion_point(builder_scope:crowdcontrol.Experiment.PlatformPopulation)
+      // @@protoc_insertion_point(builder_scope:crowdcontrol.Experiment.PlatformCalibrations)
     }
 
-    // @@protoc_insertion_point(class_scope:crowdcontrol.Experiment.PlatformPopulation)
-    private static final edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:crowdcontrol.Experiment.PlatformCalibrations)
+    private static final edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation();
+      DEFAULT_INSTANCE = new edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations();
     }
 
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getDefaultInstance() {
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<PlatformPopulation>
-        PARSER = new com.google.protobuf.AbstractParser<PlatformPopulation>() {
-      public PlatformPopulation parsePartialFrom(
+    private static final com.google.protobuf.Parser<PlatformCalibrations>
+        PARSER = new com.google.protobuf.AbstractParser<PlatformCalibrations>() {
+      public PlatformCalibrations parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         try {
-          return new PlatformPopulation(input, extensionRegistry);
+          return new PlatformCalibrations(input, extensionRegistry);
         } catch (RuntimeException e) {
           if (e.getCause() instanceof
               com.google.protobuf.InvalidProtocolBufferException) {
@@ -1151,16 +1169,16 @@ public  final class Experiment extends
       }
     };
 
-    public static com.google.protobuf.Parser<PlatformPopulation> parser() {
+    public static com.google.protobuf.Parser<PlatformCalibrations> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<PlatformPopulation> getParserForType() {
+    public com.google.protobuf.Parser<PlatformCalibrations> getParserForType() {
       return PARSER;
     }
 
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getDefaultInstanceForType() {
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -1277,105 +1295,66 @@ public  final class Experiment extends
   }
 
   public static final int ALGORITHM_TASK_CHOOSER_FIELD_NUMBER = 6;
-  private volatile java.lang.Object algorithmTaskChooser_;
+  private edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption algorithmTaskChooser_;
   /**
-   * <code>optional string algorithm_task_chooser = 6;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
    */
-  public java.lang.String getAlgorithmTaskChooser() {
-    java.lang.Object ref = algorithmTaskChooser_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      algorithmTaskChooser_ = s;
-      return s;
-    }
+  public boolean hasAlgorithmTaskChooser() {
+    return algorithmTaskChooser_ != null;
   }
   /**
-   * <code>optional string algorithm_task_chooser = 6;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
    */
-  public com.google.protobuf.ByteString
-      getAlgorithmTaskChooserBytes() {
-    java.lang.Object ref = algorithmTaskChooser_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      algorithmTaskChooser_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmTaskChooser() {
+    return algorithmTaskChooser_ == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance() : algorithmTaskChooser_;
+  }
+  /**
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmTaskChooserOrBuilder() {
+    return getAlgorithmTaskChooser();
   }
 
   public static final int ALGORITHM_QUALITY_ANSWER_FIELD_NUMBER = 7;
-  private volatile java.lang.Object algorithmQualityAnswer_;
+  private edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption algorithmQualityAnswer_;
   /**
-   * <code>optional string algorithm_quality_answer = 7;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
    */
-  public java.lang.String getAlgorithmQualityAnswer() {
-    java.lang.Object ref = algorithmQualityAnswer_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      algorithmQualityAnswer_ = s;
-      return s;
-    }
+  public boolean hasAlgorithmQualityAnswer() {
+    return algorithmQualityAnswer_ != null;
   }
   /**
-   * <code>optional string algorithm_quality_answer = 7;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
    */
-  public com.google.protobuf.ByteString
-      getAlgorithmQualityAnswerBytes() {
-    java.lang.Object ref = algorithmQualityAnswer_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      algorithmQualityAnswer_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmQualityAnswer() {
+    return algorithmQualityAnswer_ == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance() : algorithmQualityAnswer_;
+  }
+  /**
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmQualityAnswerOrBuilder() {
+    return getAlgorithmQualityAnswer();
   }
 
   public static final int ALGORITHM_QUALITY_RATING_FIELD_NUMBER = 8;
-  private volatile java.lang.Object algorithmQualityRating_;
+  private edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption algorithmQualityRating_;
   /**
-   * <code>optional string algorithm_quality_rating = 8;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
    */
-  public java.lang.String getAlgorithmQualityRating() {
-    java.lang.Object ref = algorithmQualityRating_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      algorithmQualityRating_ = s;
-      return s;
-    }
+  public boolean hasAlgorithmQualityRating() {
+    return algorithmQualityRating_ != null;
   }
   /**
-   * <code>optional string algorithm_quality_rating = 8;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
    */
-  public com.google.protobuf.ByteString
-      getAlgorithmQualityRatingBytes() {
-    java.lang.Object ref = algorithmQualityRating_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      algorithmQualityRating_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmQualityRating() {
+    return algorithmQualityRating_ == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance() : algorithmQualityRating_;
+  }
+  /**
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmQualityRatingOrBuilder() {
+    return getAlgorithmQualityRating();
   }
 
   public static final int ANSWERS_PER_WORKER_FIELD_NUMBER = 9;
@@ -1511,39 +1490,39 @@ public  final class Experiment extends
     return tags_.get(index);
   }
 
-  public static final int PLATFORM_POPULATIONS_FIELD_NUMBER = 18;
-  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> platformPopulations_;
+  public static final int PLATFORM_CALIBRATIONS_FIELD_NUMBER = 18;
+  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations> platformCalibrations_;
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> getPlatformPopulationsList() {
-    return platformPopulations_;
+  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations> getPlatformCalibrationsList() {
+    return platformCalibrations_;
   }
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
-      getPlatformPopulationsOrBuilderList() {
-    return platformPopulations_;
+  public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder> 
+      getPlatformCalibrationsOrBuilderList() {
+    return platformCalibrations_;
   }
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  public int getPlatformPopulationsCount() {
-    return platformPopulations_.size();
+  public int getPlatformCalibrationsCount() {
+    return platformCalibrations_.size();
   }
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getPlatformPopulations(int index) {
-    return platformPopulations_.get(index);
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations getPlatformCalibrations(int index) {
+    return platformCalibrations_.get(index);
   }
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
    */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder getPlatformPopulationsOrBuilder(
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder getPlatformCalibrationsOrBuilder(
       int index) {
-    return platformPopulations_.get(index);
+    return platformCalibrations_.get(index);
   }
 
   public static final int PLACEHOLDERS_FIELD_NUMBER = 19;
@@ -1621,14 +1600,14 @@ public  final class Experiment extends
     if (answerType_ != edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType.INVALID.getNumber()) {
       output.writeEnum(5, answerType_);
     }
-    if (!getAlgorithmTaskChooserBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 6, algorithmTaskChooser_);
+    if (algorithmTaskChooser_ != null) {
+      output.writeMessage(6, getAlgorithmTaskChooser());
     }
-    if (!getAlgorithmQualityAnswerBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 7, algorithmQualityAnswer_);
+    if (algorithmQualityAnswer_ != null) {
+      output.writeMessage(7, getAlgorithmQualityAnswer());
     }
-    if (!getAlgorithmQualityRatingBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 8, algorithmQualityRating_);
+    if (algorithmQualityRating_ != null) {
+      output.writeMessage(8, getAlgorithmQualityRating());
     }
     if (answersPerWorker_ != 0) {
       output.writeInt32(9, answersPerWorker_);
@@ -1657,8 +1636,8 @@ public  final class Experiment extends
     for (int i = 0; i < tags_.size(); i++) {
       output.writeMessage(17, tags_.get(i));
     }
-    for (int i = 0; i < platformPopulations_.size(); i++) {
-      output.writeMessage(18, platformPopulations_.get(i));
+    for (int i = 0; i < platformCalibrations_.size(); i++) {
+      output.writeMessage(18, platformCalibrations_.get(i));
     }
     for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
          : internalGetPlaceholders().getMap().entrySet()) {
@@ -1700,14 +1679,17 @@ public  final class Experiment extends
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(5, answerType_);
     }
-    if (!getAlgorithmTaskChooserBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(6, algorithmTaskChooser_);
+    if (algorithmTaskChooser_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(6, getAlgorithmTaskChooser());
     }
-    if (!getAlgorithmQualityAnswerBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(7, algorithmQualityAnswer_);
+    if (algorithmQualityAnswer_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(7, getAlgorithmQualityAnswer());
     }
-    if (!getAlgorithmQualityRatingBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(8, algorithmQualityRating_);
+    if (algorithmQualityRating_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(8, getAlgorithmQualityRating());
     }
     if (answersPerWorker_ != 0) {
       size += com.google.protobuf.CodedOutputStream
@@ -1745,9 +1727,9 @@ public  final class Experiment extends
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(17, tags_.get(i));
     }
-    for (int i = 0; i < platformPopulations_.size(); i++) {
+    for (int i = 0; i < platformCalibrations_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(18, platformPopulations_.get(i));
+        .computeMessageSize(18, platformCalibrations_.get(i));
     }
     for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
          : internalGetPlaceholders().getMap().entrySet()) {
@@ -1898,7 +1880,7 @@ public  final class Experiment extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         getConstraintsFieldBuilder();
         getTagsFieldBuilder();
-        getPlatformPopulationsFieldBuilder();
+        getPlatformCalibrationsFieldBuilder();
       }
     }
     public Builder clear() {
@@ -1913,12 +1895,24 @@ public  final class Experiment extends
 
       answerType_ = 0;
 
-      algorithmTaskChooser_ = "";
-
-      algorithmQualityAnswer_ = "";
-
-      algorithmQualityRating_ = "";
-
+      if (algorithmTaskChooserBuilder_ == null) {
+        algorithmTaskChooser_ = null;
+      } else {
+        algorithmTaskChooser_ = null;
+        algorithmTaskChooserBuilder_ = null;
+      }
+      if (algorithmQualityAnswerBuilder_ == null) {
+        algorithmQualityAnswer_ = null;
+      } else {
+        algorithmQualityAnswer_ = null;
+        algorithmQualityAnswerBuilder_ = null;
+      }
+      if (algorithmQualityRatingBuilder_ == null) {
+        algorithmQualityRating_ = null;
+      } else {
+        algorithmQualityRating_ = null;
+        algorithmQualityRatingBuilder_ = null;
+      }
       answersPerWorker_ = 0;
 
       ratingsPerWorker_ = 0;
@@ -1945,11 +1939,11 @@ public  final class Experiment extends
       } else {
         tagsBuilder_.clear();
       }
-      if (platformPopulationsBuilder_ == null) {
-        platformPopulations_ = java.util.Collections.emptyList();
+      if (platformCalibrationsBuilder_ == null) {
+        platformCalibrations_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00020000);
       } else {
-        platformPopulationsBuilder_.clear();
+        platformCalibrationsBuilder_.clear();
       }
       internalGetMutablePlaceholders().clear();
       workerQualityThreshold_ = 0;
@@ -1985,9 +1979,21 @@ public  final class Experiment extends
       result.description_ = description_;
       result.state_ = state_;
       result.answerType_ = answerType_;
-      result.algorithmTaskChooser_ = algorithmTaskChooser_;
-      result.algorithmQualityAnswer_ = algorithmQualityAnswer_;
-      result.algorithmQualityRating_ = algorithmQualityRating_;
+      if (algorithmTaskChooserBuilder_ == null) {
+        result.algorithmTaskChooser_ = algorithmTaskChooser_;
+      } else {
+        result.algorithmTaskChooser_ = algorithmTaskChooserBuilder_.build();
+      }
+      if (algorithmQualityAnswerBuilder_ == null) {
+        result.algorithmQualityAnswer_ = algorithmQualityAnswer_;
+      } else {
+        result.algorithmQualityAnswer_ = algorithmQualityAnswerBuilder_.build();
+      }
+      if (algorithmQualityRatingBuilder_ == null) {
+        result.algorithmQualityRating_ = algorithmQualityRating_;
+      } else {
+        result.algorithmQualityRating_ = algorithmQualityRatingBuilder_.build();
+      }
       result.answersPerWorker_ = answersPerWorker_;
       result.ratingsPerWorker_ = ratingsPerWorker_;
       result.ratingsPerAnswer_ = ratingsPerAnswer_;
@@ -2013,14 +2019,14 @@ public  final class Experiment extends
       } else {
         result.tags_ = tagsBuilder_.build();
       }
-      if (platformPopulationsBuilder_ == null) {
+      if (platformCalibrationsBuilder_ == null) {
         if (((bitField0_ & 0x00020000) == 0x00020000)) {
-          platformPopulations_ = java.util.Collections.unmodifiableList(platformPopulations_);
+          platformCalibrations_ = java.util.Collections.unmodifiableList(platformCalibrations_);
           bitField0_ = (bitField0_ & ~0x00020000);
         }
-        result.platformPopulations_ = platformPopulations_;
+        result.platformCalibrations_ = platformCalibrations_;
       } else {
-        result.platformPopulations_ = platformPopulationsBuilder_.build();
+        result.platformCalibrations_ = platformCalibrationsBuilder_.build();
       }
       result.placeholders_ = internalGetPlaceholders();
       result.placeholders_.makeImmutable();
@@ -2059,17 +2065,14 @@ public  final class Experiment extends
       if (other.answerType_ != 0) {
         setAnswerTypeValue(other.getAnswerTypeValue());
       }
-      if (!other.getAlgorithmTaskChooser().isEmpty()) {
-        algorithmTaskChooser_ = other.algorithmTaskChooser_;
-        onChanged();
+      if (other.hasAlgorithmTaskChooser()) {
+        mergeAlgorithmTaskChooser(other.getAlgorithmTaskChooser());
       }
-      if (!other.getAlgorithmQualityAnswer().isEmpty()) {
-        algorithmQualityAnswer_ = other.algorithmQualityAnswer_;
-        onChanged();
+      if (other.hasAlgorithmQualityAnswer()) {
+        mergeAlgorithmQualityAnswer(other.getAlgorithmQualityAnswer());
       }
-      if (!other.getAlgorithmQualityRating().isEmpty()) {
-        algorithmQualityRating_ = other.algorithmQualityRating_;
-        onChanged();
+      if (other.hasAlgorithmQualityRating()) {
+        mergeAlgorithmQualityRating(other.getAlgorithmQualityRating());
       }
       if (other.getAnswersPerWorker() != 0) {
         setAnswersPerWorker(other.getAnswersPerWorker());
@@ -2144,29 +2147,29 @@ public  final class Experiment extends
           }
         }
       }
-      if (platformPopulationsBuilder_ == null) {
-        if (!other.platformPopulations_.isEmpty()) {
-          if (platformPopulations_.isEmpty()) {
-            platformPopulations_ = other.platformPopulations_;
+      if (platformCalibrationsBuilder_ == null) {
+        if (!other.platformCalibrations_.isEmpty()) {
+          if (platformCalibrations_.isEmpty()) {
+            platformCalibrations_ = other.platformCalibrations_;
             bitField0_ = (bitField0_ & ~0x00020000);
           } else {
-            ensurePlatformPopulationsIsMutable();
-            platformPopulations_.addAll(other.platformPopulations_);
+            ensurePlatformCalibrationsIsMutable();
+            platformCalibrations_.addAll(other.platformCalibrations_);
           }
           onChanged();
         }
       } else {
-        if (!other.platformPopulations_.isEmpty()) {
-          if (platformPopulationsBuilder_.isEmpty()) {
-            platformPopulationsBuilder_.dispose();
-            platformPopulationsBuilder_ = null;
-            platformPopulations_ = other.platformPopulations_;
+        if (!other.platformCalibrations_.isEmpty()) {
+          if (platformCalibrationsBuilder_.isEmpty()) {
+            platformCalibrationsBuilder_.dispose();
+            platformCalibrationsBuilder_ = null;
+            platformCalibrations_ = other.platformCalibrations_;
             bitField0_ = (bitField0_ & ~0x00020000);
-            platformPopulationsBuilder_ = 
+            platformCalibrationsBuilder_ = 
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                 getPlatformPopulationsFieldBuilder() : null;
+                 getPlatformCalibrationsFieldBuilder() : null;
           } else {
-            platformPopulationsBuilder_.addAllMessages(other.platformPopulations_);
+            platformCalibrationsBuilder_.addAllMessages(other.platformCalibrations_);
           }
         }
       }
@@ -2457,211 +2460,355 @@ public  final class Experiment extends
       return this;
     }
 
-    private java.lang.Object algorithmTaskChooser_ = "";
+    private edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption algorithmTaskChooser_ = null;
+    private com.google.protobuf.SingleFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> algorithmTaskChooserBuilder_;
     /**
-     * <code>optional string algorithm_task_chooser = 6;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
      */
-    public java.lang.String getAlgorithmTaskChooser() {
-      java.lang.Object ref = algorithmTaskChooser_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        algorithmTaskChooser_ = s;
-        return s;
+    public boolean hasAlgorithmTaskChooser() {
+      return algorithmTaskChooserBuilder_ != null || algorithmTaskChooser_ != null;
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmTaskChooser() {
+      if (algorithmTaskChooserBuilder_ == null) {
+        return algorithmTaskChooser_ == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance() : algorithmTaskChooser_;
       } else {
-        return (java.lang.String) ref;
+        return algorithmTaskChooserBuilder_.getMessage();
       }
     }
     /**
-     * <code>optional string algorithm_task_chooser = 6;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
      */
-    public com.google.protobuf.ByteString
-        getAlgorithmTaskChooserBytes() {
-      java.lang.Object ref = algorithmTaskChooser_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        algorithmTaskChooser_ = b;
-        return b;
+    public Builder setAlgorithmTaskChooser(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (algorithmTaskChooserBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        algorithmTaskChooser_ = value;
+        onChanged();
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        algorithmTaskChooserBuilder_.setMessage(value);
       }
+
+      return this;
     }
     /**
-     * <code>optional string algorithm_task_chooser = 6;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
      */
     public Builder setAlgorithmTaskChooser(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      algorithmTaskChooser_ = value;
-      onChanged();
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
+      if (algorithmTaskChooserBuilder_ == null) {
+        algorithmTaskChooser_ = builderForValue.build();
+        onChanged();
+      } else {
+        algorithmTaskChooserBuilder_.setMessage(builderForValue.build());
+      }
+
       return this;
     }
     /**
-     * <code>optional string algorithm_task_chooser = 6;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
+     */
+    public Builder mergeAlgorithmTaskChooser(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (algorithmTaskChooserBuilder_ == null) {
+        if (algorithmTaskChooser_ != null) {
+          algorithmTaskChooser_ =
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.newBuilder(algorithmTaskChooser_).mergeFrom(value).buildPartial();
+        } else {
+          algorithmTaskChooser_ = value;
+        }
+        onChanged();
+      } else {
+        algorithmTaskChooserBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
      */
     public Builder clearAlgorithmTaskChooser() {
-      
-      algorithmTaskChooser_ = getDefaultInstance().getAlgorithmTaskChooser();
-      onChanged();
+      if (algorithmTaskChooserBuilder_ == null) {
+        algorithmTaskChooser_ = null;
+        onChanged();
+      } else {
+        algorithmTaskChooser_ = null;
+        algorithmTaskChooserBuilder_ = null;
+      }
+
       return this;
     }
     /**
-     * <code>optional string algorithm_task_chooser = 6;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
      */
-    public Builder setAlgorithmTaskChooserBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder getAlgorithmTaskChooserBuilder() {
       
-      algorithmTaskChooser_ = value;
       onChanged();
-      return this;
+      return getAlgorithmTaskChooserFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmTaskChooserOrBuilder() {
+      if (algorithmTaskChooserBuilder_ != null) {
+        return algorithmTaskChooserBuilder_.getMessageOrBuilder();
+      } else {
+        return algorithmTaskChooser_ == null ?
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance() : algorithmTaskChooser_;
+      }
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+        getAlgorithmTaskChooserFieldBuilder() {
+      if (algorithmTaskChooserBuilder_ == null) {
+        algorithmTaskChooserBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder>(
+                getAlgorithmTaskChooser(),
+                getParentForChildren(),
+                isClean());
+        algorithmTaskChooser_ = null;
+      }
+      return algorithmTaskChooserBuilder_;
     }
 
-    private java.lang.Object algorithmQualityAnswer_ = "";
+    private edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption algorithmQualityAnswer_ = null;
+    private com.google.protobuf.SingleFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> algorithmQualityAnswerBuilder_;
     /**
-     * <code>optional string algorithm_quality_answer = 7;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
      */
-    public java.lang.String getAlgorithmQualityAnswer() {
-      java.lang.Object ref = algorithmQualityAnswer_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        algorithmQualityAnswer_ = s;
-        return s;
+    public boolean hasAlgorithmQualityAnswer() {
+      return algorithmQualityAnswerBuilder_ != null || algorithmQualityAnswer_ != null;
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmQualityAnswer() {
+      if (algorithmQualityAnswerBuilder_ == null) {
+        return algorithmQualityAnswer_ == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance() : algorithmQualityAnswer_;
       } else {
-        return (java.lang.String) ref;
+        return algorithmQualityAnswerBuilder_.getMessage();
       }
     }
     /**
-     * <code>optional string algorithm_quality_answer = 7;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
      */
-    public com.google.protobuf.ByteString
-        getAlgorithmQualityAnswerBytes() {
-      java.lang.Object ref = algorithmQualityAnswer_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        algorithmQualityAnswer_ = b;
-        return b;
+    public Builder setAlgorithmQualityAnswer(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (algorithmQualityAnswerBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        algorithmQualityAnswer_ = value;
+        onChanged();
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        algorithmQualityAnswerBuilder_.setMessage(value);
       }
+
+      return this;
     }
     /**
-     * <code>optional string algorithm_quality_answer = 7;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
      */
     public Builder setAlgorithmQualityAnswer(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      algorithmQualityAnswer_ = value;
-      onChanged();
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
+      if (algorithmQualityAnswerBuilder_ == null) {
+        algorithmQualityAnswer_ = builderForValue.build();
+        onChanged();
+      } else {
+        algorithmQualityAnswerBuilder_.setMessage(builderForValue.build());
+      }
+
       return this;
     }
     /**
-     * <code>optional string algorithm_quality_answer = 7;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
+     */
+    public Builder mergeAlgorithmQualityAnswer(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (algorithmQualityAnswerBuilder_ == null) {
+        if (algorithmQualityAnswer_ != null) {
+          algorithmQualityAnswer_ =
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.newBuilder(algorithmQualityAnswer_).mergeFrom(value).buildPartial();
+        } else {
+          algorithmQualityAnswer_ = value;
+        }
+        onChanged();
+      } else {
+        algorithmQualityAnswerBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
      */
     public Builder clearAlgorithmQualityAnswer() {
-      
-      algorithmQualityAnswer_ = getDefaultInstance().getAlgorithmQualityAnswer();
-      onChanged();
+      if (algorithmQualityAnswerBuilder_ == null) {
+        algorithmQualityAnswer_ = null;
+        onChanged();
+      } else {
+        algorithmQualityAnswer_ = null;
+        algorithmQualityAnswerBuilder_ = null;
+      }
+
       return this;
     }
     /**
-     * <code>optional string algorithm_quality_answer = 7;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
      */
-    public Builder setAlgorithmQualityAnswerBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder getAlgorithmQualityAnswerBuilder() {
       
-      algorithmQualityAnswer_ = value;
       onChanged();
-      return this;
+      return getAlgorithmQualityAnswerFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmQualityAnswerOrBuilder() {
+      if (algorithmQualityAnswerBuilder_ != null) {
+        return algorithmQualityAnswerBuilder_.getMessageOrBuilder();
+      } else {
+        return algorithmQualityAnswer_ == null ?
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance() : algorithmQualityAnswer_;
+      }
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+        getAlgorithmQualityAnswerFieldBuilder() {
+      if (algorithmQualityAnswerBuilder_ == null) {
+        algorithmQualityAnswerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder>(
+                getAlgorithmQualityAnswer(),
+                getParentForChildren(),
+                isClean());
+        algorithmQualityAnswer_ = null;
+      }
+      return algorithmQualityAnswerBuilder_;
     }
 
-    private java.lang.Object algorithmQualityRating_ = "";
+    private edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption algorithmQualityRating_ = null;
+    private com.google.protobuf.SingleFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> algorithmQualityRatingBuilder_;
     /**
-     * <code>optional string algorithm_quality_rating = 8;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
      */
-    public java.lang.String getAlgorithmQualityRating() {
-      java.lang.Object ref = algorithmQualityRating_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        algorithmQualityRating_ = s;
-        return s;
+    public boolean hasAlgorithmQualityRating() {
+      return algorithmQualityRatingBuilder_ != null || algorithmQualityRating_ != null;
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmQualityRating() {
+      if (algorithmQualityRatingBuilder_ == null) {
+        return algorithmQualityRating_ == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance() : algorithmQualityRating_;
       } else {
-        return (java.lang.String) ref;
+        return algorithmQualityRatingBuilder_.getMessage();
       }
     }
     /**
-     * <code>optional string algorithm_quality_rating = 8;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
      */
-    public com.google.protobuf.ByteString
-        getAlgorithmQualityRatingBytes() {
-      java.lang.Object ref = algorithmQualityRating_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        algorithmQualityRating_ = b;
-        return b;
+    public Builder setAlgorithmQualityRating(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (algorithmQualityRatingBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        algorithmQualityRating_ = value;
+        onChanged();
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        algorithmQualityRatingBuilder_.setMessage(value);
       }
+
+      return this;
     }
     /**
-     * <code>optional string algorithm_quality_rating = 8;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
      */
     public Builder setAlgorithmQualityRating(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      algorithmQualityRating_ = value;
-      onChanged();
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
+      if (algorithmQualityRatingBuilder_ == null) {
+        algorithmQualityRating_ = builderForValue.build();
+        onChanged();
+      } else {
+        algorithmQualityRatingBuilder_.setMessage(builderForValue.build());
+      }
+
       return this;
     }
     /**
-     * <code>optional string algorithm_quality_rating = 8;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
+     */
+    public Builder mergeAlgorithmQualityRating(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (algorithmQualityRatingBuilder_ == null) {
+        if (algorithmQualityRating_ != null) {
+          algorithmQualityRating_ =
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.newBuilder(algorithmQualityRating_).mergeFrom(value).buildPartial();
+        } else {
+          algorithmQualityRating_ = value;
+        }
+        onChanged();
+      } else {
+        algorithmQualityRatingBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
      */
     public Builder clearAlgorithmQualityRating() {
-      
-      algorithmQualityRating_ = getDefaultInstance().getAlgorithmQualityRating();
-      onChanged();
+      if (algorithmQualityRatingBuilder_ == null) {
+        algorithmQualityRating_ = null;
+        onChanged();
+      } else {
+        algorithmQualityRating_ = null;
+        algorithmQualityRatingBuilder_ = null;
+      }
+
       return this;
     }
     /**
-     * <code>optional string algorithm_quality_rating = 8;</code>
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
      */
-    public Builder setAlgorithmQualityRatingBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder getAlgorithmQualityRatingBuilder() {
       
-      algorithmQualityRating_ = value;
       onChanged();
-      return this;
+      return getAlgorithmQualityRatingFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmQualityRatingOrBuilder() {
+      if (algorithmQualityRatingBuilder_ != null) {
+        return algorithmQualityRatingBuilder_.getMessageOrBuilder();
+      } else {
+        return algorithmQualityRating_ == null ?
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance() : algorithmQualityRating_;
+      }
+    }
+    /**
+     * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+        getAlgorithmQualityRatingFieldBuilder() {
+      if (algorithmQualityRatingBuilder_ == null) {
+        algorithmQualityRatingBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder>(
+                getAlgorithmQualityRating(),
+                getParentForChildren(),
+                isClean());
+        algorithmQualityRating_ = null;
+      }
+      return algorithmQualityRatingBuilder_;
     }
 
     private int answersPerWorker_ ;
@@ -3326,244 +3473,244 @@ public  final class Experiment extends
       return tagsBuilder_;
     }
 
-    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> platformPopulations_ =
+    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations> platformCalibrations_ =
       java.util.Collections.emptyList();
-    private void ensurePlatformPopulationsIsMutable() {
+    private void ensurePlatformCalibrationsIsMutable() {
       if (!((bitField0_ & 0x00020000) == 0x00020000)) {
-        platformPopulations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation>(platformPopulations_);
+        platformCalibrations_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations>(platformCalibrations_);
         bitField0_ |= 0x00020000;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> platformPopulationsBuilder_;
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder> platformCalibrationsBuilder_;
 
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> getPlatformPopulationsList() {
-      if (platformPopulationsBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(platformPopulations_);
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations> getPlatformCalibrationsList() {
+      if (platformCalibrationsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(platformCalibrations_);
       } else {
-        return platformPopulationsBuilder_.getMessageList();
+        return platformCalibrationsBuilder_.getMessageList();
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public int getPlatformPopulationsCount() {
-      if (platformPopulationsBuilder_ == null) {
-        return platformPopulations_.size();
+    public int getPlatformCalibrationsCount() {
+      if (platformCalibrationsBuilder_ == null) {
+        return platformCalibrations_.size();
       } else {
-        return platformPopulationsBuilder_.getCount();
+        return platformCalibrationsBuilder_.getCount();
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getPlatformPopulations(int index) {
-      if (platformPopulationsBuilder_ == null) {
-        return platformPopulations_.get(index);
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations getPlatformCalibrations(int index) {
+      if (platformCalibrationsBuilder_ == null) {
+        return platformCalibrations_.get(index);
       } else {
-        return platformPopulationsBuilder_.getMessage(index);
+        return platformCalibrationsBuilder_.getMessage(index);
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public Builder setPlatformPopulations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation value) {
-      if (platformPopulationsBuilder_ == null) {
+    public Builder setPlatformCalibrations(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations value) {
+      if (platformCalibrationsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePlatformPopulationsIsMutable();
-        platformPopulations_.set(index, value);
+        ensurePlatformCalibrationsIsMutable();
+        platformCalibrations_.set(index, value);
         onChanged();
       } else {
-        platformPopulationsBuilder_.setMessage(index, value);
+        platformCalibrationsBuilder_.setMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public Builder setPlatformPopulations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder builderForValue) {
-      if (platformPopulationsBuilder_ == null) {
-        ensurePlatformPopulationsIsMutable();
-        platformPopulations_.set(index, builderForValue.build());
+    public Builder setPlatformCalibrations(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder builderForValue) {
+      if (platformCalibrationsBuilder_ == null) {
+        ensurePlatformCalibrationsIsMutable();
+        platformCalibrations_.set(index, builderForValue.build());
         onChanged();
       } else {
-        platformPopulationsBuilder_.setMessage(index, builderForValue.build());
+        platformCalibrationsBuilder_.setMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public Builder addPlatformPopulations(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation value) {
-      if (platformPopulationsBuilder_ == null) {
+    public Builder addPlatformCalibrations(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations value) {
+      if (platformCalibrationsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePlatformPopulationsIsMutable();
-        platformPopulations_.add(value);
+        ensurePlatformCalibrationsIsMutable();
+        platformCalibrations_.add(value);
         onChanged();
       } else {
-        platformPopulationsBuilder_.addMessage(value);
+        platformCalibrationsBuilder_.addMessage(value);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public Builder addPlatformPopulations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation value) {
-      if (platformPopulationsBuilder_ == null) {
+    public Builder addPlatformCalibrations(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations value) {
+      if (platformCalibrationsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePlatformPopulationsIsMutable();
-        platformPopulations_.add(index, value);
+        ensurePlatformCalibrationsIsMutable();
+        platformCalibrations_.add(index, value);
         onChanged();
       } else {
-        platformPopulationsBuilder_.addMessage(index, value);
+        platformCalibrationsBuilder_.addMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public Builder addPlatformPopulations(
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder builderForValue) {
-      if (platformPopulationsBuilder_ == null) {
-        ensurePlatformPopulationsIsMutable();
-        platformPopulations_.add(builderForValue.build());
+    public Builder addPlatformCalibrations(
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder builderForValue) {
+      if (platformCalibrationsBuilder_ == null) {
+        ensurePlatformCalibrationsIsMutable();
+        platformCalibrations_.add(builderForValue.build());
         onChanged();
       } else {
-        platformPopulationsBuilder_.addMessage(builderForValue.build());
+        platformCalibrationsBuilder_.addMessage(builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public Builder addPlatformPopulations(
-        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder builderForValue) {
-      if (platformPopulationsBuilder_ == null) {
-        ensurePlatformPopulationsIsMutable();
-        platformPopulations_.add(index, builderForValue.build());
+    public Builder addPlatformCalibrations(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder builderForValue) {
+      if (platformCalibrationsBuilder_ == null) {
+        ensurePlatformCalibrationsIsMutable();
+        platformCalibrations_.add(index, builderForValue.build());
         onChanged();
       } else {
-        platformPopulationsBuilder_.addMessage(index, builderForValue.build());
+        platformCalibrationsBuilder_.addMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public Builder addAllPlatformPopulations(
-        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> values) {
-      if (platformPopulationsBuilder_ == null) {
-        ensurePlatformPopulationsIsMutable();
+    public Builder addAllPlatformCalibrations(
+        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations> values) {
+      if (platformCalibrationsBuilder_ == null) {
+        ensurePlatformCalibrationsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, platformPopulations_);
+            values, platformCalibrations_);
         onChanged();
       } else {
-        platformPopulationsBuilder_.addAllMessages(values);
+        platformCalibrationsBuilder_.addAllMessages(values);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public Builder clearPlatformPopulations() {
-      if (platformPopulationsBuilder_ == null) {
-        platformPopulations_ = java.util.Collections.emptyList();
+    public Builder clearPlatformCalibrations() {
+      if (platformCalibrationsBuilder_ == null) {
+        platformCalibrations_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00020000);
         onChanged();
       } else {
-        platformPopulationsBuilder_.clear();
+        platformCalibrationsBuilder_.clear();
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public Builder removePlatformPopulations(int index) {
-      if (platformPopulationsBuilder_ == null) {
-        ensurePlatformPopulationsIsMutable();
-        platformPopulations_.remove(index);
+    public Builder removePlatformCalibrations(int index) {
+      if (platformCalibrationsBuilder_ == null) {
+        ensurePlatformCalibrationsIsMutable();
+        platformCalibrations_.remove(index);
         onChanged();
       } else {
-        platformPopulationsBuilder_.remove(index);
+        platformCalibrationsBuilder_.remove(index);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder getPlatformPopulationsBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder getPlatformCalibrationsBuilder(
         int index) {
-      return getPlatformPopulationsFieldBuilder().getBuilder(index);
+      return getPlatformCalibrationsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder getPlatformPopulationsOrBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder getPlatformCalibrationsOrBuilder(
         int index) {
-      if (platformPopulationsBuilder_ == null) {
-        return platformPopulations_.get(index);  } else {
-        return platformPopulationsBuilder_.getMessageOrBuilder(index);
+      if (platformCalibrationsBuilder_ == null) {
+        return platformCalibrations_.get(index);  } else {
+        return platformCalibrationsBuilder_.getMessageOrBuilder(index);
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
-         getPlatformPopulationsOrBuilderList() {
-      if (platformPopulationsBuilder_ != null) {
-        return platformPopulationsBuilder_.getMessageOrBuilderList();
+    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder> 
+         getPlatformCalibrationsOrBuilderList() {
+      if (platformCalibrationsBuilder_ != null) {
+        return platformCalibrationsBuilder_.getMessageOrBuilderList();
       } else {
-        return java.util.Collections.unmodifiableList(platformPopulations_);
+        return java.util.Collections.unmodifiableList(platformCalibrations_);
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder addPlatformPopulationsBuilder() {
-      return getPlatformPopulationsFieldBuilder().addBuilder(
-          edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.getDefaultInstance());
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder addPlatformCalibrationsBuilder() {
+      return getPlatformCalibrationsFieldBuilder().addBuilder(
+          edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder addPlatformPopulationsBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder addPlatformCalibrationsBuilder(
         int index) {
-      return getPlatformPopulationsFieldBuilder().addBuilder(
-          index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.getDefaultInstance());
+      return getPlatformCalibrationsFieldBuilder().addBuilder(
+          index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+     * <code>repeated .crowdcontrol.Experiment.PlatformCalibrations platform_calibrations = 18;</code>
      */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder> 
-         getPlatformPopulationsBuilderList() {
-      return getPlatformPopulationsFieldBuilder().getBuilderList();
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder> 
+         getPlatformCalibrationsBuilderList() {
+      return getPlatformCalibrationsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
-        getPlatformPopulationsFieldBuilder() {
-      if (platformPopulationsBuilder_ == null) {
-        platformPopulationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-            edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder>(
-                platformPopulations_,
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder> 
+        getPlatformCalibrationsFieldBuilder() {
+      if (platformCalibrationsBuilder_ == null) {
+        platformCalibrationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrations.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformCalibrationsOrBuilder>(
+                platformCalibrations_,
                 ((bitField0_ & 0x00020000) == 0x00020000),
                 getParentForChildren(),
                 isClean());
-        platformPopulations_ = null;
+        platformCalibrations_ = null;
       }
-      return platformPopulationsBuilder_;
+      return platformCalibrationsBuilder_;
     }
 
     private com.google.protobuf.MapField<
