@@ -204,12 +204,18 @@ public class ExperimentResource {
         Experiment experiment = request.attribute("input");
         Experiment old = fetchExperiment(id);
         ExperimentRecord original = getOrThrow(experimentOperations.getExperiment(id));
-
+        Experiment resulting;
         if (experiment.getState() != experimentOperations.getExperimentState(id)) {
             int size = experiment.getAllFields().size();
 
             if (size > 1)
                 throw new IllegalStateException("if you change the state nothing else can be changed");
+
+            if (experiment.getState() != Experiment.State.PUBLISHED || experiment.getState() != Experiment.State.STOPPING)
+                throw new IllegalArgumentException("Only Publish and Creativ_Stop is allowed as state change");
+
+            resulting = fetchExperiment(id);
+            resulting = resulting.toBuilder().setState(experiment.getState()).build();
         } else {
             ExperimentRecord experimentRecord = ExperimentTransform.mergeProto(original, experiment);
             experimentRecord.setIdExperiment(id);
@@ -237,9 +243,9 @@ public class ExperimentResource {
 
             //update the experiment itself
             experimentOperations.updateExperiment(experimentRecord);
-        }
 
-        Experiment resulting = fetchExperiment(id);
+            resulting = fetchExperiment(id);
+        }
 
         EventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(old, resulting));
 
