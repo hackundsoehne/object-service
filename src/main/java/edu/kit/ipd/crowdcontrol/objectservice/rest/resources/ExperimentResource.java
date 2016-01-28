@@ -286,7 +286,7 @@ public class ExperimentResource {
             }
 
             if (!old.getAlgorithmTaskChooser().getName().equals(experimentRecord.getAlgorithmTaskChooser())) {
-                algorithmsOperations.deleteTaskChooserParams(id);
+                algorithmsOperations.deleteChosenTaskChooserParams(id);
             }
 
             experiment.getAlgorithmTaskChooser().getParametersList().forEach(param -> {
@@ -294,7 +294,7 @@ public class ExperimentResource {
             });
 
             if (!old.getAlgorithmQualityAnswer().getName().equals(experimentRecord.getAlgorithmQualityAnswer())) {
-                algorithmsOperations.deleteAnswerQualityParams(id);
+                algorithmsOperations.deleteChosenAnswerQualityParams(id);
             }
 
             experiment.getAlgorithmQualityAnswer().getParametersList().forEach(param -> {
@@ -302,7 +302,7 @@ public class ExperimentResource {
             });
 
             if (!old.getAlgorithmQualityRating().getName().equals(experimentRecord.getAlgorithmQualityRating())) {
-                algorithmsOperations.deleteRatingQualityParams(id);
+                algorithmsOperations.deleteChosenRatingQualityParams(id);
             }
 
             experiment.getAlgorithmQualityRating().getParametersList().forEach(param -> {
