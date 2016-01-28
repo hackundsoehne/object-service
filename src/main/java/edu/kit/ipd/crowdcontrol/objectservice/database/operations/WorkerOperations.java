@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.jooq.AggregateFunction;
 import org.jooq.DSLContext;

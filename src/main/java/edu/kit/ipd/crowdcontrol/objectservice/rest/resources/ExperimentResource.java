@@ -2,9 +2,9 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.AnswerRatingTransform;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.ExperimentTransform;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.TagConstraintTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstraintTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;

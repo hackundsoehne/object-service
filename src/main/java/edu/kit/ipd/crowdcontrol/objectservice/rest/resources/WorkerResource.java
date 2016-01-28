@@ -3,7 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.WorkerList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;

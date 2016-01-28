@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.TemplateTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TemplateTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;

@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.PlatformTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.PlatformTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Platform;
 import org.jooq.DSLContext;
 

@@ -4,7 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.NotificationTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.NotificationTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;

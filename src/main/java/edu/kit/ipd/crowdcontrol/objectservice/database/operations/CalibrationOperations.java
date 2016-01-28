@@ -4,7 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationAnswerOptionRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.CalibrationTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.CalibrationTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

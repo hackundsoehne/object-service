@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.database.transforms;
+package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.MessageOrBuilder;

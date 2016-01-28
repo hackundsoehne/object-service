@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.database.transforms;
+package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

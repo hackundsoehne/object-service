@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.database.transforms;
+package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
