@@ -206,10 +206,16 @@ public class ExperimentResource {
         ExperimentRecord original = getOrThrow(experimentOperations.getExperiment(id));
 
         if (experiment.getState() != experimentOperations.getExperimentState(id)) {
+            //TODO do stuff! valid state changes Draft -> Published -> Stopping
             int size = experiment.getAllFields().size();
 
             if (size > 1)
                 throw new IllegalStateException("if you change the state nothing else can be changed");
+
+            if (experiment.getState().equals(Experiment.State.PUBLISHED)
+                    && experimentOperations.verifyExperimentForPublishing(id)) {
+                throw new IllegalStateException("experiment lacks information needed for publishing");
+            }
         } else {
             ExperimentRecord experimentRecord = ExperimentTransform.mergeProto(original, experiment);
             experimentRecord.setIdExperiment(id);
