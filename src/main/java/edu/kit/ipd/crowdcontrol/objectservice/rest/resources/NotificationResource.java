@@ -11,6 +11,11 @@ import spark.Response;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
+/**
+ * Handles requests to notification resources.
+ *
+ * @author Niklas Keller
+ */
 public class NotificationResource {
     private NotificationOperations operations;
 
@@ -19,12 +24,10 @@ public class NotificationResource {
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return A list of all templates.
+     * @return List of notifications.
      */
     public Paginated<Integer> all(Request request, Response response) {
         int from = getQueryInt(request, "from", 0);
@@ -35,32 +38,29 @@ public class NotificationResource {
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return A single template.
+     * @return Single notification.
      */
     public Notification get(Request request, Response response) {
         return operations.getNotification(getParamInt(request, "id"))
-                .orElseThrow(() -> new NotFoundException("Resource not found."));
+                .orElseThrow(NotFoundException::new);
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return The created template.
+     * @return Created notification.
      */
     public Notification put(Request request, Response response) {
         Notification notification = request.attribute("input");
+
         try {
             notification = operations.insertNotification(notification);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("All parameters must be set!");
+            throw new BadRequestException("Missing at least one required parameter.");
         }
 
         response.status(201);
@@ -70,12 +70,10 @@ public class NotificationResource {
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return The modified template.
+     * @return Modified notification.
      */
     public Notification patch(Request request, Response response) {
         Notification notification = request.attribute("input");
@@ -83,10 +81,8 @@ public class NotificationResource {
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
      * @return {@code null}.
      */
@@ -94,7 +90,7 @@ public class NotificationResource {
         boolean existed = operations.deleteNotification(getParamInt(request, "id"));
 
         if (!existed) {
-            throw new NotFoundException("Template does not exist!");
+            throw new NotFoundException();
         }
 
         return null;

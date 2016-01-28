@@ -61,7 +61,7 @@ public class CalibrationResource {
         try {
             calibration = operations.insertCalibration(calibration);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Name and content must be set!");
+            throw new BadRequestException("Missing at least one required parameter.");
         }
 
         response.status(201);

@@ -29,26 +29,26 @@ public class WorkerResource {
     }
 
     /**
-     * @param request  request provided by Spark.
-     * @param response response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return Worker if found.
+     * @return Identified worker.
      */
     public Worker identify(Request request, Response response) {
         try {
             return manager.getWorker(request.params("platform"), request.queryMap().toMap())
                     .map(WorkerTransform::toProto)
-                    .orElseThrow(() -> new NotFoundException("Resource not found."));
+                    .orElseThrow(NotFoundException::new);
         } catch (UnidentifiedWorkerException e) {
-            throw new BadRequestException("Unidentified worker!");
+            throw new BadRequestException("Could not identify worker.");
         }
     }
 
     /**
-     * @param request  request provided by Spark.
-     * @param response response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return A list of all workers.
+     * @return List of workers.
      */
     public Paginated<Integer> all(Request request, Response response) {
         int from = getQueryInt(request, "from", 0);
@@ -62,16 +62,16 @@ public class WorkerResource {
      * @param request  request provided by Spark.
      * @param response response provided by Spark.
      *
-     * @return A single worker.
+     * @return Single worker.
      */
     public Worker get(Request request, Response response) {
         return operations.getWorkerProto(getParamInt(request, "id"))
-                .orElseThrow(() -> new NotFoundException("Resource not found."));
+                .orElseThrow(NotFoundException::new);
     }
 
     /**
-     * @param request  request provided by Spark.
-     * @param response response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
      * @return Created worker.
      */
@@ -82,7 +82,7 @@ public class WorkerResource {
         try {
             identity = manager.identifyWorker(request.params("platform"), request.queryMap().toMap());
         } catch (UnidentifiedWorkerException e) {
-            throw new BadRequestException("Unidentified worker!");
+            throw new BadRequestException("Could not identify worker.");
         }
 
         worker = operations.insertWorker(worker, identity);
@@ -94,8 +94,8 @@ public class WorkerResource {
     }
 
     /**
-     * @param request  request provided by Spark.
-     * @param response response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
      * @return {@code null}.
      */
@@ -103,7 +103,7 @@ public class WorkerResource {
         try {
             operations.anonymizeWorker(getParamInt(request, "id"));
         } catch (IllegalArgumentException e) {
-            throw new NotFoundException("Resource not found.");
+            throw new NotFoundException();
         }
 
         return null;
