@@ -1,8 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
-import org.apache.commons.mail.MultiPartEmail;
-import org.apache.commons.mail.util.MimeMessageParser;
 
 import javax.mail.BodyPart;
 import javax.mail.Message;
@@ -19,26 +17,20 @@ public class MailParser {
 
     protected static GiftCodeRecord parseAmazonGiftCode(Message msg) throws MessagingException, IOException, AmazonMailFormatChangedException{
         //Extract Message
-        Multipart parts = (Multipart) msg.getContent();
-        BodyPart body = parts.getBodyPart(0);
-        Multipart innerMsg = (Multipart) body.getContent();
-        BodyPart textBody = innerMsg.getBodyPart(0);
-
-        //Build Message
-        StringBuilder message = new StringBuilder();
-        InputStream inputStream = textBody.getInputStream();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-        String messageLine;
-        while ((messageLine = bufferedReader.readLine()) != null) {
-            message.append(messageLine);
-            message.append(System.getProperty("line.separator"));
+        String message = "";
+        try {
+            Multipart parts = (Multipart) msg.getContent();
+            BodyPart body = parts.getBodyPart(0);
+            Multipart innerMsg = (Multipart) body.getContent();
+            BodyPart textBody = innerMsg.getBodyPart(0);
+            message = textBody.getContent().toString();
+        } catch (ClassCastException e) {
+            throw new AmazonMailFormatChangedException();
         }
-
         //Parse Message
-        String messageStr = message.toString().replaceAll(" ","");
+        String messageStr = message.replaceAll(" ","");
 
-        String codePatternStr = "[0-9A-Z]+(\\-[0-9A-Z]+)+";
+        String codePatternStr = "[0-9A-Z]+(-[0-9A-Z]+)+";
         Pattern codePattern = Pattern.compile(codePatternStr);
         Matcher codeMatcher = codePattern.matcher(messageStr);
 
@@ -46,7 +38,7 @@ public class MailParser {
         Pattern amountPattern = Pattern.compile(amountPatternStr);
         Matcher amountMatcher = amountPattern.matcher(messageStr);
 
-        if (checkMatches(codeMatcher) || checkMatches(amountMatcher)) {
+        if (!checkMatches(codeMatcher) || !checkMatches(amountMatcher)) {
             throw new AmazonMailFormatChangedException();
         }
 
