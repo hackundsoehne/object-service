@@ -206,22 +206,35 @@ public class ExperimentResource {
         ExperimentRecord original = getOrThrow(experimentOperations.getExperiment(id));
         Experiment resulting;
         if (experiment.getState() != experimentOperations.getExperimentState(id)) {
-            //TODO do stuff! valid state changes Draft -> Published -> Stopping
             int size = experiment.getAllFields().size();
 
             if (size > 1)
                 throw new IllegalStateException("if you change the state nothing else can be changed");
 
+            //validate the only two possible changes
             if (!experiment.getState().equals(Experiment.State.PUBLISHED)
                     && !experiment.getState().equals(Experiment.State.CREATIVE_STOPPED))
                 throw new IllegalArgumentException("Only "+ Experiment.State.PUBLISHED.name()+
                         " and " +Experiment.State.CREATIVE_STOPPED.name()+
                         " is allowed as state change");
 
+            //validate its draft -> published
+            if (!(experiment.getState().equals(Experiment.State.PUBLISHED) && old.getState().equals(Experiment.State.DRAFT))) {
+                throw new IllegalArgumentException("Publish is only allowed for DRAFT experiments");
+            }
+
+            //validate its published -> creative_stopped
+            if (!(experiment.getState().equals(Experiment.State.CREATIVE_STOPPED) && old.getState().equals(Experiment.State.PUBLISHED))) {
+                throw new IllegalArgumentException("Creative stop is only allowed for published experiments");
+            }
+
+            //check that there are enough datas for publish
             if (experiment.getState().equals(Experiment.State.PUBLISHED)
                     && experimentOperations.verifyExperimentForPublishing(id)) {
                 throw new IllegalStateException("experiment lacks information needed for publishing");
             }
+
+            //TODO check if there is a chance to creative stopp is not possible? like no creative answers?
 
             resulting = fetchExperiment(id);
             resulting = resulting.toBuilder().setState(experiment.getState()).build();
