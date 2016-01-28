@@ -53,7 +53,7 @@ public class AlgorithmOperations extends AbstractOperations {
      * @param limit  Number of records
      * @return List of AnswerQuality-Algorithms
      */
-    public Range<AlgorithmOption, String> getAnswerQualitiesFrom(String cursor, boolean next, int limit) {
+    public Range<AlgorithmOption, String> getAnswerQualitieyAlgortihmsFrom(String cursor, boolean next, int limit) {
         SelectJoinStep<Record> query = create.select(ALGORITHM_ANSWER_QUALITY.fields())
                 .select(ALGORITHM_ANSWER_QUALITY_PARAM.fields())
                 .from(ALGORITHM_ANSWER_QUALITY)
@@ -70,7 +70,7 @@ public class AlgorithmOperations extends AbstractOperations {
      * @param limit  Number of records
      * @return List of RatingQuality-Algorithms
      */
-    public Range<AlgorithmOption, String> getRatingQualitiesFrom(String cursor, boolean next, int limit) {
+    public Range<AlgorithmOption, String> getRatingQualitieyAlgortihmsFrom(String cursor, boolean next, int limit) {
         SelectJoinStep<Record> query = create.select(ALGORITHM_RATING_QUALITY.fields())
                 .select(ALGORITHM_RATING_QUALITY_PARAM.fields())
                 .from(ALGORITHM_RATING_QUALITY)

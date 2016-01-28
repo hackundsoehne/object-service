@@ -39,6 +39,7 @@ public class Router implements SparkApplication {
     private final WorkerResource workerResource;
     private final CalibrationResource calibrationResource;
     private final ExperimentResource experimentResource;
+    private final AlgorithmResources algorithmResources;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
@@ -46,13 +47,14 @@ public class Router implements SparkApplication {
     public Router(TemplateResource templateResource, NotificationResource notificationResource,
                   PlatformResource platformResource, WorkerResource workerResource,
                   CalibrationResource calibrationResource,
-                  ExperimentResource experimentResource) {
+                  ExperimentResource experimentResource, AlgorithmResources algorithmResources) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
         this.calibrationResource = calibrationResource;
         this.workerResource = workerResource;
         this.experimentResource = experimentResource;
+        this.algorithmResources = algorithmResources;
     }
 
     @Override
@@ -122,9 +124,9 @@ public class Router implements SparkApplication {
         get("/workers/:id", workerResource::get);
         delete("/workers/:id", workerResource::delete);
 
-        get("/algorithms/task_chooser", );
-        get("/algorithms/answer_quality", );
-        get("/algortihms/rating_quality", );
+        get("/algorithms/task_chooser", algorithmResources::allTaskChoosers);
+        get("/algorithms/answer_quality", algorithmResources::allAnswerQualityAlgorithms);
+        get("/algorithms/rating_quality", algorithmResources::allRatingQualityAlgorithms);
 
         put("/experiments", experimentResource::put, Experiment.class);
         get("/experiments", experimentResource::all);
