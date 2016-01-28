@@ -206,13 +206,20 @@ public class ExperimentResource {
         ExperimentRecord original = getOrThrow(experimentOperations.getExperiment(id));
         Experiment resulting;
         if (experiment.getState() != experimentOperations.getExperimentState(id)) {
+            //TODO do stuff! valid state changes Draft -> Published -> Stopping
             int size = experiment.getAllFields().size();
 
             if (size > 1)
                 throw new IllegalStateException("if you change the state nothing else can be changed");
 
-            if (experiment.getState() != Experiment.State.PUBLISHED || experiment.getState() != Experiment.State.STOPPING)
+            if (!experiment.getState().equals(Experiment.State.PUBLISHED)
+                    && !experiment.getState().equals(Experiment.State.STOPPING))
                 throw new IllegalArgumentException("Only Publish and Creativ_Stop is allowed as state change");
+
+            if (experiment.getState().equals(Experiment.State.PUBLISHED)
+                    && experimentOperations.verifyExperimentForPublishing(id)) {
+                throw new IllegalStateException("experiment lacks information needed for publishing");
+            }
 
             resulting = fetchExperiment(id);
             resulting = resulting.toBuilder().setState(experiment.getState()).build();

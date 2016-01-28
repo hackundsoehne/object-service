@@ -113,4 +113,80 @@ public class ExperimentOperations extends AbstractOperations {
     public Range<ExperimentRecord, Integer> getExperimentsFrom(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(EXPERIMENT), EXPERIMENT.ID_EXPERIMENT, cursor, next, limit);
     }
+
+    /**
+     * checks whether the experiment has all the information needed for publishing
+     * @param id the primary key of the experiment
+     * @return true if able to publish, false if not
+     */
+    public boolean verifyExperimentForPublishing(int id) {
+        ExperimentRecord experimentRecord = create.fetchOne(EXPERIMENT, EXPERIMENT.ID_EXPERIMENT.eq(id));
+        if (experimentRecord.getTitel() == null
+                || experimentRecord.getDescription() == null
+                || experimentRecord.getNeededAnswers() == null
+                || experimentRecord.getRatingsPerAnswer() == null
+                || experimentRecord.getAnwersPerWorker() == null
+                || experimentRecord.getRatingsPerAnswer() == null
+                || experimentRecord.getAlgorithmTaskChooser() == null
+                || experimentRecord.getAlgorithmQualityAnswer() == null
+                || experimentRecord.getAlgorithmQualityRating() == null
+                || experimentRecord.getBasePayment() == null
+                || experimentRecord.getBonusAnswer() == null
+                || experimentRecord.getBonusRating() == null
+                || experimentRecord.getWorkerQualityThreshold() == null) {
+            return false;
+        }
+        int ratings = create.fetchCount(
+                DSL.selectFrom(RATING_OPTION_EXPERIMENT)
+                        .where(RATING_OPTION_EXPERIMENT.EXPERIMENT.eq(id))
+        );
+
+        if (ratings < 2) {
+            return false;
+        }
+
+        int numberParameterTaskChooser = create.fetchCount(
+                DSL.selectFrom(CHOSEN_TASK_CHOOSER_PARAM)
+                .where(CHOSEN_TASK_CHOOSER_PARAM.EXPERIMENT.eq(id))
+        );
+
+        int numberNeededParameterTaskChooser = create.fetchCount(
+                DSL.selectFrom(ALGORITHM_TASK_CHOOSER_PARAM)
+                .where(ALGORITHM_TASK_CHOOSER_PARAM.ALGORITHM.eq(experimentRecord.getAlgorithmTaskChooser()))
+        );
+
+        if (numberParameterTaskChooser != numberNeededParameterTaskChooser) {
+            return false;
+        }
+
+        int numberParameterRatingQuality = create.fetchCount(
+                DSL.selectFrom(CHOSEN_RATING_QUALITY_PARAM)
+                        .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(id))
+        );
+
+        int numberNeededParameterRatingQuality = create.fetchCount(
+                DSL.selectFrom(ALGORITHM_RATING_QUALITY)
+                        .where(ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY.eq(experimentRecord.getAlgorithmQualityRating()))
+        );
+
+        if (numberParameterRatingQuality != numberNeededParameterRatingQuality) {
+            return false;
+        }
+
+        int numberParameterAnswerQuality = create.fetchCount(
+                DSL.selectFrom(CHOSEN_ANSWER_QUALITY_PARAM)
+                        .where(CHOSEN_ANSWER_QUALITY_PARAM.EXPERIMENT.eq(id))
+        );
+
+        int numberNeededParameterAnswerQuality = create.fetchCount(
+                DSL.selectFrom(ALGORITHM_ANSWER_QUALITY)
+                        .where(ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY.eq(experimentRecord.getAlgorithmQualityAnswer()))
+        );
+
+        if (numberParameterAnswerQuality != numberNeededParameterAnswerQuality) {
+            return false;
+        }
+
+        return true;
+    }
 }
