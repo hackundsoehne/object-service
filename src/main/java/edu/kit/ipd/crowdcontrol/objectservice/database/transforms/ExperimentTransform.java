@@ -55,7 +55,7 @@ public class ExperimentTransform extends AbstractTransform {
      */
     public static Experiment toProto(ExperimentRecord record, Experiment.State state,
                                      List<ConstraintRecord> constraintRecords,
-                                     List<Experiment.PlatformCalibrations> platforms,
+                                     List<Experiment.Population> platforms,
                                      List<TagRecord> tagRecords,
                                      AlgorithmTaskChooserRecord taskChooserRecord,
                                      Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams,
@@ -69,7 +69,7 @@ public class ExperimentTransform extends AbstractTransform {
                 .setAlgorithmQualityAnswer(AlgorithmsTransform.toAnswerQualityProto(answerQualityRecord, answerQualityParams))
                 .setAlgorithmQualityRating(AlgorithmsTransform.toRatingQualityProto(ratingQualityRecord, ratingQualityParams))
                 .addAllConstraints(constraintRecords.stream().map(TagConstraintTransform::toConstraintsProto).collect(Collectors.toList()))
-                .addAllPlatformCalibrations(platforms)
+                .addAllPopulations(platforms)
                 .addAllTags(tagRecords.stream().map(TagConstraintTransform::toTagProto).collect(Collectors.toList()))
                 .build();
     }
@@ -152,7 +152,7 @@ public class ExperimentTransform extends AbstractTransform {
                 case Experiment.PLACEHOLDERS_FIELD_NUMBER:
                     record.setTemplateData(new JSONObject(experiment.getPlaceholders()).toString());
                     break;
-                case Experiment.PLATFORM_CALIBRATIONS_FIELD_NUMBER:
+                case Experiment.POPULATIONS_FIELD_NUMBER:
                     // has to be done manual with CalibrationsTransformer
                     break;
                 case Experiment.RATINGS_PER_ANSWER_FIELD_NUMBER:
