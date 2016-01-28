@@ -6,7 +6,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.proto;
 /**
  * Protobuf type {@code crowdcontrol.Population}
  */
-public  final class calibration extends
+public  final class Calibration extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:crowdcontrol.Population)
     PopulationOrBuilder {
