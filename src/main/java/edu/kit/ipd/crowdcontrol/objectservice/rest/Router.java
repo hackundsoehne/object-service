@@ -150,10 +150,8 @@ public class Router implements SparkApplication {
     /**
      * Creates a new GET route.
      *
-     * @param path
-     *         Path.
-     * @param route
-     *         Handler.
+     * @param path  Path.
+     * @param route Handler.
      */
     private void get(String path, Route route) {
         Spark.get(path, new OutputTransformer(route));
@@ -162,12 +160,9 @@ public class Router implements SparkApplication {
     /**
      * Creates a new PUT route.
      *
-     * @param path
-     *         Path.
-     * @param route
-     *         Handler.
-     * @param type
-     *         Protocol buffer type.
+     * @param path  Path.
+     * @param route Handler.
+     * @param type  Protocol buffer type.
      */
     private void put(String path, Route route, Class<? extends Message> type) {
         Spark.put(path, new InputTransformer(new OutputTransformer(route), type));
@@ -176,12 +171,9 @@ public class Router implements SparkApplication {
     /**
      * Creates a new PATCH route.
      *
-     * @param path
-     *         Path.
-     * @param route
-     *         Handler.
-     * @param type
-     *         Protocol buffer type.
+     * @param path  Path.
+     * @param route Handler.
+     * @param type  Protocol buffer type.
      */
     private void patch(String path, Route route, Class<? extends Message> type) {
         Spark.patch(path, new InputTransformer(new OutputTransformer(route), type));
@@ -190,10 +182,8 @@ public class Router implements SparkApplication {
     /**
      * Creates a new DELETE route.
      *
-     * @param path
-     *         Path.
-     * @param route
-     *         Handler.
+     * @param path  Path.
+     * @param route Handler.
      */
     private void delete(String path, Route route) {
         Spark.delete(path, new OutputTransformer(route));
@@ -202,15 +192,10 @@ public class Router implements SparkApplication {
     /**
      * Creates an error response and encodes it into JSON / protocol buffers.
      *
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
-     * @param code
-     *         Short error code to make errors machine readable.
-     * @param detail
-     *         Detailed error message for humans.
-     *
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
+     * @param code     Short error code to make errors machine readable.
+     * @param detail   Detailed error message for humans.
      * @return Encoded message.
      */
     private String error(Request request, Response response, String code, String detail) {

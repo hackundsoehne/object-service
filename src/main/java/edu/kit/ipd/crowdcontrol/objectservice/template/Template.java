@@ -17,9 +17,7 @@ public class Template {
     /**
      * Parses a template.
      *
-     * @param text
-     *         Raw template.
-     *
+     * @param text Raw template.
      * @return A map, mapping placeholder names to their positions.
      */
     public static Map<String, Placeholder> parse(String text) {
@@ -64,11 +62,8 @@ public class Template {
     /**
      * Applies values to a template, effectively rendering it.
      *
-     * @param text
-     *         Raw template.
-     * @param placeholders
-     *         Placeholder name to replacement map.
-     *
+     * @param text         Raw template.
+     * @param placeholders Placeholder name to replacement map.
      * @return Rendered template.
      */
     public static String apply(String text, Map<String, String> placeholders) {

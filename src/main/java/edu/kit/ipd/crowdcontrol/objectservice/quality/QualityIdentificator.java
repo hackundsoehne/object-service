@@ -17,42 +17,37 @@ import java.util.Map;
 
 /**
  * Created by lucaskrauss
- *
+ * <p>
  * The QualityIdentificator class provides the functionality to rate the quality of ratings and answers of
  * an experiment.
  * It is notified via a EXPERIMENT_CHANGE-observable if an experiment has been stopped.
  * In that case the QualityIdentificator will first rate the quality of all ratings of the ended experiment
  * and thus can assure that only "good" ratings will be used on the identification of the experiment's
  * answers.
- *
- *
- *
  */
-public class QualityIdentificator implements  Observer<Rating> {
-
+public class QualityIdentificator implements Observer<Rating> {
 
 
     final static int MAXIMUM_QUALITY = 9;
     final static int MINUMUM_QUALITY = 0;
 
-   // private Observable<Answer> answerObservable = EventManager.ANSWER_CREATE.getObservable();
+    // private Observable<Answer> answerObservable = EventManager.ANSWER_CREATE.getObservable();
     private Observable<Rating> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
     private AnswerRatingOperations operations;
     private AnswerQualityStrategy answerIdentifier;
     private RatingQualityStrategy ratingIdentifier;
 
 
-
     /**
      * Has to be  >= 0 and  <10
-     *
+     * <p>
      * Might be set to allow more flexibility and more good answers
      */
     private int ratingQualityThreshold = 10;
 
 
-    public QualityIdentificator(AnswerRatingOperations ops){
-      //  answerObservable.subscribe();
+    public QualityIdentificator(AnswerRatingOperations ops) {
+        //  answerObservable.subscribe();
         //TODO get alg. params
         ratingObservable.subscribe();
         operations = ops;
@@ -77,23 +72,20 @@ public class QualityIdentificator implements  Observer<Rating> {
     }
 
 
-
-
-
     /**
      * Rates and sets quality of all ratings of specified experiment.
      * Ratings to the same answer are grouped and rated together.
      *
      * @param expID of the experiment.
      */
-    private void rateQualityOfRatings(int expID){
+    private void rateQualityOfRatings(int expID) {
 
         List<AnswerRecord> answers = operations.getAnswersOfExperiment(expID);
 
-        for (AnswerRecord answer: answers) {
+        for (AnswerRecord answer : answers) {
             List<RatingRecord> records = operations.getRatingsOfAnswer(answer);
 
-            Map<RatingRecord,Integer> map = ratingIdentifier.identifyRatingQuality(records, MAXIMUM_QUALITY, MINUMUM_QUALITY);
+            Map<RatingRecord, Integer> map = ratingIdentifier.identifyRatingQuality(records, MAXIMUM_QUALITY, MINUMUM_QUALITY);
             operations.setQualityToRatings(map);
         }
 
@@ -106,11 +98,11 @@ public class QualityIdentificator implements  Observer<Rating> {
      *
      * @param expID of the experiment.
      */
-    private void rateQualityOfAnswers(int expID){
+    private void rateQualityOfAnswers(int expID) {
         List<AnswerRecord> answers = operations.getAnswersOfExperiment(expID);
-        for (AnswerRecord answer: answers) {
+        for (AnswerRecord answer : answers) {
             List<RatingRecord> records = operations.getGoodRatingsOfAnswer(answer, ratingQualityThreshold);
-            operations.setQualityToAnswer(answer,answerIdentifier.identifyAnswerQuality(answer,records, MAXIMUM_QUALITY, MINUMUM_QUALITY));
+            operations.setQualityToAnswer(answer, answerIdentifier.identifyAnswerQuality(answer, records, MAXIMUM_QUALITY, MINUMUM_QUALITY));
         }
     }
 
@@ -128,9 +120,6 @@ public class QualityIdentificator implements  Observer<Rating> {
     }
 
  */
-
-
-
 
 
 }

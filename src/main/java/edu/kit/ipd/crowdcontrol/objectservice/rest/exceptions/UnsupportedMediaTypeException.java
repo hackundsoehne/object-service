@@ -11,10 +11,8 @@ public class UnsupportedMediaTypeException extends BadRequestException {
     private final String[] supportedTypes;
 
     /**
-     * @param providedType
-     *         Sent content-type value.
-     * @param supportedTypes
-     *         Accepted content-type values.
+     * @param providedType   Sent content-type value.
+     * @param supportedTypes Accepted content-type values.
      */
     public UnsupportedMediaTypeException(String providedType, String... supportedTypes) {
         super("Provided content-type is not supported: '%s'.", providedType);

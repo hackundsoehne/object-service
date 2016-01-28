@@ -7,10 +7,8 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions;
  */
 public class NotFoundException extends BadRequestException {
     /**
-     * @param message
-     *         Error details. Forwarded to the client.
-     * @param args
-     *         Arguments for {@link String#format(String, Object...)}.
+     * @param message Error details. Forwarded to the client.
+     * @param args    Arguments for {@link String#format(String, Object...)}.
      */
     public NotFoundException(String message, Object... args) {
         super(String.format(message, args));

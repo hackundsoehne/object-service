@@ -32,15 +32,15 @@ public class PlatformManager {
      * Create a new manager for platforms. The known platforms in the database will be deleted,
      * and filled with the new.
      *
-     * @param crowdPlatforms The list of crowdplatforms to be managed by this manager,
-     *                       will be used to setup the list of platforms in the database
-     * @param fallbackWorker handler which is called if a platform does not support identifying a worker
-     *                       for this case need_email on the platform is set and the email which got entered by the worker
-     *                       should be set as some param
+     * @param crowdPlatforms  The list of crowdplatforms to be managed by this manager,
+     *                        will be used to setup the list of platforms in the database
+     * @param fallbackWorker  handler which is called if a platform does not support identifying a worker
+     *                        for this case need_email on the platform is set and the email which got entered by the worker
+     *                        should be set as some param
      * @param fallbackPayment handler which is called if a platform does not support payment
-     * @param tasksOps Used for the task operations on the database
-     * @param platformOps Used for the platform operations on the database
-     * @param workerOps Used for the worker operations on the database
+     * @param tasksOps        Used for the task operations on the database
+     * @param platformOps     Used for the platform operations on the database
+     * @param workerOps       Used for the worker operations on the database
      */
     public PlatformManager(List<Platform> crowdPlatforms, WorkerIdentification fallbackWorker,
                            Payment fallbackPayment, TasksOperations tasksOps,
@@ -95,6 +95,7 @@ public class PlatformManager {
 
     /**
      * Will get you the instance of a platform interface of a platform, this instance is the same for all calls
+     *
      * @param name The name of the instance to use
      * @return The optional crowd platform instance
      */
@@ -131,7 +132,7 @@ public class PlatformManager {
      * Publish the given experiment on the platform.
      * The method will update the database with the new public task
      *
-     * @param name The name of the platform
+     * @param name       The name of the platform
      * @param experiment The experiment to publish
      * @return None if the platform does not exist
      */
@@ -165,7 +166,7 @@ public class PlatformManager {
     /**
      * Unpublish a given experiment from the given platform
      *
-     * @param name The name of the platform
+     * @param name       The name of the platform
      * @param experiment The experiment to unpublish
      * @return None if the platform was not found, false if the unpublish failed and true if everything went fine
      */
@@ -187,7 +188,8 @@ public class PlatformManager {
 
     /**
      * update the given experiment on the given platform
-     * @param name The name of the platform
+     *
+     * @param name       The name of the platform
      * @param experiment The experiment to update
      * @return None if the platform was not found, false if the update failed and true if everything went fine.
      */
@@ -208,7 +210,8 @@ public class PlatformManager {
 
     /**
      * Parse a worker id out of the params which got passed by a platform
-     * @param name The name of the platform
+     *
+     * @param name   The name of the platform
      * @param params Params passed by the platform
      * @return A String if the platform exists
      * @throws UnidentifiedWorkerException if the user can not be found by the platform code
@@ -219,18 +222,20 @@ public class PlatformManager {
 
     /**
      * Get a worker if he exists
-     * @param name Name of the platform
+     *
+     * @param name   Name of the platform
      * @param params Params passed by the platform
      * @return A worker if one is found
      * @throws UnidentifiedWorkerException if the platform does not identify a worker
      */
-    public Optional<WorkerRecord> getWorker(String name, Map<String ,String[]> params) throws UnidentifiedWorkerException {
-        return getWorker(name).getWorker(workerOps,name,params);
+    public Optional<WorkerRecord> getWorker(String name, Map<String, String[]> params) throws UnidentifiedWorkerException {
+        return getWorker(name).getWorker(workerOps, name, params);
     }
 
     /**
      * Pay a worker
-     * @param name The name of the platform
+     *
+     * @param name   The name of the platform
      * @param worker Worker to pay
      * @param amount The amount of money
      * @return A completable future which returns the success of the call

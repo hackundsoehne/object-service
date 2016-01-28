@@ -23,10 +23,8 @@ public class InputTransformer implements Route {
     private final Class<? extends Message> type;
 
     /**
-     * @param next
-     *         Route that consumes the transformed input.
-     * @param type
-     *         Expected protocol buffer type.
+     * @param next Route that consumes the transformed input.
+     * @param type Expected protocol buffer type.
      */
     public InputTransformer(Route next, Class<? extends Message> type) {
         this.next = next;
@@ -37,11 +35,8 @@ public class InputTransformer implements Route {
      * Transforms the body of the request into a protocol buffer object and saves it as {@code
      * input} attribute in the request.
      *
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
-     *
+     * @param request  Request provided by Spark.
+     * @param response Response provided by Spark.
      * @return Returns the result of the {@code next} route.
      */
     public Object handle(Request request, Response response) throws Exception {

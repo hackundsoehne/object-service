@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface WorkerIdentification {
     /**
      * Parse a worker id out of the params
+     *
      * @param param The parameters which were sent by a platform
      * @return The id of the worker if one can be found
      */
@@ -22,8 +23,8 @@ public interface WorkerIdentification {
      * Get a worker record from the identification
      *
      * @param workerOperations The worker operations to use
-     * @param platform The platform on which this is called
-     * @param param The parameters of the platform
+     * @param platform         The platform on which this is called
+     * @param param            The parameters of the platform
      * @return A WorkerRecord, if one is found
      * @throws UnidentifiedWorkerException
      */

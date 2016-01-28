@@ -4,65 +4,70 @@
 package edu.kit.ipd.crowdcontrol.objectservice.proto;
 
 public interface AnswerOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:crowdcontrol.Answer)
-    com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:crowdcontrol.Answer)
+        com.google.protobuf.MessageOrBuilder {
 
-  /**
-   * <code>optional int32 id = 1;</code>
-   */
-  int getId();
+    /**
+     * <code>optional int32 id = 1;</code>
+     */
+    int getId();
 
-  /**
-   * <code>optional int32 experiment_id = 2;</code>
-   */
-  int getExperimentId();
+    /**
+     * <code>optional int32 experiment_id = 2;</code>
+     */
+    int getExperimentId();
 
-  /**
-   * <code>optional int32 worker = 3;</code>
-   */
-  int getWorker();
+    /**
+     * <code>optional int32 worker = 3;</code>
+     */
+    int getWorker();
 
-  /**
-   * <code>optional string content = 4;</code>
-   */
-  java.lang.String getContent();
-  /**
-   * <code>optional string content = 4;</code>
-   */
-  com.google.protobuf.ByteString
-      getContentBytes();
+    /**
+     * <code>optional string content = 4;</code>
+     */
+    java.lang.String getContent();
 
-  /**
-   * <code>optional int32 time = 5;</code>
-   */
-  int getTime();
+    /**
+     * <code>optional string content = 4;</code>
+     */
+    com.google.protobuf.ByteString
+    getContentBytes();
 
-  /**
-   * <code>optional int32 quality = 6;</code>
-   */
-  int getQuality();
+    /**
+     * <code>optional int32 time = 5;</code>
+     */
+    int getTime();
 
-  /**
-   * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
-   */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating> 
-      getRatingsList();
-  /**
-   * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Rating getRatings(int index);
-  /**
-   * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
-   */
-  int getRatingsCount();
-  /**
-   * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
-   */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder> 
-      getRatingsOrBuilderList();
-  /**
-   * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder getRatingsOrBuilder(
-      int index);
+    /**
+     * <code>optional int32 quality = 6;</code>
+     */
+    int getQuality();
+
+    /**
+     * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
+     */
+    java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating>
+    getRatingsList();
+
+    /**
+     * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
+     */
+    edu.kit.ipd.crowdcontrol.objectservice.proto.Rating getRatings(int index);
+
+    /**
+     * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
+     */
+    int getRatingsCount();
+
+    /**
+     * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
+     */
+    java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder>
+    getRatingsOrBuilderList();
+
+    /**
+     * <code>repeated .crowdcontrol.Rating ratings = 7;</code>
+     */
+    edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder getRatingsOrBuilder(
+            int index);
 }
