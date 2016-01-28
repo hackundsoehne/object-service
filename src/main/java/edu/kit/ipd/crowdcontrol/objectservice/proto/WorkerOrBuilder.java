@@ -4,31 +4,33 @@
 package edu.kit.ipd.crowdcontrol.objectservice.proto;
 
 public interface WorkerOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:crowdcontrol.Worker)
-    com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:crowdcontrol.Worker)
+        com.google.protobuf.MessageOrBuilder {
 
-  /**
-   * <code>optional int32 id = 1;</code>
-   */
-  int getId();
+    /**
+     * <code>optional int32 id = 1;</code>
+     */
+    int getId();
 
-  /**
-   * <code>optional string platform = 2;</code>
-   */
-  java.lang.String getPlatform();
-  /**
-   * <code>optional string platform = 2;</code>
-   */
-  com.google.protobuf.ByteString
-      getPlatformBytes();
+    /**
+     * <code>optional string platform = 2;</code>
+     */
+    java.lang.String getPlatform();
 
-  /**
-   * <code>optional string email = 3;</code>
-   */
-  java.lang.String getEmail();
-  /**
-   * <code>optional string email = 3;</code>
-   */
-  com.google.protobuf.ByteString
-      getEmailBytes();
+    /**
+     * <code>optional string platform = 2;</code>
+     */
+    com.google.protobuf.ByteString
+    getPlatformBytes();
+
+    /**
+     * <code>optional string email = 3;</code>
+     */
+    java.lang.String getEmail();
+
+    /**
+     * <code>optional string email = 3;</code>
+     */
+    com.google.protobuf.ByteString
+    getEmailBytes();
 }

@@ -4,51 +4,56 @@
 package edu.kit.ipd.crowdcontrol.objectservice.proto;
 
 public final class PlatformListOuterClass {
-  private PlatformListOuterClass() {}
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
-  }
-  static com.google.protobuf.Descriptors.Descriptor
-    internal_static_crowdcontrol_PlatformList_descriptor;
-  static
+    private PlatformListOuterClass() {
+    }
+
+    public static void registerAllExtensions(
+            com.google.protobuf.ExtensionRegistry registry) {
+    }
+
+    static com.google.protobuf.Descriptors.Descriptor
+            internal_static_crowdcontrol_PlatformList_descriptor;
+    static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_crowdcontrol_PlatformList_fieldAccessorTable;
+            internal_static_crowdcontrol_PlatformList_fieldAccessorTable;
 
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
-    return descriptor;
-  }
-  private static com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
-  static {
-    java.lang.String[] descriptorData = {
-      "\n\023platform_list.proto\022\014crowdcontrol\032\016pla" +
-      "tform.proto\"5\n\014PlatformList\022%\n\005items\030\001 \003" +
-      "(\0132\026.crowdcontrol.PlatformB0\n,edu.kit.ip" +
-      "d.crowdcontrol.objectservice.protoP\001b\006pr" +
-      "oto3"
-    };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
+    public static com.google.protobuf.Descriptors.FileDescriptor
+    getDescriptor() {
+        return descriptor;
+    }
+
+    private static com.google.protobuf.Descriptors.FileDescriptor
+            descriptor;
+
+    static {
+        java.lang.String[] descriptorData = {
+                "\n\023platform_list.proto\022\014crowdcontrol\032\016pla" +
+                        "tform.proto\"5\n\014PlatformList\022%\n\005items\030\001 \003" +
+                        "(\0132\026.crowdcontrol.PlatformB0\n,edu.kit.ip" +
+                        "d.crowdcontrol.objectservice.protoP\001b\006pr" +
+                        "oto3"
         };
-    com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-          edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOuterClass.getDescriptor(),
-        }, assigner);
-    internal_static_crowdcontrol_PlatformList_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_crowdcontrol_PlatformList_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_crowdcontrol_PlatformList_descriptor,
-        new java.lang.String[] { "Items", });
-    edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOuterClass.getDescriptor();
-  }
+        com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+                new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+                    public com.google.protobuf.ExtensionRegistry assignDescriptors(
+                            com.google.protobuf.Descriptors.FileDescriptor root) {
+                        descriptor = root;
+                        return null;
+                    }
+                };
+        com.google.protobuf.Descriptors.FileDescriptor
+                .internalBuildGeneratedFileFrom(descriptorData,
+                        new com.google.protobuf.Descriptors.FileDescriptor[]{
+                                edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOuterClass.getDescriptor(),
+                        }, assigner);
+        internal_static_crowdcontrol_PlatformList_descriptor =
+                getDescriptor().getMessageTypes().get(0);
+        internal_static_crowdcontrol_PlatformList_fieldAccessorTable = new
+                com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                internal_static_crowdcontrol_PlatformList_descriptor,
+                new java.lang.String[]{"Items",});
+        edu.kit.ipd.crowdcontrol.objectservice.proto.PlatformOuterClass.getDescriptor();
+    }
 
-  // @@protoc_insertion_point(outer_class_scope)
+    // @@protoc_insertion_point(outer_class_scope)
 }

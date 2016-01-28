@@ -4,16 +4,17 @@
 package edu.kit.ipd.crowdcontrol.objectservice.proto;
 
 public interface TagOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:crowdcontrol.Tag)
-    com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:crowdcontrol.Tag)
+        com.google.protobuf.MessageOrBuilder {
 
-  /**
-   * <code>optional string name = 1;</code>
-   */
-  java.lang.String getName();
-  /**
-   * <code>optional string name = 1;</code>
-   */
-  com.google.protobuf.ByteString
-      getNameBytes();
+    /**
+     * <code>optional string name = 1;</code>
+     */
+    java.lang.String getName();
+
+    /**
+     * <code>optional string name = 1;</code>
+     */
+    com.google.protobuf.ByteString
+    getNameBytes();
 }

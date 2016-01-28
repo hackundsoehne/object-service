@@ -4,30 +4,34 @@
 package edu.kit.ipd.crowdcontrol.objectservice.proto;
 
 public interface AnswerListOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:crowdcontrol.AnswerList)
-    com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:crowdcontrol.AnswerList)
+        com.google.protobuf.MessageOrBuilder {
 
-  /**
-   * <code>repeated .crowdcontrol.Answer items = 1;</code>
-   */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Answer> 
-      getItemsList();
-  /**
-   * <code>repeated .crowdcontrol.Answer items = 1;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Answer getItems(int index);
-  /**
-   * <code>repeated .crowdcontrol.Answer items = 1;</code>
-   */
-  int getItemsCount();
-  /**
-   * <code>repeated .crowdcontrol.Answer items = 1;</code>
-   */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerOrBuilder> 
-      getItemsOrBuilderList();
-  /**
-   * <code>repeated .crowdcontrol.Answer items = 1;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerOrBuilder getItemsOrBuilder(
-      int index);
+    /**
+     * <code>repeated .crowdcontrol.Answer items = 1;</code>
+     */
+    java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Answer>
+    getItemsList();
+
+    /**
+     * <code>repeated .crowdcontrol.Answer items = 1;</code>
+     */
+    edu.kit.ipd.crowdcontrol.objectservice.proto.Answer getItems(int index);
+
+    /**
+     * <code>repeated .crowdcontrol.Answer items = 1;</code>
+     */
+    int getItemsCount();
+
+    /**
+     * <code>repeated .crowdcontrol.Answer items = 1;</code>
+     */
+    java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerOrBuilder>
+    getItemsOrBuilderList();
+
+    /**
+     * <code>repeated .crowdcontrol.Answer items = 1;</code>
+     */
+    edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerOrBuilder getItemsOrBuilder(
+            int index);
 }

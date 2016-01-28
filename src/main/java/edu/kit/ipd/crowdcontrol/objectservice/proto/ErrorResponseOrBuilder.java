@@ -4,26 +4,28 @@
 package edu.kit.ipd.crowdcontrol.objectservice.proto;
 
 public interface ErrorResponseOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:crowdcontrol.ErrorResponse)
-    com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:crowdcontrol.ErrorResponse)
+        com.google.protobuf.MessageOrBuilder {
 
-  /**
-   * <code>optional string code = 1;</code>
-   */
-  java.lang.String getCode();
-  /**
-   * <code>optional string code = 1;</code>
-   */
-  com.google.protobuf.ByteString
-      getCodeBytes();
+    /**
+     * <code>optional string code = 1;</code>
+     */
+    java.lang.String getCode();
 
-  /**
-   * <code>optional string detail = 2;</code>
-   */
-  java.lang.String getDetail();
-  /**
-   * <code>optional string detail = 2;</code>
-   */
-  com.google.protobuf.ByteString
-      getDetailBytes();
+    /**
+     * <code>optional string code = 1;</code>
+     */
+    com.google.protobuf.ByteString
+    getCodeBytes();
+
+    /**
+     * <code>optional string detail = 2;</code>
+     */
+    java.lang.String getDetail();
+
+    /**
+     * <code>optional string detail = 2;</code>
+     */
+    com.google.protobuf.ByteString
+    getDetailBytes();
 }

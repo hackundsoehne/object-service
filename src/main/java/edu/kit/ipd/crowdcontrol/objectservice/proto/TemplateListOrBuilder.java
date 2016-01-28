@@ -4,30 +4,34 @@
 package edu.kit.ipd.crowdcontrol.objectservice.proto;
 
 public interface TemplateListOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:crowdcontrol.TemplateList)
-    com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:crowdcontrol.TemplateList)
+        com.google.protobuf.MessageOrBuilder {
 
-  /**
-   * <code>repeated .crowdcontrol.Template items = 1;</code>
-   */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Template> 
-      getItemsList();
-  /**
-   * <code>repeated .crowdcontrol.Template items = 1;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Template getItems(int index);
-  /**
-   * <code>repeated .crowdcontrol.Template items = 1;</code>
-   */
-  int getItemsCount();
-  /**
-   * <code>repeated .crowdcontrol.Template items = 1;</code>
-   */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateOrBuilder> 
-      getItemsOrBuilderList();
-  /**
-   * <code>repeated .crowdcontrol.Template items = 1;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateOrBuilder getItemsOrBuilder(
-      int index);
+    /**
+     * <code>repeated .crowdcontrol.Template items = 1;</code>
+     */
+    java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Template>
+    getItemsList();
+
+    /**
+     * <code>repeated .crowdcontrol.Template items = 1;</code>
+     */
+    edu.kit.ipd.crowdcontrol.objectservice.proto.Template getItems(int index);
+
+    /**
+     * <code>repeated .crowdcontrol.Template items = 1;</code>
+     */
+    int getItemsCount();
+
+    /**
+     * <code>repeated .crowdcontrol.Template items = 1;</code>
+     */
+    java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateOrBuilder>
+    getItemsOrBuilderList();
+
+    /**
+     * <code>repeated .crowdcontrol.Template items = 1;</code>
+     */
+    edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateOrBuilder getItemsOrBuilder(
+            int index);
 }

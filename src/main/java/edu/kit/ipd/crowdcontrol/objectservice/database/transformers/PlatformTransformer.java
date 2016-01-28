@@ -13,7 +13,6 @@ public class PlatformTransformer extends AbstractTransformer {
      * Converts a platform record to its protobuf representation.
      *
      * @param record platform record
-     *
      * @return Platform.
      */
     public static Platform toProto(PlatformRecord record) {

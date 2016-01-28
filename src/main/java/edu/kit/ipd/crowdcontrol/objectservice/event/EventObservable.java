@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * Created by marcel on 02.01.16.
  */
 public class EventObservable<T> {
@@ -18,7 +17,7 @@ public class EventObservable<T> {
     public EventObservable() {
         subs = new LinkedList<>();
         observable = Observable.create(sub -> {
-            synchronized(subs) {
+            synchronized (subs) {
                 subs.add(sub);
             }
         });
@@ -26,6 +25,7 @@ public class EventObservable<T> {
 
     /**
      * Will emit the given object as event to the subscribed subscribers of the observable.
+     *
      * @param t The object to pass to the events
      * @return The messages returned by the emits
      */
@@ -43,6 +43,7 @@ public class EventObservable<T> {
 
     /**
      * Get the observable object of this event
+     *
      * @return The observable
      */
     public Observable<Event<T>> getObservable() {
