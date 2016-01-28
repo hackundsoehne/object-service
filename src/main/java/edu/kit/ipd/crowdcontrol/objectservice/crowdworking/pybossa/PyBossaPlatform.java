@@ -24,8 +24,8 @@ public class PyBossaPlatform implements Platform {
     private final String name;
     private final String projectID;
     private final Boolean calibsAllowed;
-    private int idTask1;
-    private int idTask2;
+    private String idTask1 = null;
+    private String idTask2 = null;
 
     public PyBossaPlatform(String workerServiceUrl, String apiKey, String apiUrl, String name, String projectID, Boolean calibsAllowed) {
         this.workerServiceUrl = workerServiceUrl;
@@ -37,6 +37,82 @@ public class PyBossaPlatform implements Platform {
 
         taskUrl = apiUrl + "/task";
         initIdTasks();
+    }
+
+    private void initIdTasks() {
+        if (!getIdTasks()) {
+            createIdTasks();
+        }
+    }
+
+    private boolean getIdTasks() {
+        // request existing tasks for project
+        HttpResponse<JsonNode> response;
+        try {
+            response = Unirest.get(taskUrl)
+                    .queryString("api_key", apiKey)
+                    .queryString("project_id", projectID)
+                    .asJson();
+        } catch (UnirestException e) {
+            throw new PlatformConnectionException(e);
+        }
+
+        // check for existent idTasks
+        if (response.getStatus() == 200) {
+            if (response.getBody().getArray().length() >= 2) {
+                String[] ids = new String[2];
+
+                // idTasks have to be the first two objects
+                for (int i = 0; i < 1; i++) {
+                    JSONObject task = response.getBody().getArray().getJSONObject(i);
+                    if (task.isNull("info")) {
+                        ids[i] = task.getString("id");
+                    }
+                }
+
+                idTask1 = ids[0];
+                idTask2 = ids[1];
+            }
+        } else {
+            throw new PlatformResponseException(response.getBody().getObject()
+                    .optString("exception_msg", "getIdTasks failed"));
+        }
+
+        return true;
+    }
+
+    /**
+     * Creates 2 new idTasks with empty info object and assigns the IDs to idTask1 and idTask2
+     */
+    private void createIdTasks() {
+        JsonNode jsonTask = new JsonNode("");
+        jsonTask.getObject()
+                .append("project_id", projectID)
+                .append("priority_0", 0);
+
+        String[] ids = new String[2];
+        HttpResponse<JsonNode> response;
+        for (int i = 0; i < 1; i++) {
+            try {
+                response = Unirest.post(taskUrl)
+                        .header("Content-Type", "application/json")
+                        .queryString("api_key", apiKey)
+                        .body(jsonTask)
+                        .asJson();
+            } catch (UnirestException e) {
+                throw new PlatformConnectionException(e);
+            }
+
+            if (response.getStatus() == 200) {
+                ids[i] = response.getBody().getObject().getString("id");
+            } else {
+                throw new PlatformResponseException(response.getBody().getObject()
+                        .optString("exception_msg", "createIdTasks failed"));
+            }
+        }
+
+        idTask1 = ids[0];
+        idTask2 = ids[1];
     }
 
     /**
@@ -107,7 +183,7 @@ public class PyBossaPlatform implements Platform {
             if (response.getStatus() == 200) {
                 taskID = response.getBody().getObject().getString("id");
             } else {
-                throw new PlatformPublishException(response.getBody().getObject()
+                throw new PlatformResponseException(response.getBody().getObject()
                         .optString("exception_msg", "Publishing task failed"));
             }
             return taskID;
@@ -146,7 +222,39 @@ public class PyBossaPlatform implements Platform {
      * @return The new id or a Exception if the update failed.
      */
     public CompletableFuture<String> updateTask(String id, Experiment experiment) {
-        return null;
+        return CompletableFuture.supplyAsync(() -> {
+            //build request body
+            JsonNode jsonTask = new JsonNode("");
+            jsonTask.getObject()
+                    .append("info", new JSONObject()
+                            .append("url", workerServiceUrl)
+                            .append("expID", experiment.getId())
+                            .append("platformName", name)
+                            .append("idTask1", idTask1)
+                            .append("idTask2", idTask2)
+                    )
+                    .append("n_answers", experiment.getNeededAnswers());
+
+            HttpResponse<JsonNode> response;
+            try {
+                response = Unirest.put(taskUrl + "/{taskId}")
+                        .header("Content-Type", "application/json")
+                        .routeParam("taskId", id)
+                        .queryString("api_key", apiKey)
+                        .body(jsonTask)
+                        .asJson();
+            } catch (UnirestException e) {
+                throw new PlatformConnectionException(e);
+            }
+
+
+            if (response.getStatus() == 200) {
+                return id;
+            } else {
+                throw new PlatformResponseException(response.getBody().getObject()
+                        .optString("exception_msg", "Updating task failed"));
+            }
+        });
     }
 
     /**
@@ -157,47 +265,4 @@ public class PyBossaPlatform implements Platform {
     public Boolean isCalibrationAllowed() {
         return this.calibsAllowed;
     }
-
-//    private void initIdsTasks() {
-//        HttpResponse<JsonNode> response = null;
-//        try {
-//            response = Unirest.get(apiUrl + "task")
-//                    .queryString("api_key", apiKey)
-//                    .queryString("project_id", projectID)
-//                    .asJson();
-//        } catch (UnirestException e) {
-//            e.printStackTrace();
-//        }
-//
-//        JsonNode json = response.getBody();
-//
-//        if (json.isArray() && json.getArray().length() < 2) {
-//
-//        }
-//    }
-
-    private void initIdTasks() {
-        JsonNode jsonTask = new JsonNode("");
-        jsonTask.getObject()
-                .append("project_id", projectID)
-                .append("priority_0", 0);
-
-        try {
-            HttpResponse<JsonNode> postResponse = Unirest.post(apiUrl + "task")
-                    .header("Content-Type", "application/json")
-                    .queryString("api_key", apiKey)
-                    .body(jsonTask)
-                    .asJson();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-    }
-
-//    private String appendName(String id) {
-//        return this.name + ":" + id;
-//    }
-//
-//    private String stripName(String uniqueId) {
-//
-//    }
 }
