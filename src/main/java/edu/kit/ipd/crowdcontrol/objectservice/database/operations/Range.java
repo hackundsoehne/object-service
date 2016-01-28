@@ -3,7 +3,9 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 import com.google.protobuf.Message;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ public class Range<T, X> {
     private final boolean hasSuccessors;
     private final X left;
     private final X right;
+    private static Range range = new Range<>(Collections.emptyList(), null, null, false, false);
 
     /**
      * @param data
@@ -45,6 +48,17 @@ public class Range<T, X> {
         this.right = right;
         this.hasPredecessors = hasPredecessors;
         this.hasSuccessors = hasSuccessors;
+    }
+
+    /**
+     *
+     * @param <A>
+     * @param <B>
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <A, B> Range<A, B> getEmptyRange() {
+        return (Range<A, B>) range;
     }
 
     /**
@@ -75,12 +89,28 @@ public class Range<T, X> {
     }
 
     /**
+     * Maps the data inside the range.
+     *
+     * @param mapping
+     *         Mapping to apply.
+     * @param <Y>
+     *         Type to map to.
+     *
+     * @return Range with applied mapping.
+     */
+    public <Y> Range<Y, X> mapList(Function<List<T>, List<Y>> mapping) {
+        List<Y> newList = mapping.apply(data);
+
+        return new Range<>(newList, left, right, hasPredecessors, hasSuccessors);
+    }
+
+    /**
      * Key of the most left data element inside the range.
      *
      * @return Key, or empty if the list is empty.
      */
-    public X getLeft() {
-        return left;
+    public Optional<X> getLeft() {
+        return Optional.ofNullable(left);
     }
 
     /**
@@ -88,8 +118,8 @@ public class Range<T, X> {
      *
      * @return Key, or empty if the list is empty.
      */
-    public X getRight() {
-        return right;
+    public Optional<X> getRight() {
+        return Optional.ofNullable(right);
     }
 
     /**
