@@ -78,6 +78,6 @@ public class Main {
                 new WorkerResource(workerOperations, platformManager),
                 new CalibrationResource(calibrationOperations),
                 new ExperimentResource(experimentOperations, answerRatingOperations, calibrationOperations, tagConstraintsOperations, workerOperations, algorithmsOperations),
-                algorithmResources).init();
+                new AlgorithmResources(algorithmsOperations)).init();
     }
 }
