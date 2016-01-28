@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentsCalibration extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord> {
 
-	private static final long serialVersionUID = 379656541;
+	private static final long serialVersionUID = -1292195892;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Experiments_Calibration</code>
@@ -71,6 +71,14 @@ public class ExperimentsCalibration extends org.jooq.impl.TableImpl<edu.kit.ipd.
 
 	private ExperimentsCalibration(java.lang.String alias, org.jooq.Table<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord> aliased, org.jooq.Field<?>[] parameters) {
 		super(alias, edu.kit.ipd.crowdcontrol.objectservice.database.model.Crowdcontrol.CROWDCONTROL, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public org.jooq.Identity<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord, java.lang.Integer> getIdentity() {
+		return edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDENTITY_EXPERIMENTS_CALIBRATION;
 	}
 
 	/**
