@@ -196,7 +196,7 @@ public class ExperimentResource {
 
         Function<Map.Entry<String, List<Calibration>>, Experiment.Population> toPopulation = entry ->
                 Experiment.Population.newBuilder()
-                //.setPlatformId(entry.getKey)
+                .setPlatformId(entry.getKey())
                 .addAllCalibration(entry.getValue())
                 .build();
 
