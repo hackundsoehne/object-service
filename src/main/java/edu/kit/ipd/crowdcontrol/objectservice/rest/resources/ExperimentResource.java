@@ -206,12 +206,9 @@ public class ExperimentResource {
         ExperimentRecord original = getOrThrow(experimentOperations.getExperiment(id));
 
         if (experiment.getState() != experimentOperations.getExperimentState(id)) {
-            //TODO marcel wtf what does this do?
-            final int[] count = {0};
+            int size = experiment.getAllFields().size();
 
-            experiment.getAllFields().forEach((fieldDescriptor, o) -> count[0]++);
-
-            if (count[0] > 1)
+            if (size > 1)
                 throw new IllegalStateException("if you change the state nothing else can be changed");
         } else {
             //TODO refactor into method
