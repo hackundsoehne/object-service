@@ -17,10 +17,11 @@ public class WorkerTransform extends AbstractTransform {
      * @return Worker.
      */
     public static Worker toProto(WorkerRecord record) {
-        return Worker.newBuilder()
+        return builder(Worker.newBuilder())
+                .set(record.getEmail(), Worker.Builder::setEmail)
+                .getBuilder()
                 .setId(record.getIdWorker())
                 .setPlatform(record.getPlatform())
-                .setEmail(record.getEmail())
                 .build();
     }
 

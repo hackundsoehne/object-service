@@ -17,12 +17,12 @@ public class TemplateTransform extends AbstractTransform {
      *
      * @return Template.
      */
-    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Template toProto(TemplateRecord record) {
+    public static Template toProto(TemplateRecord record) {
         AnswerType answerType = "IMAGE".equals(record.getAnswerType())
                 ? AnswerType.IMAGE
                 : AnswerType.TEXT;
 
-        return edu.kit.ipd.crowdcontrol.objectservice.proto.Template.newBuilder()
+        return Template.newBuilder()
                 .setId(record.getIdTemplate())
                 .setName(record.getTitel())
                 .setContent(record.getTemplate())
@@ -44,7 +44,10 @@ public class TemplateTransform extends AbstractTransform {
                     break;
                 case Template.CONTENT_FIELD_NUMBER: record.setTemplate(template.getContent());
                     break;
-                case Template.ANSWER_TYPE_FIELD_NUMBER: record.setAnswerType(template.getAnswerType().name());
+                case Template.ANSWER_TYPE_FIELD_NUMBER:
+                    if ("IMAGE".equals(template.getAnswerType().name())) {
+                        record.setAnswerType(template.getAnswerType().name());
+                    }
                     break;
             }
         });
