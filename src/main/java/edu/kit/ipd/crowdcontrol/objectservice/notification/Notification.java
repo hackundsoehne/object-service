@@ -53,8 +53,7 @@ public class Notification implements Runnable {
      * @return true if threshold since last sent has passed, else false
      */
     public boolean thresholdPassed() {
-        return ((lastSent.plusSeconds(sendThreshold)
-                .compareTo(Instant.now())) <= 0);
+        return lastSent.plusSeconds(sendThreshold).isBefore(Instant.now());
     }
 
     /**

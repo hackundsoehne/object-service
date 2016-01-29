@@ -33,17 +33,15 @@ public class DBEmailNotificationPolicy extends NotificationPolicy<Result<Record>
         }
     }
 
-
     @Override
-    protected void send(Notification notification, Result<Record> token) {
 
+    protected void send(Notification notification, Result<Record> token) {
         StringBuilder message = new StringBuilder();
-        message.append("<html>");
         message.append(notification.getDescription());
-        if (token != null) {
-            message.append(token.formatHTML());
+        message.append("\n");
+        for (Record record : token) {
+            message.append(record.toString());
         }
-        message.append("</html>");
 
         try {
             mailSender.sendMail(receiver, notification.getName(), message.toString());
@@ -56,5 +54,5 @@ public class DBEmailNotificationPolicy extends NotificationPolicy<Result<Record>
         notification.setLastSent(now);
         operation.updateLastSentForNotification(notification.getID(), now);
     }
-
 }
+
