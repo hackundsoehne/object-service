@@ -306,7 +306,9 @@ public class ExperimentResource {
                 experimentOperations.deleteRatingOptions(id);
             }
 
-            experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
+            if (!experiment.getRatingOptionsList().isEmpty()) {
+                experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
+            }
 
             //update the experiment itself
             experimentOperations.updateExperiment(experimentRecord);
