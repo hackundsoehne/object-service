@@ -62,6 +62,7 @@ public class ExperimentTransform extends AbstractTransform {
                                      List<ConstraintRecord> constraintRecords,
                                      List<Experiment.Population> platforms,
                                      List<TagRecord> tagRecords,
+                                     List<RatingOptionExperimentRecord> ratingOptions,
                                      AlgorithmTaskChooserRecord taskChooserRecord,
                                      Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams,
                                      AlgorithmAnswerQualityRecord answerQualityRecord,
@@ -79,6 +80,7 @@ public class ExperimentTransform extends AbstractTransform {
                 .addAllConstraints(constraints)
                 .addAllPopulations(platforms)
                 .addAllTags(tagRecords.stream().map(TagConstraintTransform::toTagProto).collect(Collectors.toList()))
+                .addAllRatingOptions(ratingOptions.stream().map(ExperimentTransform::transform).collect(Collectors.toList()))
                 .build();
     }
 
@@ -86,6 +88,15 @@ public class ExperimentTransform extends AbstractTransform {
         if (answerType == AnswerType.INVALID) return null;
         return answerType.name();
     }
+
+    private static Experiment.RatingOption transform(RatingOptionExperimentRecord record) {
+        return Experiment.RatingOption.newBuilder()
+                .setExperimentRatingId(record.getIdRatingOptionExperiment())
+                .setName(record.getName())
+                .setValue(record.getValue())
+                .build();
+    }
+
 
     /**
      * Merge the data from a experiment proto object into a existing record
@@ -157,5 +168,30 @@ public class ExperimentTransform extends AbstractTransform {
                     break;
             }
         });
+    }
+
+    /**
+     * creates a list of RatingOptionExperimentRecords from the passed experiment
+     * @param experiment the Experiment
+     * @return a list of RatingOptionExperimentRecords
+     */
+    public static List<RatingOptionExperimentRecord> toRecord(Experiment experiment) {
+        return experiment.getRatingOptionsList().stream()
+                .map(ratingOption ->
+                        merge(new RatingOptionExperimentRecord(), ratingOption, (field, record) -> {
+                            switch (field) {
+                                case Experiment.RatingOption.EXPERIMENT_RATING_ID_FIELD_NUMBER:
+                                    record.setIdRatingOptionExperiment(ratingOption.getExperimentRatingId());
+                                    break;
+                                case Experiment.RatingOption.NAME_FIELD_NUMBER:
+                                    record.setName(ratingOption.getName());
+                                    break;
+                                case Experiment.RatingOption.VALUE_FIELD_NUMBER:
+                                    record.setValue(ratingOption.getValue());
+                                    break;
+                            }
+                        })
+                )
+                .collect(Collectors.toList());
     }
 }

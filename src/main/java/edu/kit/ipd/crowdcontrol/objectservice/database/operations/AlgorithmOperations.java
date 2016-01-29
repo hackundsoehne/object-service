@@ -207,7 +207,8 @@ public class AlgorithmOperations extends AbstractOperations {
      */
     public void deleteChosenTaskChooserParams(int experimentId) {
         create.deleteFrom(CHOSEN_TASK_CHOOSER_PARAM)
-                .where(CHOSEN_TASK_CHOOSER_PARAM.EXPERIMENT.eq(experimentId));
+                .where(CHOSEN_TASK_CHOOSER_PARAM.EXPERIMENT.eq(experimentId))
+                .execute();
     }
 
     /**
@@ -216,7 +217,8 @@ public class AlgorithmOperations extends AbstractOperations {
      */
     public void deleteChosenAnswerQualityParams(int experimentId) {
         create.deleteFrom(CHOSEN_ANSWER_QUALITY_PARAM)
-                .where(CHOSEN_ANSWER_QUALITY_PARAM.EXPERIMENT.eq(experimentId));
+                .where(CHOSEN_ANSWER_QUALITY_PARAM.EXPERIMENT.eq(experimentId))
+                .execute();
     }
 
     /**
@@ -225,7 +227,8 @@ public class AlgorithmOperations extends AbstractOperations {
      */
     public void deleteChosenRatingQualityParams(int experimentId) {
         create.deleteFrom(CHOSEN_RATING_QUALITY_PARAM)
-                .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(experimentId));
+                .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(experimentId))
+                .execute();
     }
 
     /**

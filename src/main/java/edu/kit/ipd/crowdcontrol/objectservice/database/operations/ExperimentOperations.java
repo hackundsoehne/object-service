@@ -1,15 +1,20 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.protobuf.Descriptors;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingOptionExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
@@ -104,6 +109,17 @@ public class ExperimentOperations extends AbstractOperations {
     }
 
     /**
+     * returns all RatingOptions for the Experiment
+     * @param experimentId the primary key of the experiment
+     * @return a list of RatingOptionExperiments
+     */
+    public List<RatingOptionExperimentRecord> getRatingOptions(int experimentId) {
+        return create.selectFrom(RATING_OPTION_EXPERIMENT)
+                .where(RATING_OPTION_EXPERIMENT.EXPERIMENT.eq(experimentId))
+                .fetch();
+    }
+
+    /**
      * returns the experiments starting from {@code cursor}
      * @param cursor pagination cursor
      * @param next {@code true} for next, {@code false} for previous
@@ -188,5 +204,50 @@ public class ExperimentOperations extends AbstractOperations {
         }
 
         return true;
+    }
+
+    /**
+     * deletes all the associated RatingOptions from the DB
+     * @param experimentId the primary key of the Experiment-Table
+     */
+    public void deleteRatingOptions(int experimentId) {
+        create.deleteFrom(RATING_OPTION_EXPERIMENT)
+                .where(RATING_OPTION_EXPERIMENT.EXPERIMENT.eq(experimentId))
+                .execute();
+    }
+
+    /**
+     * stores the passed RatingOption, deletes the existing if they are missing in the list
+     * @param ratingOptions the ratingOptions
+     * @param experimentId the primary key of the Experiment-Table
+     */
+    public void storeRatingOptions(List<Experiment.RatingOption> ratingOptions, int experimentId) {
+        Descriptors.Descriptor descriptor = Experiment.RatingOption.getDescriptor();
+
+        Predicate<Experiment.RatingOption> hasID = ratingOption ->
+                ratingOption.hasField(descriptor.findFieldByNumber(Experiment.RatingOption.EXPERIMENT_RATING_ID_FIELD_NUMBER));
+
+        Map<Integer, RatingOptionExperimentRecord> existing = ratingOptions.stream()
+                .filter(hasID)
+                .collect(Collectors.toMap(
+                        Experiment.RatingOption::getExperimentRatingId,
+                        option -> new RatingOptionExperimentRecord(option.getExperimentRatingId(), option.getName(), option.getValue(), option.getValue())
+                ));
+
+        List<RatingOptionExperimentRecord> toInsert = ratingOptions.stream()
+                .filter(ratingOption -> !hasID.test(ratingOption))
+                .map(option -> new RatingOptionExperimentRecord(null, option.getName(), option.getValue(), option.getValue()))
+                .collect(Collectors.toList());
+
+        create.transaction(conf -> {
+            DSL.using(conf).deleteFrom(RATING_OPTION_EXPERIMENT)
+                    .where(RATING_OPTION_EXPERIMENT.EXPERIMENT.eq(experimentId))
+                    .and(RATING_OPTION_EXPERIMENT.ID_RATING_OPTION_EXPERIMENT.notIn(existing.keySet()))
+                    .execute();
+
+            DSL.using(conf).batchUpdate(existing.values()).execute();
+
+            DSL.using(conf).batchInsert(toInsert).execute();
+        });
     }
 }
