@@ -251,9 +251,9 @@ public  final class Experiment extends
      */
     PUBLISHED(2, 2),
     /**
-     * <code>STOPPING = 3;</code>
+     * <code>CREATIVE_STOPPED = 3;</code>
      */
-    STOPPING(3, 3),
+    CREATIVE_STOPPED(3, 3),
     /**
      * <code>STOPPED = 4;</code>
      */
@@ -274,9 +274,9 @@ public  final class Experiment extends
      */
     public static final int PUBLISHED_VALUE = 2;
     /**
-     * <code>STOPPING = 3;</code>
+     * <code>CREATIVE_STOPPED = 3;</code>
      */
-    public static final int STOPPING_VALUE = 3;
+    public static final int CREATIVE_STOPPED_VALUE = 3;
     /**
      * <code>STOPPED = 4;</code>
      */
@@ -296,7 +296,7 @@ public  final class Experiment extends
         case 0: return INVALID;
         case 1: return DRAFT;
         case 2: return PUBLISHED;
-        case 3: return STOPPING;
+        case 3: return CREATIVE_STOPPED;
         case 4: return STOPPED;
         default: return null;
       }

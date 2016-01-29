@@ -34,7 +34,7 @@ public final class ExperimentOuterClass {
     java.lang.String[] descriptorData = {
       "\n\020experiment.proto\022\014crowdcontrol\032\021answer" +
       "_type.proto\032\020constraint.proto\032\020populatio" +
-      "n.proto\032\ttag.proto\"\236\007\n\nExperiment\022\n\n\002id\030" +
+      "n.proto\032\ttag.proto\"\246\007\n\nExperiment\022\n\n\002id\030" +
       "\001 \001(\005\022\r\n\005title\030\002 \001(\t\022\023\n\013description\030\003 \001(" +
       "\t\022-\n\005state\030\004 \001(\0162\036.crowdcontrol.Experime" +
       "nt.State\022-\n\013answer_type\030\005 \001(\0162\030.crowdcon" +
@@ -55,11 +55,11 @@ public final class ExperimentOuterClass {
       "_id\030\025 \001(\005\0323\n\021PlaceholdersEntry\022\013\n\003key\030\001 " +
       "\001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032X\n\022PlatformPopula" +
       "tion\022\023\n\013platform_id\030\001 \001(\t\022-\n\013populations" +
-      "\030\002 \003(\0132\030.crowdcontrol.Population\"I\n\005Stat" +
+      "\030\002 \003(\0132\030.crowdcontrol.Population\"Q\n\005Stat" +
       "e\022\013\n\007INVALID\020\000\022\t\n\005DRAFT\020\001\022\r\n\tPUBLISHED\020\002" +
-      "\022\014\n\010STOPPING\020\003\022\013\n\007STOPPED\020\004B0\n,edu.kit.i" +
-      "pd.crowdcontrol.objectservice.protoP\001b\006p" +
-      "roto3"
+      "\022\024\n\020CREATIVE_STOPPED\020\003\022\013\n\007STOPPED\020\004B0\n,e" +
+      "du.kit.ipd.crowdcontrol.objectservice.pr" +
+      "otoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

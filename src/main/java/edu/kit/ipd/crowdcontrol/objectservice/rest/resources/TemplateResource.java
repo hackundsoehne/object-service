@@ -24,12 +24,10 @@ public class TemplateResource {
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return A list of all templates.
+     * @return List of templates.
      */
     public Paginated<Integer> all(Request request, Response response) {
         int from = getQueryInt(request, "from", 0);
@@ -40,47 +38,42 @@ public class TemplateResource {
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return A single template.
+     * @return Single template.
      */
     public Template get(Request request, Response response) {
         return operations.getTemplate(getParamInt(request, "id"))
-                .orElseThrow(() -> new NotFoundException("Resource not found."));
+                .orElseThrow(NotFoundException::new);
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return The created template.
+     * @return Created template.
      */
     public Template put(Request request, Response response) {
         Template template = request.attribute("input");
+
         try {
             template = operations.insertTemplate(template);
         } catch (IllegalArgumentException e) {
-           throw new BadRequestException("Name and content must be set!");
+            throw new BadRequestException("Missing at least one required parameter.");
         }
 
         response.status(201);
-        response.header("Location", "/notifications/" + template.getId());
+        response.header("Location", "/templates/" + template.getId());
 
         return template;
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return The modified template.
+     * @return Modified template.
      */
     public Template patch(Request request, Response response) {
         Template template = request.attribute("input");
@@ -88,10 +81,8 @@ public class TemplateResource {
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
      * @return {@code null}.
      */
@@ -99,7 +90,7 @@ public class TemplateResource {
         boolean existed = operations.deleteTemplate(getParamInt(request, "id"));
 
         if (!existed) {
-            throw new NotFoundException("Template does not exist!");
+            throw new NotFoundException();
         }
 
         return null;

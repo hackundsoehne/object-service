@@ -15,4 +15,11 @@ public class NotFoundException extends BadRequestException {
     public NotFoundException(String message, Object... args) {
         super(String.format(message, args));
     }
+
+    /**
+     * Creates a new instance with the default text "Resource not found."
+     */
+    public NotFoundException() {
+        this("Resource not found.");
+    }
 }
