@@ -3,6 +3,9 @@ package edu.kit.ipd.crowdcontrol.objectservice.mail;
 import org.junit.Test;
 
 import javax.mail.Message;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.util.Properties;
 import java.util.UUID;
 
 import static org.junit.Assert.assertTrue;
@@ -21,7 +24,12 @@ public abstract class MailHandlerTest {
         String uuid = UUID.randomUUID().toString();
         String subject = "[test] " + uuid;
 
-        handler.sendMail("pseipd@trash-mail.com", subject, uuid);
+        Properties properties = new Properties();
+        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/integration-test/resources/mailHandlerTestProps.properties"));
+        properties.load(stream);
+        stream.close();
+
+        handler.sendMail(properties.getProperty("receiver"), subject, uuid);
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {}
