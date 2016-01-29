@@ -40,6 +40,7 @@ public class Router implements SparkApplication {
     private final CalibrationResource calibrationResource;
     private final ExperimentResource experimentResource;
     private final AlgorithmResources algorithmResources;
+    private final AnswerRatingResource answerRatingResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
@@ -47,7 +48,8 @@ public class Router implements SparkApplication {
     public Router(TemplateResource templateResource, NotificationResource notificationResource,
                   PlatformResource platformResource, WorkerResource workerResource,
                   CalibrationResource calibrationResource,
-                  ExperimentResource experimentResource, AlgorithmResources algorithmResources) {
+                  ExperimentResource experimentResource, AlgorithmResources algorithmResources,
+                  AnswerRatingResource answerRatingResource) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
@@ -55,6 +57,7 @@ public class Router implements SparkApplication {
         this.workerResource = workerResource;
         this.experimentResource = experimentResource;
         this.algorithmResources = algorithmResources;
+        this.answerRatingResource = answerRatingResource;
     }
 
     @Override
@@ -133,10 +136,10 @@ public class Router implements SparkApplication {
         get("/experiments/:id", experimentResource::get);
         patch("/experiments/:id", experimentResource::patch, Experiment.class);
         delete("/experiments/:id", experimentResource::delete);
-        put("/experiments/:id/answers", experimentResource::putAnswer, Answer.class);
-        get("/experiments/:id/answers", experimentResource::getAnswers);
-        get("/experiments/:id/answers/:aid", experimentResource::getAnswer);
-        put("/experiments/:id/answers/:aid/rating", experimentResource::putRating, Rating.class);
+        put("/experiments/:id/answers", answerRatingResource::putAnswer, Answer.class);
+        get("/experiments/:id/answers", answerRatingResource::getAnswers);
+        get("/experiments/:id/answers/:aid", answerRatingResource::getAnswer);
+        put("/experiments/:id/answers/:aid/rating", answerRatingResource::putRating, Rating.class);
     }
 
     /**

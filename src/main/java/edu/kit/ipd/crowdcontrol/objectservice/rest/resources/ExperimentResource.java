@@ -2,19 +2,23 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstraintTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -124,9 +128,10 @@ public class ExperimentResource {
     private Experiment fetchExperiment(int id) {
         ExperimentRecord experimentRecord = getOrThrow(experimentOperations.getExperiment(id));
         Experiment.State state = experimentOperations.getExperimentState(id);
+        List<RatingOptionExperimentRecord> ratingOptions = experimentOperations.getRatingOptions(id);
         List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
         List<ConstraintRecord> constraintRecords = tagConstraintsOperations.getConstraints(id);
-        List<Experiment.Population> platforms = getPlatforms(id);
+        List<Experiment.Population> platforms = getPopulation(id);
         AlgorithmTaskChooserRecord taskChooserRecord = getOrThrow(
                 algorithmsOperations.getTaskChooser(experimentRecord.getAlgorithmTaskChooser())
         );
@@ -148,6 +153,7 @@ public class ExperimentResource {
                 constraintRecords,
                 platforms,
                 tagRecords,
+                ratingOptions,
                 taskChooserRecord,
                 taskChooserParams,
                 answerQualityRecord,
@@ -174,7 +180,7 @@ public class ExperimentResource {
      * @param id the id of the experiment
      * @return returns a list of populations with a platform
      */
-    private List<Experiment.Population> getPlatforms(int id) {
+    private List<Experiment.Population> getPopulation(int id) {
 
         Function<ExperimentsCalibrationRecord, Calibration> toCalibration = record -> {
             CalibrationAnswerOptionRecord a = getOrThrow(
@@ -330,111 +336,5 @@ public class ExperimentResource {
         EventManager.EXPERIMENT_DELETE.emit(experiment);
 
         return null;
-    }
-
-    /**
-     * Get answers from a experiment
-     * @param request  Request provided by Spark.
-     * @param response Response provided by Spark.
-     * @return The answer if it was found
-     */
-    public Paginated<Integer> getAnswers(Request request, Response response) {
-        int from = getQueryInt(request, "from", 0);
-        boolean asc = getQueryBool(request, "asc", true);
-        int experimentId = getParamInt(request, "id");
-
-        return answerRatingOperations.getAnswersFrom(experimentId, from, asc, 20)
-                .map(answerRecord -> AnswerRatingTransform.toAnswerProto(answerRecord,
-                        answerRatingOperations.getRatings(answerRecord.getIdAnswer())))
-                .constructPaginated(AnswerList.newBuilder(), AnswerList.Builder::addAllItems);
-    }
-
-    /**
-     * Creates a new Answer
-     * @param request  Request provided by Spark.
-     * @param response Response provided by Spark.
-     * @return The new created answer object
-     */
-    public Answer putAnswer(Request request, Response response) {
-        int experimentId = getParamInt(request, "id");
-        Answer answer = request.attribute("input");
-
-        //throw on ratings in the answer
-        if (answer.getRatingsCount() != 0)
-            throw new BadRequestException("A answer Resource can not have ratings while creating!");
-
-        //the worker of this rating does not exist
-        if (!workerOperations.getWorker(answer.getWorker()).isPresent())
-            throw new BadRequestException("The given worker does not exists!");
-
-        //check that the experiment really exists
-        if (!experimentOperations.getExperiment(answer.getExperimentId()).isPresent())
-            throw new BadRequestException("Experiment does not exists!");
-
-        //check that the experiment id does not differ
-        if (experimentId != answer.getExperimentId())
-            throw new BadRequestException("Experiment id of call and object are differing");
-
-        if (answer.getQuality() != 0)
-            throw new BadRequestException("Quality cannot be set at creation");
-
-        AnswerRecord record = answerRatingOperations.insertNewAnswer(
-                AnswerRatingTransform.toAnswerRecord(answer, experimentId)
-        );
-
-        response.status(201);
-        response.header("Location","/experiment/"+experimentId+"/answers/"+answer.getId()+"");
-
-        answer = AnswerRatingTransform.toAnswerProto(record,Collections.emptyList());
-
-        EventManager.ANSWER_CREATE.emit(answer);
-
-        return answer;
-    }
-
-    /**
-     * Return a answer with :aid from experiment :id
-     * @param request  Request provided by Spark.
-     * @param response Response provided by Spark.
-     * @return The answer if it was found
-     */
-    public Answer getAnswer(Request request, Response response) {
-        int experimentId = getParamInt(request, "id");
-        int answerId = getParamInt(request, "aid");
-        AnswerRecord record = getOrThrow(answerRatingOperations.getAnswer(answerId));
-
-        if (experimentId != record.getExperiment())
-            throw new IllegalArgumentException("Answer not found for the given experiment");
-
-        return AnswerRatingTransform.toAnswerProto (record,
-                answerRatingOperations.getRatings(answerId));
-    }
-
-    /**
-     * Creates a new Rating for answer :aid in experiment :id
-     * @param request  Request provided by Spark.
-     * @param response Response provided by Spark.
-     * @return The new Created Rating
-     */
-    public Rating putRating(Request request, Response response) {
-        int experimentId = getParamInt(request, "id");
-        int answerId = getParamInt(request, "aid");
-        Rating rating = request.attribute("input");
-
-        if (rating.getQuality() != 0) {
-            throw new IllegalArgumentException("Quality cannot be set when creating a Rating");
-        }
-
-        RatingRecord r = answerRatingOperations.insertNewRating(
-                    AnswerRatingTransform.toRatingRecord(rating, answerId, experimentId)
-                );
-
-        response.status(201);
-
-        rating = AnswerRatingTransform.toRatingProto(r);
-
-        EventManager.RATINGS_CREATE.emit(rating);
-
-        return rating;
     }
 }
