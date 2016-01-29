@@ -84,6 +84,60 @@ public class AlgorithmsTransformer extends AbstractTransformer {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * creates the protobuf-representation for the TaskChooser
+     * @param taskChooserRecord the TaskChooserRecord
+     * @param taskChooserParams the parameters, where the values may be the chosen values
+     * @return the resulting AlgorithmOption
+     */
+    static AlgorithmOption toTaskChooserProto(AlgorithmTaskChooserRecord taskChooserRecord,
+                                              Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams) {
+        List<AlgorithmOption.AlgorithmParameter> parameters = taskChooserParams.entrySet().stream()
+                .map(entry -> getParam(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+        return AlgorithmOption.newBuilder()
+                .setName(taskChooserRecord.getIdTaskChooser())
+                .setDescription(taskChooserRecord.getDescription())
+                .addAllParameters(parameters)
+                .build();
+    }
+
+    /**
+     * creates the protobuf-representation for the AnswerQuality-Algorithm
+     * @param answerQualityRecord the the answerQualityRecord
+     * @param answerQualityParams the parameters, where the values may be the chosen values
+     * @return the resulting AlgorithmOption
+     */
+    static AlgorithmOption toAnswerQualityProto(AlgorithmAnswerQualityRecord answerQualityRecord,
+                                                Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams) {
+        List<AlgorithmOption.AlgorithmParameter> parameters = answerQualityParams.entrySet().stream()
+                .map(entry -> getParam(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+        return AlgorithmOption.newBuilder()
+                .setName(answerQualityRecord.getIdAlgorithmAnswerQuality())
+                .setDescription(answerQualityRecord.getDescription())
+                .addAllParameters(parameters)
+                .build();
+    }
+
+    /**
+     * creates the protobuf-representation for the RatingQuality-Algorithm
+     * @param ratingQualityRecord the ratingQualityRecord
+     * @param ratingQualityParams the parameters, where the values may be the chosen values
+     * @return the resulting AlgorithmOption
+     */
+    static AlgorithmOption toRatingQualityProto(AlgorithmRatingQualityRecord ratingQualityRecord,
+                                                Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
+        List<AlgorithmOption.AlgorithmParameter> parameters = ratingQualityParams.entrySet().stream()
+                .map(entry -> getParam(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+        return AlgorithmOption.newBuilder()
+                .setName(ratingQualityRecord.getIdAlgorithmRatingQuality())
+                .setDescription(ratingQualityRecord.getDescription())
+                .addAllParameters(parameters)
+                .build();
+    }
+
     private static AlgorithmOption.AlgorithmParameter getParam(AlgorithmTaskChooserParamRecord record, String value) {
         AlgorithmOption.AlgorithmParameter.Builder builder = AlgorithmOption.AlgorithmParameter.newBuilder()
                 .setDescription(record.getDescription())
@@ -117,42 +171,6 @@ public class AlgorithmsTransformer extends AbstractTransformer {
             builder = builder.setValue(value);
         }
         return builder
-                .build();
-    }
-
-    static AlgorithmOption toTaskChooserProto(AlgorithmTaskChooserRecord taskChooserRecord,
-                                                      Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams) {
-        List<AlgorithmOption.AlgorithmParameter> parameters = taskChooserParams.entrySet().stream()
-                .map(entry -> getParam(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-        return AlgorithmOption.newBuilder()
-                .setName(taskChooserRecord.getIdTaskChooser())
-                .setDescription(taskChooserRecord.getDescription())
-                .addAllParameters(parameters)
-                .build();
-    }
-
-    static AlgorithmOption toAnswerQualityProto(AlgorithmAnswerQualityRecord answerQualityRecord,
-                                                        Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams) {
-        List<AlgorithmOption.AlgorithmParameter> parameters = answerQualityParams.entrySet().stream()
-                .map(entry -> getParam(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-        return AlgorithmOption.newBuilder()
-                .setName(answerQualityRecord.getIdAlgorithmAnswerQuality())
-                .setDescription(answerQualityRecord.getDescription())
-                .addAllParameters(parameters)
-                .build();
-    }
-
-    static AlgorithmOption toRatingQualityProto(AlgorithmRatingQualityRecord ratingQualityRecord,
-                                                        Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
-        List<AlgorithmOption.AlgorithmParameter> parameters = ratingQualityParams.entrySet().stream()
-                .map(entry -> getParam(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-        return AlgorithmOption.newBuilder()
-                .setName(ratingQualityRecord.getIdAlgorithmRatingQuality())
-                .setDescription(ratingQualityRecord.getDescription())
-                .addAllParameters(parameters)
                 .build();
     }
 }
