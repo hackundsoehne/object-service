@@ -127,9 +127,9 @@ public class Router implements SparkApplication {
         get("/workers/:id", workerResource::get);
         delete("/workers/:id", workerResource::delete);
 
-        get("/algorithms/task_chooser", algorithmResources::allTaskChoosers);
-        get("/algorithms/answer_quality", algorithmResources::allAnswerQualityAlgorithms);
-        get("/algorithms/rating_quality", algorithmResources::allRatingQualityAlgorithms);
+        get("/algorithms/task-chooser", algorithmResources::allTaskChoosers);
+        get("/algorithms/answer-quality", algorithmResources::allAnswerQualityAlgorithms);
+        get("/algorithms/rating-quality", algorithmResources::allRatingQualityAlgorithms);
 
         put("/experiments", experimentResource::put, Experiment.class);
         get("/experiments", experimentResource::all);

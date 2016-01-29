@@ -341,8 +341,6 @@ public class ExperimentResource {
             throw new IllegalStateException("experiment lacks information needed for publishing");
         }
 
-        //TODO check if there is a chance to creative stopp is not possible? like no creative answers?
-
         resulting = fetchExperiment(id);
         resulting = resulting.toBuilder().setState(experiment.getState()).build();
         return resulting;
