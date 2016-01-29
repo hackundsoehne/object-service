@@ -330,7 +330,7 @@ public class ExperimentResource {
 
         try {
             if (!experimentOperations.deleteExperiment(id)) {
-                throw new InternalServerErrorException("Resource not found!");
+                throw new NotFoundException();
             }
         } catch (IllegalStateException e) {
             throw new BadRequestException("Deleting an experiment is not allowed while it is still running.");
