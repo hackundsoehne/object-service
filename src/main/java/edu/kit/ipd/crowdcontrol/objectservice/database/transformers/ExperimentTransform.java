@@ -28,7 +28,7 @@ public class ExperimentTransform extends AbstractTransform {
         return Experiment.newBuilder()
                 .setId(record.getIdExperiment())
                 .setDescription(record.getDescription())
-                        /*.set*/
+                .setNeededAnswers(record.getNeededAnswers())
                 .setRatingsPerAnswer(record.getRatingsPerAnswer())
                 .setAnswersPerWorker(record.getAnwersPerWorker())
                 .setRatingsPerWorker(record.getRatingsPerWorker())
@@ -64,7 +64,6 @@ public class ExperimentTransform extends AbstractTransform {
                                      AlgorithmRatingQualityRecord ratingQualityRecord,
                                      Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
         return toProto(record, state).toBuilder()
-                        /*.set*/
                 .setAlgorithmTaskChooser(AlgorithmsTransform.toTaskChooserProto(taskChooserRecord, taskChooserParams))
                 .setAlgorithmQualityAnswer(AlgorithmsTransform.toAnswerQualityProto(answerQualityRecord, answerQualityParams))
                 .setAlgorithmQualityRating(AlgorithmsTransform.toRatingQualityProto(ratingQualityRecord, ratingQualityParams))
