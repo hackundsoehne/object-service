@@ -1,7 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -42,7 +42,7 @@ public class AlgorithmOperations extends AbstractOperations {
         SelectJoinStep<Record1<String>> query = create.select(ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER).from(ALGORITHM_TASK_CHOOSER);
         return getNextRange(query, ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER, ALGORITHM_TASK_CHOOSER,
                 cursor, next, limit, String::compareTo)
-                .mapList(records -> AlgorithmsTransform.constructTaskChoosers(getTaskChooserParams(records)));
+                .mapList(records -> AlgorithmsTransformer.constructTaskChoosers(getTaskChooserParams(records)));
     }
 
     private Map<AlgorithmTaskChooserRecord, List<AlgorithmTaskChooserParamRecord>> getTaskChooserParams(List<Record1<String>> taskChooserIds) {
@@ -66,7 +66,7 @@ public class AlgorithmOperations extends AbstractOperations {
         SelectJoinStep<Record1<String>> query = create.select(ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY).from(ALGORITHM_ANSWER_QUALITY);
         return getNextRange(query, ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY, ALGORITHM_ANSWER_QUALITY,
                 cursor, next, limit, String::compareTo)
-                .mapList(records -> AlgorithmsTransform.constructAnswerQualityAlgorithms(getAnswerQualityParams(records)));
+                .mapList(records -> AlgorithmsTransformer.constructAnswerQualityAlgorithms(getAnswerQualityParams(records)));
     }
 
     private Map<AlgorithmAnswerQualityRecord, List<AlgorithmAnswerQualityParamRecord>> getAnswerQualityParams(List<Record1<String>> answerQualityIds) {
@@ -90,7 +90,7 @@ public class AlgorithmOperations extends AbstractOperations {
         SelectJoinStep<Record1<String>> query = create.select(ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY).from(ALGORITHM_RATING_QUALITY);
         return getNextRange(query, ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY, ALGORITHM_RATING_QUALITY,
                 cursor, next, limit, String::compareTo)
-                .mapList(records -> AlgorithmsTransform.constructRatingQualityAlgorithms(getRatingQualityParams(records)));
+                .mapList(records -> AlgorithmsTransformer.constructRatingQualityAlgorithms(getRatingQualityParams(records)));
     }
 
     private Map<AlgorithmRatingQualityRecord, List<AlgorithmRatingQualityParamRecord>> getRatingQualityParams(List<Record1<String>> ratingQualityIDs) {

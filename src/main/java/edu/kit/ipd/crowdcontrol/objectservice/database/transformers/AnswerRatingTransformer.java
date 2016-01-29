@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by marcel on 26.01.16.
  */
-public class AnswerRatingTransform extends AbstractTransform {
+public class AnswerRatingTransformer extends AbstractTransformer {
 
     /**
      * Convert a record into a protobuf object
@@ -29,7 +29,7 @@ public class AnswerRatingTransform extends AbstractTransform {
                 .setTime(answerRecord.getTimestamp().getNanos())
                 .setWorker(answerRecord.getWorkerId())
                 .addAllRatings(() -> ratings.stream()
-                        .map(AnswerRatingTransform::toRatingProto)
+                        .map(AnswerRatingTransformer::toRatingProto)
                         .iterator()).build();
 
     }

@@ -4,7 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationAnswerOptionRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.CalibrationTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.CalibrationTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
@@ -48,7 +48,7 @@ public class CalibrationOperations extends AbstractOperations {
                             .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(calibrationRecord.getIdCalibration()))
                             .fetch();
 
-                    return CalibrationTransform.toProto(calibrationRecord, answers);
+                    return CalibrationTransformer.toProto(calibrationRecord, answers);
                 });
     }
 
@@ -68,7 +68,7 @@ public class CalibrationOperations extends AbstractOperations {
                             .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(calibrationRecord.getIdCalibration()))
                             .fetch();
 
-                    return CalibrationTransform.toProto(calibrationRecord, answers);
+                    return CalibrationTransformer.toProto(calibrationRecord, answers);
                 });
     }
 
@@ -87,7 +87,7 @@ public class CalibrationOperations extends AbstractOperations {
                 Calibration.QUESTION_FIELD_NUMBER,
                 Calibration.ANSWERS_FIELD_NUMBER);
 
-        CalibrationRecord calibration = CalibrationTransform.mergeRecord(create.newRecord(CALIBRATION), toStore);
+        CalibrationRecord calibration = CalibrationTransformer.mergeRecord(create.newRecord(CALIBRATION), toStore);
         calibration.store();
 
         toStore.getAnswersList().stream()
@@ -99,7 +99,7 @@ public class CalibrationOperations extends AbstractOperations {
                 .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(calibration.getIdCalibration()))
                 .fetch();
 
-        return CalibrationTransform.toProto(calibration, answers);
+        return CalibrationTransformer.toProto(calibration, answers);
     }
 
     /**

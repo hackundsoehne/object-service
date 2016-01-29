@@ -3,7 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Answer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerList;
@@ -59,7 +59,7 @@ public class AnswerRatingResource {
         int experimentId = getParamInt(request, "id");
 
         return answerRatingOperations.getAnswersFrom(experimentId, from, asc, 20)
-                .map(answerRecord -> AnswerRatingTransform.toAnswerProto(answerRecord,
+                .map(answerRecord -> AnswerRatingTransformer.toAnswerProto(answerRecord,
                         answerRatingOperations.getRatings(answerRecord.getIdAnswer())))
                 .constructPaginated(AnswerList.newBuilder(), AnswerList.Builder::addAllItems);
     }
@@ -94,13 +94,13 @@ public class AnswerRatingResource {
             throw new BadRequestException("Quality cannot be set at creation");
 
         AnswerRecord record = answerRatingOperations.insertNewAnswer(
-                AnswerRatingTransform.toAnswerRecord(answer, experimentId)
+                AnswerRatingTransformer.toAnswerRecord(answer, experimentId)
         );
 
         response.status(201);
         response.header("Location","/experiment/"+experimentId+"/answers/"+answer.getId()+"");
 
-        answer = AnswerRatingTransform.toAnswerProto(record, Collections.emptyList());
+        answer = AnswerRatingTransformer.toAnswerProto(record, Collections.emptyList());
 
         EventManager.ANSWER_CREATE.emit(answer);
 
@@ -121,7 +121,7 @@ public class AnswerRatingResource {
         if (experimentId != record.getExperiment())
             throw new IllegalArgumentException("Answer not found for the given experiment");
 
-        return AnswerRatingTransform.toAnswerProto (record,
+        return AnswerRatingTransformer.toAnswerProto (record,
                 answerRatingOperations.getRatings(answerId));
     }
 
@@ -141,12 +141,12 @@ public class AnswerRatingResource {
         }
 
         RatingRecord r = answerRatingOperations.insertNewRating(
-                AnswerRatingTransform.toRatingRecord(rating, answerId, experimentId)
+                AnswerRatingTransformer.toRatingRecord(rating, answerId, experimentId)
         );
 
         response.status(201);
 
-        rating = AnswerRatingTransform.toRatingProto(r);
+        rating = AnswerRatingTransformer.toRatingProto(r);
 
         EventManager.RATINGS_CREATE.emit(rating);
 

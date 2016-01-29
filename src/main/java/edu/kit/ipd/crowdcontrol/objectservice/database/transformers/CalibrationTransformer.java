@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  *
  * @author Niklas Keller
  */
-public class CalibrationTransform extends AbstractTransform {
+public class CalibrationTransformer extends AbstractTransformer {
     /**
      * Converts a calibration record to its protobuf representation.
      *

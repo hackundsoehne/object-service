@@ -8,7 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
  *
  * @author Niklas Keller
  */
-public class WorkerTransform extends AbstractTransform {
+public class WorkerTransformer extends AbstractTransformer {
     /**
      * Converts a worker record to its protobuf representation.
      *

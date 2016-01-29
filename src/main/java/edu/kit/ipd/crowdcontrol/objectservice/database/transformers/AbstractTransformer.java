@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
  * @author LeanderK
  * @version 1.0
  */
-public abstract class AbstractTransform {
+public abstract class AbstractTransformer {
     /**
      * merges the MessageOrBuilder Y with X. Only merges the set fields
      * @param x the x to return

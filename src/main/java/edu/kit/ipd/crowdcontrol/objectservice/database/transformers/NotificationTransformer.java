@@ -8,7 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
  *
  * @author Niklas Keller
  */
-public class NotificationTransform extends AbstractTransform {
+public class NotificationTransformer extends AbstractTransformer {
     /**
      * Converts a notification record to its protobuf representation.
      *

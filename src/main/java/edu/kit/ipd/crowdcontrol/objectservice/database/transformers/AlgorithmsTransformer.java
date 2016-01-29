@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * @author LeanderK
  * @version 1.0
  */
-public class AlgorithmsTransform extends AbstractTransform {
+public class AlgorithmsTransformer extends AbstractTransformer {
 
     /**
      * transforms the records into TaskChoosers

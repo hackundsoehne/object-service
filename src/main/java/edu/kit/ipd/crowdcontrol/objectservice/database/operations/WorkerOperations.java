@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.jooq.AggregateFunction;
 import org.jooq.DSLContext;
@@ -160,7 +160,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Optional<Worker> getWorkerProto(int id) {
         return create.fetchOptional(WORKER, WORKER.ID_WORKER.eq(id))
-                .map(WorkerTransform::toProto);
+                .map(WorkerTransformer::toProto);
     }
 
     /**
@@ -173,7 +173,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Range<Worker, Integer> getWorkersFrom(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, WORKER, cursor, next, limit)
-                .map(WorkerTransform::toProto);
+                .map(WorkerTransformer::toProto);
     }
 
     /**
@@ -187,10 +187,10 @@ public class WorkerOperations extends AbstractOperations {
     public Worker insertWorker(Worker toStore, String identity) {
         assertHasField(toStore, Worker.PLATFORM_FIELD_NUMBER);
 
-        WorkerRecord record = WorkerTransform.mergeRecord(create.newRecord(WORKER), toStore);
+        WorkerRecord record = WorkerTransformer.mergeRecord(create.newRecord(WORKER), toStore);
         record.setIdentification(identity);
         record.store();
 
-        return WorkerTransform.toProto(record);
+        return WorkerTransformer.toProto(record);
     }
 }

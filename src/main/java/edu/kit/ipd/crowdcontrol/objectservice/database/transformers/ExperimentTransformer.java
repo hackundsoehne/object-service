@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * Created by marcel on 26.01.16.
  */
-public class ExperimentTransform extends AbstractTransform {
+public class ExperimentTransformer extends AbstractTransformer {
     /**
      * Convert a experiment record to a proto object with the given additional infos
      * @param record The Database record to use
@@ -70,17 +70,17 @@ public class ExperimentTransform extends AbstractTransform {
                                      AlgorithmRatingQualityRecord ratingQualityRecord,
                                      Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
         List<Constraint> constraints = constraintRecords.stream()
-                .map(TagConstraintTransform::toConstraintsProto)
+                .map(TagConstraintTransformer::toConstraintsProto)
                 .collect(Collectors.toList());
         return builder(toProto(record, state).toBuilder())
-                .set(taskChooserRecord, (builder, x) -> builder.setAlgorithmTaskChooser(AlgorithmsTransform.toTaskChooserProto(x, taskChooserParams)))
-                .set(answerQualityRecord, (builder, x) -> builder.setAlgorithmQualityAnswer(AlgorithmsTransform.toAnswerQualityProto(x, answerQualityParams)))
-                .set(ratingQualityRecord, (builder, x) -> builder.setAlgorithmQualityRating(AlgorithmsTransform.toRatingQualityProto(x, ratingQualityParams)))
+                .set(taskChooserRecord, (builder, x) -> builder.setAlgorithmTaskChooser(AlgorithmsTransformer.toTaskChooserProto(x, taskChooserParams)))
+                .set(answerQualityRecord, (builder, x) -> builder.setAlgorithmQualityAnswer(AlgorithmsTransformer.toAnswerQualityProto(x, answerQualityParams)))
+                .set(ratingQualityRecord, (builder, x) -> builder.setAlgorithmQualityRating(AlgorithmsTransformer.toRatingQualityProto(x, ratingQualityParams)))
                 .getBuilder()
                 .addAllConstraints(constraints)
                 .addAllPopulations(platforms)
-                .addAllTags(tagRecords.stream().map(TagConstraintTransform::toTagProto).collect(Collectors.toList()))
-                .addAllRatingOptions(ratingOptions.stream().map(ExperimentTransform::transform).collect(Collectors.toList()))
+                .addAllTags(tagRecords.stream().map(TagConstraintTransformer::toTagProto).collect(Collectors.toList()))
+                .addAllRatingOptions(ratingOptions.stream().map(ExperimentTransformer::transform).collect(Collectors.toList()))
                 .build();
     }
 

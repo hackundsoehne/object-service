@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Created by marcel on 26.01.16.
  */
-public class TagConstraintTransform extends AbstractTransform {
+public class TagConstraintTransformer extends AbstractTransformer {
 
     /**
      * Converts a record into a proto object

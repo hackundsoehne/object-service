@@ -2,8 +2,8 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransform;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstraintTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstraintTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
@@ -62,7 +62,7 @@ public class ExperimentResource {
         boolean asc = getQueryBool(request, "asc", true);
 
         return experimentOperations.getExperimentsFrom(from, asc, 20)
-                .map(experimentRecord -> ExperimentTransform.toProto(
+                .map(experimentRecord -> ExperimentTransformer.toProto(
                         experimentRecord,
                         experimentOperations.getExperimentState(experimentRecord.getIdExperiment()))
                 )
@@ -105,9 +105,9 @@ public class ExperimentResource {
     public Experiment put(Request request, Response response) {
         Experiment experiment = request.attribute("input");
 
-        ExperimentRecord record = ExperimentTransform.mergeProto(new ExperimentRecord(), experiment);
-        List<TagRecord> tags = TagConstraintTransform.getTags(experiment);
-        List<ConstraintRecord> constraints = TagConstraintTransform.getConstraints(experiment);
+        ExperimentRecord record = ExperimentTransformer.mergeProto(new ExperimentRecord(), experiment);
+        List<TagRecord> tags = TagConstraintTransformer.getTags(experiment);
+        List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment);
 
         int id = experimentOperations.insertNewExperiment(record);
 
@@ -145,7 +145,7 @@ public class ExperimentResource {
         Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams =
                 algorithmsOperations.getRatingQualityParams(experimentRecord.getAlgorithmQualityRating(), experimentRecord.getIdExperiment());
 
-        return ExperimentTransform.toProto(experimentRecord,
+        return ExperimentTransformer.toProto(experimentRecord,
                 state,
                 constraintRecords,
                 platforms,
@@ -254,18 +254,18 @@ public class ExperimentResource {
                 throw new IllegalStateException("When an experiment is running, only the state is allowed to be changed.");
             }
 
-            ExperimentRecord experimentRecord = ExperimentTransform.mergeProto(original, experiment);
+            ExperimentRecord experimentRecord = ExperimentTransformer.mergeProto(original, experiment);
             experimentRecord.setIdExperiment(id);
 
             //update tags if they were updated
-            List<TagRecord> tags = TagConstraintTransform.getTags(experiment);
+            List<TagRecord> tags = TagConstraintTransformer.getTags(experiment);
             if (!tags.isEmpty()) {
                 tagConstraintsOperations.deleteAllTags(id);
                 tags.forEach(tagConstraintsOperations::insertTag);
             }
 
             //update constraints if they were changed
-            List<ConstraintRecord> constraints = TagConstraintTransform.getConstraints(experiment);
+            List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment);
             if (!constraints.isEmpty()) {
                 tagConstraintsOperations.deleteAllConstraint(id);
                 constraints.forEach(tagConstraintsOperations::insertConstraint);
