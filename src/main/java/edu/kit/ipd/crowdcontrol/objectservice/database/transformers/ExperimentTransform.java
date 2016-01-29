@@ -5,12 +5,14 @@ import com.google.gson.reflect.TypeToken;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.tools.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -26,22 +28,24 @@ public class ExperimentTransform extends AbstractTransform {
     public static Experiment toProto(ExperimentRecord record, Experiment.State state) {
         Type type = new TypeToken<Map<String, String>>(){}.getType();
 
-        return Experiment.newBuilder()
-                .setId(record.getIdExperiment())
-                .setDescription(record.getDescription())
-                .setNeededAnswers(record.getNeededAnswers())
-                .setRatingsPerAnswer(record.getRatingsPerAnswer())
-                .setAnswersPerWorker(record.getAnwersPerWorker())
-                .setRatingsPerWorker(record.getRatingsPerWorker())
-                .setAnswerType(AnswerType.valueOf(record.getAnswerType()))
-                .setAlgorithmTaskChooser(AlgorithmOption.newBuilder().setName(record.getAlgorithmTaskChooser()).build())
-                .setAlgorithmQualityAnswer(AlgorithmOption.newBuilder().setName(record.getAlgorithmQualityAnswer()).build())
-                .setAlgorithmQualityRating(AlgorithmOption.newBuilder().setName(record.getAlgorithmQualityRating()).build())
-                .setPaymentBase(record.getBasePayment())
-                .setPaymentAnswer(record.getBonusAnswer())
-                .setPaymentRating(record.getBonusRating())
-                .setState(state)
-                .putAllPlaceholders(new Gson().fromJson(record.getTemplateData(), type))
+        Function<String, AlgorithmOption> algo = name -> AlgorithmOption.newBuilder().setName(name).build();
+
+        return builder(Experiment.newBuilder())
+                .set(record.getIdExperiment(), Experiment.Builder::setId)
+                .set(record.getDescription(), Experiment.Builder::setDescription)
+                .set(record.getNeededAnswers(), Experiment.Builder::setNeededAnswers)
+                .set(record.getAnwersPerWorker(), Experiment.Builder::setAnswersPerWorker)
+                .set(record.getRatingsPerWorker(), Experiment.Builder::setRatingsPerWorker)
+                .set(record.getAnswerType(), (builder, x) -> builder.setAnswerType(AnswerType.valueOf(x)))
+                .set(record.getAlgorithmTaskChooser(), (builder, x) -> builder.setAlgorithmTaskChooser(algo.apply(x)))
+                .set(record.getAlgorithmQualityAnswer(), (builder, x) -> builder.setAlgorithmQualityAnswer(algo.apply(x)))
+                .set(record.getAlgorithmQualityRating(), (builder, x) -> builder.setAlgorithmQualityRating(algo.apply(x)))
+                .set(record.getBasePayment(), Experiment.Builder::setPaymentBase)
+                .set(record.getBonusAnswer(), Experiment.Builder::setPaymentAnswer)
+                .set(record.getBonusRating(), Experiment.Builder::setPaymentRating)
+                .set(state, Experiment.Builder::setState)
+                .set(record.getTemplateData(), ((builder, s) -> builder.putAllPlaceholders(new Gson().fromJson(s, type))))
+                .getBuilder()
                 .build();
     }
 
@@ -64,39 +68,17 @@ public class ExperimentTransform extends AbstractTransform {
                                      Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams,
                                      AlgorithmRatingQualityRecord ratingQualityRecord,
                                      Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
+        List<Constraint> constraints = constraintRecords.stream()
+                .map(TagConstraintTransform::toConstraintsProto)
+                .collect(Collectors.toList());
         return toProto(record, state).toBuilder()
                 .setAlgorithmTaskChooser(AlgorithmsTransform.toTaskChooserProto(taskChooserRecord, taskChooserParams))
                 .setAlgorithmQualityAnswer(AlgorithmsTransform.toAnswerQualityProto(answerQualityRecord, answerQualityParams))
                 .setAlgorithmQualityRating(AlgorithmsTransform.toRatingQualityProto(ratingQualityRecord, ratingQualityParams))
-                .addAllConstraints(constraintRecords.stream().map(TagConstraintTransform::toConstraintsProto).collect(Collectors.toList()))
+                .addAllConstraints(constraints)
                 .addAllPopulations(platforms)
                 .addAllTags(tagRecords.stream().map(TagConstraintTransform::toTagProto).collect(Collectors.toList()))
                 .build();
-    }
-
-    /**
-     * Creates a new record  from the data of a experiment
-     * @param experiment the protobuf to generate the record from
-     * @return a record
-     */
-    public static ExperimentRecord toRecord(Experiment experiment) {
-        return new ExperimentRecord(experiment.getId(),
-                experiment.getTitle(),
-                experiment.getDescription(),
-                experiment.getNeededAnswers(),
-                experiment.getRatingsPerAnswer(),
-                experiment.getAnswersPerWorker(),
-                experiment.getRatingsPerWorker(),
-                transform(experiment.getAnswerType()),
-                experiment.getAlgorithmTaskChooser().getName(),
-                experiment.getAlgorithmQualityAnswer().getName(),
-                experiment.getAlgorithmQualityRating().getName(),
-                experiment.getPaymentBase(),
-                experiment.getPaymentAnswer(),
-                experiment.getPaymentRating(),
-                (new JSONObject(experiment.getPlaceholders())).toString(),
-                experiment.getTemplateId(),
-                experiment.getWorkerQualityThreshold());
     }
 
     private static String transform(AnswerType answerType) {

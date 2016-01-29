@@ -8,13 +8,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstrain
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Answer;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
@@ -109,7 +104,7 @@ public class ExperimentResource {
     public Experiment put(Request request, Response response) {
         Experiment experiment = request.attribute("input");
 
-        ExperimentRecord record = ExperimentTransform.toRecord(experiment);
+        ExperimentRecord record = ExperimentTransform.mergeProto(new ExperimentRecord(), experiment);
         List<TagRecord> tags = TagConstraintTransform.getTags(experiment);
         List<ConstraintRecord> constraints = TagConstraintTransform.getConstraints(experiment);
 

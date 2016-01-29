@@ -1,9 +1,11 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.MessageOrBuilder;
 
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 /**
  * Contains various helper-methods to deal with the transformations
@@ -26,5 +28,28 @@ public abstract class AbstractTransform {
                 .map(Descriptors.FieldDescriptor::getNumber)
                 .forEach(number -> combine.accept(number, x));
         return x;
+    }
+
+    protected static <X extends GeneratedMessage.Builder<X>> BuilderHelper<X> builder(X x) {
+        return new BuilderHelper<>(x);
+    }
+
+    protected static class BuilderHelper <B extends GeneratedMessage.Builder<B>> {
+        private B b;
+
+        public BuilderHelper(B b) {
+            this.b = b;
+        }
+
+        public <X> BuilderHelper<B> set(X x, BiFunction<B, X, B> merge) {
+            if (x != null) {
+                b = merge.apply(b, x);
+            }
+            return this;
+        }
+
+        public B getBuilder() {
+            return b;
+        }
     }
 }
