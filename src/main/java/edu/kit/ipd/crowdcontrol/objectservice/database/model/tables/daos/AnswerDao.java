@@ -30,28 +30,28 @@ public class AnswerDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.ob
 	 */
 	@Override
 	protected java.lang.Integer getId(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer object) {
-		return object.getIdanswer();
+		return object.getIdAnswer();
 	}
 
 	/**
-	 * Fetch records that have <code>idAnswer IN (values)</code>
+	 * Fetch records that have <code>id_answer IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer> fetchByIdanswer(java.lang.Integer... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.IDANSWER, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer> fetchByIdAnswer(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.ID_ANSWER, values);
 	}
 
 	/**
-	 * Fetch a unique record that has <code>idAnswer = value</code>
+	 * Fetch a unique record that has <code>id_answer = value</code>
 	 */
-	public edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer fetchOneByIdanswer(java.lang.Integer value) {
-		return fetchOne(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.IDANSWER, value);
+	public edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer fetchOneByIdAnswer(java.lang.Integer value) {
+		return fetchOne(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.ID_ANSWER, value);
 	}
 
 	/**
-	 * Fetch records that have <code>task IN (values)</code>
+	 * Fetch records that have <code>experiment IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer> fetchByTask(java.lang.Integer... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.TASK, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer> fetchByExperiment(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.EXPERIMENT, values);
 	}
 
 	/**
@@ -80,5 +80,12 @@ public class AnswerDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.ob
 	 */
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer> fetchByQuality(java.lang.Integer... values) {
 		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.QUALITY, values);
+	}
+
+	/**
+	 * Fetch records that have <code>quality_assured IN (values)</code>
+	 */
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Answer> fetchByQualityAssured(java.lang.Boolean... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER.QUALITY_ASSURED, values);
 	}
 }

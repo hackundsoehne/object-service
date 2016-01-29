@@ -1,88 +1,100 @@
 package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
-import java.io.UnsupportedEncodingException;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
-import java.util.LinkedList;
-
-import javax.mail.Authenticator;
-import javax.mail.NoSuchProviderException;
-import javax.mail.MessagingException;
-import javax.mail.Store;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.mail.Folder;
-import javax.mail.Session;
-import javax.mail.Message;
-import javax.mail.Transport;
+import javax.mail.search.FlagTerm;
+import javax.mail.search.SubjectTerm;
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 
 /**
  * A Mailhandler, that can send and fetch mails to another mail address/from a mailbox
+ * @author Felix Rittler
+ * @author Niklas Keller
  */
 public class MailHandler implements MailFetcher, MailSender {
 
-
-    private Properties props;
-    private Authenticator auth;
     private Session session;
     private String sender;
-    Store store;
-    Folder emailfolder;
-
-
-    public MailHandler(Properties props, Authenticator auth) throws IllegalPropertiesException, MessagingException {
-        sender = props.getProperty("sender");
-        props.remove("sender");
-        this.auth = auth;
-        this.props = props;
-        session = Session.getInstance(props, auth);
-        try {
-            store = session.getStore("imap");
-        } catch (NoSuchProviderException e) {
-            throw new IllegalPropertiesException();
-        }
-        store.connect();
-        emailfolder = store.getFolder("INBOX");
-        emailfolder.open(Folder.READ_ONLY);
-    }
+    private Store store;
 
     /**
-     * Fetches Mails, that are younger than a certain amount of days.
      *
-     * @param ageOfOldestMail The maximal age of a mail, that gets fetched in days
-     * @return Returns a list of fetched mails
+     * A Mailhandler object to send and fetch emails.
+     * @param props properties, that describe the connection to the mailserver
+     * @param auth an authenticator authenticating the user to connect to the account
+     * @throws AuthenticationFailedException  Throws this exception, if there is a problem with the authentication
+     * @throws MessagingException For other problems e.g. with properties object: unvalid domains, ports not valid etc.
      */
+    public MailHandler(Properties props, Authenticator auth) throws MessagingException {
+        sender = props.getProperty("sender");
+        props.remove("sender");
+        session = Session.getInstance(props, auth);
+        store = session.getStore();
+    }
+
     @Override
-    public Message[] fetchNewSince(int ageOfOldestMail) throws UndefinedForPurposeException, MessagingException {
-        Message[] messages = emailfolder.getMessages();
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, ageOfOldestMail * -1);
-        Date dateOfOldestMail = cal.getTime();
-        LinkedList<Message> mails = new LinkedList<Message>();
-        System.out.print(messages.length);
-        for (int i = 0; i < messages.length /*&& messages[i].getReceivedDate().before(dateOfOldestMail)*/; i++) {
-            mails.add(messages[i]);
-        }
+    public Message[] fetchUnseen(String name) throws MessagingException {
+        connectToStore();
+
+        Folder folder = store.getFolder(name);
+        folder.open(Folder.READ_ONLY);
+
+        Flags seen = new Flags(Flags.Flag.SEEN);
+        FlagTerm unseenFlagTerm = new FlagTerm(seen, false);
+        Message[] messages = folder.search(unseenFlagTerm);
+
         return messages;
     }
 
-    /**
-     * Sends mails to another mail address.
-     *
-     * @param recipientMail The mail address, the mail gets sent
-     * @param subject       The subject of the mail
-     * @param message       The content of the mail
-     */
     @Override
-    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException, UndefinedForPurposeException {
+    public Message[] fetchFolder(String name) throws MessagingException{
+        connectToStore();
+
+        Folder folder = store.getFolder(name);
+        folder.open(Folder.READ_ONLY);
+        Message[] messages = folder.getMessages();
+        return messages;
+    }
+
+    @Override
+    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException {
+        connectToStore();
+
         Message msg = new MimeMessage(session);
         msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientMail, recipientMail));
         msg.setFrom(new InternetAddress(sender, sender));
         msg.setSubject(subject);
         msg.setText(message);
         msg.saveChanges();
+
         Transport.send(msg);
+    }
+
+    /**
+     * Deletes all mails in a certain folder with a certain subject.
+     * @param subject the subject of the mails
+     * @param name the name of the folder
+     * @throws MessagingException
+     */
+    protected void deleteMails(String subject, String name) throws MessagingException{
+        connectToStore();
+
+        Folder folder = store.getFolder(name);
+        folder.open(Folder.READ_WRITE);
+        SubjectTerm subjectterm = new SubjectTerm(subject);
+
+        Message[] messages = folder.search(subjectterm);
+        for (Message msg : messages) {
+            msg.setFlag(Flags.Flag.DELETED, true);
+        }
+        folder.close(true);
+    }
+
+    private void connectToStore() throws MessagingException {
+        if (!store.isConnected()) {
+            store.connect();
+        }
     }
 }

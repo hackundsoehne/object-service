@@ -23,41 +23,50 @@ public interface PopulationOrBuilder extends
       getNameBytes();
 
   /**
-   * <code>optional string platform = 3;</code>
+   * <code>optional string question = 3;</code>
    */
-  java.lang.String getPlatform();
+  java.lang.String getQuestion();
   /**
-   * <code>optional string platform = 3;</code>
+   * <code>optional string question = 3;</code>
    */
   com.google.protobuf.ByteString
-      getPlatformBytes();
+      getQuestionBytes();
 
   /**
-   * <code>optional int32 minimum_rating = 4;</code>
+   * <code>repeated string answers = 4;</code>
    */
-  int getMinimumRating();
+  com.google.protobuf.ProtocolStringList
+      getAnswersList();
+  /**
+   * <code>repeated string answers = 4;</code>
+   */
+  int getAnswersCount();
+  /**
+   * <code>repeated string answers = 4;</code>
+   */
+  java.lang.String getAnswers(int index);
+  /**
+   * <code>repeated string answers = 4;</code>
+   */
+  com.google.protobuf.ByteString
+      getAnswersBytes(int index);
 
   /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+   * <code>repeated string accepted_answers = 5;</code>
    */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration> 
-      getCalibrationsList();
+  com.google.protobuf.ProtocolStringList
+      getAcceptedAnswersList();
   /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+   * <code>repeated string accepted_answers = 5;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration getCalibrations(int index);
+  int getAcceptedAnswersCount();
   /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+   * <code>repeated string accepted_answers = 5;</code>
    */
-  int getCalibrationsCount();
+  java.lang.String getAcceptedAnswers(int index);
   /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
+   * <code>repeated string accepted_answers = 5;</code>
    */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder> 
-      getCalibrationsOrBuilderList();
-  /**
-   * <code>repeated .crowdcontrol.Calibration calibrations = 5;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder getCalibrationsOrBuilder(
-      int index);
+  com.google.protobuf.ByteString
+      getAcceptedAnswersBytes(int index);
 }

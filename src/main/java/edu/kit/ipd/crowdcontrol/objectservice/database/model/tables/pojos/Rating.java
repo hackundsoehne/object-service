@@ -11,50 +11,53 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Rating implements java.io.Serializable {
 
-	private static final long serialVersionUID = 3312551;
+	private static final long serialVersionUID = -1097801915;
 
-	private java.lang.Integer  idrating;
-	private java.lang.Integer  task;
+	private java.lang.Integer  idRating;
+	private java.lang.Integer  experiment;
 	private java.lang.Integer  answerR;
 	private java.sql.Timestamp timestamp;
 	private java.lang.Integer  rating;
+	private java.lang.String   feedback;
 	private java.lang.Integer  workerId;
 	private java.lang.Integer  quality;
 
 	public Rating() {}
 
 	public Rating(
-		java.lang.Integer  idrating,
-		java.lang.Integer  task,
+		java.lang.Integer  idRating,
+		java.lang.Integer  experiment,
 		java.lang.Integer  answerR,
 		java.sql.Timestamp timestamp,
 		java.lang.Integer  rating,
+		java.lang.String   feedback,
 		java.lang.Integer  workerId,
 		java.lang.Integer  quality
 	) {
-		this.idrating = idrating;
-		this.task = task;
+		this.idRating = idRating;
+		this.experiment = experiment;
 		this.answerR = answerR;
 		this.timestamp = timestamp;
 		this.rating = rating;
+		this.feedback = feedback;
 		this.workerId = workerId;
 		this.quality = quality;
 	}
 
-	public java.lang.Integer getIdrating() {
-		return this.idrating;
+	public java.lang.Integer getIdRating() {
+		return this.idRating;
 	}
 
-	public void setIdrating(java.lang.Integer idrating) {
-		this.idrating = idrating;
+	public void setIdRating(java.lang.Integer idRating) {
+		this.idRating = idRating;
 	}
 
-	public java.lang.Integer getTask() {
-		return this.task;
+	public java.lang.Integer getExperiment() {
+		return this.experiment;
 	}
 
-	public void setTask(java.lang.Integer task) {
-		this.task = task;
+	public void setExperiment(java.lang.Integer experiment) {
+		this.experiment = experiment;
 	}
 
 	public java.lang.Integer getAnswerR() {
@@ -79,6 +82,14 @@ public class Rating implements java.io.Serializable {
 
 	public void setRating(java.lang.Integer rating) {
 		this.rating = rating;
+	}
+
+	public java.lang.String getFeedback() {
+		return this.feedback;
+	}
+
+	public void setFeedback(java.lang.String feedback) {
+		this.feedback = feedback;
 	}
 
 	public java.lang.Integer getWorkerId() {

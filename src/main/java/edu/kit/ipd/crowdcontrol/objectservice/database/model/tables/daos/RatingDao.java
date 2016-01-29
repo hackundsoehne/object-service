@@ -30,28 +30,28 @@ public class RatingDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.ob
 	 */
 	@Override
 	protected java.lang.Integer getId(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating object) {
-		return object.getIdrating();
+		return object.getIdRating();
 	}
 
 	/**
-	 * Fetch records that have <code>idRating IN (values)</code>
+	 * Fetch records that have <code>id_rating IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByIdrating(java.lang.Integer... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.IDRATING, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByIdRating(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.ID_RATING, values);
 	}
 
 	/**
-	 * Fetch a unique record that has <code>idRating = value</code>
+	 * Fetch a unique record that has <code>id_rating = value</code>
 	 */
-	public edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating fetchOneByIdrating(java.lang.Integer value) {
-		return fetchOne(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.IDRATING, value);
+	public edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating fetchOneByIdRating(java.lang.Integer value) {
+		return fetchOne(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.ID_RATING, value);
 	}
 
 	/**
-	 * Fetch records that have <code>task IN (values)</code>
+	 * Fetch records that have <code>experiment IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByTask(java.lang.Integer... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.TASK, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByExperiment(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.EXPERIMENT, values);
 	}
 
 	/**
@@ -73,6 +73,13 @@ public class RatingDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.ob
 	 */
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByRating(java.lang.Integer... values) {
 		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.RATING_, values);
+	}
+
+	/**
+	 * Fetch records that have <code>feedback IN (values)</code>
+	 */
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByFeedback(java.lang.String... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.FEEDBACK, values);
 	}
 
 	/**

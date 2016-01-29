@@ -1,6 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperation;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -14,10 +14,10 @@ import java.time.Instant;
 public class DBEmailNotificationPolicy extends NotificationPolicy<Result<Record>> {
     private MailSender mailSender;
     private String receiver;
-    private NotificationOperation operation;
+    private NotificationOperations operation;
 
 
-    public DBEmailNotificationPolicy(MailSender mailSender, String receiver, NotificationOperation operation) {
+    public DBEmailNotificationPolicy(MailSender mailSender, String receiver, NotificationOperations operation) {
         this.mailSender = mailSender;
         this.receiver = receiver;
         this.operation = operation;

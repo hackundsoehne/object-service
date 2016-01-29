@@ -14,9 +14,54 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model;
 public class Tables {
 
 	/**
+	 * The table crowdcontrol.Algorithm_Answer_Quality
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmAnswerQuality ALGORITHM_ANSWER_QUALITY = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmAnswerQuality.ALGORITHM_ANSWER_QUALITY;
+
+	/**
+	 * The table crowdcontrol.Algorithm_Answer_Quality_Param
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmAnswerQualityParam ALGORITHM_ANSWER_QUALITY_PARAM = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmAnswerQualityParam.ALGORITHM_ANSWER_QUALITY_PARAM;
+
+	/**
+	 * The table crowdcontrol.Algorithm_Rating_Quality
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmRatingQuality ALGORITHM_RATING_QUALITY = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmRatingQuality.ALGORITHM_RATING_QUALITY;
+
+	/**
+	 * The table crowdcontrol.Algorithm_Rating_Quality_Param
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmRatingQualityParam ALGORITHM_RATING_QUALITY_PARAM = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmRatingQualityParam.ALGORITHM_RATING_QUALITY_PARAM;
+
+	/**
+	 * The table crowdcontrol.Algorithm_Task_Chooser
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmTaskChooser ALGORITHM_TASK_CHOOSER = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmTaskChooser.ALGORITHM_TASK_CHOOSER;
+
+	/**
+	 * The table crowdcontrol.Algorithm_Task_Chooser_Param
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmTaskChooserParam ALGORITHM_TASK_CHOOSER_PARAM = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.AlgorithmTaskChooserParam.ALGORITHM_TASK_CHOOSER_PARAM;
+
+	/**
 	 * The table crowdcontrol.Answer
 	 */
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer ANSWER = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer.ANSWER;
+
+	/**
+	 * The table crowdcontrol.Chosen_Answer_Quality_Param
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ChosenAnswerQualityParam CHOSEN_ANSWER_QUALITY_PARAM = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ChosenAnswerQualityParam.CHOSEN_ANSWER_QUALITY_PARAM;
+
+	/**
+	 * The table crowdcontrol.Chosen_Rating_Quality_Param
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ChosenRatingQualityParam CHOSEN_RATING_QUALITY_PARAM = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ChosenRatingQualityParam.CHOSEN_RATING_QUALITY_PARAM;
+
+	/**
+	 * The table crowdcontrol.Chosen_Task_Chooser_Param
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ChosenTaskChooserParam CHOSEN_TASK_CHOOSER_PARAM = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ChosenTaskChooserParam.CHOSEN_TASK_CHOOSER_PARAM;
 
 	/**
 	 * The table crowdcontrol.Constraint
@@ -34,19 +79,14 @@ public class Tables {
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experimentspopulation EXPERIMENTSPOPULATION = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experimentspopulation.EXPERIMENTSPOPULATION;
 
 	/**
-	 * The table crowdcontrol.GiftCode
+	 * The table crowdcontrol.Gift_Code
 	 */
-	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Giftcode GIFTCODE = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Giftcode.GIFTCODE;
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.GiftCode GIFT_CODE = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.GiftCode.GIFT_CODE;
 
 	/**
 	 * The table crowdcontrol.Notification
 	 */
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Notification NOTIFICATION = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Notification.NOTIFICATION;
-
-	/**
-	 * The table crowdcontrol.Payment
-	 */
-	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Payment PAYMENT = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Payment.PAYMENT;
 
 	/**
 	 * The table crowdcontrol.Platform
@@ -59,19 +99,29 @@ public class Tables {
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Population POPULATION = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Population.POPULATION;
 
 	/**
-	 * The table crowdcontrol.PopulationAnswerOption
+	 * The table crowdcontrol.Population_answer_option
 	 */
-	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Populationansweroption POPULATIONANSWEROPTION = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Populationansweroption.POPULATIONANSWEROPTION;
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.PopulationAnswerOption POPULATION_ANSWER_OPTION = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.PopulationAnswerOption.POPULATION_ANSWER_OPTION;
 
 	/**
-	 * The table crowdcontrol.PopulationResult
+	 * The table crowdcontrol.Population_Result
 	 */
-	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Populationresult POPULATIONRESULT = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Populationresult.POPULATIONRESULT;
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.PopulationResult POPULATION_RESULT = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.PopulationResult.POPULATION_RESULT;
 
 	/**
 	 * The table crowdcontrol.Rating
 	 */
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating RATING = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING;
+
+	/**
+	 * The table crowdcontrol.Rating_Option_Experiment
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingOptionExperiment RATING_OPTION_EXPERIMENT = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingOptionExperiment.RATING_OPTION_EXPERIMENT;
+
+	/**
+	 * The table crowdcontrol.Rating_Option_Template
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingOptionTemplate RATING_OPTION_TEMPLATE = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingOptionTemplate.RATING_OPTION_TEMPLATE;
 
 	/**
 	 * The table crowdcontrol.Tag
@@ -92,4 +142,9 @@ public class Tables {
 	 * The table crowdcontrol.Worker
 	 */
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Worker WORKER = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Worker.WORKER;
+
+	/**
+	 * The table crowdcontrol.Worker_Balance
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.WorkerBalance WORKER_BALANCE = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.WorkerBalance.WORKER_BALANCE;
 }

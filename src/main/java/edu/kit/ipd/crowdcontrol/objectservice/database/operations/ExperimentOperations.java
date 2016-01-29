@@ -12,8 +12,8 @@ import java.util.Optional;
  * @author LeanderK
  * @version 1.0
  */
-public class ExperimentOperations extends AbstractOperation {
-    protected ExperimentOperations(DSLContext create) {
+public class ExperimentOperations extends AbstractOperations {
+    public ExperimentOperations(DSLContext create) {
         super(create);
     }
 
@@ -34,7 +34,7 @@ public class ExperimentOperations extends AbstractOperation {
      */
     public Optional<ExperimentRecord> getExperiment(int id) {
         return create.selectFrom(Tables.EXPERIMENT)
-                .where(Tables.EXPERIMENT.IDEXPERIMENT.eq(id))
+                .where(Tables.EXPERIMENT.ID_EXPERIMENT.eq(id))
                 .fetchOptional();
     }
 
@@ -44,7 +44,7 @@ public class ExperimentOperations extends AbstractOperation {
      * @return true if successful, false if not
      */
     public boolean updateExperiment(ExperimentRecord experimentRecord) {
-        return doIfNotRunning(experimentRecord.getIdexperiment(), trans ->
+        return doIfNotRunning(experimentRecord.getIdExperiment(), trans ->
                 DSL.using(trans).executeUpdate(experimentRecord) == 1);
     }
 
@@ -58,7 +58,7 @@ public class ExperimentOperations extends AbstractOperation {
         return doIfNotRunning(id, trans -> {
             int deleted = DSL.using(trans)
                     .deleteFrom(Tables.EXPERIMENT)
-                    .where(Tables.EXPERIMENT.IDEXPERIMENT.eq(id))
+                    .where(Tables.EXPERIMENT.ID_EXPERIMENT.eq(id))
                     .execute();
             return deleted == 1;
         });

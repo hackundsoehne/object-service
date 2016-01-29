@@ -1,0 +1,82 @@
+package edu.kit.ipd.crowdcontrol.objectservice.rest;
+
+import com.google.protobuf.Message;
+
+/**
+ * Represents a page containing the items and whether there's a next / previous page.
+ *
+ * @param <X>
+ *         Type of the cursor.
+ *
+ * @author Niklas Keller
+ */
+public class Paginated<X> {
+    private final Message message;
+    private final boolean hasPrevious;
+    private final boolean hasNext;
+    private final X left;
+    private final X right;
+
+    /**
+     * @param message
+     *         Paginated message.
+     * @param left
+     *         Key of the most left element inside the page.
+     * @param right
+     *         Key of the most right element inside the page.
+     * @param hasPrevious
+     *         Whether there's a previous page.
+     * @param hasNext
+     *         Whether there's a next page.
+     */
+    public Paginated(Message message, X left, X right, boolean hasPrevious, boolean hasNext) {
+        this.message = message;
+        this.left = left;
+        this.right = right;
+        this.hasPrevious = hasPrevious;
+        this.hasNext = hasNext;
+    }
+
+    /**
+     * @return Paginated message.
+     */
+    public Message getMessage() {
+        return message;
+    }
+
+    /**
+     * Key of the most left data element inside the page.
+     *
+     * @return Key, or empty if the list is empty.
+     */
+    public X getLeft() {
+        return left;
+    }
+
+    /**
+     * Key of the most right data element inside the page.
+     *
+     * @return Key, or empty if the list is empty.
+     */
+    public X getRight() {
+        return right;
+    }
+
+    /**
+     * Whether there's a previous page.
+     *
+     * @return {@code true}, if there's a previous page.
+     */
+    public boolean hasPrevious() {
+        return hasPrevious;
+    }
+
+    /**
+     * Whether there's a next page.
+     *
+     * @return {@code true}, if there's a next page.
+     */
+    public boolean hasNext() {
+        return hasNext;
+    }
+}

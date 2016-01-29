@@ -22,13 +22,11 @@ public final class PopulationOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020population.proto\022\014crowdcontrol\032\021calibr" +
-      "ation.proto\"\201\001\n\nPopulation\022\n\n\002id\030\001 \001(\005\022\014" +
-      "\n\004name\030\002 \001(\t\022\020\n\010platform\030\003 \001(\t\022\026\n\016minimu" +
-      "m_rating\030\004 \001(\005\022/\n\014calibrations\030\005 \003(\0132\031.c" +
-      "rowdcontrol.CalibrationB0\n,edu.kit.ipd.c" +
-      "rowdcontrol.objectservice.protoP\001b\006proto" +
-      "3"
+      "\n\020population.proto\022\014crowdcontrol\"c\n\nPopu" +
+      "lation\022\n\n\002id\030\001 \001(\005\022\014\n\004name\030\002 \001(\t\022\020\n\010ques" +
+      "tion\030\003 \001(\t\022\017\n\007answers\030\004 \003(\t\022\030\n\020accepted_" +
+      "answers\030\005 \003(\tB0\n,edu.kit.ipd.crowdcontro" +
+      "l.objectservice.protoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -41,15 +39,13 @@ public final class PopulationOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOuterClass.getDescriptor(),
         }, assigner);
     internal_static_crowdcontrol_Population_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_crowdcontrol_Population_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_crowdcontrol_Population_descriptor,
-        new java.lang.String[] { "Id", "Name", "Platform", "MinimumRating", "Calibrations", });
-    edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOuterClass.getDescriptor();
+        new java.lang.String[] { "Id", "Name", "Question", "Answers", "AcceptedAnswers", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

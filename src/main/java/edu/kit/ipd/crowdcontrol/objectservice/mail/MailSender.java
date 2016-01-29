@@ -6,7 +6,11 @@ import java.io.UnsupportedEncodingException;
 /**
  * Describes an interface to send mails from certain mail address to a mail address.
  *
+<<<<<<< HEAD
  * @author felix
+=======
+ * @author Felix Rittler
+>>>>>>> origin/master
  */
 
 public interface MailSender {
@@ -14,9 +18,9 @@ public interface MailSender {
     /**
      * Sends mails to another mail address.
      *
-     * @param recipientMail The mail address, the mail gets sent
-     * @param subject       The subject of the mail
-     * @param message       The content of the mail
+     * @param recipientMail the mail address, the mail gets sent
+     * @param subject       the subject of the mail
+     * @param message       the content of the mail
      */
-    void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException, UndefinedForPurposeException;
+    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException;
 }

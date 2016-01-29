@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Answer extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord> {
 
-	private static final long serialVersionUID = 982304545;
+	private static final long serialVersionUID = 484144829;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Answer</code>
@@ -27,14 +27,14 @@ public class Answer extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.obj
 	}
 
 	/**
-	 * The column <code>crowdcontrol.Answer.idAnswer</code>.
+	 * The column <code>crowdcontrol.Answer.id_answer</code>.
 	 */
-	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, java.lang.Integer> IDANSWER = createField("idAnswer", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, java.lang.Integer> ID_ANSWER = createField("id_answer", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>crowdcontrol.Answer.task</code>.
+	 * The column <code>crowdcontrol.Answer.experiment</code>.
 	 */
-	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, java.lang.Integer> TASK = createField("task", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, java.lang.Integer> EXPERIMENT = createField("experiment", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>crowdcontrol.Answer.answer</code>.
@@ -55,6 +55,11 @@ public class Answer extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.obj
 	 * The column <code>crowdcontrol.Answer.quality</code>.
 	 */
 	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, java.lang.Integer> QUALITY = createField("quality", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>crowdcontrol.Answer.quality_assured</code>.
+	 */
+	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, java.lang.Boolean> QUALITY_ASSURED = createField("quality_assured", org.jooq.impl.SQLDataType.BIT, this, "");
 
 	/**
 	 * Create a <code>crowdcontrol.Answer</code> table reference
@@ -82,6 +87,14 @@ public class Answer extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.obj
 	 * {@inheritDoc}
 	 */
 	@Override
+	public org.jooq.Identity<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, java.lang.Integer> getIdentity() {
+		return edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDENTITY_ANSWER;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public org.jooq.UniqueKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord> getPrimaryKey() {
 		return edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.KEY_ANSWER_PRIMARY;
 	}
@@ -99,7 +112,7 @@ public class Answer extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.obj
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, ?>>asList(edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDHITANSWERS, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.WORKERANSWERED);
+		return java.util.Arrays.<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord, ?>>asList(edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDEXPERIMENTANSWERS, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.WORKERANSWERED);
 	}
 
 	/**
