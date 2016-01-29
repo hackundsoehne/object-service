@@ -54,23 +54,7 @@ public class MoneyTransferManager {
      * Pays all workers depending on their logged money transfers.
      */
     public void payOff() {
-        //Fetch new GiftCodes
-        Message[] messages = new Message[0];
-        try {
-            messages = mailHandler.fetchUnseen("inbox");
-        } catch (MessagingException e){
-            e.printStackTrace();
-        }
-        for (int i = 0; i < messages.length; i++) {
-            try {
-                GiftCodeRecord rec = MailParser.parseAmazonGiftCode(messages[i]);
-                workerBalanceOperations.addGiftCode(rec.getCode(), rec.getAmount());
-            } catch (MessagingException | IOException e) {
-                e.printStackTrace();
-            } catch (AmazonMailFormatChangedException e) {
-                //TODO : Notification + mark Mails as unseen
-            }
-        }
+        fetchNewGiftCodes();
         //Choose giftcodes and pay workers
         Result<WorkerRecord> workers = workerOperations.getWorkerWithCreditBalanceGreaterOrEqual(payOffThreshold);
         Iterator<WorkerRecord> workerIt = workers.iterator();
@@ -90,8 +74,32 @@ public class MoneyTransferManager {
         sendNotification();
     }
 
+    private void fetchNewGiftCodes() {
+        Message[] messages = new Message[0];
+        try {
+            messages = mailHandler.fetchUnseen("inbox");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        for (Message message : messages) {
+            try {
+                GiftCodeRecord rec = MailParser.parseAmazonGiftCode(message);
+                workerBalanceOperations.addGiftCode(rec.getCode(), rec.getAmount());
+            } catch (MessagingException | IOException e) {
+                e.printStackTrace();
+            } catch (AmazonMailFormatChangedException e) {
+                try {
+                    mailHandler.markAsUnseen(message);
+                } catch (MessagingException f) {
+                    f.printStackTrace();
+                }
+                notificationTextHTML = notificationTextHTML + "It seems, that amazon changed the format of the giftcode E-Mails. You need to adjust the parser to import giftcodes in future.";
+            }
+        }
+    }
+
     private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
-        List<GiftCodeRecord> payedCodes = new LinkedList<GiftCodeRecord>();
+        List<GiftCodeRecord> payedCodes = new LinkedList<>();
         int creditBalance = workerBalanceOperations.getBalance(worker.getIdWorker());
         Iterator<GiftCodeRecord> giftCodesIt = giftCodes.iterator();
         while (giftCodesIt.hasNext()) {

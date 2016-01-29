@@ -1,14 +1,17 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import org.jooq.Result;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.stubbing.Answer;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,17 +39,22 @@ public class MoneyTransferManagerTest {
 
     @Test
     public void testPayOff1Worker() throws Exception {
-        WorkerRecord worker0 = new WorkerRecord();
-        WorkerRecord worker1 = new WorkerRecord();
+        WorkerRecord worker0 = mock(WorkerRecord.class);
+        WorkerRecord worker1 = mock(WorkerRecord.class);
 
-        worker0.setEmail("pseipd@gmail.com");
-        worker1.setEmail("pseipd@gmail.com");
+        doReturn("pseipd@gmail.com").when(worker0).getEmail();
+        doReturn("pseipd@gmail.com").when(worker1).getEmail();
 
-        payops.addCredit(worker0.getIdWorker(),30, 0);
-        payops.addCredit(worker1.getIdWorker(), 30, 0);
+        doReturn(0).when(worker0).getIdWorker();
+        doReturn(1).when(worker1).getIdWorker();
 
+        doReturn(30).when(payops).getBalance(anyInt());
 
-        List<WorkerRecord> workerList = new LinkedList<>();
+        Result<WorkerRecord> workerList = mock(Result.class);
+        Iterator<WorkerRecord> it = mock(Iterator.class);
+        when(it.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
+        when(it.next()).thenReturn(worker0).thenReturn(worker1);
+        when(workerList.iterator()).thenReturn(it);
 
         workerList.add(worker0);
         workerList.add(worker1);
@@ -85,7 +93,6 @@ public class MoneyTransferManagerTest {
             codeList.remove(code0);
             return null;
         };
-        WorkerRecord red = new WorkerRecord();
 
         doAnswer(answer0).when(payops).addDebit(any(), any(), any(), code0.getIdGiftCode());
         doAnswer(answer1).when(payops).addDebit(any(), any(), any(), code1.getIdGiftCode());
