@@ -211,4 +211,28 @@ public interface ExperimentOrBuilder extends
    * <code>optional int32 template_id = 21;</code>
    */
   int getTemplateId();
+
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption> 
+      getRatingOptionsList();
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption getRatingOptions(int index);
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  int getRatingOptionsCount();
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder> 
+      getRatingOptionsOrBuilderList();
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder getRatingOptionsOrBuilder(
+      int index);
 }

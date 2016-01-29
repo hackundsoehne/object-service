@@ -32,6 +32,7 @@ public  final class Experiment extends
     populations_ = java.util.Collections.emptyList();
     workerQualityThreshold_ = 0;
     templateId_ = 0;
+    ratingOptions_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -207,6 +208,14 @@ public  final class Experiment extends
             templateId_ = input.readInt32();
             break;
           }
+          case 178: {
+            if (!((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
+              ratingOptions_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption>();
+              mutable_bitField0_ |= 0x00200000;
+            }
+            ratingOptions_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.parser(), extensionRegistry));
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -224,6 +233,9 @@ public  final class Experiment extends
       }
       if (((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
         populations_ = java.util.Collections.unmodifiableList(populations_);
+      }
+      if (((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
+        ratingOptions_ = java.util.Collections.unmodifiableList(ratingOptions_);
       }
       makeExtensionsImmutable();
     }
@@ -1184,6 +1196,573 @@ public  final class Experiment extends
 
   }
 
+  public interface RatingOptionOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:crowdcontrol.Experiment.RatingOption)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional int32 experiment_rating_id = 1;</code>
+     */
+    int getExperimentRatingId();
+
+    /**
+     * <code>optional string name = 2;</code>
+     */
+    java.lang.String getName();
+    /**
+     * <code>optional string name = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getNameBytes();
+
+    /**
+     * <code>optional int32 value = 3;</code>
+     */
+    int getValue();
+  }
+  /**
+   * Protobuf type {@code crowdcontrol.Experiment.RatingOption}
+   */
+  public  static final class RatingOption extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:crowdcontrol.Experiment.RatingOption)
+      RatingOptionOrBuilder {
+    // Use RatingOption.newBuilder() to construct.
+    private RatingOption(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private RatingOption() {
+      experimentRatingId_ = 0;
+      name_ = "";
+      value_ = 0;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
+    private RatingOption(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
+      int mutable_bitField0_ = 0;
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!input.skipField(tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+
+              experimentRatingId_ = input.readInt32();
+              break;
+            }
+            case 18: {
+              String s = input.readStringRequireUtf8();
+
+              name_ = s;
+              break;
+            }
+            case 24: {
+
+              value_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw new RuntimeException(e.setUnfinishedMessage(this));
+      } catch (java.io.IOException e) {
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
+      } finally {
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_RatingOption_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_RatingOption_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder.class);
+    }
+
+    public static final int EXPERIMENT_RATING_ID_FIELD_NUMBER = 1;
+    private int experimentRatingId_;
+    /**
+     * <code>optional int32 experiment_rating_id = 1;</code>
+     */
+    public int getExperimentRatingId() {
+      return experimentRatingId_;
+    }
+
+    public static final int NAME_FIELD_NUMBER = 2;
+    private volatile java.lang.Object name_;
+    /**
+     * <code>optional string name = 2;</code>
+     */
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        name_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>optional string name = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int VALUE_FIELD_NUMBER = 3;
+    private int value_;
+    /**
+     * <code>optional int32 value = 3;</code>
+     */
+    public int getValue() {
+      return value_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (experimentRatingId_ != 0) {
+        output.writeInt32(1, experimentRatingId_);
+      }
+      if (!getNameBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, name_);
+      }
+      if (value_ != 0) {
+        output.writeInt32(3, value_);
+      }
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (experimentRatingId_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, experimentRatingId_);
+      }
+      if (!getNameBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, name_);
+      }
+      if (value_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, value_);
+      }
+      memoizedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code crowdcontrol.Experiment.RatingOption}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:crowdcontrol.Experiment.RatingOption)
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_RatingOption_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_RatingOption_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder.class);
+      }
+
+      // Construct using edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        experimentRatingId_ = 0;
+
+        name_ = "";
+
+        value_ = 0;
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_RatingOption_descriptor;
+      }
+
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption getDefaultInstanceForType() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.getDefaultInstance();
+      }
+
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption build() {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption buildPartial() {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption result = new edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption(this);
+        result.experimentRatingId_ = experimentRatingId_;
+        result.name_ = name_;
+        result.value_ = value_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption) {
+          return mergeFrom((edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption other) {
+        if (other == edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.getDefaultInstance()) return this;
+        if (other.getExperimentRatingId() != 0) {
+          setExperimentRatingId(other.getExperimentRatingId());
+        }
+        if (!other.getName().isEmpty()) {
+          name_ = other.name_;
+          onChanged();
+        }
+        if (other.getValue() != 0) {
+          setValue(other.getValue());
+        }
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private int experimentRatingId_ ;
+      /**
+       * <code>optional int32 experiment_rating_id = 1;</code>
+       */
+      public int getExperimentRatingId() {
+        return experimentRatingId_;
+      }
+      /**
+       * <code>optional int32 experiment_rating_id = 1;</code>
+       */
+      public Builder setExperimentRatingId(int value) {
+        
+        experimentRatingId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 experiment_rating_id = 1;</code>
+       */
+      public Builder clearExperimentRatingId() {
+        
+        experimentRatingId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object name_ = "";
+      /**
+       * <code>optional string name = 2;</code>
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          name_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string name = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string name = 2;</code>
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        name_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string name = 2;</code>
+       */
+      public Builder clearName() {
+        
+        name_ = getDefaultInstance().getName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string name = 2;</code>
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        name_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int value_ ;
+      /**
+       * <code>optional int32 value = 3;</code>
+       */
+      public int getValue() {
+        return value_;
+      }
+      /**
+       * <code>optional int32 value = 3;</code>
+       */
+      public Builder setValue(int value) {
+        
+        value_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 value = 3;</code>
+       */
+      public Builder clearValue() {
+        
+        value_ = 0;
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:crowdcontrol.Experiment.RatingOption)
+    }
+
+    // @@protoc_insertion_point(class_scope:crowdcontrol.Experiment.RatingOption)
+    private static final edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption();
+    }
+
+    public static edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<RatingOption>
+        PARSER = new com.google.protobuf.AbstractParser<RatingOption>() {
+      public RatingOption parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        try {
+          return new RatingOption(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
+      }
+    };
+
+    public static com.google.protobuf.Parser<RatingOption> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RatingOption> getParserForType() {
+      return PARSER;
+    }
+
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private int bitField0_;
   public static final int ID_FIELD_NUMBER = 1;
   private int id_;
@@ -1573,6 +2152,41 @@ public  final class Experiment extends
     return templateId_;
   }
 
+  public static final int RATING_OPTIONS_FIELD_NUMBER = 22;
+  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption> ratingOptions_;
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption> getRatingOptionsList() {
+    return ratingOptions_;
+  }
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder> 
+      getRatingOptionsOrBuilderList() {
+    return ratingOptions_;
+  }
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  public int getRatingOptionsCount() {
+    return ratingOptions_.size();
+  }
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption getRatingOptions(int index) {
+    return ratingOptions_.get(index);
+  }
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder getRatingOptionsOrBuilder(
+      int index) {
+    return ratingOptions_.get(index);
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -1653,6 +2267,9 @@ public  final class Experiment extends
     }
     if (templateId_ != 0) {
       output.writeInt32(21, templateId_);
+    }
+    for (int i = 0; i < ratingOptions_.size(); i++) {
+      output.writeMessage(22, ratingOptions_.get(i));
     }
   }
 
@@ -1748,6 +2365,10 @@ public  final class Experiment extends
     if (templateId_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(21, templateId_);
+    }
+    for (int i = 0; i < ratingOptions_.size(); i++) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(22, ratingOptions_.get(i));
     }
     memoizedSize = size;
     return size;
@@ -1881,6 +2502,7 @@ public  final class Experiment extends
         getConstraintsFieldBuilder();
         getTagsFieldBuilder();
         getPopulationsFieldBuilder();
+        getRatingOptionsFieldBuilder();
       }
     }
     public Builder clear() {
@@ -1950,6 +2572,12 @@ public  final class Experiment extends
 
       templateId_ = 0;
 
+      if (ratingOptionsBuilder_ == null) {
+        ratingOptions_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00200000);
+      } else {
+        ratingOptionsBuilder_.clear();
+      }
       return this;
     }
 
@@ -2032,6 +2660,15 @@ public  final class Experiment extends
       result.placeholders_.makeImmutable();
       result.workerQualityThreshold_ = workerQualityThreshold_;
       result.templateId_ = templateId_;
+      if (ratingOptionsBuilder_ == null) {
+        if (((bitField0_ & 0x00200000) == 0x00200000)) {
+          ratingOptions_ = java.util.Collections.unmodifiableList(ratingOptions_);
+          bitField0_ = (bitField0_ & ~0x00200000);
+        }
+        result.ratingOptions_ = ratingOptions_;
+      } else {
+        result.ratingOptions_ = ratingOptionsBuilder_.build();
+      }
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -2180,6 +2817,32 @@ public  final class Experiment extends
       }
       if (other.getTemplateId() != 0) {
         setTemplateId(other.getTemplateId());
+      }
+      if (ratingOptionsBuilder_ == null) {
+        if (!other.ratingOptions_.isEmpty()) {
+          if (ratingOptions_.isEmpty()) {
+            ratingOptions_ = other.ratingOptions_;
+            bitField0_ = (bitField0_ & ~0x00200000);
+          } else {
+            ensureRatingOptionsIsMutable();
+            ratingOptions_.addAll(other.ratingOptions_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.ratingOptions_.isEmpty()) {
+          if (ratingOptionsBuilder_.isEmpty()) {
+            ratingOptionsBuilder_.dispose();
+            ratingOptionsBuilder_ = null;
+            ratingOptions_ = other.ratingOptions_;
+            bitField0_ = (bitField0_ & ~0x00200000);
+            ratingOptionsBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 getRatingOptionsFieldBuilder() : null;
+          } else {
+            ratingOptionsBuilder_.addAllMessages(other.ratingOptions_);
+          }
+        }
       }
       onChanged();
       return this;
@@ -3807,6 +4470,246 @@ public  final class Experiment extends
       templateId_ = 0;
       onChanged();
       return this;
+    }
+
+    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption> ratingOptions_ =
+      java.util.Collections.emptyList();
+    private void ensureRatingOptionsIsMutable() {
+      if (!((bitField0_ & 0x00200000) == 0x00200000)) {
+        ratingOptions_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption>(ratingOptions_);
+        bitField0_ |= 0x00200000;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder> ratingOptionsBuilder_;
+
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption> getRatingOptionsList() {
+      if (ratingOptionsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(ratingOptions_);
+      } else {
+        return ratingOptionsBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public int getRatingOptionsCount() {
+      if (ratingOptionsBuilder_ == null) {
+        return ratingOptions_.size();
+      } else {
+        return ratingOptionsBuilder_.getCount();
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption getRatingOptions(int index) {
+      if (ratingOptionsBuilder_ == null) {
+        return ratingOptions_.get(index);
+      } else {
+        return ratingOptionsBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public Builder setRatingOptions(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption value) {
+      if (ratingOptionsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureRatingOptionsIsMutable();
+        ratingOptions_.set(index, value);
+        onChanged();
+      } else {
+        ratingOptionsBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public Builder setRatingOptions(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder builderForValue) {
+      if (ratingOptionsBuilder_ == null) {
+        ensureRatingOptionsIsMutable();
+        ratingOptions_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        ratingOptionsBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public Builder addRatingOptions(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption value) {
+      if (ratingOptionsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureRatingOptionsIsMutable();
+        ratingOptions_.add(value);
+        onChanged();
+      } else {
+        ratingOptionsBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public Builder addRatingOptions(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption value) {
+      if (ratingOptionsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureRatingOptionsIsMutable();
+        ratingOptions_.add(index, value);
+        onChanged();
+      } else {
+        ratingOptionsBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public Builder addRatingOptions(
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder builderForValue) {
+      if (ratingOptionsBuilder_ == null) {
+        ensureRatingOptionsIsMutable();
+        ratingOptions_.add(builderForValue.build());
+        onChanged();
+      } else {
+        ratingOptionsBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public Builder addRatingOptions(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder builderForValue) {
+      if (ratingOptionsBuilder_ == null) {
+        ensureRatingOptionsIsMutable();
+        ratingOptions_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        ratingOptionsBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public Builder addAllRatingOptions(
+        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption> values) {
+      if (ratingOptionsBuilder_ == null) {
+        ensureRatingOptionsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, ratingOptions_);
+        onChanged();
+      } else {
+        ratingOptionsBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public Builder clearRatingOptions() {
+      if (ratingOptionsBuilder_ == null) {
+        ratingOptions_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00200000);
+        onChanged();
+      } else {
+        ratingOptionsBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public Builder removeRatingOptions(int index) {
+      if (ratingOptionsBuilder_ == null) {
+        ensureRatingOptionsIsMutable();
+        ratingOptions_.remove(index);
+        onChanged();
+      } else {
+        ratingOptionsBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder getRatingOptionsBuilder(
+        int index) {
+      return getRatingOptionsFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder getRatingOptionsOrBuilder(
+        int index) {
+      if (ratingOptionsBuilder_ == null) {
+        return ratingOptions_.get(index);  } else {
+        return ratingOptionsBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder> 
+         getRatingOptionsOrBuilderList() {
+      if (ratingOptionsBuilder_ != null) {
+        return ratingOptionsBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(ratingOptions_);
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder addRatingOptionsBuilder() {
+      return getRatingOptionsFieldBuilder().addBuilder(
+          edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder addRatingOptionsBuilder(
+        int index) {
+      return getRatingOptionsFieldBuilder().addBuilder(
+          index, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 22;</code>
+     */
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder> 
+         getRatingOptionsBuilderList() {
+      return getRatingOptionsFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder> 
+        getRatingOptionsFieldBuilder() {
+      if (ratingOptionsBuilder_ == null) {
+        ratingOptionsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder>(
+                ratingOptions_,
+                ((bitField0_ & 0x00200000) == 0x00200000),
+                getParentForChildren(),
+                isClean());
+        ratingOptions_ = null;
+      }
+      return ratingOptionsBuilder_;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
