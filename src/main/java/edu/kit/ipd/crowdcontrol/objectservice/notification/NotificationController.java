@@ -1,7 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperation;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 
@@ -20,10 +20,10 @@ public class NotificationController {
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
     private HashMap<Integer, ScheduledFuture<?>> handleMap;
-    private NotificationOperation operation;
+    private NotificationOperations operation;
     private NotificationPolicy policy;
 
-    public NotificationController(NotificationOperation operation, NotificationPolicy policy) {
+    public NotificationController(NotificationOperations operation, NotificationPolicy policy) {
         this.operation = operation;
         this.policy = policy;
 
@@ -39,7 +39,7 @@ public class NotificationController {
     private void loadNotificationsFromDatabase() {
         List<NotificationRecord> notificationList = operation.getAllNotifications();
         for (NotificationRecord record : notificationList) {
-            createNotification(new Notification(record.getIdnotification(), record.getName(), record.getDescription(),
+            createNotification(new Notification(record.getIdNotification(), record.getName(), record.getDescription(),
                     record.getSendthreshold(), record.getCheckperiod(), record.getQuery(), policy));
         }
     }

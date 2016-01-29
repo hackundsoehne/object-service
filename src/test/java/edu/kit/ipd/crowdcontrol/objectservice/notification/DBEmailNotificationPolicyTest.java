@@ -1,7 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperation;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -44,7 +44,7 @@ public class DBEmailNotificationPolicyTest {
     private MailSender mailSender;
 
     @Mock
-    private NotificationOperation notificationOperation;
+    private NotificationOperations notificationOperation;
 
     @Captor
     ArgumentCaptor<String> messageCaptor;
