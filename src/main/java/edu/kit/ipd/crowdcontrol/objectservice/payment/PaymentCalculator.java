@@ -14,6 +14,10 @@ import java.util.Set;
 
 /**
  * Created by lucaskrauss at 28.01.2016
+ *
+ * The PaymentCalculator calculates the payment of all workers of an experiment.
+ * The payment of a worker depends on the number of good (above the specified threshold) answers and good ratings.
+ * If the experiment's base payment is greater than zero the worker's payment is increased by that value.
  */
 public class PaymentCalculator {
 
@@ -78,7 +82,7 @@ public class PaymentCalculator {
         }
 
 
-        //Now all workers which were    are present in the map and the base-payment can be added to their salary
+        //Now all workers participating in the experiment are present in the map and the base-payment can be added to their salary
         if(paymentBase > 0) {
             for (Map.Entry<Worker, Integer> entry : map.entrySet()) {
                 entry.setValue(entry.getValue() + paymentBase);
