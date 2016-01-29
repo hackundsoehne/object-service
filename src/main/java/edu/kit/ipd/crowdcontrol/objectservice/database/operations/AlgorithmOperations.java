@@ -4,10 +4,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
 import org.jooq.DSLContext;
-import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,12 +38,20 @@ public class AlgorithmOperations extends AbstractOperations {
      * @return List of TaskChooser-Algorithms
      */
     public Range<AlgorithmOption, String> getTaskChoosersFrom(String cursor, boolean next, int limit) {
-        SelectJoinStep<Record> query = create.select(ALGORITHM_TASK_CHOOSER.fields())
+        SelectJoinStep<Record1<String>> query = create.select(ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER).from(ALGORITHM_TASK_CHOOSER);
+        return getNextRange(query, ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER, ALGORITHM_TASK_CHOOSER,
+                cursor, next, limit, String::compareTo)
+                .mapList(records -> AlgorithmsTransform.constructTaskChoosers(getTaskChooserParams(records)));
+    }
+
+    private Map<AlgorithmTaskChooserRecord, List<AlgorithmTaskChooserParamRecord>> getTaskChooserParams(List<Record1<String>> taskChooserIds) {
+        return create.select(ALGORITHM_TASK_CHOOSER.fields())
                 .select(ALGORITHM_TASK_CHOOSER_PARAM.fields())
                 .from(ALGORITHM_TASK_CHOOSER)
-                .leftJoin(ALGORITHM_TASK_CHOOSER_PARAM).onKey();
-        return getNextRange(query, ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER, cursor, next, limit, String::compareTo)
-                .mapList(AlgorithmsTransform::constructTaskChooser);
+                .leftJoin(ALGORITHM_TASK_CHOOSER_PARAM).onKey()
+                .where(ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER.greaterOrEqual(taskChooserIds.get(0).value1()))
+                .and(ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER.lessOrEqual(taskChooserIds.get(taskChooserIds.size() - 1).value1()))
+                .fetchGroups(ALGORITHM_TASK_CHOOSER, record -> record.into(ALGORITHM_TASK_CHOOSER_PARAM));
     }
 
     /**
@@ -53,13 +62,21 @@ public class AlgorithmOperations extends AbstractOperations {
      * @param limit  Number of records
      * @return List of AnswerQuality-Algorithms
      */
-    public Range<AlgorithmOption, String> getAnswerQualitieyAlgortihmsFrom(String cursor, boolean next, int limit) {
-        SelectJoinStep<Record> query = create.select(ALGORITHM_ANSWER_QUALITY.fields())
+    public Range<AlgorithmOption, String> getAnswerQualityAlgorithmsFrom(String cursor, boolean next, int limit) {
+        SelectJoinStep<Record1<String>> query = create.select(ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY).from(ALGORITHM_ANSWER_QUALITY);
+        return getNextRange(query, ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY, ALGORITHM_ANSWER_QUALITY,
+                cursor, next, limit, String::compareTo)
+                .mapList(records -> AlgorithmsTransform.constructAnswerQualityAlgorithms(getAnswerQualityParams(records)));
+    }
+
+    private Map<AlgorithmAnswerQualityRecord, List<AlgorithmAnswerQualityParamRecord>> getAnswerQualityParams(List<Record1<String>> taskChooserIds) {
+        return create.select(ALGORITHM_ANSWER_QUALITY.fields())
                 .select(ALGORITHM_ANSWER_QUALITY_PARAM.fields())
                 .from(ALGORITHM_ANSWER_QUALITY)
-                .leftJoin(ALGORITHM_ANSWER_QUALITY_PARAM).onKey();
-        return getNextRange(query, ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY, cursor, next, limit, String::compareTo)
-                .mapList(AlgorithmsTransform::constructAnswerQuality);
+                .leftJoin(ALGORITHM_ANSWER_QUALITY_PARAM).onKey()
+                .where(ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY.greaterOrEqual(taskChooserIds.get(0).value1()))
+                .and(ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY.lessOrEqual(taskChooserIds.get(taskChooserIds.size() - 1).value1()))
+                .fetchGroups(ALGORITHM_ANSWER_QUALITY, record -> record.into(ALGORITHM_ANSWER_QUALITY_PARAM));
     }
 
     /**
@@ -70,13 +87,21 @@ public class AlgorithmOperations extends AbstractOperations {
      * @param limit  Number of records
      * @return List of RatingQuality-Algorithms
      */
-    public Range<AlgorithmOption, String> getRatingQualitieyAlgortihmsFrom(String cursor, boolean next, int limit) {
-        SelectJoinStep<Record> query = create.select(ALGORITHM_RATING_QUALITY.fields())
+    public Range<AlgorithmOption, String> getRatingQualityAlgorithmsFrom(String cursor, boolean next, int limit) {
+        SelectJoinStep<Record1<String>> query = create.select(ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY).from(ALGORITHM_RATING_QUALITY);
+        return getNextRange(query, ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY, ALGORITHM_RATING_QUALITY,
+                cursor, next, limit, String::compareTo)
+                .mapList(records -> AlgorithmsTransform.constructRatingQualityAlgorithms(getRatingQualityParams(records)));
+    }
+
+    private Map<AlgorithmRatingQualityRecord, List<AlgorithmRatingQualityParamRecord>> getRatingQualityParams(List<Record1<String>> taskChooserIds) {
+        return create.select(ALGORITHM_RATING_QUALITY.fields())
                 .select(ALGORITHM_RATING_QUALITY_PARAM.fields())
                 .from(ALGORITHM_RATING_QUALITY)
-                .leftJoin(ALGORITHM_RATING_QUALITY_PARAM).onKey();
-        return getNextRange(query, ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY, cursor, next, limit, String::compareTo)
-                .mapList(AlgorithmsTransform::constructRatingQuality);
+                .leftJoin(ALGORITHM_RATING_QUALITY_PARAM).onKey()
+                .where(ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY.greaterOrEqual(taskChooserIds.get(0).value1()))
+                .and(ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY.lessOrEqual(taskChooserIds.get(taskChooserIds.size() - 1).value1()))
+                .fetchGroups(ALGORITHM_RATING_QUALITY, record -> record.into(ALGORITHM_RATING_QUALITY_PARAM));
     }
 
     /**

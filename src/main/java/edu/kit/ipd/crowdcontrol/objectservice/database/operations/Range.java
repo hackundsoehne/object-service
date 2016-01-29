@@ -28,21 +28,19 @@ public class Range<T, X> {
     private final boolean hasSuccessors;
     private final X left;
     private final X right;
-    private static Range range = new Range<>(Collections.emptyList(), null, null, false, false);
+    private static Range rangeFF = new Range<>(Collections.emptyList(), null, null, false, false);
+    private static Range rangeTT = new Range<>(Collections.emptyList(), null, null, true, true);
+    private static Range rangeTF = new Range<>(Collections.emptyList(), null, null, true, false);
+    private static Range rangeFT = new Range<>(Collections.emptyList(), null, null, false, true);
 
     /**
-     * @param data
-     *         Data of the range.
-     * @param left
-     *         Key of the most left element inside the range.
-     * @param right
-     *         Key of the most right element inside the range.
-     * @param hasPredecessors
-     *         Whether there are elements left of the range.
-     * @param hasSuccessors
-     *         Whether there are elements right of the range.
+     * @param data the data of the range
+     * @param left the key of the most left element inside the range
+     * @param right the key of the most right element inside the range
+     * @param hasPredecessors whether there are elements left of the range
+     * @param hasSuccessors whether there are elements right of the range
      */
-    public Range(List<T> data, X left, X right, boolean hasPredecessors, boolean hasSuccessors) {
+    private Range(List<T> data, X left, X right, boolean hasPredecessors, boolean hasSuccessors) {
         this.data = data;
         this.left = left;
         this.right = right;
@@ -51,13 +49,41 @@ public class Range<T, X> {
     }
 
     /**
-     *
-     * @param <A>
-     * @param <B>
-     * @return
+     * gets a Range
+     * @param data the data of the range
+     * @param left the key of the most left element inside the range
+     * @param right the key of the most right element inside the range
+     * @param hasPredecessors whether there are elements left of the range
+     * @param hasSuccessors whether there are elements right of the range
+     * @param <A> the type of the data
+     * @param <B> the type of the key
+     * @return an instance of Range
+     */
+    public static <A, B> Range<A, B> of(List<A> data, B left, B right, boolean hasPredecessors, boolean hasSuccessors) {
+        if (data.isEmpty()) {
+            return getEmptyRange(hasPredecessors, hasSuccessors);
+        }
+        return new Range<>(data, left, right, hasPredecessors, hasSuccessors);
+    }
+
+    /**
+     * constructs an empty Range
+     * @param <A> the type of the data
+     * @param <B> the type of the key
+     * @return an empty Range
      */
     @SuppressWarnings("unchecked")
-    public static <A, B> Range<A, B> getEmptyRange() {
+    public static <A, B> Range<A, B> getEmptyRange(boolean hasPredecessors, boolean hasSuccessors) {
+        Range range;
+        if (hasPredecessors && hasSuccessors) {
+            range = rangeTT;
+        } else if (hasPredecessors) {
+            range = rangeTF;
+        } else if (hasSuccessors) {
+            range = rangeFT;
+        } else {
+            range = rangeFF;
+        }
         return (Range<A, B>) range;
     }
 
@@ -80,7 +106,10 @@ public class Range<T, X> {
      *
      * @return Range with applied mapping.
      */
+    @SuppressWarnings("unchecked")
     public <Y> Range<Y, X> map(Function<T, Y> mapping) {
+        if (data.isEmpty())
+            return (Range<Y, X>) this;
         List<Y> newList = data.stream()
                 .map(mapping)
                 .collect(Collectors.toList());
@@ -90,6 +119,7 @@ public class Range<T, X> {
 
     /**
      * Maps the data inside the range.
+     * This method does not get called when the range is empty.
      *
      * @param mapping
      *         Mapping to apply.
@@ -98,7 +128,10 @@ public class Range<T, X> {
      *
      * @return Range with applied mapping.
      */
+    @SuppressWarnings("unchecked")
     public <Y> Range<Y, X> mapList(Function<List<T>, List<Y>> mapping) {
+        if (data.isEmpty())
+            return (Range<Y, X>) this;
         List<Y> newList = mapping.apply(data);
 
         return new Range<>(newList, left, right, hasPredecessors, hasSuccessors);

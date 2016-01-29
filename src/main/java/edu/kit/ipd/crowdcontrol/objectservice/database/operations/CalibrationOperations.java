@@ -40,7 +40,7 @@ public class CalibrationOperations extends AbstractOperations {
     public Range<Calibration, Integer> getCalibrationsFrom(int cursor, boolean next, int limit) {
         // Join is more complicated and the performance gain would be negligible considering the the
         // expected moderate usage
-        return getNextRange(create.selectFrom(CALIBRATION), CALIBRATION.ID_CALIBRATION, cursor, next, limit)
+        return getNextRange(create.selectFrom(CALIBRATION), CALIBRATION.ID_CALIBRATION, CALIBRATION, cursor, next, limit)
                 .map(calibrationRecord -> {
                     List<CalibrationAnswerOptionRecord> answers = create.selectFrom(CALIBRATION_ANSWER_OPTION)
                             .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(calibrationRecord.getIdCalibration()))

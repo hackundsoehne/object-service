@@ -32,7 +32,7 @@ public class PlatformOperations extends AbstractOperations {
      * @return List of platforms.
      */
     public Range<Platform, String> getPlatformList(String cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(PLATFORM), PLATFORM.ID_PLATFORM, cursor, next, limit, String::compareTo)
+        return getNextRange(create.selectFrom(PLATFORM), PLATFORM.ID_PLATFORM, PLATFORM, cursor, next, limit, String::compareTo)
                 .map(PlatformTransform::toProto);
     }
 

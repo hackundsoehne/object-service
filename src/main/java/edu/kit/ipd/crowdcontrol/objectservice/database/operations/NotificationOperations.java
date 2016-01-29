@@ -66,7 +66,7 @@ public class NotificationOperations extends AbstractOperations {
      * @return a list of notifications
      */
     public Range<Notification, Integer> getNotificationsFrom(int cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(NOTIFICATION), NOTIFICATION.ID_NOTIFICATION, cursor, next, limit)
+        return getNextRange(create.selectFrom(NOTIFICATION), NOTIFICATION.ID_NOTIFICATION, NOTIFICATION, cursor, next, limit)
                 .map(NotificationTransform::toProto);
     }
 

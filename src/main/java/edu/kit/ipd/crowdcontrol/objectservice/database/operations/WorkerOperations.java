@@ -172,7 +172,7 @@ public class WorkerOperations extends AbstractOperations {
      * @return List of workers
      */
     public Range<Worker, Integer> getWorkersFrom(int cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, cursor, next, limit)
+        return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, WORKER, cursor, next, limit)
                 .map(WorkerTransform::toProto);
     }
 

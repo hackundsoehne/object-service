@@ -25,6 +25,7 @@ public class ExperimentTransform extends AbstractTransform {
      */
     public static Experiment toProto(ExperimentRecord record, Experiment.State state) {
         Type type = new TypeToken<Map<String, String>>(){}.getType();
+
         return Experiment.newBuilder()
                 .setId(record.getIdExperiment())
                 .setDescription(record.getDescription())

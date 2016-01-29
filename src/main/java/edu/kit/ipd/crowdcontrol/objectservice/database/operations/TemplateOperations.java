@@ -6,9 +6,12 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TemplateTran
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.SelectJoinStep;
 
 import java.util.Optional;
 
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATING_OPTION_TEMPLATE;
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.TEMPLATE;
 
 /**
@@ -32,8 +35,13 @@ public class TemplateOperations extends AbstractOperations {
      * @return List of templates.
      */
     public Range<Template, Integer> getTemplatesFrom(int cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(TEMPLATE), TEMPLATE.ID_TEMPLATE, cursor, next, limit)
-                .map(TemplateTransform::toProto);
+        SelectJoinStep<Record> query = create.select(TEMPLATE.fields())
+                .select(RATING_OPTION_TEMPLATE.fields())
+                .from(TEMPLATE)
+                .join(RATING_OPTION_TEMPLATE).onKey();
+        //return getNextRange(query, TEMPLATE.ID_TEMPLATE, cursor, next, limit)
+        //        .map(TemplateTransform::toProto);
+        return null;
     }
 
     /**

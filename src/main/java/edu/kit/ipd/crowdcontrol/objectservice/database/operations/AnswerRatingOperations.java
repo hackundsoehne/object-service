@@ -74,7 +74,7 @@ public class AnswerRatingOperations extends AbstractOperations {
     public Range<AnswerRecord, Integer> getAnswersFrom(int expid, int cursor, boolean next, int limit) {
         SelectConditionStep<AnswerRecord> query = create.selectFrom(ANSWER)
                 .where(ANSWER.EXPERIMENT.eq(expid));
-        return getNextRange(query, ANSWER.ID_ANSWER, cursor, next, limit);
+        return getNextRange(query, ANSWER.ID_ANSWER, ANSWER, cursor, next, limit);
     }
 
     /**

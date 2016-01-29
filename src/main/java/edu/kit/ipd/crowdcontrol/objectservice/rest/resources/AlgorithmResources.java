@@ -43,7 +43,7 @@ public class AlgorithmResources {
         String from = request.queryParams("from");
         boolean asc = getQueryBool(request, "asc", true);
 
-        return algorithmOperations.getAnswerQualitieyAlgortihmsFrom(from == null ? "" : from, asc, 20)
+        return algorithmOperations.getAnswerQualityAlgorithmsFrom(from == null ? "" : from, asc, 20)
                 .constructPaginated(AlgorithmList.newBuilder(), AlgorithmList.Builder::addAllItems);
     }
 
@@ -57,7 +57,7 @@ public class AlgorithmResources {
         String from = request.queryParams("from");
         boolean asc = getQueryBool(request, "asc", true);
 
-        return algorithmOperations.getRatingQualitieyAlgortihmsFrom(from == null ? "" : from, asc, 20)
+        return algorithmOperations.getRatingQualityAlgorithmsFrom(from == null ? "" : from, asc, 20)
                 .constructPaginated(AlgorithmList.newBuilder(), AlgorithmList.Builder::addAllItems);
     }
 }

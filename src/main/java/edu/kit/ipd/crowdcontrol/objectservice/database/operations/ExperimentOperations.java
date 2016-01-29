@@ -111,7 +111,7 @@ public class ExperimentOperations extends AbstractOperations {
      * @return a list of experiments
      */
     public Range<ExperimentRecord, Integer> getExperimentsFrom(int cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(EXPERIMENT), EXPERIMENT.ID_EXPERIMENT, cursor, next, limit);
+        return getNextRange(create.selectFrom(EXPERIMENT), EXPERIMENT.ID_EXPERIMENT, EXPERIMENT, cursor, next, limit);
     }
 
     /**
