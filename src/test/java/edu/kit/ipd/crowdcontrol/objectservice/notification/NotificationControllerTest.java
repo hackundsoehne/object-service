@@ -1,31 +1,65 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Simon Korz
  * @version 1.0
  */
 public class NotificationControllerTest {
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+    private NotificationController notificationController;
+    private edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto;
+    private edu.kit.ipd.crowdcontrol.objectservice.notification.Notification notification;
+    @Mock
+    private NotificationPolicy<Result<Record>> policy;
 
-    @Test
-    public void testCreateNotification() throws Exception {
+    @Mock
+    private NotificationOperations notificationOperations;
 
+    @Before
+    public void setUp() throws Exception {
+        notificationController = new NotificationController(notificationOperations, policy);
+        Notification.Builder builder = Notification.newBuilder();
+        builder.setId(5);
+        builder.setName("Test Notification");
+        builder.setDescription("This is a test notification");
+        builder.setSendThreshold(60 * 60 * 24);
+        builder.setCheckPeriod(1);
+        builder.setQuery("SELECT");
+        notificationProto = builder.buildPartial();
+
+        notification = new edu.kit.ipd.crowdcontrol.objectservice.notification.Notification(5, "Test Notification",
+                "This is a test notification", 60 * 60 * 24, 1, "SELECT", policy);
     }
 
     @Test
-    public void testCreateNotification1() throws Exception {
-
+    public void testCreateNotification() throws Exception {
+        notificationController.createNotification(notificationProto);
+        Thread.sleep(200);
+        verify(policy).invoke(eq(notification));
     }
 
     @Test
     public void testDeleteNotification() throws Exception {
-
-    }
-
-    @Test
-    public void testDeleteNotification1() throws Exception {
-
+        // TODO
+        notificationController.createNotification(notificationProto);
+        verify(policy).invoke(eq(notification));
+        notificationController.deleteNotification(notificationProto);
+        verify(policy).invoke(eq(notification));
     }
 
     @Test

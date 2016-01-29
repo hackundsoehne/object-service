@@ -20,11 +20,11 @@ public class NotificationController {
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
     private HashMap<Integer, ScheduledFuture<?>> handleMap;
-    private NotificationOperations operation;
+    private NotificationOperations operations;
     private NotificationPolicy policy;
 
-    public NotificationController(NotificationOperations operation, NotificationPolicy policy) {
-        this.operation = operation;
+    public NotificationController(NotificationOperations operations, NotificationPolicy policy) {
+        this.operations = operations;
         this.policy = policy;
 
         handleMap = new HashMap<>();
@@ -37,7 +37,7 @@ public class NotificationController {
     }
 
     private void loadNotificationsFromDatabase() {
-        List<NotificationRecord> notificationList = operation.getAllNotifications();
+        List<NotificationRecord> notificationList = operations.getAllNotifications();
         for (NotificationRecord record : notificationList) {
             createNotification(new Notification(record.getIdNotification(), record.getName(), record.getDescription(),
                     record.getSendthreshold(), record.getCheckperiod(), record.getQuery(), policy));
@@ -47,12 +47,12 @@ public class NotificationController {
     /**
      * Creates a new Notification
      *
-     * @param notification the notification to create
+     * @param notificationProto the notification to create
      */
-    public void createNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notification) {
-        Notification internalNotification = new Notification(notification.getId(), notification.getName(),
-                notification.getDescription(), notification.getSendThreshold(),
-                notification.getCheckPeriod(), notification.getQuery(), policy);
+    public void createNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto) {
+        Notification internalNotification = new Notification(notificationProto.getId(), notificationProto.getName(),
+                notificationProto.getDescription(), notificationProto.getSendThreshold(),
+                notificationProto.getCheckPeriod(), notificationProto.getQuery(), policy);
 
         createNotification(internalNotification);
     }
@@ -69,12 +69,12 @@ public class NotificationController {
     }
 
     /**
-     * Deletes a notification
+     * Deletes a notificationProto
      *
-     * @param notification the notification to delete
+     * @param notificationProto the notification to delete
      */
-    public void deleteNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notification) {
-        deleteNotification(notification.getId());
+    public void deleteNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto) {
+        deleteNotification(notificationProto.getId());
     }
 
     /**
@@ -97,8 +97,8 @@ public class NotificationController {
      * @param notificationChangeEvent the notification change event
      */
     public void updateNotification(ChangeEvent<edu.kit.ipd.crowdcontrol.objectservice.proto.Notification> notificationChangeEvent) {
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notification = notificationChangeEvent.getNeww();
-        deleteNotification(notification);
-        createNotification(notification);
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto = notificationChangeEvent.getNeww();
+        deleteNotification(notificationProto);
+        createNotification(notificationProto);
     }
 }

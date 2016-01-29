@@ -96,4 +96,33 @@ public class Notification implements Runnable {
     public long getCheckPeriod() {
         return checkPeriod;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Notification that = (Notification) o;
+
+        if (ID != that.ID) return false;
+        if (sendThreshold != that.sendThreshold) return false;
+        if (checkPeriod != that.checkPeriod) return false;
+        if (!name.equals(that.name)) return false;
+        if (!description.equals(that.description)) return false;
+        if (!query.equals(that.query)) return false;
+        return policy.equals(that.policy);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = ID;
+        result = 31 * result + name.hashCode();
+        result = 31 * result + description.hashCode();
+        result = 31 * result + (int) (sendThreshold ^ (sendThreshold >>> 32));
+        result = 31 * result + (int) (checkPeriod ^ (checkPeriod >>> 32));
+        result = 31 * result + query.hashCode();
+        result = 31 * result + policy.hashCode();
+        return result;
+    }
 }

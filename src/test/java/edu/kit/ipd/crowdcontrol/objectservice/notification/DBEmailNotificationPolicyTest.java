@@ -32,26 +32,26 @@ import static org.mockito.Mockito.when;
 public class DBEmailNotificationPolicyTest {
     private static final String TESTQUERY = "SELECT test query";
     private static final String RECEIVER = "mail@example.com";
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     DBEmailNotificationPolicy policy;
     Notification notification;
     NotificationRecord record;
     Result<Record> result;
 
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+
     @Mock
     private MailSender mailSender;
 
     @Mock
-    private NotificationOperations notificationOperation;
+    private NotificationOperations notificationOperations;
 
     @Captor
     ArgumentCaptor<String> messageCaptor;
 
     @Before
     public void setUp() throws Exception {
-        policy = new DBEmailNotificationPolicy(mailSender, RECEIVER, notificationOperation);
+        policy = new DBEmailNotificationPolicy(mailSender, RECEIVER, notificationOperations);
         notification = new Notification(5, "Test Notification",
                 "This is a test notification", 60 * 60 * 24, 60 * 10, TESTQUERY, policy);
 
@@ -65,7 +65,7 @@ public class DBEmailNotificationPolicyTest {
 
     @Test
     public void testCheckPositive() throws Exception {
-        when(notificationOperation.runReadOnlySQL(TESTQUERY)).thenReturn(result);
+        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(result);
         Result<Record> token = policy.check(notification);
 
         assertEquals(result, token);
@@ -75,7 +75,7 @@ public class DBEmailNotificationPolicyTest {
     public void testCheckNegative() throws Exception {
         // return empty result
         result.clear();
-        when(notificationOperation.runReadOnlySQL(TESTQUERY)).thenReturn(result);
+        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(result);
         Result<Record> token = policy.check(notification);
 
         assertEquals(null, token);
