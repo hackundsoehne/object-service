@@ -115,13 +115,11 @@ public class ExperimentResource {
 
         int id = experimentOperations.insertNewExperiment(record);
 
-        tags = tags.stream()
-                .map(tagConstraintsOperations::insertTag)
-                .collect(Collectors.toList());
+        tags.stream()
+                .map(tagConstraintsOperations::insertTag);
 
-        constraints = constraints.stream()
-                .map(tagConstraintsOperations::insertConstraint)
-                .collect(Collectors.toList());
+        constraints.stream()
+                .map(tagConstraintsOperations::insertConstraint);
 
         convertToCalibrationRecords(experiment).forEach(calibrationOperations::insertExperimentCalibration);
 
