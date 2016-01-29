@@ -77,7 +77,7 @@ public class Main {
                 new PlatformResource(platformOperations),
                 new WorkerResource(workerOperations, platformManager),
                 new CalibrationResource(calibrationOperations),
-                new ExperimentResource(experimentOperations, answerRatingOperations, calibrationOperations, tagConstraintsOperations, workerOperations, algorithmsOperations),
+                new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations),
                 new AlgorithmResources(algorithmsOperations),
                 new AnswerRatingResource(experimentOperations, answerRatingOperations, workerOperations)
         )
