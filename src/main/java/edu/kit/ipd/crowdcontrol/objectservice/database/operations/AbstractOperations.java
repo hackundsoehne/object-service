@@ -254,6 +254,8 @@ public abstract class AbstractOperations {
         }
     }
 
+    //experimental, do not use in production!
+    @SuppressWarnings("unused")
     private <R extends Record, K> Range<R, K> getNextRangeJoinExperimental(SelectConditionStep<R> query, Field<K> primaryKey,
                                                                            Table<?> tablePrimaryKey, K start, boolean next,
                                                                            int limit, Comparator<K> sort) {

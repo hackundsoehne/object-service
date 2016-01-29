@@ -20,6 +20,8 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATIN
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.TEMPLATE;
 
 /**
+ * responsible for the operations concerning the Template and Rating_Option_Template tables.
+ *
  * @author Niklas Keller
  */
 public class TemplateOperations extends AbstractOperations {
