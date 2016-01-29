@@ -22,22 +22,22 @@ import java.util.stream.Collectors;
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
 /**
- * Created by marcel on 25.01.16.
+ * Handles requests to experiment resources.
+ *
+ * @author LeanderK
+ * @author Marcel Hollerbach
  */
 public class ExperimentResource {
     private final ExperimentOperations experimentOperations;
-    private final AnswerRatingOperations answerRatingOperations;
     private final CalibrationOperations calibrationOperations;
     private final TagConstraintsOperations tagConstraintsOperations;
-    private final WorkerOperations workerOperations;
     private final AlgorithmOperations algorithmsOperations;
 
-    public ExperimentResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations, CalibrationOperations calibrationOperations, TagConstraintsOperations tagConstraintsOperations, WorkerOperations workerOperations, AlgorithmOperations algorithmsOperations) {
+    public ExperimentResource(ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
+                              TagConstraintsOperations tagConstraintsOperations,  AlgorithmOperations algorithmsOperations) {
         this.experimentOperations = experimentOperations;
-        this.answerRatingOperations = answerRatingOperations;
         this.calibrationOperations = calibrationOperations;
         this.tagConstraintsOperations = tagConstraintsOperations;
-        this.workerOperations = workerOperations;
         this.algorithmsOperations = algorithmsOperations;
     }
 

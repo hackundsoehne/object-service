@@ -22,6 +22,8 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getQueryBo
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getQueryInt;
 
 /**
+ * Handles requests to answer- and rating-resources.
+ *
  * @author LeanderK
  * @version 1.0
  */

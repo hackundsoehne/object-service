@@ -9,6 +9,8 @@ import spark.Response;
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getQueryBool;
 
 /**
+ * Handles requests to algorithms resources.
+ *
  * @author LeanderK
  * @version 1.0
  */
