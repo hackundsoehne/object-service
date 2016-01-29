@@ -21,11 +21,11 @@ public abstract class MailHandlerTest {
         String uuid = UUID.randomUUID().toString();
         String subject = "[test] " + uuid;
 
-        handler.sendMail(this.mail, subject, uuid);
+        handler.sendMail("pseipd@trash-mail.com", subject, uuid);
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {}
-        Message[] messages = handler.fetchUnseen(folder);
+        Message[] messages = handler.fetchFolder(folder);
 
         boolean found = false;
 
