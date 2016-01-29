@@ -15,10 +15,10 @@ public abstract class NotificationPolicy<T> {
     }
 
     /**
-     * Checks the query of a notification
+     * Checks the query of a notification.
      *
      * @param notification the notification to check
-     * @return instance of a generic result of the check
+     * @return instance of a generic result as token if the check was positive, else null
      */
     protected abstract T check(Notification notification);
 
