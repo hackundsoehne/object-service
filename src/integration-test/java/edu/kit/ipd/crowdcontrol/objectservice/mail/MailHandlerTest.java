@@ -34,8 +34,7 @@ public abstract class MailHandlerTest {
 
             if (message.getSubject().equals(subject)) {
                 found = true;
-                handler.deleteMails(message.getSubject(), folder);
-                handler.deleteMails(message.getSubject(), "inbox");
+                handler.deleteMails(message);
                 break;
             }
         }

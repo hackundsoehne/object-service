@@ -10,6 +10,7 @@ import java.util.Properties;
 
 /**
  * A Mailhandler, that can send and fetch mails to another mail address/from a mailbox
+ *
  * @author Felix Rittler
  * @author Niklas Keller
  */
@@ -20,12 +21,12 @@ public class MailHandler implements MailFetcher, MailSender {
     private Store store;
 
     /**
-     *
      * A Mailhandler object to send and fetch emails.
+     *
      * @param props properties, that describe the connection to the mailserver
-     * @param auth an authenticator authenticating the user to connect to the account
-     * @throws AuthenticationFailedException  Throws this exception, if there is a problem with the authentication
-     * @throws MessagingException For other problems e.g. with properties object: unvalid domains, ports not valid etc.
+     * @param auth  an authenticator authenticating the user to connect to the account
+     * @throws AuthenticationFailedException Throws this exception, if there is a problem with the authentication
+     * @throws MessagingException            For other problems e.g. with properties object: unvalid domains, ports not valid etc.
      */
     public MailHandler(Properties props, Authenticator auth) throws MessagingException {
         sender = props.getProperty("sender");
@@ -39,22 +40,39 @@ public class MailHandler implements MailFetcher, MailSender {
         connectToStore();
 
         Folder folder = store.getFolder(name);
-        folder.open(Folder.READ_ONLY);
+        folder.open(Folder.READ_WRITE);
 
         Flags seen = new Flags(Flags.Flag.SEEN);
         FlagTerm unseenFlagTerm = new FlagTerm(seen, false);
         Message[] messages = folder.search(unseenFlagTerm);
 
+        for (Message msg : messages) {
+            msg.setFlag(Flags.Flag.SEEN, true);
+        }
+
+        folder.close(true);
+
+        folder.open(Folder.READ_ONLY);
+
         return messages;
     }
 
     @Override
-    public Message[] fetchFolder(String name) throws MessagingException{
+    public Message[] fetchFolder(String name) throws MessagingException {
         connectToStore();
 
         Folder folder = store.getFolder(name);
-        folder.open(Folder.READ_ONLY);
+        folder.open(Folder.READ_WRITE);
         Message[] messages = folder.getMessages();
+
+        Flags seen = new Flags(Flags.Flag.SEEN);
+        for (Message msg : messages) {
+            msg.setFlag(Flags.Flag.SEEN, true);
+        }
+        folder.close(true);
+
+        folder.open(Folder.READ_ONLY);
+
         return messages;
     }
 
@@ -62,34 +80,59 @@ public class MailHandler implements MailFetcher, MailSender {
     public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException {
         connectToStore();
 
-        Message msg = new MimeMessage(session);
+        MimeMessage msg = new MimeMessage(session);
         msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientMail, recipientMail));
         msg.setFrom(new InternetAddress(sender, sender));
         msg.setSubject(subject);
         msg.setText(message);
         msg.saveChanges();
+        msg.setContent(message, "text/html; charset=utf-8");
 
         Transport.send(msg);
     }
 
-    /**
-     * Deletes all mails in a certain folder with a certain subject.
-     * @param subject the subject of the mails
-     * @param name the name of the folder
-     * @throws MessagingException
-     */
-    protected void deleteMails(String subject, String name) throws MessagingException{
+    @Override
+    public void markAsUnseen(Message message) throws MessagingException {
         connectToStore();
 
-        Folder folder = store.getFolder(name);
-        folder.open(Folder.READ_WRITE);
-        SubjectTerm subjectterm = new SubjectTerm(subject);
-
-        Message[] messages = folder.search(subjectterm);
-        for (Message msg : messages) {
-            msg.setFlag(Flags.Flag.DELETED, true);
+        Folder folder = message.getFolder();
+        boolean wasOpen = false;
+        int mode = 0;
+        if (folder.isOpen()) {
+            wasOpen = true;
+            mode = folder.getMode();
+            folder.close(true);
         }
+        folder.open(Folder.READ_WRITE);
+
+        message.setFlag(Flags.Flag.SEEN, false);
+
         folder.close(true);
+        if(wasOpen) {
+            folder.open(mode);
+        }
+    }
+
+    @Override
+    public void deleteMails(Message message) throws MessagingException {
+        connectToStore();
+
+        Folder folder = message.getFolder();
+        boolean wasOpen = false;
+        int mode = 0;
+        if (folder.isOpen()) {
+            wasOpen = true;
+            mode = folder.getMode();
+            folder.close(true);
+        }
+        folder.open(Folder.READ_WRITE);
+
+        message.setFlag(Flags.Flag.DELETED, false);
+
+        folder.close(true);
+        if(wasOpen) {
+            folder.open(mode);
+        }
     }
 
     private void connectToStore() throws MessagingException {
