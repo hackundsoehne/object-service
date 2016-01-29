@@ -15,10 +15,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -218,6 +215,7 @@ public class ExperimentResource {
         Experiment old = fetchExperiment(id);
         ExperimentRecord original = getOrThrow(experimentOperations.getExperiment(id));
         Experiment resulting;
+
         if (experiment.getState() != experimentOperations.getExperimentState(id)) {
             int size = experiment.getAllFields().size();
 
@@ -280,7 +278,7 @@ public class ExperimentResource {
                 records.forEach(calibrationOperations::insertExperimentCalibration);
             }
 
-            if (!old.getAlgorithmTaskChooser().getName().equals(experimentRecord.getAlgorithmTaskChooser())) {
+            if (!Objects.equals(old.getAlgorithmTaskChooser().getName(), experimentRecord.getAlgorithmTaskChooser())) {
                 algorithmsOperations.deleteChosenTaskChooserParams(id);
             }
 
@@ -288,7 +286,7 @@ public class ExperimentResource {
                 algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue());
             });
 
-            if (!old.getAlgorithmQualityAnswer().getName().equals(experimentRecord.getAlgorithmQualityAnswer())) {
+            if (!Objects.equals(old.getAlgorithmQualityAnswer().getName(), experimentRecord.getAlgorithmQualityAnswer())) {
                 algorithmsOperations.deleteChosenAnswerQualityParams(id);
             }
 
@@ -296,13 +294,19 @@ public class ExperimentResource {
                 algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue());
             });
 
-            if (!old.getAlgorithmQualityRating().getName().equals(experimentRecord.getAlgorithmQualityRating())) {
+            if (!Objects.equals(old.getAlgorithmQualityRating().getName(), experimentRecord.getAlgorithmQualityRating())) {
                 algorithmsOperations.deleteChosenRatingQualityParams(id);
             }
 
             experiment.getAlgorithmQualityRating().getParametersList().forEach(param -> {
                 algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue());
             });
+
+            if (!Objects.equals(old.getTemplateId(), experimentRecord.getTemplate())) {
+                experimentOperations.deleteRatingOptions(id);
+            }
+
+            experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
 
             //update the experiment itself
             experimentOperations.updateExperiment(experimentRecord);
