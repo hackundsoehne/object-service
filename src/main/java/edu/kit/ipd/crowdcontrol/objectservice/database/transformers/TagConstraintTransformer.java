@@ -10,7 +10,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by marcel on 26.01.16.
+ * handles the transformation of the Tags and Constraints from and to the protobuf-definitions
+ * @author Marcel Hollderbach
  */
 public class TagConstraintTransformer extends AbstractTransformer {
 

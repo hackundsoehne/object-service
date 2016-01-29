@@ -16,7 +16,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Created by marcel on 26.01.16.
+ * handles the transformation of the Experiment from and to the protobuf-definitions
+ * @author LeanderK
+ * @author Marcel Hollderbach
  */
 public class ExperimentTransformer extends AbstractTransformer {
     /**

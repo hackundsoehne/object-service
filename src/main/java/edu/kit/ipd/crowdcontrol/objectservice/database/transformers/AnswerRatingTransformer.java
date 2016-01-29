@@ -9,7 +9,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * Created by marcel on 26.01.16.
+ * handles the transformation of the Answers and Ratings from and to the protobuf-definitions
+ * @author LeanderK
+ * @author Marcel Hollderbach
  */
 public class AnswerRatingTransformer extends AbstractTransformer {
 
