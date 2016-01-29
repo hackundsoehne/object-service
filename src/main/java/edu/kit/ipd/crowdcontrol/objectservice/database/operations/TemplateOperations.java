@@ -1,15 +1,20 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingOptionTemplateRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TemplateTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TemplateTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.SelectJoinStep;
+import org.jooq.Result;
+import org.jooq.impl.DSL;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATING_OPTION_TEMPLATE;
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.TEMPLATE;
@@ -25,45 +30,38 @@ public class TemplateOperations extends AbstractOperations {
     /**
      * Returns a range of templates starting from {@code cursor}.
      *
-     * @param cursor
-     *         Pagination cursor.
-     * @param next
-     *         {@code true} for next, {@code false} for previous.
-     * @param limit
-     *         Number of records.
-     *
-     * @return List of templates.
+     * @param cursor Pagination cursor
+     * @param next {@code true} for next, {@code false} for previous
+     * @param limit Number of records
+     * @return List of templates
      */
     public Range<Template, Integer> getTemplatesFrom(int cursor, boolean next, int limit) {
-        SelectJoinStep<Record> query = create.select(TEMPLATE.fields())
-                .select(RATING_OPTION_TEMPLATE.fields())
-                .from(TEMPLATE)
-                .join(RATING_OPTION_TEMPLATE).onKey();
-        //return getNextRange(query, TEMPLATE.ID_TEMPLATE, cursor, next, limit)
-        //        .map(TemplateTransform::toProto);
-        return null;
+        return getNextRange(create.selectFrom(TEMPLATE), TEMPLATE.ID_TEMPLATE, TEMPLATE, cursor, next, limit)
+                .map(TemplateTransformer::toProto);
     }
 
     /**
      * Returns a single template.
      *
-     * @param id
-     *         ID of the template.
-     *
-     * @return The template.
+     * @param id the ID of the template
+     * @return The template
      */
     public Optional<Template> getTemplate(int id) {
+
         return create.fetchOptional(TEMPLATE, Tables.TEMPLATE.ID_TEMPLATE.eq(id))
-                .map(TemplateTransform::toProto);
+                .map(template -> {
+                    Result<RatingOptionTemplateRecord> options = create.selectFrom(RATING_OPTION_TEMPLATE)
+                            .where(RATING_OPTION_TEMPLATE.TEMPLATE.eq(id))
+                            .fetch();
+                    return TemplateTransformer.toProto(template, options);
+                });
     }
 
     /**
      * Creates a new template.
      *
-     * @param toStore
-     *         Template to save.
-     *
-     * @return Template with ID assigned.
+     * @param toStore the Template to save
+     * @return Template with ID assigned
      * @throws IllegalArgumentException if the name or content is not set
      */
     public Template insertTemplate(Template toStore) throws IllegalArgumentException {
@@ -71,44 +69,81 @@ public class TemplateOperations extends AbstractOperations {
                 Template.NAME_FIELD_NUMBER,
                 Template.CONTENT_FIELD_NUMBER);
 
-        TemplateRecord record = TemplateTransform.mergeRecord(create.newRecord(TEMPLATE), toStore);
+        TemplateRecord record = TemplateTransformer.mergeRecord(create.newRecord(TEMPLATE), toStore);
         record.store();
+        List<RatingOptionTemplateRecord> options = toStore.getRatingOptionsList().stream()
+                .map(option -> TemplateTransformer.toRecord(option, record.getIdTemplate()))
+                .peek(option -> option.setIdRatingOptionsTemplate(null))
+                .collect(Collectors.toList());
 
-        return TemplateTransform.toProto(record);
+        create.batchInsert(options);
+
+        return getTemplate(record.getIdTemplate())
+                .orElseThrow(() -> new IllegalStateException("inserted Template is absent"));
     }
 
     /**
-     * Updates a template.
+     * Updates a template
      *
-     * @param id
-     *         ID of the template.
-     * @param template
-     *         New template contents.
-     *
-     * @return Updated template.
+     * @param id the ID of the template
+     * @param template the new template contents
+     * @return the updated template
      */
     public Template updateTemplate(int id, Template template) {
-        TemplateRecord record = create
+        TemplateRecord templateRecord = create
                 .fetchOptional(TEMPLATE, TEMPLATE.ID_TEMPLATE.eq(id))
                 .orElseThrow(() -> new NotFoundException("Template does not exist!"));
 
-        record = TemplateTransform.mergeRecord(record, template);
-        record.update();
+        templateRecord = TemplateTransformer.mergeRecord(templateRecord, template);
 
-        return TemplateTransform.toProto(record);
+        if (!template.getRatingOptionsList().isEmpty()) {
+            Predicate<Template.RatingOption> hasId = option ->
+                    option.hasField(option.getDescriptorForType().findFieldByNumber
+                            (Template.RatingOption.TEMPLATE_RATING_ID_FIELD_NUMBER));
+            Map<Integer, RatingOptionTemplateRecord> toUpdate = template.getRatingOptionsList().stream()
+                    .filter(hasId)
+                    .collect(Collectors.toMap(
+                            Template.RatingOption::getTemplateRatingId,
+                            option -> TemplateTransformer.toRecord(option, id)
+                    ));
+
+            List<RatingOptionTemplateRecord> toInsert = template.getRatingOptionsList().stream()
+                    .filter(option -> !hasId.test(option))
+                    .map(option -> TemplateTransformer.toRecord(option, id))
+                    .collect(Collectors.toList());
+
+            create.transaction(conf -> {
+                DSL.using(conf).deleteFrom(RATING_OPTION_TEMPLATE)
+                        .where(RATING_OPTION_TEMPLATE.TEMPLATE.eq(id))
+                        .and(RATING_OPTION_TEMPLATE.ID_RATING_OPTIONS_TEMPLATE.notIn(toUpdate.keySet()))
+                        .execute();
+
+                DSL.using(conf).batchUpdate(toUpdate.values());
+
+                DSL.using(conf).batchInsert(toInsert);
+            });
+        }
+
+        templateRecord.update();
+
+
+
+        return TemplateTransformer.toProto(templateRecord);
     }
 
     /**
      * Deletes a template.
      *
-     * @param id
-     *         ID of the template.
-     *
-     * @return {@code true} if deleted, {@code false} otherwise.
+     * @param id the ID of the template
+     * @return {@code true} if deleted, {@code false} otherwise
      */
     public boolean deleteTemplate(int id) {
         TemplateRecord record = create.newRecord(Tables.TEMPLATE);
         record.setIdTemplate(id);
+
+        create.deleteFrom(RATING_OPTION_TEMPLATE)
+                .where(RATING_OPTION_TEMPLATE.TEMPLATE.eq(id))
+                .execute();
 
         return create.executeDelete(record, Tables.TEMPLATE.ID_TEMPLATE.eq(id)) == 1;
     }
