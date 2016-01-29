@@ -11,6 +11,7 @@ import org.jooq.impl.DSL;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
@@ -49,8 +50,7 @@ public class AlgorithmOperations extends AbstractOperations {
                 .select(ALGORITHM_TASK_CHOOSER_PARAM.fields())
                 .from(ALGORITHM_TASK_CHOOSER)
                 .leftJoin(ALGORITHM_TASK_CHOOSER_PARAM).onKey()
-                .where(ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER.greaterOrEqual(taskChooserIds.get(0).value1()))
-                .and(ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER.lessOrEqual(taskChooserIds.get(taskChooserIds.size() - 1).value1()))
+                .where(ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER.in(flatten(taskChooserIds)))
                 .fetchGroups(ALGORITHM_TASK_CHOOSER, record -> record.into(ALGORITHM_TASK_CHOOSER_PARAM));
     }
 
@@ -69,13 +69,12 @@ public class AlgorithmOperations extends AbstractOperations {
                 .mapList(records -> AlgorithmsTransform.constructAnswerQualityAlgorithms(getAnswerQualityParams(records)));
     }
 
-    private Map<AlgorithmAnswerQualityRecord, List<AlgorithmAnswerQualityParamRecord>> getAnswerQualityParams(List<Record1<String>> taskChooserIds) {
+    private Map<AlgorithmAnswerQualityRecord, List<AlgorithmAnswerQualityParamRecord>> getAnswerQualityParams(List<Record1<String>> answerQualityIds) {
         return create.select(ALGORITHM_ANSWER_QUALITY.fields())
                 .select(ALGORITHM_ANSWER_QUALITY_PARAM.fields())
                 .from(ALGORITHM_ANSWER_QUALITY)
                 .leftJoin(ALGORITHM_ANSWER_QUALITY_PARAM).onKey()
-                .where(ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY.greaterOrEqual(taskChooserIds.get(0).value1()))
-                .and(ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY.lessOrEqual(taskChooserIds.get(taskChooserIds.size() - 1).value1()))
+                .where(ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY.in(flatten(answerQualityIds)))
                 .fetchGroups(ALGORITHM_ANSWER_QUALITY, record -> record.into(ALGORITHM_ANSWER_QUALITY_PARAM));
     }
 
@@ -94,14 +93,19 @@ public class AlgorithmOperations extends AbstractOperations {
                 .mapList(records -> AlgorithmsTransform.constructRatingQualityAlgorithms(getRatingQualityParams(records)));
     }
 
-    private Map<AlgorithmRatingQualityRecord, List<AlgorithmRatingQualityParamRecord>> getRatingQualityParams(List<Record1<String>> taskChooserIds) {
+    private Map<AlgorithmRatingQualityRecord, List<AlgorithmRatingQualityParamRecord>> getRatingQualityParams(List<Record1<String>> ratingQualityIDs) {
         return create.select(ALGORITHM_RATING_QUALITY.fields())
                 .select(ALGORITHM_RATING_QUALITY_PARAM.fields())
                 .from(ALGORITHM_RATING_QUALITY)
                 .leftJoin(ALGORITHM_RATING_QUALITY_PARAM).onKey()
-                .where(ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY.greaterOrEqual(taskChooserIds.get(0).value1()))
-                .and(ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY.lessOrEqual(taskChooserIds.get(taskChooserIds.size() - 1).value1()))
+                .where(ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY.in(flatten(ratingQualityIDs)))
                 .fetchGroups(ALGORITHM_RATING_QUALITY, record -> record.into(ALGORITHM_RATING_QUALITY_PARAM));
+    }
+
+    private List<String> flatten(List<Record1<String>> taskChooser) {
+        return taskChooser.stream()
+                .map(Record1::value1)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -190,7 +194,7 @@ public class AlgorithmOperations extends AbstractOperations {
         return create.select(ALGORITHM_RATING_QUALITY_PARAM.fields())
                 .select(CHOSEN_RATING_QUALITY_PARAM.VALUE)
                 .from(ALGORITHM_RATING_QUALITY_PARAM)
-                .leftJoin(ALGORITHM_RATING_QUALITY_PARAM).onKey()
+                .leftJoin(CHOSEN_RATING_QUALITY_PARAM).onKey()
                 .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(experimentID))
                 .and(ALGORITHM_RATING_QUALITY_PARAM.ALGORITHM.eq(ratingQualityID))
                 .groupBy(ALGORITHM_RATING_QUALITY_PARAM.fields())

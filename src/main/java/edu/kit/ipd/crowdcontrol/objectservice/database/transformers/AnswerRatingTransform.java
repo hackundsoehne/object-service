@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by marcel on 26.01.16.
  */
-public class AnswerRatingTransform {
+public class AnswerRatingTransform extends AbstractTransform {
 
     /**
      * Convert a record into a protobuf object
@@ -20,16 +20,18 @@ public class AnswerRatingTransform {
      * @return The protobuf object with the given data from answerRecord and ratings
      */
     public static Answer toAnswerProto(AnswerRecord answerRecord, List<RatingRecord> ratings) {
-        return Answer.newBuilder()
+        return builder(Answer.newBuilder())
+                .set(answerRecord.getQuality(), Answer.Builder::setQuality)
+                .getBuilder()
                 .setExperimentId(answerRecord.getExperiment())
                 .setContent(answerRecord.getAnswer())
                 .setId(answerRecord.getIdAnswer())
-                .setQuality(answerRecord.getQuality())
                 .setTime(answerRecord.getTimestamp().getNanos())
                 .setWorker(answerRecord.getWorkerId())
                 .addAllRatings(() -> ratings.stream()
-                        .map(ratingRecord -> toRatingProto(ratingRecord))
+                        .map(AnswerRatingTransform::toRatingProto)
                         .iterator()).build();
+
     }
 
     /**
@@ -40,14 +42,20 @@ public class AnswerRatingTransform {
      * @return The record with the same data like the answer
      */
     public static AnswerRecord toAnswerRecord(Answer answer, int experimentId) {
-        return new AnswerRecord(
-                answer.getId(),
-                experimentId,
-                answer.getContent(),
-                new Timestamp(answer.getTime()),
-                answer.getWorker(),
-                answer.getQuality(),
-                false);
+        return merge(new AnswerRecord(), answer, (field, record) -> {
+            switch (field) {
+                case Answer.ID_FIELD_NUMBER: record.setIdAnswer(answer.getId());
+                    break;
+                case Answer.EXPERIMENT_ID_FIELD_NUMBER: record.setExperiment(experimentId);
+                    break;
+                case Answer.CONTENT_FIELD_NUMBER: record.setAnswer(answer.getContent());
+                    break;
+                case Answer.WORKER_FIELD_NUMBER: record.setWorkerId(answer.getWorker());
+                    break;
+                case Answer.QUALITY_FIELD_NUMBER: record.setQuality(answer.getQuality());
+                    break;
+            }
+        });
     }
 
     /**
@@ -56,10 +64,13 @@ public class AnswerRatingTransform {
      * @return the new object created from the Record
      */
     public static Rating toRatingProto(RatingRecord ratingRecord) {
-        return Rating.newBuilder()
-                .setRating(ratingRecord.getRating())
+        return builder(Rating.newBuilder())
+                .set(ratingRecord.getRating(), Rating.Builder::setRating)
+                .set(ratingRecord.getFeedback(), Rating.Builder::setFeedback)
+                .getBuilder()
                 .setTime(ratingRecord.getTimestamp().getNanos())
-                .setWorker(ratingRecord.getWorkerId()).build();
+                .setWorker(ratingRecord.getWorkerId())
+                .build();
     }
 
     /**
@@ -71,14 +82,23 @@ public class AnswerRatingTransform {
      * @return A RatingRecord
      */
     public static RatingRecord toRatingRecord(Rating rating, int answerId, int experimentId) {
-        return new RatingRecord(0,
-                experimentId,
-                answerId,
-                new Timestamp(rating.getTime()),
-                rating.getRating(),
-                rating.getFeedback(),
-                rating.getWorker(),
-                rating.getQuality());
-
+        RatingRecord ratingRecord = new RatingRecord();
+        ratingRecord.setAnswerR(answerId);
+        return merge(ratingRecord, rating, (field, record) -> {
+            switch (field) {
+                case Rating.EXPERIMENT_ID_FIELD_NUMBER: record.setExperiment(experimentId);
+                    break;
+                case Rating.TIME_FIELD_NUMBER: record.setTimestamp(new Timestamp(rating.getTime()));
+                    break;
+                case Rating.RATING_FIELD_NUMBER: record.setRating(rating.getRating());
+                    break;
+                case Rating.FEEDBACK_FIELD_NUMBER: record.setFeedback(rating.getFeedback());
+                    break;
+                case Rating.WORKER_FIELD_NUMBER: record.setWorkerId(rating.getWorker());
+                    break;
+                case Rating.QUALITY_FIELD_NUMBER: record.setQuality(rating.getQuality());
+                    break;
+            }
+        });
     }
 }

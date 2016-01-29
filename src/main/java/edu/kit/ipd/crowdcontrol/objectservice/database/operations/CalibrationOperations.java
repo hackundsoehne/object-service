@@ -7,6 +7,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Expe
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.CalibrationTransform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 import org.jooq.DSLContext;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
 import java.util.List;
@@ -40,7 +41,8 @@ public class CalibrationOperations extends AbstractOperations {
     public Range<Calibration, Integer> getCalibrationsFrom(int cursor, boolean next, int limit) {
         // Join is more complicated and the performance gain would be negligible considering the the
         // expected moderate usage
-        return getNextRange(create.selectFrom(CALIBRATION), CALIBRATION.ID_CALIBRATION, CALIBRATION, cursor, next, limit)
+        SelectConditionStep<CalibrationRecord> query = create.selectFrom(CALIBRATION).where(CALIBRATION.EXPERIMENT.isNull());
+        return getNextRange(query, CALIBRATION.ID_CALIBRATION, CALIBRATION, cursor, next, limit)
                 .map(calibrationRecord -> {
                     List<CalibrationAnswerOptionRecord> answers = create.selectFrom(CALIBRATION_ANSWER_OPTION)
                             .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(calibrationRecord.getIdCalibration()))
