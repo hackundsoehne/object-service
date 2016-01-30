@@ -47,7 +47,7 @@ public class TemplateTransformer extends AbstractTransformer {
 
         return Template.newBuilder()
                 .setId(record.getIdTemplate())
-                .setName(record.getTitel())
+                .setName(record.getTitle())
                 .setContent(record.getTemplate())
                 .setAnswerType(answerType)
                 .addAllRatingOptions(options)
@@ -80,7 +80,7 @@ public class TemplateTransformer extends AbstractTransformer {
     public static TemplateRecord mergeRecord(TemplateRecord target, Template template) {
         return merge(target, template, (fieldNumber, record) -> {
             switch (fieldNumber) {
-                case Template.NAME_FIELD_NUMBER: record.setTitel(template.getName());
+                case Template.NAME_FIELD_NUMBER: record.setTitle(template.getName());
                     break;
                 case Template.CONTENT_FIELD_NUMBER: record.setTemplate(template.getContent());
                     break;

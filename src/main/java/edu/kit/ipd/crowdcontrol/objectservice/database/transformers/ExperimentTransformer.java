@@ -166,7 +166,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                     record.setTemplate(experiment.getTemplateId());
                     break;
                 case Experiment.TITLE_FIELD_NUMBER:
-                    record.setTitel(experiment.getTitle());
+                    record.setTitle(experiment.getTitle());
                     break;
                 case Experiment.NEEDED_ANSWERS_FIELD_NUMBER:
                     record.setNeededAnswers(experiment.getNeededAnswers());
