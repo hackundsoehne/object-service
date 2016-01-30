@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
+import com.google.common.base.MoreObjects;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
@@ -130,7 +131,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                     record.setAnswerType(transform(experiment.getAnswerType()));
                     break;
                 case Experiment.ANSWERS_PER_WORKER_FIELD_NUMBER:
-                    record.setAnwersPerWorker(experiment.getAnswersPerWorker());
+                    record.setAnwersPerWorker(MoreObjects.firstNonNull(experiment.getAnswersPerWorker(), 0));
                     break;
                 case Experiment.CONSTRAINTS_FIELD_NUMBER:
                     // has to be done manual with Constraints Transformer
@@ -142,13 +143,13 @@ public class ExperimentTransformer extends AbstractTransformer {
                     record.setIdExperiment(experiment.getId());
                     break;
                 case Experiment.PAYMENT_ANSWER_FIELD_NUMBER:
-                    record.setBonusAnswer(experiment.getPaymentAnswer());
+                    record.setBonusAnswer(MoreObjects.firstNonNull(experiment.getPaymentAnswer(), 0));
                     break;
                 case Experiment.PAYMENT_BASE_FIELD_NUMBER:
-                    record.setBasePayment(experiment.getPaymentBase());
+                    record.setBasePayment(MoreObjects.firstNonNull(experiment.getPaymentBase(), 0));
                     break;
                 case Experiment.PAYMENT_RATING_FIELD_NUMBER:
-                    record.setBonusRating(experiment.getPaymentRating());
+                    record.setBonusRating(MoreObjects.firstNonNull(experiment.getPaymentRating(), 0));
                     break;
                 case Experiment.PLACEHOLDERS_FIELD_NUMBER:
                     record.setTemplateData(new JSONObject(experiment.getPlaceholders()).toString());
@@ -157,7 +158,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                     // has to be done manual with CalibrationsTransformer
                     break;
                 case Experiment.RATINGS_PER_ANSWER_FIELD_NUMBER:
-                    record.setRatingsPerAnswer(experiment.getRatingsPerAnswer());
+                    record.setRatingsPerAnswer(MoreObjects.firstNonNull(experiment.getRatingsPerAnswer(), 0));
                     break;
                 case Experiment.STATE_FIELD_NUMBER:
                     // this is not merged into the database this event will
@@ -174,13 +175,13 @@ public class ExperimentTransformer extends AbstractTransformer {
                     record.setTitle(experiment.getTitle());
                     break;
                 case Experiment.NEEDED_ANSWERS_FIELD_NUMBER:
-                    record.setNeededAnswers(experiment.getNeededAnswers());
+                    record.setNeededAnswers(MoreObjects.firstNonNull(experiment.getNeededAnswers(), 0));
                     break;
                 case Experiment.RATINGS_PER_WORKER_FIELD_NUMBER:
-                    record.setRatingsPerAnswer(experiment.getRatingsPerWorker());
+                    record.setRatingsPerAnswer(MoreObjects.firstNonNull(experiment.getRatingsPerWorker(), 0));
                     break;
                 case Experiment.WORKER_QUALITY_THRESHOLD_FIELD_NUMBER:
-                    record.setWorkerQualityThreshold(experiment.getWorkerQualityThreshold());
+                    record.setWorkerQualityThreshold(MoreObjects.firstNonNull(experiment.getWorkerQualityThreshold(), 0));
                     break;
             }
         });
