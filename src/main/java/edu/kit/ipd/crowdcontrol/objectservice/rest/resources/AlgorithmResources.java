@@ -2,11 +2,11 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmList;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
 import spark.Request;
 import spark.Response;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getQueryBool;
+import java.util.List;
 
 /**
  * Handles requests to algorithms resources.
@@ -25,41 +25,16 @@ public class AlgorithmResources {
      * @param request  request provided by Spark
      * @param response response provided by Spark
      *
-     * @return List of TaskChooser-algorithms.
+     * @return the algorithm-list
      */
-    public Paginated<String> allTaskChoosers(Request request, Response response) {
-        String from = request.queryParams("from");
-        boolean asc = getQueryBool(request, "asc", true);
-
-        return algorithmOperations.getTaskChoosersFrom(from == null ? "" : from, asc, 20)
-                .constructPaginated(AlgorithmList.newBuilder(), AlgorithmList.Builder::addAllItems);
-    }
-
-    /**
-     * @param request  request provided by Spark
-     * @param response response provided by Spark
-     *
-     * @return List of AnswerQuality-algorithms.
-     */
-    public Paginated<String> allAnswerQualityAlgorithms(Request request, Response response) {
-        String from = request.queryParams("from");
-        boolean asc = getQueryBool(request, "asc", true);
-
-        return algorithmOperations.getAnswerQualityAlgorithmsFrom(from == null ? "" : from, asc, 20)
-                .constructPaginated(AlgorithmList.newBuilder(), AlgorithmList.Builder::addAllItems);
-    }
-
-    /**
-     * @param request  request provided by Spark
-     * @param response response provided by Spark
-     *
-     * @return List of RatingQuality-algorithms.
-     */
-    public Paginated<String> allRatingQualityAlgorithms(Request request, Response response) {
-        String from = request.queryParams("from");
-        boolean asc = getQueryBool(request, "asc", true);
-
-        return algorithmOperations.getRatingQualityAlgorithmsFrom(from == null ? "" : from, asc, 20)
-                .constructPaginated(AlgorithmList.newBuilder(), AlgorithmList.Builder::addAllItems);
+    public AlgorithmList getAllAlgortihms(Request request, Response response) {
+        List<AlgorithmOption> taskChoosers = algorithmOperations.getAllTaskChoosers();
+        List<AlgorithmOption> answerQualityAlgorithms = algorithmOperations.getAllAnswerQualityAlgorithms();
+        List<AlgorithmOption> ratingQualityAlgorithms = algorithmOperations.getAllRatingQualityAlgorithms();
+        return AlgorithmList.newBuilder()
+                .addAllTaskChooserAlgorithms(taskChoosers)
+                .addAllAnswerQualityAlgorithms(answerQualityAlgorithms)
+                .addAllRatingQualityAlgorithms(ratingQualityAlgorithms)
+                .build();
     }
 }
