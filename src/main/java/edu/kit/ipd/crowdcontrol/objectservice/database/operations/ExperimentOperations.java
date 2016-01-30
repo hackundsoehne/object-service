@@ -141,7 +141,7 @@ public class ExperimentOperations extends AbstractOperations {
      */
     public boolean verifyExperimentForPublishing(int id) {
         ExperimentRecord experimentRecord = create.fetchOne(EXPERIMENT, EXPERIMENT.ID_EXPERIMENT.eq(id));
-        if (experimentRecord.getTitel() == null
+        if (experimentRecord.getTitle() == null
                 || experimentRecord.getDescription() == null
                 || experimentRecord.getNeededAnswers() == null
                 || experimentRecord.getRatingsPerAnswer() == null
