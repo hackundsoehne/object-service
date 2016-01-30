@@ -33,7 +33,7 @@ public class TagConstraintTransformer extends AbstractTransformer {
     public static List<TagRecord> getTags(Experiment experiment) {
         if (experiment.getTagsCount() > 0)
             return experiment.getTagsList().stream().map(tag ->
-                    new TagRecord(-1,
+                    new TagRecord(null,
                             tag.getName(),
                             experiment.getId())).collect(Collectors.toList());
         return Collections.emptyList();
@@ -57,7 +57,7 @@ public class TagConstraintTransformer extends AbstractTransformer {
     public static List<ConstraintRecord> getConstraints(Experiment experiment) {
         if (experiment.getConstraintsCount() > 0)
             return experiment.getConstraintsList().stream()
-                    .map(constraint -> new ConstraintRecord(-1,
+                    .map(constraint -> new ConstraintRecord(null,
                             constraint.getName(),
                             experiment.getId()))
                     .collect(Collectors.toList());
