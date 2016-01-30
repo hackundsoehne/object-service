@@ -15,7 +15,9 @@ public  final class AlgorithmList extends
     super(builder);
   }
   private AlgorithmList() {
-    items_ = java.util.Collections.emptyList();
+    taskChooserAlgorithms_ = java.util.Collections.emptyList();
+    ratingQualityAlgorithms_ = java.util.Collections.emptyList();
+    answerQualityAlgorithms_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -44,10 +46,26 @@ public  final class AlgorithmList extends
           }
           case 10: {
             if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-              items_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption>();
+              taskChooserAlgorithms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption>();
               mutable_bitField0_ |= 0x00000001;
             }
-            items_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.parser(), extensionRegistry));
+            taskChooserAlgorithms_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.parser(), extensionRegistry));
+            break;
+          }
+          case 18: {
+            if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+              ratingQualityAlgorithms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption>();
+              mutable_bitField0_ |= 0x00000002;
+            }
+            ratingQualityAlgorithms_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.parser(), extensionRegistry));
+            break;
+          }
+          case 26: {
+            if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              answerQualityAlgorithms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption>();
+              mutable_bitField0_ |= 0x00000004;
+            }
+            answerQualityAlgorithms_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.parser(), extensionRegistry));
             break;
           }
         }
@@ -60,7 +78,13 @@ public  final class AlgorithmList extends
               e.getMessage()).setUnfinishedMessage(this));
     } finally {
       if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-        items_ = java.util.Collections.unmodifiableList(items_);
+        taskChooserAlgorithms_ = java.util.Collections.unmodifiableList(taskChooserAlgorithms_);
+      }
+      if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+        ratingQualityAlgorithms_ = java.util.Collections.unmodifiableList(ratingQualityAlgorithms_);
+      }
+      if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+        answerQualityAlgorithms_ = java.util.Collections.unmodifiableList(answerQualityAlgorithms_);
       }
       makeExtensionsImmutable();
     }
@@ -77,39 +101,109 @@ public  final class AlgorithmList extends
             edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmList.class, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmList.Builder.class);
   }
 
-  public static final int ITEMS_FIELD_NUMBER = 1;
-  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> items_;
+  public static final int TASK_CHOOSER_ALGORITHMS_FIELD_NUMBER = 1;
+  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> taskChooserAlgorithms_;
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
-  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> getItemsList() {
-    return items_;
+  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> getTaskChooserAlgorithmsList() {
+    return taskChooserAlgorithms_;
   }
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
   public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
-      getItemsOrBuilderList() {
-    return items_;
+      getTaskChooserAlgorithmsOrBuilderList() {
+    return taskChooserAlgorithms_;
   }
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
-  public int getItemsCount() {
-    return items_.size();
+  public int getTaskChooserAlgorithmsCount() {
+    return taskChooserAlgorithms_.size();
   }
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getItems(int index) {
-    return items_.get(index);
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getTaskChooserAlgorithms(int index) {
+    return taskChooserAlgorithms_.get(index);
   }
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
-  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getItemsOrBuilder(
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getTaskChooserAlgorithmsOrBuilder(
       int index) {
-    return items_.get(index);
+    return taskChooserAlgorithms_.get(index);
+  }
+
+  public static final int RATING_QUALITY_ALGORITHMS_FIELD_NUMBER = 2;
+  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> ratingQualityAlgorithms_;
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> getRatingQualityAlgorithmsList() {
+    return ratingQualityAlgorithms_;
+  }
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+      getRatingQualityAlgorithmsOrBuilderList() {
+    return ratingQualityAlgorithms_;
+  }
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  public int getRatingQualityAlgorithmsCount() {
+    return ratingQualityAlgorithms_.size();
+  }
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getRatingQualityAlgorithms(int index) {
+    return ratingQualityAlgorithms_.get(index);
+  }
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getRatingQualityAlgorithmsOrBuilder(
+      int index) {
+    return ratingQualityAlgorithms_.get(index);
+  }
+
+  public static final int ANSWER_QUALITY_ALGORITHMS_FIELD_NUMBER = 3;
+  private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> answerQualityAlgorithms_;
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> getAnswerQualityAlgorithmsList() {
+    return answerQualityAlgorithms_;
+  }
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+      getAnswerQualityAlgorithmsOrBuilderList() {
+    return answerQualityAlgorithms_;
+  }
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  public int getAnswerQualityAlgorithmsCount() {
+    return answerQualityAlgorithms_.size();
+  }
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAnswerQualityAlgorithms(int index) {
+    return answerQualityAlgorithms_.get(index);
+  }
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAnswerQualityAlgorithmsOrBuilder(
+      int index) {
+    return answerQualityAlgorithms_.get(index);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -124,8 +218,14 @@ public  final class AlgorithmList extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    for (int i = 0; i < items_.size(); i++) {
-      output.writeMessage(1, items_.get(i));
+    for (int i = 0; i < taskChooserAlgorithms_.size(); i++) {
+      output.writeMessage(1, taskChooserAlgorithms_.get(i));
+    }
+    for (int i = 0; i < ratingQualityAlgorithms_.size(); i++) {
+      output.writeMessage(2, ratingQualityAlgorithms_.get(i));
+    }
+    for (int i = 0; i < answerQualityAlgorithms_.size(); i++) {
+      output.writeMessage(3, answerQualityAlgorithms_.get(i));
     }
   }
 
@@ -134,9 +234,17 @@ public  final class AlgorithmList extends
     if (size != -1) return size;
 
     size = 0;
-    for (int i = 0; i < items_.size(); i++) {
+    for (int i = 0; i < taskChooserAlgorithms_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, items_.get(i));
+        .computeMessageSize(1, taskChooserAlgorithms_.get(i));
+    }
+    for (int i = 0; i < ratingQualityAlgorithms_.size(); i++) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(2, ratingQualityAlgorithms_.get(i));
+    }
+    for (int i = 0; i < answerQualityAlgorithms_.size(); i++) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(3, answerQualityAlgorithms_.get(i));
     }
     memoizedSize = size;
     return size;
@@ -245,16 +353,30 @@ public  final class AlgorithmList extends
     }
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        getItemsFieldBuilder();
+        getTaskChooserAlgorithmsFieldBuilder();
+        getRatingQualityAlgorithmsFieldBuilder();
+        getAnswerQualityAlgorithmsFieldBuilder();
       }
     }
     public Builder clear() {
       super.clear();
-      if (itemsBuilder_ == null) {
-        items_ = java.util.Collections.emptyList();
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        taskChooserAlgorithms_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
       } else {
-        itemsBuilder_.clear();
+        taskChooserAlgorithmsBuilder_.clear();
+      }
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        ratingQualityAlgorithms_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000002);
+      } else {
+        ratingQualityAlgorithmsBuilder_.clear();
+      }
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        answerQualityAlgorithms_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000004);
+      } else {
+        answerQualityAlgorithmsBuilder_.clear();
       }
       return this;
     }
@@ -279,14 +401,32 @@ public  final class AlgorithmList extends
     public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmList buildPartial() {
       edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmList result = new edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmList(this);
       int from_bitField0_ = bitField0_;
-      if (itemsBuilder_ == null) {
+      if (taskChooserAlgorithmsBuilder_ == null) {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          items_ = java.util.Collections.unmodifiableList(items_);
+          taskChooserAlgorithms_ = java.util.Collections.unmodifiableList(taskChooserAlgorithms_);
           bitField0_ = (bitField0_ & ~0x00000001);
         }
-        result.items_ = items_;
+        result.taskChooserAlgorithms_ = taskChooserAlgorithms_;
       } else {
-        result.items_ = itemsBuilder_.build();
+        result.taskChooserAlgorithms_ = taskChooserAlgorithmsBuilder_.build();
+      }
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          ratingQualityAlgorithms_ = java.util.Collections.unmodifiableList(ratingQualityAlgorithms_);
+          bitField0_ = (bitField0_ & ~0x00000002);
+        }
+        result.ratingQualityAlgorithms_ = ratingQualityAlgorithms_;
+      } else {
+        result.ratingQualityAlgorithms_ = ratingQualityAlgorithmsBuilder_.build();
+      }
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          answerQualityAlgorithms_ = java.util.Collections.unmodifiableList(answerQualityAlgorithms_);
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.answerQualityAlgorithms_ = answerQualityAlgorithms_;
+      } else {
+        result.answerQualityAlgorithms_ = answerQualityAlgorithmsBuilder_.build();
       }
       onBuilt();
       return result;
@@ -303,29 +443,81 @@ public  final class AlgorithmList extends
 
     public Builder mergeFrom(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmList other) {
       if (other == edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmList.getDefaultInstance()) return this;
-      if (itemsBuilder_ == null) {
-        if (!other.items_.isEmpty()) {
-          if (items_.isEmpty()) {
-            items_ = other.items_;
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        if (!other.taskChooserAlgorithms_.isEmpty()) {
+          if (taskChooserAlgorithms_.isEmpty()) {
+            taskChooserAlgorithms_ = other.taskChooserAlgorithms_;
             bitField0_ = (bitField0_ & ~0x00000001);
           } else {
-            ensureItemsIsMutable();
-            items_.addAll(other.items_);
+            ensureTaskChooserAlgorithmsIsMutable();
+            taskChooserAlgorithms_.addAll(other.taskChooserAlgorithms_);
           }
           onChanged();
         }
       } else {
-        if (!other.items_.isEmpty()) {
-          if (itemsBuilder_.isEmpty()) {
-            itemsBuilder_.dispose();
-            itemsBuilder_ = null;
-            items_ = other.items_;
+        if (!other.taskChooserAlgorithms_.isEmpty()) {
+          if (taskChooserAlgorithmsBuilder_.isEmpty()) {
+            taskChooserAlgorithmsBuilder_.dispose();
+            taskChooserAlgorithmsBuilder_ = null;
+            taskChooserAlgorithms_ = other.taskChooserAlgorithms_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            itemsBuilder_ = 
+            taskChooserAlgorithmsBuilder_ = 
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                 getItemsFieldBuilder() : null;
+                 getTaskChooserAlgorithmsFieldBuilder() : null;
           } else {
-            itemsBuilder_.addAllMessages(other.items_);
+            taskChooserAlgorithmsBuilder_.addAllMessages(other.taskChooserAlgorithms_);
+          }
+        }
+      }
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        if (!other.ratingQualityAlgorithms_.isEmpty()) {
+          if (ratingQualityAlgorithms_.isEmpty()) {
+            ratingQualityAlgorithms_ = other.ratingQualityAlgorithms_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensureRatingQualityAlgorithmsIsMutable();
+            ratingQualityAlgorithms_.addAll(other.ratingQualityAlgorithms_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.ratingQualityAlgorithms_.isEmpty()) {
+          if (ratingQualityAlgorithmsBuilder_.isEmpty()) {
+            ratingQualityAlgorithmsBuilder_.dispose();
+            ratingQualityAlgorithmsBuilder_ = null;
+            ratingQualityAlgorithms_ = other.ratingQualityAlgorithms_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+            ratingQualityAlgorithmsBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 getRatingQualityAlgorithmsFieldBuilder() : null;
+          } else {
+            ratingQualityAlgorithmsBuilder_.addAllMessages(other.ratingQualityAlgorithms_);
+          }
+        }
+      }
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        if (!other.answerQualityAlgorithms_.isEmpty()) {
+          if (answerQualityAlgorithms_.isEmpty()) {
+            answerQualityAlgorithms_ = other.answerQualityAlgorithms_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureAnswerQualityAlgorithmsIsMutable();
+            answerQualityAlgorithms_.addAll(other.answerQualityAlgorithms_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.answerQualityAlgorithms_.isEmpty()) {
+          if (answerQualityAlgorithmsBuilder_.isEmpty()) {
+            answerQualityAlgorithmsBuilder_.dispose();
+            answerQualityAlgorithmsBuilder_ = null;
+            answerQualityAlgorithms_ = other.answerQualityAlgorithms_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+            answerQualityAlgorithmsBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 getAnswerQualityAlgorithmsFieldBuilder() : null;
+          } else {
+            answerQualityAlgorithmsBuilder_.addAllMessages(other.answerQualityAlgorithms_);
           }
         }
       }
@@ -356,244 +548,724 @@ public  final class AlgorithmList extends
     }
     private int bitField0_;
 
-    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> items_ =
+    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> taskChooserAlgorithms_ =
       java.util.Collections.emptyList();
-    private void ensureItemsIsMutable() {
+    private void ensureTaskChooserAlgorithmsIsMutable() {
       if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-        items_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption>(items_);
+        taskChooserAlgorithms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption>(taskChooserAlgorithms_);
         bitField0_ |= 0x00000001;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> itemsBuilder_;
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> taskChooserAlgorithmsBuilder_;
 
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> getItemsList() {
-      if (itemsBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(items_);
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> getTaskChooserAlgorithmsList() {
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(taskChooserAlgorithms_);
       } else {
-        return itemsBuilder_.getMessageList();
+        return taskChooserAlgorithmsBuilder_.getMessageList();
       }
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public int getItemsCount() {
-      if (itemsBuilder_ == null) {
-        return items_.size();
+    public int getTaskChooserAlgorithmsCount() {
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        return taskChooserAlgorithms_.size();
       } else {
-        return itemsBuilder_.getCount();
+        return taskChooserAlgorithmsBuilder_.getCount();
       }
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getItems(int index) {
-      if (itemsBuilder_ == null) {
-        return items_.get(index);
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getTaskChooserAlgorithms(int index) {
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        return taskChooserAlgorithms_.get(index);
       } else {
-        return itemsBuilder_.getMessage(index);
+        return taskChooserAlgorithmsBuilder_.getMessage(index);
       }
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public Builder setItems(
+    public Builder setTaskChooserAlgorithms(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
-      if (itemsBuilder_ == null) {
+      if (taskChooserAlgorithmsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureItemsIsMutable();
-        items_.set(index, value);
+        ensureTaskChooserAlgorithmsIsMutable();
+        taskChooserAlgorithms_.set(index, value);
         onChanged();
       } else {
-        itemsBuilder_.setMessage(index, value);
+        taskChooserAlgorithmsBuilder_.setMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public Builder setItems(
+    public Builder setTaskChooserAlgorithms(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
-      if (itemsBuilder_ == null) {
-        ensureItemsIsMutable();
-        items_.set(index, builderForValue.build());
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        ensureTaskChooserAlgorithmsIsMutable();
+        taskChooserAlgorithms_.set(index, builderForValue.build());
         onChanged();
       } else {
-        itemsBuilder_.setMessage(index, builderForValue.build());
+        taskChooserAlgorithmsBuilder_.setMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public Builder addItems(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
-      if (itemsBuilder_ == null) {
+    public Builder addTaskChooserAlgorithms(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (taskChooserAlgorithmsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureItemsIsMutable();
-        items_.add(value);
+        ensureTaskChooserAlgorithmsIsMutable();
+        taskChooserAlgorithms_.add(value);
         onChanged();
       } else {
-        itemsBuilder_.addMessage(value);
+        taskChooserAlgorithmsBuilder_.addMessage(value);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public Builder addItems(
+    public Builder addTaskChooserAlgorithms(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
-      if (itemsBuilder_ == null) {
+      if (taskChooserAlgorithmsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureItemsIsMutable();
-        items_.add(index, value);
+        ensureTaskChooserAlgorithmsIsMutable();
+        taskChooserAlgorithms_.add(index, value);
         onChanged();
       } else {
-        itemsBuilder_.addMessage(index, value);
+        taskChooserAlgorithmsBuilder_.addMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public Builder addItems(
+    public Builder addTaskChooserAlgorithms(
         edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
-      if (itemsBuilder_ == null) {
-        ensureItemsIsMutable();
-        items_.add(builderForValue.build());
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        ensureTaskChooserAlgorithmsIsMutable();
+        taskChooserAlgorithms_.add(builderForValue.build());
         onChanged();
       } else {
-        itemsBuilder_.addMessage(builderForValue.build());
+        taskChooserAlgorithmsBuilder_.addMessage(builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public Builder addItems(
+    public Builder addTaskChooserAlgorithms(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
-      if (itemsBuilder_ == null) {
-        ensureItemsIsMutable();
-        items_.add(index, builderForValue.build());
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        ensureTaskChooserAlgorithmsIsMutable();
+        taskChooserAlgorithms_.add(index, builderForValue.build());
         onChanged();
       } else {
-        itemsBuilder_.addMessage(index, builderForValue.build());
+        taskChooserAlgorithmsBuilder_.addMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public Builder addAllItems(
+    public Builder addAllTaskChooserAlgorithms(
         java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> values) {
-      if (itemsBuilder_ == null) {
-        ensureItemsIsMutable();
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        ensureTaskChooserAlgorithmsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, items_);
+            values, taskChooserAlgorithms_);
         onChanged();
       } else {
-        itemsBuilder_.addAllMessages(values);
+        taskChooserAlgorithmsBuilder_.addAllMessages(values);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public Builder clearItems() {
-      if (itemsBuilder_ == null) {
-        items_ = java.util.Collections.emptyList();
+    public Builder clearTaskChooserAlgorithms() {
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        taskChooserAlgorithms_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
       } else {
-        itemsBuilder_.clear();
+        taskChooserAlgorithmsBuilder_.clear();
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public Builder removeItems(int index) {
-      if (itemsBuilder_ == null) {
-        ensureItemsIsMutable();
-        items_.remove(index);
+    public Builder removeTaskChooserAlgorithms(int index) {
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        ensureTaskChooserAlgorithmsIsMutable();
+        taskChooserAlgorithms_.remove(index);
         onChanged();
       } else {
-        itemsBuilder_.remove(index);
+        taskChooserAlgorithmsBuilder_.remove(index);
       }
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder getItemsBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder getTaskChooserAlgorithmsBuilder(
         int index) {
-      return getItemsFieldBuilder().getBuilder(index);
+      return getTaskChooserAlgorithmsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getItemsOrBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getTaskChooserAlgorithmsOrBuilder(
         int index) {
-      if (itemsBuilder_ == null) {
-        return items_.get(index);  } else {
-        return itemsBuilder_.getMessageOrBuilder(index);
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        return taskChooserAlgorithms_.get(index);  } else {
+        return taskChooserAlgorithmsBuilder_.getMessageOrBuilder(index);
       }
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
     public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
-         getItemsOrBuilderList() {
-      if (itemsBuilder_ != null) {
-        return itemsBuilder_.getMessageOrBuilderList();
+         getTaskChooserAlgorithmsOrBuilderList() {
+      if (taskChooserAlgorithmsBuilder_ != null) {
+        return taskChooserAlgorithmsBuilder_.getMessageOrBuilderList();
       } else {
-        return java.util.Collections.unmodifiableList(items_);
+        return java.util.Collections.unmodifiableList(taskChooserAlgorithms_);
       }
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder addItemsBuilder() {
-      return getItemsFieldBuilder().addBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder addTaskChooserAlgorithmsBuilder() {
+      return getTaskChooserAlgorithmsFieldBuilder().addBuilder(
           edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
-    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder addItemsBuilder(
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder addTaskChooserAlgorithmsBuilder(
         int index) {
-      return getItemsFieldBuilder().addBuilder(
+      return getTaskChooserAlgorithmsFieldBuilder().addBuilder(
           index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+     * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
      */
     public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder> 
-         getItemsBuilderList() {
-      return getItemsFieldBuilder().getBuilderList();
+         getTaskChooserAlgorithmsBuilderList() {
+      return getTaskChooserAlgorithmsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilder<
         edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
-        getItemsFieldBuilder() {
-      if (itemsBuilder_ == null) {
-        itemsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+        getTaskChooserAlgorithmsFieldBuilder() {
+      if (taskChooserAlgorithmsBuilder_ == null) {
+        taskChooserAlgorithmsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
             edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder>(
-                items_,
+                taskChooserAlgorithms_,
                 ((bitField0_ & 0x00000001) == 0x00000001),
                 getParentForChildren(),
                 isClean());
-        items_ = null;
+        taskChooserAlgorithms_ = null;
       }
-      return itemsBuilder_;
+      return taskChooserAlgorithmsBuilder_;
+    }
+
+    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> ratingQualityAlgorithms_ =
+      java.util.Collections.emptyList();
+    private void ensureRatingQualityAlgorithmsIsMutable() {
+      if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+        ratingQualityAlgorithms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption>(ratingQualityAlgorithms_);
+        bitField0_ |= 0x00000002;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> ratingQualityAlgorithmsBuilder_;
+
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> getRatingQualityAlgorithmsList() {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(ratingQualityAlgorithms_);
+      } else {
+        return ratingQualityAlgorithmsBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public int getRatingQualityAlgorithmsCount() {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        return ratingQualityAlgorithms_.size();
+      } else {
+        return ratingQualityAlgorithmsBuilder_.getCount();
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getRatingQualityAlgorithms(int index) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        return ratingQualityAlgorithms_.get(index);
+      } else {
+        return ratingQualityAlgorithmsBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public Builder setRatingQualityAlgorithms(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureRatingQualityAlgorithmsIsMutable();
+        ratingQualityAlgorithms_.set(index, value);
+        onChanged();
+      } else {
+        ratingQualityAlgorithmsBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public Builder setRatingQualityAlgorithms(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        ensureRatingQualityAlgorithmsIsMutable();
+        ratingQualityAlgorithms_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        ratingQualityAlgorithmsBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public Builder addRatingQualityAlgorithms(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureRatingQualityAlgorithmsIsMutable();
+        ratingQualityAlgorithms_.add(value);
+        onChanged();
+      } else {
+        ratingQualityAlgorithmsBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public Builder addRatingQualityAlgorithms(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureRatingQualityAlgorithmsIsMutable();
+        ratingQualityAlgorithms_.add(index, value);
+        onChanged();
+      } else {
+        ratingQualityAlgorithmsBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public Builder addRatingQualityAlgorithms(
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        ensureRatingQualityAlgorithmsIsMutable();
+        ratingQualityAlgorithms_.add(builderForValue.build());
+        onChanged();
+      } else {
+        ratingQualityAlgorithmsBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public Builder addRatingQualityAlgorithms(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        ensureRatingQualityAlgorithmsIsMutable();
+        ratingQualityAlgorithms_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        ratingQualityAlgorithmsBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public Builder addAllRatingQualityAlgorithms(
+        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> values) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        ensureRatingQualityAlgorithmsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, ratingQualityAlgorithms_);
+        onChanged();
+      } else {
+        ratingQualityAlgorithmsBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public Builder clearRatingQualityAlgorithms() {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        ratingQualityAlgorithms_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+      } else {
+        ratingQualityAlgorithmsBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public Builder removeRatingQualityAlgorithms(int index) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        ensureRatingQualityAlgorithmsIsMutable();
+        ratingQualityAlgorithms_.remove(index);
+        onChanged();
+      } else {
+        ratingQualityAlgorithmsBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder getRatingQualityAlgorithmsBuilder(
+        int index) {
+      return getRatingQualityAlgorithmsFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getRatingQualityAlgorithmsOrBuilder(
+        int index) {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        return ratingQualityAlgorithms_.get(index);  } else {
+        return ratingQualityAlgorithmsBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+         getRatingQualityAlgorithmsOrBuilderList() {
+      if (ratingQualityAlgorithmsBuilder_ != null) {
+        return ratingQualityAlgorithmsBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(ratingQualityAlgorithms_);
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder addRatingQualityAlgorithmsBuilder() {
+      return getRatingQualityAlgorithmsFieldBuilder().addBuilder(
+          edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder addRatingQualityAlgorithmsBuilder(
+        int index) {
+      return getRatingQualityAlgorithmsFieldBuilder().addBuilder(
+          index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+     */
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder> 
+         getRatingQualityAlgorithmsBuilderList() {
+      return getRatingQualityAlgorithmsFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+        getRatingQualityAlgorithmsFieldBuilder() {
+      if (ratingQualityAlgorithmsBuilder_ == null) {
+        ratingQualityAlgorithmsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder>(
+                ratingQualityAlgorithms_,
+                ((bitField0_ & 0x00000002) == 0x00000002),
+                getParentForChildren(),
+                isClean());
+        ratingQualityAlgorithms_ = null;
+      }
+      return ratingQualityAlgorithmsBuilder_;
+    }
+
+    private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> answerQualityAlgorithms_ =
+      java.util.Collections.emptyList();
+    private void ensureAnswerQualityAlgorithmsIsMutable() {
+      if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        answerQualityAlgorithms_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption>(answerQualityAlgorithms_);
+        bitField0_ |= 0x00000004;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> answerQualityAlgorithmsBuilder_;
+
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> getAnswerQualityAlgorithmsList() {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(answerQualityAlgorithms_);
+      } else {
+        return answerQualityAlgorithmsBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public int getAnswerQualityAlgorithmsCount() {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        return answerQualityAlgorithms_.size();
+      } else {
+        return answerQualityAlgorithmsBuilder_.getCount();
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAnswerQualityAlgorithms(int index) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        return answerQualityAlgorithms_.get(index);
+      } else {
+        return answerQualityAlgorithmsBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public Builder setAnswerQualityAlgorithms(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureAnswerQualityAlgorithmsIsMutable();
+        answerQualityAlgorithms_.set(index, value);
+        onChanged();
+      } else {
+        answerQualityAlgorithmsBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public Builder setAnswerQualityAlgorithms(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        ensureAnswerQualityAlgorithmsIsMutable();
+        answerQualityAlgorithms_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        answerQualityAlgorithmsBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public Builder addAnswerQualityAlgorithms(edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureAnswerQualityAlgorithmsIsMutable();
+        answerQualityAlgorithms_.add(value);
+        onChanged();
+      } else {
+        answerQualityAlgorithmsBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public Builder addAnswerQualityAlgorithms(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption value) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureAnswerQualityAlgorithmsIsMutable();
+        answerQualityAlgorithms_.add(index, value);
+        onChanged();
+      } else {
+        answerQualityAlgorithmsBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public Builder addAnswerQualityAlgorithms(
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        ensureAnswerQualityAlgorithmsIsMutable();
+        answerQualityAlgorithms_.add(builderForValue.build());
+        onChanged();
+      } else {
+        answerQualityAlgorithmsBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public Builder addAnswerQualityAlgorithms(
+        int index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder builderForValue) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        ensureAnswerQualityAlgorithmsIsMutable();
+        answerQualityAlgorithms_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        answerQualityAlgorithmsBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public Builder addAllAnswerQualityAlgorithms(
+        java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> values) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        ensureAnswerQualityAlgorithmsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, answerQualityAlgorithms_);
+        onChanged();
+      } else {
+        answerQualityAlgorithmsBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public Builder clearAnswerQualityAlgorithms() {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        answerQualityAlgorithms_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+      } else {
+        answerQualityAlgorithmsBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public Builder removeAnswerQualityAlgorithms(int index) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        ensureAnswerQualityAlgorithmsIsMutable();
+        answerQualityAlgorithms_.remove(index);
+        onChanged();
+      } else {
+        answerQualityAlgorithmsBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder getAnswerQualityAlgorithmsBuilder(
+        int index) {
+      return getAnswerQualityAlgorithmsFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAnswerQualityAlgorithmsOrBuilder(
+        int index) {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        return answerQualityAlgorithms_.get(index);  } else {
+        return answerQualityAlgorithmsBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+         getAnswerQualityAlgorithmsOrBuilderList() {
+      if (answerQualityAlgorithmsBuilder_ != null) {
+        return answerQualityAlgorithmsBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(answerQualityAlgorithms_);
+      }
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder addAnswerQualityAlgorithmsBuilder() {
+      return getAnswerQualityAlgorithmsFieldBuilder().addBuilder(
+          edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder addAnswerQualityAlgorithmsBuilder(
+        int index) {
+      return getAnswerQualityAlgorithmsFieldBuilder().addBuilder(
+          index, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+     */
+    public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder> 
+         getAnswerQualityAlgorithmsBuilderList() {
+      return getAnswerQualityAlgorithmsFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+        getAnswerQualityAlgorithmsFieldBuilder() {
+      if (answerQualityAlgorithmsBuilder_ == null) {
+        answerQualityAlgorithmsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder>(
+                answerQualityAlgorithms_,
+                ((bitField0_ & 0x00000004) == 0x00000004),
+                getParentForChildren(),
+                isClean());
+        answerQualityAlgorithms_ = null;
+      }
+      return answerQualityAlgorithmsBuilder_;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {

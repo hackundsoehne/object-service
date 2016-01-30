@@ -23,10 +23,14 @@ public final class AlgorithmListOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\024algorithm_list.proto\022\014crowdcontrol\032\026al" +
-      "gorithm_option.proto\"=\n\rAlgorithmList\022,\n" +
-      "\005items\030\001 \003(\0132\035.crowdcontrol.AlgorithmOpt" +
-      "ionB0\n,edu.kit.ipd.crowdcontrol.objectse" +
-      "rvice.protoP\001b\006proto3"
+      "gorithm_option.proto\"\323\001\n\rAlgorithmList\022>" +
+      "\n\027task_chooser_algorithms\030\001 \003(\0132\035.crowdc" +
+      "ontrol.AlgorithmOption\022@\n\031rating_quality" +
+      "_algorithms\030\002 \003(\0132\035.crowdcontrol.Algorit" +
+      "hmOption\022@\n\031answer_quality_algorithms\030\003 " +
+      "\003(\0132\035.crowdcontrol.AlgorithmOptionB0\n,ed" +
+      "u.kit.ipd.crowdcontrol.objectservice.pro" +
+      "toP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -46,7 +50,7 @@ public final class AlgorithmListOuterClass {
     internal_static_crowdcontrol_AlgorithmList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_crowdcontrol_AlgorithmList_descriptor,
-        new java.lang.String[] { "Items", });
+        new java.lang.String[] { "TaskChooserAlgorithms", "RatingQualityAlgorithms", "AnswerQualityAlgorithms", });
     edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOuterClass.getDescriptor();
   }
 

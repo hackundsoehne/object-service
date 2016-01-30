@@ -8,26 +8,74 @@ public interface AlgorithmListOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
   java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> 
-      getItemsList();
+      getTaskChooserAlgorithmsList();
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getItems(int index);
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getTaskChooserAlgorithms(int index);
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
-  int getItemsCount();
+  int getTaskChooserAlgorithmsCount();
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
   java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
-      getItemsOrBuilderList();
+      getTaskChooserAlgorithmsOrBuilderList();
   /**
-   * <code>repeated .crowdcontrol.AlgorithmOption items = 1;</code>
+   * <code>repeated .crowdcontrol.AlgorithmOption task_chooser_algorithms = 1;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getItemsOrBuilder(
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getTaskChooserAlgorithmsOrBuilder(
+      int index);
+
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> 
+      getRatingQualityAlgorithmsList();
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getRatingQualityAlgorithms(int index);
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  int getRatingQualityAlgorithmsCount();
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+      getRatingQualityAlgorithmsOrBuilderList();
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption rating_quality_algorithms = 2;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getRatingQualityAlgorithmsOrBuilder(
+      int index);
+
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption> 
+      getAnswerQualityAlgorithmsList();
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAnswerQualityAlgorithms(int index);
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  int getAnswerQualityAlgorithmsCount();
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder> 
+      getAnswerQualityAlgorithmsOrBuilderList();
+  /**
+   * <code>repeated .crowdcontrol.AlgorithmOption answer_quality_algorithms = 3;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAnswerQualityAlgorithmsOrBuilder(
       int index);
 }
