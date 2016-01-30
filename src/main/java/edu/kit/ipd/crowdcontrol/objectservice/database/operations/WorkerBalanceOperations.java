@@ -29,7 +29,7 @@ public class WorkerBalanceOperations extends AbstractOperations {
     public List<GiftCodeRecord> getUnusedGiftCodes() {
         return create.selectFrom(GIFT_CODE)
                 .where(GIFT_CODE.ID_GIFT_CODE.notIn(
-                        DSL.select(WORKER_BALANCE.GIFT_CODE).from(WORKER_BALANCE).where(WORKER_BALANCE.GIFT_CODE.isNotNull()))
+                        DSL.select(WORKER_BALANCE.GIFT_CODE).from(WORKER_BALANCE))
                 )
                 .orderBy(GIFT_CODE.AMOUNT.desc())
                 .fetch();
@@ -70,15 +70,13 @@ public class WorkerBalanceOperations extends AbstractOperations {
      * adds a debit to the balance-sheet of the workers wages.
      * @param workerID the primary key of the worker the debit belongs to
      * @param amount the amount that got payed
-     * @param experiment the experiment the worker worked on
-     * @param giftCode the giftCode used
+     * @param giftCode the primary key of the giftCode used
      * @return true if successful
      */
-    public boolean addDebit(int workerID, int amount, int experiment, int giftCode) {
+    public boolean addDebit(int workerID, int amount, int giftCode) {
         if (amount > 0)
             throw new IllegalArgumentException("amount: " + amount + " has do be negative or zero");
         WorkerBalanceRecord workerBalanceRecord = create.newRecord(WORKER_BALANCE);
-        workerBalanceRecord.setExperiment(experiment);
         workerBalanceRecord.setTransactionValue(amount);
         workerBalanceRecord.setWorker(workerID);
         workerBalanceRecord.setGiftCode(giftCode);
