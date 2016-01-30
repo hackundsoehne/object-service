@@ -43,12 +43,17 @@ public class PaymentCalculator {
      * @param experiment representation of the experiment whose workers will have their payment estimated
      * @return a mapping of workers to their salary
      */
-    public Map<Worker, Integer> estimatePayment(Experiment experiment) {
+    public Map<Worker, Integer> estimatePayment(Experiment experiment)throws IllegalArgumentException {
+
 
         Map<Worker, Integer> map = new HashMap<>();
         int paymentBase = experiment.getPaymentBase();
         int paymentAnswer = experiment.getPaymentAnswer();
         int paymentRating = experiment.getPaymentRating();
+
+        if(paymentAnswer < 0 || paymentBase < 0 || paymentRating < 0){
+            throw new IllegalArgumentException("Error in "+this.getClass()+"! Payment-values must not be less than zero!");
+        }
 
         //Gets a all answers of a worker above the specified threshold
         Map<WorkerRecord,Set<AnswerRecord>> workerAnswerSet = ops.getGoodAnswersOfExperiment(experiment.getId(), 0); //TODO params
@@ -91,6 +96,4 @@ public class PaymentCalculator {
 
         return map;
     }
-
-
 }

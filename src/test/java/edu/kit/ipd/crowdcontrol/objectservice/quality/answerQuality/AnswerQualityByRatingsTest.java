@@ -27,7 +27,7 @@ public class AnswerQualityByRatingsTest {
     public void setUp() throws Exception {
 
         identifier = new AnswerQualityByRatings();
-        answer = new AnswerRecord(1,0,null,null,0,-1);
+        answer = new AnswerRecord(1,0,null,null,0,-1,false);
         ratings = new LinkedList<>();
 
     }
