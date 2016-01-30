@@ -33,7 +33,11 @@ public class ExperimentOperations extends AbstractOperations {
      * @return the resulting id of the experiment
      */
     public int insertNewExperiment(ExperimentRecord experimentRecord) {
-        return create.executeInsert(experimentRecord);
+        return create.insertInto(EXPERIMENT)
+                .set(experimentRecord)
+                .returning(EXPERIMENT.ID_EXPERIMENT)
+                .fetchOne()
+                .value1();
     }
 
     /**
