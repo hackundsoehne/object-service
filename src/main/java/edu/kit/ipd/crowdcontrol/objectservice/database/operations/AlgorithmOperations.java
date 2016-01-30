@@ -8,6 +8,7 @@ import org.jooq.Record1;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +32,51 @@ public class AlgorithmOperations extends AbstractOperations {
     }
 
     /**
+     * returns all the Task-Choosers as AlgorithmOptions
+     * @return a List of AlgorithmOptions
+     */
+    public List<AlgorithmOption> getAllTaskChoosers() {
+        return create.select(ALGORITHM_TASK_CHOOSER.fields())
+                .select(ALGORITHM_TASK_CHOOSER_PARAM.fields())
+                .from(ALGORITHM_TASK_CHOOSER)
+                .leftJoin(ALGORITHM_TASK_CHOOSER_PARAM).onKey()
+                .fetchGroups(ALGORITHM_TASK_CHOOSER, record -> record.into(ALGORITHM_TASK_CHOOSER_PARAM))
+                .entrySet().stream()
+                .map(entry -> AlgorithmsTransformer.constructTaskChooser(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * returns all the AnswerQuality-Algorithms as AlgorithmOptions
+     * @return a List of AlgorithmOptions
+     */
+    public List<AlgorithmOption> getAllAnswerQualityAlgorithms() {
+        return create.select(ALGORITHM_ANSWER_QUALITY.fields())
+                .select(ALGORITHM_ANSWER_QUALITY_PARAM.fields())
+                .from(ALGORITHM_ANSWER_QUALITY)
+                .leftJoin(ALGORITHM_ANSWER_QUALITY_PARAM).onKey()
+                .fetchGroups(ALGORITHM_ANSWER_QUALITY, record -> record.into(ALGORITHM_ANSWER_QUALITY_PARAM))
+                .entrySet().stream()
+                .map(entry -> AlgorithmsTransformer.constructAnswerQuality(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * returns all the RatingQuality-Algortihms as AlgorithmOptions
+     * @return a List of AlgorithmOptions
+     */
+    public List<AlgorithmOption> getAllRatingQualityAlgorithms() {
+        return create.select(ALGORITHM_RATING_QUALITY.fields())
+                .select(ALGORITHM_RATING_QUALITY_PARAM.fields())
+                .from(ALGORITHM_RATING_QUALITY)
+                .leftJoin(ALGORITHM_RATING_QUALITY_PARAM).onKey()
+                .fetchGroups(ALGORITHM_RATING_QUALITY, record -> record.into(ALGORITHM_RATING_QUALITY_PARAM))
+                .entrySet().stream()
+                .map(entry -> AlgorithmsTransformer.constructRatingQuality(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Returns a range of TaskChooser-Algorithms starting from {@code cursor}.
      *
      * @param cursor Pagination cursor or null if first item
@@ -42,7 +88,8 @@ public class AlgorithmOperations extends AbstractOperations {
         SelectJoinStep<Record1<String>> query = create.select(ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER).from(ALGORITHM_TASK_CHOOSER);
         return getNextRange(query, ALGORITHM_TASK_CHOOSER.ID_TASK_CHOOSER, ALGORITHM_TASK_CHOOSER,
                 cursor, next, limit, String::compareTo)
-                .mapList(records -> AlgorithmsTransformer.constructTaskChoosers(getTaskChooserParams(records)));
+                .mapList(records -> new ArrayList<>(getTaskChooserParams(records).entrySet()))
+                .map(entry -> AlgorithmsTransformer.constructTaskChooser(entry.getKey(), entry.getValue()));
     }
 
     private Map<AlgorithmTaskChooserRecord, List<AlgorithmTaskChooserParamRecord>> getTaskChooserParams(List<Record1<String>> taskChooserIds) {
@@ -66,7 +113,8 @@ public class AlgorithmOperations extends AbstractOperations {
         SelectJoinStep<Record1<String>> query = create.select(ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY).from(ALGORITHM_ANSWER_QUALITY);
         return getNextRange(query, ALGORITHM_ANSWER_QUALITY.ID_ALGORITHM_ANSWER_QUALITY, ALGORITHM_ANSWER_QUALITY,
                 cursor, next, limit, String::compareTo)
-                .mapList(records -> AlgorithmsTransformer.constructAnswerQualityAlgorithms(getAnswerQualityParams(records)));
+                .mapList(records -> new ArrayList<>(getAnswerQualityParams(records).entrySet()))
+                .map(entry -> AlgorithmsTransformer.constructAnswerQuality(entry.getKey(), entry.getValue()));
     }
 
     private Map<AlgorithmAnswerQualityRecord, List<AlgorithmAnswerQualityParamRecord>> getAnswerQualityParams(List<Record1<String>> answerQualityIds) {
@@ -90,7 +138,8 @@ public class AlgorithmOperations extends AbstractOperations {
         SelectJoinStep<Record1<String>> query = create.select(ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY).from(ALGORITHM_RATING_QUALITY);
         return getNextRange(query, ALGORITHM_RATING_QUALITY.ID_ALGORITHM_RATING_QUALITY, ALGORITHM_RATING_QUALITY,
                 cursor, next, limit, String::compareTo)
-                .mapList(records -> AlgorithmsTransformer.constructRatingQualityAlgorithms(getRatingQualityParams(records)));
+                .mapList(records -> new ArrayList<>(getRatingQualityParams(records).entrySet()))
+                .map(entry -> AlgorithmsTransformer.constructRatingQuality(entry.getKey(), entry.getValue()));
     }
 
     private Map<AlgorithmRatingQualityRecord, List<AlgorithmRatingQualityParamRecord>> getRatingQualityParams(List<Record1<String>> ratingQualityIDs) {
