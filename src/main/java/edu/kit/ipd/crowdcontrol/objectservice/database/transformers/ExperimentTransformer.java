@@ -32,21 +32,26 @@ public class ExperimentTransformer extends AbstractTransformer {
 
         Function<String, AlgorithmOption> algo = name -> AlgorithmOption.newBuilder().setName(name).build();
 
+        // TODO: Algo Parameters… Already in second toProto?
+
         return builder(Experiment.newBuilder())
                 .set(record.getIdExperiment(), Experiment.Builder::setId)
+                .set(record.getTitel(), Experiment.Builder::setTitle)
                 .set(record.getDescription(), Experiment.Builder::setDescription)
-                .set(record.getNeededAnswers(), Experiment.Builder::setNeededAnswers)
-                .set(record.getAnwersPerWorker(), Experiment.Builder::setAnswersPerWorker)
-                .set(record.getRatingsPerWorker(), Experiment.Builder::setRatingsPerWorker)
+                .set(state, Experiment.Builder::setState)
                 .set(record.getAnswerType(), (builder, x) -> builder.setAnswerType(AnswerType.valueOf(x)))
                 .set(record.getAlgorithmTaskChooser(), (builder, x) -> builder.setAlgorithmTaskChooser(algo.apply(x)))
                 .set(record.getAlgorithmQualityAnswer(), (builder, x) -> builder.setAlgorithmQualityAnswer(algo.apply(x)))
                 .set(record.getAlgorithmQualityRating(), (builder, x) -> builder.setAlgorithmQualityRating(algo.apply(x)))
+                .set(record.getAnwersPerWorker(), Experiment.Builder::setAnswersPerWorker)
+                .set(record.getRatingsPerWorker(), Experiment.Builder::setRatingsPerWorker)
+                .set(record.getRatingsPerAnswer(), Experiment.Builder::setRatingsPerAnswer)
+                .set(record.getNeededAnswers(), Experiment.Builder::setNeededAnswers)
                 .set(record.getBasePayment(), Experiment.Builder::setPaymentBase)
                 .set(record.getBonusAnswer(), Experiment.Builder::setPaymentAnswer)
                 .set(record.getBonusRating(), Experiment.Builder::setPaymentRating)
-                .set(state, Experiment.Builder::setState)
                 .set(record.getTemplateData(), ((builder, s) -> builder.putAllPlaceholders(new Gson().fromJson(s, type))))
+                .set(record.getWorkerQualityThreshold(), Experiment.Builder::setWorkerQualityThreshold)
                 .getBuilder()
                 .build();
     }
