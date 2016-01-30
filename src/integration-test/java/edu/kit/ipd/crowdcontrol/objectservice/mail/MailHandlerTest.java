@@ -32,14 +32,13 @@ public abstract class MailHandlerTest {
         handler.sendMail(properties.getProperty("receiver"), subject, uuid);
         try {
             Thread.sleep(3000);
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+        }
         Message[] messages = handler.fetchFolder(folder);
 
         boolean found = false;
 
-
         for (Message message : messages) {
-
             if (message.getSubject().equals(subject)) {
                 found = true;
                 handler.deleteMails(message);
