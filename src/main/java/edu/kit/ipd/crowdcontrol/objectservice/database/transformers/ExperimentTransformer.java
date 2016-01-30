@@ -36,7 +36,7 @@ public class ExperimentTransformer extends AbstractTransformer {
 
         return builder(Experiment.newBuilder())
                 .set(record.getIdExperiment(), Experiment.Builder::setId)
-                .set(record.getTitel(), Experiment.Builder::setTitle)
+                .set(record.getTitle(), Experiment.Builder::setTitle)
                 .set(record.getDescription(), Experiment.Builder::setDescription)
                 .set(state, Experiment.Builder::setState)
                 .set(record.getAnswerType(), (builder, x) -> builder.setAnswerType(AnswerType.valueOf(x)))
