@@ -135,6 +135,22 @@ public class MailHandler implements MailFetcher, MailSender {
         }
     }
 
+    /**
+     * Closes the folder and the store of the messages.
+     * @param messages the messages their resources become closed
+     * @throws MessagingException in case of problems with closing
+     */
+    public void close(Message[] messages) throws MessagingException {
+        if (messages.length > 0) {
+            if (messages[0].getFolder().isOpen()) {
+                messages[0].getFolder().close(true);
+            }
+            if (messages[0].getFolder().getStore().isConnected()) {
+                messages[0].getFolder().getStore().close();
+            }
+        }
+    }
+
     private Store connect() throws MessagingException {
         Session session = Session.getInstance(props, auth);
         Store store = session.getStore();

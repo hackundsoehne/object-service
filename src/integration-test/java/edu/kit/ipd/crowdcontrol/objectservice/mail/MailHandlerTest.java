@@ -45,6 +45,7 @@ public abstract class MailHandlerTest {
                 break;
             }
         }
+        handler.close(messages);
         assertTrue(found);
     }
 }
