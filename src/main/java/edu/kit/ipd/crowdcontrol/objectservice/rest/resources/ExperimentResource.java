@@ -13,6 +13,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
@@ -83,11 +84,14 @@ public class ExperimentResource {
                     ExperimentsCalibrationRecord record = new ExperimentsCalibrationRecord(
                             null,
                             experimentId,
-                            getOrThrow(calibrationOperations
+                            calibrationOperations
                                     .getCalibrationAnswerOptionFromCalibrations(
                                             calibration.getId(),
                                             answer
-                                    ))
+                                    )
+                                    .orElseThrow(() ->
+                                            new InternalServerErrorException(
+                                                    String.format("CalibrationsAnswerOption: %d/%s not present!", calibration.getId(), answer)))
                                     .getIdCalibrationAnswerOption(),
                             platformPopulation.getPlatformId(),
                             false);
@@ -177,12 +181,12 @@ public class ExperimentResource {
      */
     private List<Experiment.Population> getPopulations(int id) {
         Function<ExperimentsCalibrationRecord, Calibration.Builder> toCalibration = record -> {
-            CalibrationAnswerOptionRecord acceptedAnswer = getOrThrow(
-                    calibrationOperations.getCalibrationAnswerOption(record.getAnswer())
-            );
+            CalibrationAnswerOptionRecord acceptedAnswer = calibrationOperations.getCalibrationAnswerOption(record.getAnswer())
+                    .orElseThrow(() -> new InternalServerErrorException(String.format("CalibrationAnswerOption: %s not found", record.getAnswer())));
 
-            return getOrThrow(calibrationOperations.getCalibration(acceptedAnswer.getCalibration())
-                    .map(calibration -> calibration.toBuilder().addAcceptedAnswers(acceptedAnswer.getAnswer())));
+            return calibrationOperations.getCalibration(acceptedAnswer.getCalibration())
+                    .map(calibration -> calibration.toBuilder().addAcceptedAnswers(acceptedAnswer.getAnswer()))
+                    .orElseThrow(() -> new InternalServerErrorException(String.format("Calibration: %d not found", acceptedAnswer.getCalibration())));
         };
 
         Function<Map.Entry<String, List<Calibration.Builder>>, Experiment.Population> toPopulation = entry -> {
