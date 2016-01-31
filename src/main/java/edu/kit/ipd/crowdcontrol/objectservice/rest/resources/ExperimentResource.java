@@ -184,11 +184,11 @@ public class ExperimentResource {
      * @return returns a list of populations with a platform
      */
     private List<Experiment.Population> getPopulation(int id) {
-
         Function<ExperimentsCalibrationRecord, Calibration> toCalibration = record -> {
             CalibrationAnswerOptionRecord a = getOrThrow(
                     calibrationOperations.getCalibrationAnswerOption(record.getAnswer())
             );
+
             return getOrThrow(calibrationOperations.getCalibration(a.getCalibration()));
         };
 
@@ -197,6 +197,8 @@ public class ExperimentResource {
                 .setPlatformId(entry.getKey())
                 .addAllCalibrations(entry.getValue())
                 .build();
+
+        // TODO: Add accepted answers to calibrations…
 
         return experimentOperations.getCalibrations(id).stream()
                 .collect(Collectors.groupingBy(

@@ -27,7 +27,7 @@ public class OutputTransformer implements Route {
     // Request and Response objects. We need access to the accept header and must change the type of
     // the response.
 
-    private static final JsonFormat.Printer PRINTER = JsonFormat.printer();
+    private static final JsonFormat.Printer PRINTER = JsonFormat.printer().includingDefaultValueFields();
     private static final String TYPE_JSON = "application/json";
     private static final String TYPE_PROTOBUF = "application/protobuf";
     private static final List<String> SUPPORTED_TYPES;
