@@ -61,8 +61,7 @@ public class PlatformManager {
             rec.setName(platform.getName());
             rec.setNeedsEmail(false);
 
-
-            rec.setNeedsEmail(rec.setNeedsEmail());
+            rec.setNeedsEmail(isNeedemail(platform));
             rec.setRenderCalibrations(platform.isCalibrationAllowed());
 
             platformOps.createPlatform(rec);
