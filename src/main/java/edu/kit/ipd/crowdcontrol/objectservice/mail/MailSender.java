@@ -18,5 +18,5 @@ public interface MailSender {
      * @param subject       the subject of the mail
      * @param message       the content of the mail
      */
-    void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException;
+    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException;
 }
