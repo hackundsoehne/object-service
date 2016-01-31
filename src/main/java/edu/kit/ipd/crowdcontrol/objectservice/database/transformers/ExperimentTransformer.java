@@ -32,8 +32,6 @@ public class ExperimentTransformer extends AbstractTransformer {
 
         Function<String, AlgorithmOption> algo = name -> AlgorithmOption.newBuilder().setName(name).build();
 
-        // TODO: Algo Parameters… Already in second toProto?
-
         return builder(Experiment.newBuilder())
                 .set(record.getIdExperiment(), Experiment.Builder::setId)
                 .set(record.getTitle(), Experiment.Builder::setTitle)
@@ -70,19 +68,16 @@ public class ExperimentTransformer extends AbstractTransformer {
                                      List<Experiment.Population> platforms,
                                      List<TagRecord> tagRecords,
                                      List<RatingOptionExperimentRecord> ratingOptions,
-                                     AlgorithmTaskChooserRecord taskChooserRecord,
-                                     Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams,
-                                     AlgorithmAnswerQualityRecord answerQualityRecord,
-                                     Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams,
-                                     AlgorithmRatingQualityRecord ratingQualityRecord,
-                                     Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
+                                     AlgorithmOption taskChooser,
+                                     AlgorithmOption answerQuality,
+                                     AlgorithmOption ratingQuality) {
         List<Constraint> constraints = constraintRecords.stream()
                 .map(TagConstraintTransformer::toConstraintsProto)
                 .collect(Collectors.toList());
         return builder(toProto(record, state).toBuilder())
-                .set(taskChooserRecord, (builder, x) -> builder.setAlgorithmTaskChooser(AlgorithmsTransformer.toTaskChooserProto(x, taskChooserParams)))
-                .set(answerQualityRecord, (builder, x) -> builder.setAlgorithmQualityAnswer(AlgorithmsTransformer.toAnswerQualityProto(x, answerQualityParams)))
-                .set(ratingQualityRecord, (builder, x) -> builder.setAlgorithmQualityRating(AlgorithmsTransformer.toRatingQualityProto(x, ratingQualityParams)))
+                .set(taskChooser, Experiment.Builder::setAlgorithmTaskChooser)
+                .set(answerQuality, Experiment.Builder::setAlgorithmQualityAnswer)
+                .set(ratingQuality, Experiment.Builder::setAlgorithmQualityRating)
                 .getBuilder()
                 .addAllConstraints(constraints)
                 .addAllPopulations(platforms)

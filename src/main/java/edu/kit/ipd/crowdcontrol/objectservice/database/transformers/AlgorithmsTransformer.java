@@ -57,7 +57,7 @@ public class AlgorithmsTransformer extends AbstractTransformer {
      * @param taskChooserParams the parameters, where the values may be the chosen values
      * @return the resulting AlgorithmOption
      */
-    static AlgorithmOption toTaskChooserProto(AlgorithmTaskChooserRecord taskChooserRecord,
+    public static AlgorithmOption toTaskChooserProto(AlgorithmTaskChooserRecord taskChooserRecord,
                                               Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams) {
         List<AlgorithmOption.AlgorithmParameter> parameters = taskChooserParams.entrySet().stream()
                 .filter(entry -> entry.getKey().getIdAlgorithmTaskChooserParam() != null)
@@ -76,7 +76,7 @@ public class AlgorithmsTransformer extends AbstractTransformer {
      * @param answerQualityParams the parameters, where the values may be the chosen values
      * @return the resulting AlgorithmOption
      */
-    static AlgorithmOption toAnswerQualityProto(AlgorithmAnswerQualityRecord answerQualityRecord,
+    public static AlgorithmOption toAnswerQualityProto(AlgorithmAnswerQualityRecord answerQualityRecord,
                                                 Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams) {
         List<AlgorithmOption.AlgorithmParameter> parameters = answerQualityParams.entrySet().stream()
                 .filter(entry -> entry.getKey().getIdAlgorithmAnswerQualityParam() != null)
@@ -95,7 +95,7 @@ public class AlgorithmsTransformer extends AbstractTransformer {
      * @param ratingQualityParams the parameters, where the values may be the chosen values
      * @return the resulting AlgorithmOption
      */
-    static AlgorithmOption toRatingQualityProto(AlgorithmRatingQualityRecord ratingQualityRecord,
+    public static AlgorithmOption toRatingQualityProto(AlgorithmRatingQualityRecord ratingQualityRecord,
                                                 Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
         List<AlgorithmOption.AlgorithmParameter> parameters = ratingQualityParams.entrySet().stream()
                 .filter(entry -> entry.getKey().getIdAlgorithmRatingQualityParam() != null)

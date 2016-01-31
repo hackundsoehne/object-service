@@ -4,9 +4,11 @@ import com.google.protobuf.Descriptors;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformsRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingOptionExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
 import org.jooq.impl.DSL;
 
 import java.util.List;
@@ -253,5 +255,45 @@ public class ExperimentOperations extends AbstractOperations {
 
             DSL.using(conf).batchInsert(toInsert).execute();
         });
+    }
+
+    /**
+     * stores the platforms for the passed experiment in the Experiments_Platform-Tables
+     * @param platforms the platforms to store
+     * @param experimentId the primary key of the experiment
+     */
+    public void storeExperimentsPlatforms(List<String> platforms, int experimentId) {
+        create.transaction(conf -> {
+            DSL.using(conf).deleteFrom(EXPERIMENTS_PLATFORMS)
+                    .where(EXPERIMENTS_PLATFORMS.EXPERIMENT.eq(experimentId))
+                    .and(EXPERIMENTS_PLATFORMS.PLATFORM.notIn(platforms))
+                    .returning();
+
+            Set<String> existing = DSL.using(conf).select(EXPERIMENTS_PLATFORMS.PLATFORM)
+                    .from(EXPERIMENTS_PLATFORMS)
+                    .where(EXPERIMENTS_PLATFORMS.EXPERIMENT.eq(experimentId))
+                    .fetch()
+                    .intoSet(EXPERIMENTS_PLATFORMS.PLATFORM);
+
+            List<ExperimentsPlatformsRecord> toInsert = platforms.stream()
+                    .filter(platform -> !existing.contains(platform))
+                    .map(platform -> new ExperimentsPlatformsRecord(null, experimentId, platform))
+                    .collect(Collectors.toList());
+
+            DSL.using(conf).batchInsert(toInsert);
+        });
+    }
+
+    /**
+     * gets all the active platform for the experiment
+     * @param experimentId the primary key of the experiment
+     * @return a list of platforms
+     */
+    public List<String> getActivePlatforms(int experimentId) {
+        return create.select(EXPERIMENTS_PLATFORMS.PLATFORM)
+                .from(EXPERIMENTS_PLATFORMS)
+                .where(EXPERIMENTS_PLATFORMS.EXPERIMENT.eq(experimentId))
+                .fetch()
+                .map(Record1::value1);
     }
 }

@@ -2,10 +2,12 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstraintTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentList;
@@ -129,35 +131,30 @@ public class ExperimentResource {
         List<RatingOptionExperimentRecord> ratingOptions = experimentOperations.getRatingOptions(id);
         List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
         List<ConstraintRecord> constraintRecords = tagConstraintsOperations.getConstraints(id);
-        List<Experiment.Population> platforms = getPopulation(id);
-        AlgorithmTaskChooserRecord taskChooserRecord = getOrThrow(
-                algorithmsOperations.getTaskChooser(experimentRecord.getAlgorithmTaskChooser())
-        );
-        Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams = algorithmsOperations.getTaskChooserParams(
-                experimentRecord.getAlgorithmTaskChooser(), experimentRecord.getIdExperiment());
-        AlgorithmAnswerQualityRecord answerQualityRecord = getOrThrow(
-                algorithmsOperations.getAnswerQualityRecord(experimentRecord.getAlgorithmQualityAnswer())
-        );
-        Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams = algorithmsOperations.getAnswerQualityParams(
-                experimentRecord.getAlgorithmQualityAnswer(), experimentRecord.getIdExperiment());
-        AlgorithmRatingQualityRecord ratingQualityRecord = getOrThrow(
-                algorithmsOperations.getRatingQualityRecord(experimentRecord.getAlgorithmQualityRating())
-        );
-        Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams =
-                algorithmsOperations.getRatingQualityParams(experimentRecord.getAlgorithmQualityRating(), experimentRecord.getIdExperiment());
+        List<Experiment.Population> populations = getPopulations(id);
+        AlgorithmOption taskChooser = algorithmsOperations.getTaskChooser(experimentRecord.getAlgorithmTaskChooser())
+                .map(record -> AlgorithmsTransformer.toTaskChooserProto(record, algorithmsOperations.getTaskChooserParams(
+                        experimentRecord.getAlgorithmTaskChooser(), experimentRecord.getIdExperiment())))
+                .orElse(null);
+        AlgorithmOption answerQuality = algorithmsOperations.getAnswerQualityRecord(experimentRecord.getAlgorithmQualityAnswer())
+                .map(record -> AlgorithmsTransformer.toAnswerQualityProto(record, algorithmsOperations.getAnswerQualityParams(
+                        experimentRecord.getAlgorithmQualityAnswer(), experimentRecord.getIdExperiment())))
+                .orElse(null);
+
+        AlgorithmOption ratingQuality = algorithmsOperations.getRatingQualityRecord(experimentRecord.getAlgorithmQualityRating())
+                .map(record -> AlgorithmsTransformer.toRatingQualityProto(record, algorithmsOperations.getRatingQualityParams(
+                        experimentRecord.getAlgorithmQualityRating(), experimentRecord.getIdExperiment())))
+                .orElse(null);
 
         return ExperimentTransformer.toProto(experimentRecord,
                 state,
                 constraintRecords,
-                platforms,
+                populations,
                 tagRecords,
                 ratingOptions,
-                taskChooserRecord,
-                taskChooserParams,
-                answerQualityRecord,
-                answerQualityParams,
-                ratingQualityRecord,
-                ratingQualityParams);
+                taskChooser,
+                answerQuality,
+                ratingQuality);
     }
 
     /**
@@ -178,29 +175,51 @@ public class ExperimentResource {
      * @param id the id of the experiment
      * @return returns a list of populations with a platform
      */
-    private List<Experiment.Population> getPopulation(int id) {
-        Function<ExperimentsCalibrationRecord, Calibration> toCalibration = record -> {
-            CalibrationAnswerOptionRecord a = getOrThrow(
+    private List<Experiment.Population> getPopulations(int id) {
+        Function<ExperimentsCalibrationRecord, Calibration.Builder> toCalibration = record -> {
+            CalibrationAnswerOptionRecord acceptedAnswer = getOrThrow(
                     calibrationOperations.getCalibrationAnswerOption(record.getAnswer())
             );
 
-            return getOrThrow(calibrationOperations.getCalibration(a.getCalibration()));
+            return getOrThrow(calibrationOperations.getCalibration(acceptedAnswer.getCalibration())
+                    .map(calibration -> calibration.toBuilder().addAcceptedAnswers(acceptedAnswer.getAnswer())));
         };
 
-        Function<Map.Entry<String, List<Calibration>>, Experiment.Population> toPopulation = entry ->
-                Experiment.Population.newBuilder()
-                .setPlatformId(entry.getKey())
-                .addAllCalibrations(entry.getValue())
-                .build();
+        Function<Map.Entry<String, List<Calibration.Builder>>, Experiment.Population> toPopulation = entry -> {
+            //normalize, multiple chosen answers from the same Calibration were multiple objects
+            List<Calibration> calibrations = entry.getValue().stream()
+                    .collect(Collectors.groupingBy(
+                            Calibration.Builder::getId,
+                            Collectors.toList())
+                    ).values().stream()
+                    .map(list -> list.stream().reduce((o1, o2) -> o1.addAllAcceptedAnswers(o2.getAcceptedAnswersList())))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(Calibration.Builder::build)
+                    .collect(Collectors.toList());
 
-        // TODO: Add accepted answers to calibrations…
+            return Experiment.Population.newBuilder()
+                    .setPlatformId(entry.getKey())
+                    .addAllCalibrations(calibrations)
+                    .build();
+        };
 
-        return experimentOperations.getCalibrations(id).stream()
+
+        Map<String, List<Calibration.Builder>> populations = experimentOperations.getCalibrations(id).stream()
                 .collect(Collectors.groupingBy(
                         ExperimentsCalibrationRecord::getReferencedPlatform,
                         Collectors.mapping(toCalibration, Collectors.toList())
                         )
-                )
+                );
+
+        experimentOperations.getActivePlatforms(id)
+                .forEach(platform -> {
+                    if (!populations.containsKey(platform)) {
+                        populations.put(platform, Collections.emptyList());
+                    }
+                });
+
+        return populations
                 .entrySet().stream()
                 .map(toPopulation)
                 .collect(Collectors.toList());
@@ -272,6 +291,13 @@ public class ExperimentResource {
         if (!records.isEmpty()) {
             calibrationOperations.deleteAllExperimentCalibration(id);
             records.forEach(calibrationOperations::insertExperimentCalibration);
+        }
+
+        if (!experiment.getPopulationsList().isEmpty()) {
+            List<String> platforms = experiment.getPopulationsList().stream()
+                    .map(Experiment.Population::getPlatformId)
+                    .collect(Collectors.toList());
+            experimentOperations.storeExperimentsPlatforms(platforms, id);
         }
 
         if (!Objects.equals(old.getAlgorithmTaskChooser().getName(), experimentRecord.getAlgorithmTaskChooser())) {
