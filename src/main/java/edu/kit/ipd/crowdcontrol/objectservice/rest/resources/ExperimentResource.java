@@ -222,11 +222,13 @@ public class ExperimentResource {
         ExperimentRecord original = getOrThrow(experimentOperations.getExperiment(id));
         Experiment resulting;
 
-        if (experiment.getState() != experimentOperations.getExperimentState(id)) {
+        if (experiment.getState() != Experiment.State.INVALID && experiment.getState() != experimentOperations.getExperimentState(id)) {
             int size = experiment.getAllFields().size();
 
-            if (size > 1)
+            if (size > 1) {
                 throw new IllegalStateException("if you change the state nothing else can be changed");
+            }
+
             resulting = updateExperimentState(id, experiment, old);
         } else {
             resulting = updateExperimentInfo(id, experiment, old, original);
