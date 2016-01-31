@@ -61,10 +61,8 @@ public class PlatformManager {
             rec.setName(platform.getName());
             rec.setNeedsEmail(false);
 
-            /* platform does not handle payment, email is needed for internal payment */
-            boolean needemail = isNeedemail(platform);
 
-            rec.setNeedsEmail(needemail);
+            rec.setNeedsEmail(rec.setNeedsEmail());
             rec.setRenderCalibrations(platform.isCalibrationAllowed());
 
             platformOps.createPlatform(rec);
@@ -73,11 +71,15 @@ public class PlatformManager {
 
     private boolean isNeedemail(Platform platform) {
         boolean needemail = false;
+
+        /* platform does not handle payment, email is needed for internal payment */
         if (!platform.getPayment().isPresent())
             needemail = true;
-            /* if platform cannot identify worker, we need to do that with a email adress */
+
+        /* if platform cannot identify worker, we need to do that with a email adress */
         if (!platform.getWorker().isPresent())
             needemail = true;
+
         return needemail;
     }
 
