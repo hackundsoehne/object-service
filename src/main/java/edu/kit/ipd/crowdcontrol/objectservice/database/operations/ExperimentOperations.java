@@ -280,7 +280,7 @@ public class ExperimentOperations extends AbstractOperations {
                     .map(platform -> new ExperimentsPlatformsRecord(null, experimentId, platform))
                     .collect(Collectors.toList());
 
-            DSL.using(conf).batchInsert(toInsert);
+            DSL.using(conf).batchInsert(toInsert).execute();
         });
     }
 

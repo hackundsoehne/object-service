@@ -78,7 +78,7 @@ public class TemplateOperations extends AbstractOperations {
                 .peek(option -> option.setIdRatingOptionsTemplate(null))
                 .collect(Collectors.toList());
 
-        create.batchInsert(options);
+        create.batchInsert(options).execute();
 
         return getTemplate(record.getIdTemplate())
                 .orElseThrow(() -> new IllegalStateException("inserted Template is absent"));
@@ -120,9 +120,9 @@ public class TemplateOperations extends AbstractOperations {
                         .and(RATING_OPTION_TEMPLATE.ID_RATING_OPTIONS_TEMPLATE.notIn(toUpdate.keySet()))
                         .execute();
 
-                DSL.using(conf).batchUpdate(toUpdate.values());
+                DSL.using(conf).batchUpdate(toUpdate.values()).execute();
 
-                DSL.using(conf).batchInsert(toInsert);
+                DSL.using(conf).batchInsert(toInsert).execute();
             });
         }
 
