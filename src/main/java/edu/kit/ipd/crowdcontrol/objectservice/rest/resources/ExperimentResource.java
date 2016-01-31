@@ -69,7 +69,7 @@ public class ExperimentResource {
                 .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
     }
 
-    private List<ExperimentsCalibrationRecord> convertToCalibrationRecords(Experiment experiment) {
+    private List<ExperimentsCalibrationRecord> convertToCalibrationRecords(Experiment experiment, int experimentId) {
         List<ExperimentsCalibrationRecord> calibrationRecords = new ArrayList<>();
 
         for (Experiment.Population platformPopulation : experiment.getPopulationsList()) {
@@ -80,7 +80,7 @@ public class ExperimentResource {
                 for (String answer : calibration.getAcceptedAnswersList()) {
                     ExperimentsCalibrationRecord record = new ExperimentsCalibrationRecord(
                             null,
-                            experiment.getId(),
+                            experimentId,
                             getOrThrow(calibrationOperations
                                     .getCalibrationAnswerOptionFromCalibrations(
                                             calibration.getId(),
@@ -106,20 +106,15 @@ public class ExperimentResource {
         Experiment experiment = request.attribute("input");
 
         ExperimentRecord record = ExperimentTransformer.mergeProto(new ExperimentRecord(), experiment);
-        List<TagRecord> tags = TagConstraintTransformer.getTags(experiment);
-        List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment);
 
         int id = experimentOperations.insertNewExperiment(record);
 
-        tags.stream()
-                .peek(tag -> tag.setExperiment(id))
-                .forEach(tagConstraintsOperations::insertTag);
-        constraints.stream()
-                .peek(tag -> tag.setExperiment(id))
-                .forEach(tagConstraintsOperations::insertConstraint);
-        convertToCalibrationRecords(experiment).stream()
-                .peek(calibration -> calibration.setReferncedExperiment(id))
-                .forEach(calibrationOperations::insertExperimentCalibration);
+        List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);
+        List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment, id);
+
+        tags.forEach(tagConstraintsOperations::insertTag);
+        constraints.forEach(tagConstraintsOperations::insertConstraint);
+        convertToCalibrationRecords(experiment, id).forEach(calibrationOperations::insertExperimentCalibration);
 
         Experiment exp = fetchExperiment(id);
 
@@ -259,26 +254,24 @@ public class ExperimentResource {
         experimentRecord.setIdExperiment(id);
 
         //update tags if they were updated
-        List<TagRecord> tags = TagConstraintTransformer.getTags(experiment);
+        List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);
         if (!tags.isEmpty()) {
             tagConstraintsOperations.deleteAllTags(id);
             tags.forEach(tagConstraintsOperations::insertTag);
         }
 
         //update constraints if they were changed
-        List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment);
+        List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment, id);
         if (!constraints.isEmpty()) {
             tagConstraintsOperations.deleteAllConstraint(id);
             constraints.forEach(tagConstraintsOperations::insertConstraint);
         }
 
         // Update calibration records from experiment
-        List<ExperimentsCalibrationRecord> records = convertToCalibrationRecords(experiment);
+        List<ExperimentsCalibrationRecord> records = convertToCalibrationRecords(experiment, id);
         if (!records.isEmpty()) {
             calibrationOperations.deleteAllExperimentCalibration(id);
-            records.stream()
-                    .peek(calibration -> calibration.setReferncedExperiment(id))
-                    .forEach(calibrationOperations::insertExperimentCalibration);
+            records.forEach(calibrationOperations::insertExperimentCalibration);
         }
 
         if (!Objects.equals(old.getAlgorithmTaskChooser().getName(), experimentRecord.getAlgorithmTaskChooser())) {

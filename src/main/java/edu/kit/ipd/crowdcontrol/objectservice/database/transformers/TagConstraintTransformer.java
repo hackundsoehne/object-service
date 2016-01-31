@@ -18,7 +18,7 @@ public class TagConstraintTransformer extends AbstractTransformer {
     /**
      * Converts a record into a proto object
      * @param record The record to convert
-     * @return A probo object with the data from the record
+     * @return A proto object with the data from the record
      */
     public static Tag toTagProto(TagRecord record) {
         return Tag.newBuilder()
@@ -28,14 +28,17 @@ public class TagConstraintTransformer extends AbstractTransformer {
     /**
      * Creates a TagRecord list form a given experiment
      * @param experiment the experiment to extract data from
+     * @param experimentId the experimentId
      * @return A list of tags used by the experiment
      */
-    public static List<TagRecord> getTags(Experiment experiment) {
+    public static List<TagRecord> getTags(Experiment experiment, int experimentId) {
         if (experiment.getTagsCount() > 0)
-            return experiment.getTagsList().stream().map(tag ->
+            return experiment.getTagsList().stream()
+                    .map(tag ->
                     new TagRecord(null,
                             tag.getName(),
-                            experiment.getId())).collect(Collectors.toList());
+                            experimentId))
+                    .collect(Collectors.toList());
         return Collections.emptyList();
     }
 
@@ -52,14 +55,15 @@ public class TagConstraintTransformer extends AbstractTransformer {
     /**
      * Create a list of Constraints from a given experiment
      * @param experiment The experiment to grab data from
+     *
      * @return A list of constraintRecords
      */
-    public static List<ConstraintRecord> getConstraints(Experiment experiment) {
+    public static List<ConstraintRecord> getConstraints(Experiment experiment, int experimentId) {
         if (experiment.getConstraintsCount() > 0)
             return experiment.getConstraintsList().stream()
                     .map(constraint -> new ConstraintRecord(null,
                             constraint.getName(),
-                            experiment.getId()))
+                            experimentId))
                     .collect(Collectors.toList());
         return Collections.emptyList();
     }

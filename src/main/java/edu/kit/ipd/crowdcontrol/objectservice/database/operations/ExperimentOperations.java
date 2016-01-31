@@ -235,7 +235,7 @@ public class ExperimentOperations extends AbstractOperations {
                 .filter(hasID)
                 .collect(Collectors.toMap(
                         Experiment.RatingOption::getExperimentRatingId,
-                        option -> new RatingOptionExperimentRecord(option.getExperimentRatingId(), option.getName(), option.getValue(), option.getValue())
+                        option -> new RatingOptionExperimentRecord(option.getExperimentRatingId(), option.getName(), option.getValue(), experimentId)
                 ));
 
         List<RatingOptionExperimentRecord> toInsert = ratingOptions.stream()
