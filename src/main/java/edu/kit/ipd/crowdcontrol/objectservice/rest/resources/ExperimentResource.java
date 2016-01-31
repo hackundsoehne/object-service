@@ -270,11 +270,13 @@ public class ExperimentResource {
             constraints.forEach(tagConstraintsOperations::insertConstraint);
         }
 
-        //update calibration records from the experiment
+        // Update calibration records from experiment
         List<ExperimentsCalibrationRecord> records = convertToCalibrationRecords(experiment);
         if (!records.isEmpty()) {
             calibrationOperations.deleteAllExperimentCalibration(id);
-            records.forEach(calibrationOperations::insertExperimentCalibration);
+            records.stream()
+                    .peek(calibration -> calibration.setReferncedExperiment(id))
+                    .forEach(calibrationOperations::insertExperimentCalibration);
         }
 
         if (!Objects.equals(old.getAlgorithmTaskChooser().getName(), experimentRecord.getAlgorithmTaskChooser())) {
