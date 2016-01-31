@@ -55,4 +55,8 @@ public class TasksOperations extends AbstractOperations {
                 .and(Tables.TASK.EXPERIMENT.eq(experimentId))
                 .fetchOptional();
     }
+
+    public void deleteTask(TaskRecord result) {
+        //TODO leander
+    }
 }
