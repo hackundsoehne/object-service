@@ -73,7 +73,7 @@ public class ExperimentResource {
         List<ExperimentsCalibrationRecord> calibrationRecords = new ArrayList<>();
 
         for (Experiment.Population platformPopulation : experiment.getPopulationsList()) {
-            for (Calibration calibration : platformPopulation.getCalibrationList()) {
+            for (Calibration calibration : platformPopulation.getCalibrationsList()) {
                 if (!calibrationOperations.getCalibration(calibration.getId()).isPresent())
                     throw new IllegalArgumentException("Calibration " + calibration.getId() + " does not exists");
 
@@ -195,7 +195,7 @@ public class ExperimentResource {
         Function<Map.Entry<String, List<Calibration>>, Experiment.Population> toPopulation = entry ->
                 Experiment.Population.newBuilder()
                 .setPlatformId(entry.getKey())
-                .addAllCalibration(entry.getValue())
+                .addAllCalibrations(entry.getValue())
                 .build();
 
         return experimentOperations.getCalibrations(id).stream()
