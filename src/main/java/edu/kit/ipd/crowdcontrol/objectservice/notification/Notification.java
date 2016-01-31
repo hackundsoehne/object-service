@@ -93,6 +93,9 @@ public class Notification implements Runnable {
         this.lastSent = lastSent;
     }
 
+    /**
+     * @return the checkPeriod
+     */
     public long getCheckPeriod() {
         return checkPeriod;
     }

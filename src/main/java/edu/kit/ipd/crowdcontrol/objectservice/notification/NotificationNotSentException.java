@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 /**
+ * NotificationNotSentException is thrown when there was an error sending a notification.
+ *
  * @author Simon Korz
  * @version 1.0
  */

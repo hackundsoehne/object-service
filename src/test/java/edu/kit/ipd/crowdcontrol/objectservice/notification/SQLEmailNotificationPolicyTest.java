@@ -29,12 +29,12 @@ import static org.mockito.Mockito.when;
  * @author Simon Korz
  * @version 1.0
  */
-public class DBEmailNotificationPolicyTest {
+public class SQLEmailNotificationPolicyTest {
     private static final String TESTQUERY = "SELECT test query";
     private static final String RECEIVER = "mail@example.com";
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
-    DBEmailNotificationPolicy policy;
+    SQLEmailNotificationPolicy policy;
     Notification notification;
     NotificationRecord record;
     Result<Record> result;
@@ -47,7 +47,7 @@ public class DBEmailNotificationPolicyTest {
 
     @Before
     public void setUp() throws Exception {
-        policy = new DBEmailNotificationPolicy(mailSender, RECEIVER, notificationOperations);
+        policy = new SQLEmailNotificationPolicy(mailSender, RECEIVER, notificationOperations);
         DSLContext create = DSL.using(SQLDialect.MYSQL);
         // this could be any record from the db
         record = new NotificationRecord(5, "Test Notification",

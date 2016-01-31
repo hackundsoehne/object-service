@@ -8,18 +8,23 @@ import org.jooq.Result;
 import java.time.Instant;
 
 /**
- * The DBEmailNotificationPolicy
+ * The SQLEmailNotificationPolicy checks given queries in a SQL-Database and sends notifications via email.
  *
  * @author Simon Korz
  * @version 1.0
  */
-public class DBEmailNotificationPolicy extends NotificationPolicy<Result<Record>> {
+public class SQLEmailNotificationPolicy extends NotificationPolicy<Result<Record>> {
     private MailSender mailSender;
     private String receiver;
     private NotificationOperations operation;
 
 
-    public DBEmailNotificationPolicy(MailSender mailSender, String receiver, NotificationOperations operation) {
+    /**
+     * @param mailSender an implementation of the MailSender interfac
+     * @param receiver   email address of the receiver
+     * @param operation  instance of the notification operations
+     */
+    public SQLEmailNotificationPolicy(MailSender mailSender, String receiver, NotificationOperations operation) {
         this.mailSender = mailSender;
         this.receiver = receiver;
         this.operation = operation;
@@ -36,7 +41,6 @@ public class DBEmailNotificationPolicy extends NotificationPolicy<Result<Record>
     }
 
     @Override
-
     protected void send(Notification notification, Result<Record> token) {
         StringBuilder message = new StringBuilder();
         message.append(notification.getDescription());

@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 /**
+ * NotificationPolicy encapsulates strategies to check and send notifications.
+ *
  * @author Simon Korz
  * @version 1.0
  */
