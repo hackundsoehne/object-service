@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -35,11 +35,8 @@ public class PaymentCalculatorTest {
         workerAnswerMap = new HashMap<>();
         workerRatingMap = new HashMap<>();
 
-        exp = mock(Experiment.class);
-        when(exp.getId()).thenReturn(13);
-        when(exp.getPaymentAnswer()).thenReturn(10);
-        when(exp.getPaymentRating()).thenReturn(10);
-        when(exp.getPaymentBase()).thenReturn(5);
+        exp = Experiment.newBuilder().setId(13).setPaymentAnswer(10).setPaymentRating(10).setPaymentBase(5).build();
+
 
         ops = mock(AnswerRatingOperations.class);
         when(ops.getGoodAnswersOfExperiment(exp.getId(),0)).thenReturn(workerAnswerMap);
@@ -57,6 +54,10 @@ public class PaymentCalculatorTest {
 
     }
 
+    /**
+     * Tests payment calculation for answers and ratings of different workers.
+     * @throws Exception
+     */
     @Test
     public void testEstimatePayment() throws Exception {
 
@@ -78,16 +79,29 @@ public class PaymentCalculatorTest {
         workerAnswerMap.put(workerOne,answerSetWorkerOne);
         workerAnswerMap.put(workerTwo,answerSetWorkerTwo);
 
-        Map<Worker,Integer> result = calculator.estimatePayment(exp);
-        List<Worker> sortedResult = new LinkedList<>();
-        for (Worker worker: result.keySet()) {
-            assertNotEquals((int)result.get(worker),0);
+        Map<Worker,Integer> resultAnswers = calculator.estimatePayment(exp);
+        assertNotNull(resultAnswers);
+        assertEquals(resultAnswers.size(),2);
+
+        List<Worker> sortedResult = sortWorkerMap(resultAnswers);
+
+        assertEquals((int)resultAnswers.get(sortedResult.get(0)), exp.getPaymentBase()+(exp.getPaymentAnswer()*answerSetWorkerOne.size()));
+        assertEquals((int)resultAnswers.get(sortedResult.get(1)), exp.getPaymentBase()+(exp.getPaymentAnswer()*answerSetWorkerTwo.size()));
 
 
-        }
+        Set<RatingRecord> ratingSetWorkerTwo = new HashSet<>();
+        ratingSetWorkerTwo.add(new RatingRecord(0,exp.getId(),0,null,6,1,7));
+        ratingSetWorkerTwo.add(new RatingRecord(1,exp.getId(),0,null,5,1,9));
+
+        workerRatingMap.put(workerTwo,ratingSetWorkerTwo);
 
 
-        assertNotNull(result);
+        Map<Worker,Integer> resultRatings = calculator.estimatePayment(exp);
+        assertNotNull(resultRatings);
+        assertEquals(resultRatings.size(),2);
+        sortedResult = sortWorkerMap(resultAnswers);
+        assertEquals((int)resultRatings.get(sortedResult.get(0)),  exp.getPaymentBase()+(exp.getPaymentAnswer()*answerSetWorkerOne.size()));
+        assertEquals((int)resultRatings.get(sortedResult.get(1)), exp.getPaymentBase()+(exp.getPaymentAnswer()*answerSetWorkerTwo.size())+(exp.getPaymentRating()*ratingSetWorkerTwo.size()));
 
 
 
@@ -95,5 +109,24 @@ public class PaymentCalculatorTest {
 
 
 
+
+
+
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testFalsePaymentArgs(){
+        exp = Experiment.newBuilder().setPaymentBase(-1).setPaymentAnswer(4).setPaymentRating(4).build();
+        calculator.estimatePayment(exp);
+
+    }
+
+
+    private List<Worker> sortWorkerMap(Map<Worker,Integer> map){
+        List<Worker> sortedWorkers = new LinkedList<>(map.keySet());
+
+
+        sortedWorkers.sort((o1, o2) -> Integer.compare(map.get(o2),map.get(o1)));
+        return sortedWorkers;
     }
 }
