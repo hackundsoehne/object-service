@@ -99,3 +99,4 @@ gradle-app.setting
 #integration-test properties
 gmailLogin.properties
 webLogin.properties
+mailHandlerTestProps.properties
