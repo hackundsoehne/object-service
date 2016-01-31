@@ -62,16 +62,34 @@ public class PlatformManager {
             rec.setNeedsEmail(false);
 
             /* platform does not handle payment, email is needed for internal payment */
-            if (!platform.getPayment().isPresent())
-                rec.setNeedsEmail(true);
-            /* if platform cannot identify worker, we need to do that with a email adress */
-            if (!platform.getWorker().isPresent())
-                rec.setNeedsEmail(true);
+            boolean needemail = isNeedemail(platform);
 
+            rec.setNeedsEmail(needemail);
             rec.setRenderCalibrations(platform.isCalibrationAllowed());
 
             platformOps.createPlatform(rec);
         });
+    }
+
+    private boolean isNeedemail(Platform platform) {
+        boolean needemail = false;
+        if (!platform.getPayment().isPresent())
+            needemail = true;
+            /* if platform cannot identify worker, we need to do that with a email adress */
+        if (!platform.getWorker().isPresent())
+            needemail = true;
+        return needemail;
+    }
+
+    /**
+     * Returns if the given Platform needs a email or not
+     * @param name name of the platform
+     * @return true if the platform needs an email, false if not
+     */
+    public boolean getNeedemail(String name) {
+        return isNeedemail(
+                getPlatform(name).orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+        );
     }
 
     /**
