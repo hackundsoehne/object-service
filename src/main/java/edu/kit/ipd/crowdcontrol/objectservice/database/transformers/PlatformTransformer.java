@@ -20,6 +20,7 @@ public class PlatformTransformer extends AbstractTransformer {
         return Platform.newBuilder()
                 .setId(record.getIdPlatform())
                 .setName(record.getName())
+                .setHasCalibrations(record.getRenderCalibrations())
                 .build();
     }
 }
