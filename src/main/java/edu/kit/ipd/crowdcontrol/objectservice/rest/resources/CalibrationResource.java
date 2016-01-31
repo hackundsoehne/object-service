@@ -58,6 +58,9 @@ public class CalibrationResource {
     public Calibration put(Request request, Response response) {
         Calibration calibration = request.attribute("input");
 
+        if (calibration.getAnswersList().isEmpty())
+            throw new BadRequestException("Calibrations must have answers!");
+
         try {
             calibration = operations.insertCalibration(calibration);
         } catch (IllegalArgumentException e) {
