@@ -12,13 +12,15 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Simon Korz
  * @version 1.0
  */
 public class NotificationControllerTest {
+    private static final int CHECKPERIOD = 1;
+
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
     private NotificationController notificationController;
@@ -38,32 +40,32 @@ public class NotificationControllerTest {
         builder.setName("Test Notification");
         builder.setDescription("This is a test notification");
         builder.setSendThreshold(60 * 60 * 24);
-        builder.setCheckPeriod(1);
+        builder.setCheckPeriod(CHECKPERIOD);
         builder.setQuery("SELECT");
         notificationProto = builder.buildPartial();
 
-        notification = new edu.kit.ipd.crowdcontrol.objectservice.notification.Notification(5, "Test Notification",
-                "This is a test notification", 60 * 60 * 24, 1, "SELECT", policy);
+        notification = new edu.kit.ipd.crowdcontrol.objectservice.notification.Notification(notificationProto.getId(),
+                notificationProto.getName(), notificationProto.getDescription(), notificationProto.getSendThreshold(),
+                notificationProto.getCheckPeriod(), notificationProto.getQuery(), policy);
     }
 
     @Test
     public void testCreateNotification() throws Exception {
         notificationController.createNotification(notificationProto);
-        Thread.sleep(200);
-        verify(policy).invoke(eq(notification));
+        // wait for a second invocation
+        Thread.sleep(CHECKPERIOD * 1000 + 10);
+        verify(policy, times(2)).invoke(eq(notification));
     }
 
     @Test
     public void testDeleteNotification() throws Exception {
-        // TODO
-        notificationController.createNotification(notificationProto);
-        verify(policy).invoke(eq(notification));
+        //depends on created notification
+        testCreateNotification();
         notificationController.deleteNotification(notificationProto);
-        verify(policy).invoke(eq(notification));
+        // wait for another invocation that hopefully never occurs
+        Thread.sleep(CHECKPERIOD * 1000 + 10);
+        verifyNoMoreInteractions(policy);
     }
 
-    @Test
-    public void testUpdateNotification() throws Exception {
 
-    }
 }

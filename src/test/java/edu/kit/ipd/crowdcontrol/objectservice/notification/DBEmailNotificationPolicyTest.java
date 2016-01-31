@@ -32,35 +32,31 @@ import static org.mockito.Mockito.when;
 public class DBEmailNotificationPolicyTest {
     private static final String TESTQUERY = "SELECT test query";
     private static final String RECEIVER = "mail@example.com";
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
     DBEmailNotificationPolicy policy;
     Notification notification;
     NotificationRecord record;
     Result<Record> result;
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
-    @Mock
-    private MailSender mailSender;
-
-    @Mock
-    private NotificationOperations notificationOperations;
-
     @Captor
     ArgumentCaptor<String> messageCaptor;
+    @Mock
+    private MailSender mailSender;
+    @Mock
+    private NotificationOperations notificationOperations;
 
     @Before
     public void setUp() throws Exception {
         policy = new DBEmailNotificationPolicy(mailSender, RECEIVER, notificationOperations);
-        notification = new Notification(5, "Test Notification",
-                "This is a test notification", 60 * 60 * 24, 60 * 10, TESTQUERY, policy);
-
         DSLContext create = DSL.using(SQLDialect.MYSQL);
         // this could be any record from the db
         record = new NotificationRecord(5, "Test Notification",
                 "This is a test notification", 60 * 60 * 24, 60 * 10, TESTQUERY, Timestamp.from(Instant.now()));
         result = create.newResult();
         result.add(record);
+
+        notification = new Notification(record.getIdNotification(), record.getName(), record.getDescription(),
+                record.getSendthreshold(), record.getCheckperiod(), TESTQUERY, policy);
     }
 
     @Test

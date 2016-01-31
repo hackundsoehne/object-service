@@ -8,6 +8,8 @@ import org.jooq.Result;
 import java.time.Instant;
 
 /**
+ * The DBEmailNotificationPolicy
+ *
  * @author Simon Korz
  * @version 1.0
  */

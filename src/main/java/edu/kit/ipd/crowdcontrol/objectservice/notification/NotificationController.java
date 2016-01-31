@@ -13,6 +13,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * The NotificationController holds all notifications and schedules them.
+ *
  * @author Simon Korz
  * @version 1.0
  */
@@ -45,20 +47,20 @@ public class NotificationController {
     }
 
     /**
-     * Creates a new Notification
+     * Creates a new Notification from protobuf and adds it to the scheduler
      *
      * @param notificationProto the notification to create
      */
     public void createNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto) {
-        Notification internalNotification = new Notification(notificationProto.getId(), notificationProto.getName(),
+        Notification notification = new Notification(notificationProto.getId(), notificationProto.getName(),
                 notificationProto.getDescription(), notificationProto.getSendThreshold(),
                 notificationProto.getCheckPeriod(), notificationProto.getQuery(), policy);
 
-        createNotification(internalNotification);
+        createNotification(notification);
     }
 
     /**
-     * Creates a new Notification
+     * Creates a new Notification and adds it to the scheduler
      *
      * @param notification the notification to create
      */
