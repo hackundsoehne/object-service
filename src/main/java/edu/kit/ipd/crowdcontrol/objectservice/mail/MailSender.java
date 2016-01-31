@@ -6,11 +6,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * Describes an interface to send mails from certain mail address to a mail address.
  *
-<<<<<<< HEAD
- * @author felix
-=======
  * @author Felix Rittler
->>>>>>> origin/master
  */
 
 public interface MailSender {
@@ -22,5 +18,5 @@ public interface MailSender {
      * @param subject       the subject of the mail
      * @param message       the content of the mail
      */
-    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException;
+    void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException;
 }

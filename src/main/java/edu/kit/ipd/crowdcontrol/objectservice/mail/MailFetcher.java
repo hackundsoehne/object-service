@@ -19,7 +19,6 @@ public interface MailFetcher {
     Message[] fetchUnseen(String name) throws MessagingException;
 
     /**
-
      * Fetches all mails in a folder.
      *
      * @param name the name of the folder
