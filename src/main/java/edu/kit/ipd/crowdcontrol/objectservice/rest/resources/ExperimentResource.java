@@ -72,36 +72,6 @@ public class ExperimentResource {
                 .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
     }
 
-    private List<ExperimentsCalibrationRecord> convertToCalibrationRecords(Experiment experiment, int experimentId) {
-        List<ExperimentsCalibrationRecord> calibrationRecords = new ArrayList<>();
-
-        for (Experiment.Population platformPopulation : experiment.getPopulationsList()) {
-            for (Calibration calibration : platformPopulation.getCalibrationsList()) {
-                if (!calibrationOperations.getCalibration(calibration.getId()).isPresent())
-                    throw new IllegalArgumentException("Calibration " + calibration.getId() + " does not exists");
-
-                for (String answer : calibration.getAcceptedAnswersList()) {
-                    ExperimentsCalibrationRecord record = new ExperimentsCalibrationRecord(
-                            null,
-                            experimentId,
-                            calibrationOperations
-                                    .getCalibrationAnswerOptionFromCalibrations(
-                                            calibration.getId(),
-                                            answer
-                                    )
-                                    .orElseThrow(() ->
-                                            new InternalServerErrorException(
-                                                    String.format("CalibrationsAnswerOption: %d/%s not present!", calibration.getId(), answer)))
-                                    .getIdCalibrationAnswerOption(),
-                            platformPopulation.getPlatformId(),
-                            false);
-                    calibrationRecords.add(record);
-                }
-            }
-        }
-        return calibrationRecords;
-    }
-
     /**
      * Create a new experiment
      * @param request  Request provided by Spark.
@@ -120,7 +90,13 @@ public class ExperimentResource {
 
         tags.forEach(tagConstraintsOperations::insertTag);
         constraints.forEach(tagConstraintsOperations::insertConstraint);
-        convertToCalibrationRecords(experiment, id).forEach(calibrationOperations::insertExperimentCalibration);
+        experiment.getPopulationsList().forEach(population -> {
+            List<Integer> answerIDs = population.getCalibrationsList().stream()
+                    .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
+                    .map(Calibration.Answer::getId)
+                    .collect(Collectors.toList());
+            calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, id);
+        });
 
         Experiment exp = fetchExperiment(id);
 
@@ -184,8 +160,13 @@ public class ExperimentResource {
             CalibrationAnswerOptionRecord acceptedAnswer = calibrationOperations.getCalibrationAnswerOption(record.getAnswer())
                     .orElseThrow(() -> new InternalServerErrorException(String.format("CalibrationAnswerOption: %s not found", record.getAnswer())));
 
+            Calibration.Answer answer = Calibration.Answer.newBuilder()
+                    .setAnswer(acceptedAnswer.getAnswer())
+                    .setId(acceptedAnswer.getIdCalibrationAnswerOption())
+                    .build();
+
             return calibrationOperations.getCalibration(acceptedAnswer.getCalibration())
-                    .map(calibration -> calibration.toBuilder().addAcceptedAnswers(acceptedAnswer.getAnswer()))
+                    .map(calibration -> calibration.toBuilder().addAcceptedAnswers(answer))
                     .orElseThrow(() -> new InternalServerErrorException(String.format("Calibration: %d not found", acceptedAnswer.getCalibration())));
         };
 
@@ -291,11 +272,13 @@ public class ExperimentResource {
         }
 
         // Update calibration records from experiment
-        List<ExperimentsCalibrationRecord> records = convertToCalibrationRecords(experiment, id);
-        if (!records.isEmpty()) {
-            calibrationOperations.deleteAllExperimentCalibration(id);
-            records.forEach(calibrationOperations::insertExperimentCalibration);
-        }
+        experiment.getPopulationsList().forEach(population -> {
+            List<Integer> answerIDs = population.getCalibrationsList().stream()
+                    .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
+                    .map(Calibration.Answer::getId)
+                    .collect(Collectors.toList());
+            calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, id);
+        });
 
         if (!experiment.getPopulationsList().isEmpty()) {
             List<String> platforms = experiment.getPopulationsList().stream()

@@ -25,7 +25,15 @@ public class CalibrationTransformer extends AbstractTransformer {
                 .setId(record.getIdCalibration())
                 .setName(record.getName())
                 .setQuestion(record.getProperty())
-                .addAllAnswers(options.stream().map(CalibrationAnswerOptionRecord::getAnswer).collect(Collectors.toList()))
+                .addAllAnswers(
+                        options.stream()
+                                .map(option ->
+                                        Calibration.Answer.newBuilder()
+                                        .setAnswer(option.getAnswer())
+                                        .setId(option.getIdCalibrationAnswerOption())
+                                        .build()
+                                )
+                                .collect(Collectors.toList()))
                 .build();
     }
 

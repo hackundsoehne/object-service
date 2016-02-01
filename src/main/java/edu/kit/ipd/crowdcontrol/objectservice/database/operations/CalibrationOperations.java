@@ -91,7 +91,7 @@ public class CalibrationOperations extends AbstractOperations {
         calibration.store();
 
         toStore.getAnswersList().stream()
-                .map(s -> new CalibrationAnswerOptionRecord(null, calibration.getIdCalibration(), s))
+                .map(s -> new CalibrationAnswerOptionRecord(null, calibration.getIdCalibration(), s.getAnswer()))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), create::batchInsert))
                 .execute();
 
@@ -128,25 +128,21 @@ public class CalibrationOperations extends AbstractOperations {
     }
 
     /**
-     * Delete all experiment calibrations
-     * @param id the primary key of the experiment
+     * stores the chosen calibrations for the experiment in the database
+     * @param platform the platform chosen
+     * @param calibrationIDs the primary key of the CalibrationAnswerOptions
+     * @param experimentID the primary key of the experiment
      */
-    public void deleteAllExperimentCalibration(int id) {
-        create.deleteFrom(EXPERIMENTS_CALIBRATION)
-                .where(EXPERIMENTS_CALIBRATION.REFERNCED_EXPERIMENT.eq(id))
-                .execute();
-    }
-
-    /**
-     * Insert a new experimentsCalibrationRecord in the database
-     * @param experimentsCalibrationRecord the record to use
-     * @return The new inserted record
-     */
-    public ExperimentsCalibrationRecord insertExperimentCalibration(ExperimentsCalibrationRecord experimentsCalibrationRecord) {
-        return create.insertInto(EXPERIMENTS_CALIBRATION)
-                .set(experimentsCalibrationRecord)
-                .returning()
-                .fetchOne();
+    public void storeExperimentCalibrations(String platform, List<Integer> calibrationIDs, int experimentID) {
+        List<ExperimentsCalibrationRecord> calibrations = calibrationIDs.stream()
+                .map(calibration -> new ExperimentsCalibrationRecord(null, experimentID, calibration, platform, false))
+                .collect(Collectors.toList());
+        create.transaction(conf -> {
+            DSL.using(conf).deleteFrom(EXPERIMENTS_CALIBRATION)
+                    .where(EXPERIMENTS_CALIBRATION.REFERNCED_EXPERIMENT.eq(experimentID))
+                    .execute();
+            DSL.using(conf).batchInsert(calibrations).execute();
+        });
     }
 
     /**
@@ -157,18 +153,5 @@ public class CalibrationOperations extends AbstractOperations {
     public Optional<CalibrationAnswerOptionRecord> getCalibrationAnswerOption(int id) {
         return create.fetchOptional(CALIBRATION_ANSWER_OPTION,
                 CALIBRATION_ANSWER_OPTION.ID_CALIBRATION_ANSWER_OPTION.eq(id));
-    }
-
-    /**
-     * Get a AnswerOption from a calibration with the given answer
-     * @param calibration The calibration this is a answer from
-     * @param answer The answer which should be found
-     * @return A record if one is found
-     */
-    public Optional<CalibrationAnswerOptionRecord> getCalibrationAnswerOptionFromCalibrations(int calibration, String answer) {
-        return create.selectFrom(CALIBRATION_ANSWER_OPTION)
-                .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(calibration))
-                .and(CALIBRATION_ANSWER_OPTION.ANSWER.eq(answer))
-                .fetchOptional();
     }
 }
