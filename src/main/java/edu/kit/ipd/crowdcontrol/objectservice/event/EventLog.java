@@ -43,10 +43,10 @@ public class EventLog {
     /**
      * Add a new message to this stack
      * @param shortmessage a short explanation on what this message is about. No linebreaks allowed.
-     * @param logmessage detailed message what happends exactly. Linebreaks allowed.
+     * @param longmessage detailed message what happends exactly. Linebreaks allowed.
      */
-    public void addEntry(String shortmessage, String logmessage) {
-        logs.add(new LogEntry(shortmessage, logmessage));
+    public synchronized void addEntry(String shortmessage, String longmessage) {
+        logs.add(new LogEntry(shortmessage, longmessage));
     }
 
     /**
