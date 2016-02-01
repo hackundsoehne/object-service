@@ -7,6 +7,7 @@ apply plugin: 'nu.studer.jooq'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'application'
+apply plugin: 'me.seeber.wsimport'
 
 
 buildscript {
@@ -14,6 +15,9 @@ buildscript {
         mavenLocal()
         mavenCentral()
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
@@ -21,6 +25,7 @@ buildscript {
         classpath 'nu.studer:gradle-jooq-plugin:1.0.5'
         classpath "net.saliman:gradle-cobertura-plugin:2.3.+"
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.+"
+        classpath 'gradle.plugin.me.seeber:gradle-wsimport-plugin:0.2.0'
     }
 }
 
