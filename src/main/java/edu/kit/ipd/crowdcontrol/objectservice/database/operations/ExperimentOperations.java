@@ -242,7 +242,7 @@ public class ExperimentOperations extends AbstractOperations {
 
         List<RatingOptionExperimentRecord> toInsert = ratingOptions.stream()
                 .filter(ratingOption -> !hasID.test(ratingOption))
-                .map(option -> new RatingOptionExperimentRecord(null, option.getName(), option.getValue(), option.getValue()))
+                .map(option -> new RatingOptionExperimentRecord(null, option.getName(), option.getValue(), experimentId))
                 .collect(Collectors.toList());
 
         create.transaction(conf -> {
