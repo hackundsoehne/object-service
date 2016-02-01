@@ -27,7 +27,7 @@ public class WorkerCalibrationResource {
      */
     public CalibrationAnswer put(Request request, Response response) {
         CalibrationAnswer answer = request.attribute("input");
-        answer = operations.insertAnswer(getParamInt(request, "id"), answer);
+        answer = operations.insertAnswer(getParamInt(request, "id"), answer.getAnswerId());
 
         response.status(201);
 
