@@ -20,19 +20,19 @@ import java.util.concurrent.CompletableFuture;
  */
 public class PyBossaPlatform implements Platform {
     /**
-     * IDTASKCOUNT is the number of idTasks that are used to get the worker's id
+     * IDTASK_COUNT is the number of idTasks that are used to get the worker's id
      */
-    private static final int IDTASKCOUNT = 2;
+    private static final int IDTASK_COUNT = 2;
     private final String workerServiceUrl;
     private final String apiKey;
     private final String apiUrl;
     private final String taskUrl;
     private final String name;
-    private final String projectID;
+    private final int projectID;
     private final Boolean calibsAllowed;
-    private String[] idTasks = new String[IDTASKCOUNT];
+    private int[] idTasks = new int[IDTASK_COUNT];
 
-    public PyBossaPlatform(String workerServiceUrl, String apiKey, String apiUrl, String name, String projectID, Boolean calibsAllowed) {
+    public PyBossaPlatform(String workerServiceUrl, String apiKey, String apiUrl, String name, int projectID, Boolean calibsAllowed) {
         this.workerServiceUrl = workerServiceUrl;
         this.apiKey = apiKey;
         this.apiUrl = apiUrl;
@@ -45,7 +45,10 @@ public class PyBossaPlatform implements Platform {
         initIdTasks();
     }
 
-    private void initIdTasks() {
+    /**
+     * Initializes the pybossa idTasks
+     */
+    public void initIdTasks() {
         if (!getIdTasks()) {
             createIdTasks();
         }
@@ -62,7 +65,7 @@ public class PyBossaPlatform implements Platform {
         try {
             response = Unirest.get(taskUrl)
                     .queryString("api_key", apiKey)
-                    .queryString("project_id", projectID)
+                    .queryString("project_id", Integer.toString(projectID))
                     .asJson();
         } catch (UnirestException e) {
             throw new PlatformConnectionException(e);
@@ -70,13 +73,17 @@ public class PyBossaPlatform implements Platform {
 
         // check for existent idTasks
         if (response.getStatus() == 200) {
-            if (response.getBody().getArray().length() >= IDTASKCOUNT) {
-
+            if (response.getBody().getArray().length() == 0) {
+                return false;
+            } else {
                 // idTasks have to be the first two objects
-                for (int i = 0; i < IDTASKCOUNT - 1; i++) {
-                    JSONObject task = response.getBody().getArray().getJSONObject(i);
-                    if (task.isNull("info")) {
-                        idTasks[i] = task.getString("id");
+                for (int i = 0; i < IDTASK_COUNT; i++) {
+                    JSONObject task = response.getBody().getArray().optJSONObject(i);
+                    if (task != null && task.isNull("info")) {
+                        idTasks[i] = task.getInt("id");
+                    } else {
+                        throw new PlatformTaskException("Could not initialize tasks for platform "
+                                + this.getName() + ": Invalid idTasks.");
                     }
                 }
             }
@@ -91,13 +98,13 @@ public class PyBossaPlatform implements Platform {
      * Creates 2 new idTasks with empty info object and assigns the IDs to the idTasks
      */
     private void createIdTasks() {
-        JsonNode jsonTask = new JsonNode("");
+        JsonNode jsonTask = new JsonNode(null);
         jsonTask.getObject()
-                .append("project_id", projectID)
-                .append("priority_0", 0);
+                .put("project_id", projectID)
+                .put("priority_0", 0);
 
         HttpResponse<JsonNode> response;
-        for (int i = 0; i < IDTASKCOUNT - 1; i++) {
+        for (int i = 0; i < IDTASK_COUNT; i++) {
             try {
                 response = Unirest.post(taskUrl)
                         .header("Content-Type", "application/json")
@@ -109,7 +116,7 @@ public class PyBossaPlatform implements Platform {
             }
 
             if (response.getStatus() == 200) {
-                idTasks[i] = response.getBody().getObject().getString("id");
+                idTasks[i] = response.getBody().getObject().getInt("id");
             } else {
                 throw new PlatformTaskException(response.getBody().getObject()
                         .optString("exception_msg", "createIdTasks failed"));
@@ -137,8 +144,14 @@ public class PyBossaPlatform implements Platform {
 
     private String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException {
         String givenId = param.get("id")[0];
-        String givenIdTask = param.get("idTask")[0];
+        String givenIdTaskString = param.get("idTask")[0];
         String givenRandom = param.get("code")[0];
+
+        if (givenId.isEmpty() || givenRandom.isEmpty() || givenIdTaskString.isEmpty()) {
+            throw new UnidentifiedWorkerException();
+        }
+
+        int givenIdTask = Integer.valueOf(givenIdTaskString);
 
         // check if valid idTask
         if (Arrays.asList(idTasks).contains(givenIdTask)) {
@@ -210,6 +223,7 @@ public class PyBossaPlatform implements Platform {
         }
     }
 
+
     /**
      * Get the name of this platform
      *
@@ -230,15 +244,16 @@ public class PyBossaPlatform implements Platform {
         return CompletableFuture.supplyAsync(() -> {
             JsonNode jsonTask = new JsonNode("");
 
-            jsonTask.getObject().append("project_id", projectID)
-                    .append("info", new JSONObject()
-                            .append("url", workerServiceUrl)
-                            .append("expID", experiment.getId())
-                            .append("platformName", name)
-                            .append("idTasks", new JSONArray(idTasks))
+            jsonTask.getObject()
+                    .put("project_id", projectID)
+                    .put("info", new JSONObject()
+                            .put("url", workerServiceUrl)
+                            .put("expID", experiment.getId())
+                            .put("platformName", name)
+                            .put("idTasks", new JSONArray(idTasks))
                     )
-                    .append("priority_0", 1)
-                    .append("n_answers", experiment.getNeededAnswers());
+                    .put("priority_0", 1)
+                    .put("n_answers", experiment.getNeededAnswers());
 
             HttpResponse<JsonNode> response;
             try {
@@ -298,13 +313,13 @@ public class PyBossaPlatform implements Platform {
             //build request body
             JsonNode jsonTask = new JsonNode("");
             jsonTask.getObject()
-                    .append("info", new JSONObject()
-                            .append("url", workerServiceUrl)
-                            .append("expID", experiment.getId())
-                            .append("platformName", name)
-                            .append("idTasks", new JSONArray(idTasks))
+                    .put("info", new JSONObject()
+                            .put("url", workerServiceUrl)
+                            .put("expID", experiment.getId())
+                            .put("platformName", name)
+                            .put("idTasks", new JSONArray(idTasks))
                     )
-                    .append("n_answers", experiment.getNeededAnswers());
+                    .put("n_answers", experiment.getNeededAnswers());
 
             HttpResponse<JsonNode> response;
             try {
