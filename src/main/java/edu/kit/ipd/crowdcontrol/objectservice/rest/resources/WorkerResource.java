@@ -13,6 +13,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
@@ -44,9 +45,9 @@ public class WorkerResource {
             Optional<WorkerRecord> optionalRecord = manager.getWorker(platform, request.queryMap().toMap());
             if (optionalRecord.isPresent()) {
                 worker = optionalRecord.get();
-            } else if (!manager.getNeedemail(platform) || request.queryParams("email").equals(String.valueOf(true))){
+            } else if (!manager.getNeedemail(platform) || Objects.equals(request.queryParams("email"), String.valueOf(true))){
                 String identify = manager.identifyWorker(platform, request.queryMap().toMap());
-                WorkerRecord workerRecord = new WorkerRecord(null, identify, platform, null);
+                WorkerRecord workerRecord = new WorkerRecord(null, identify, platform, null, null);
                 worker = operations.insertWorker(workerRecord);
             } else {
                 throw new NotFoundException();

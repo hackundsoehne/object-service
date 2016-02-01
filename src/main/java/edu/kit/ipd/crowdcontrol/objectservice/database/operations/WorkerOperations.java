@@ -99,7 +99,7 @@ public class WorkerOperations extends AbstractOperations {
                         .fetchOptional()
                         .orElseGet(() ->
                                 DSL.using(configuration).insertInto(Tables.WORKER)
-                                        .set(new WorkerRecord(null, "Anonymous Worker", toAnonymize.getPlatform(), null))
+                                        .set(new WorkerRecord(null, "Anonymous Worker", toAnonymize.getPlatform(), null, null))
                                         .returning()
                                         .fetchOne()));
         create.transaction(conf -> {
