@@ -261,14 +261,18 @@ public class ExperimentResource {
         List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);
         if (!tags.isEmpty()) {
             tagConstraintsOperations.deleteAllTags(id);
-            tags.forEach(tagConstraintsOperations::insertTag);
+            tags.stream()
+                    .filter(tagRecord -> !tagRecord.getTag().isEmpty())
+                    .forEach(tagConstraintsOperations::insertTag);
         }
 
         //update constraints if they were changed
         List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment, id);
         if (!constraints.isEmpty()) {
             tagConstraintsOperations.deleteAllConstraint(id);
-            constraints.forEach(tagConstraintsOperations::insertConstraint);
+            constraints.stream()
+                    .filter(record -> !record.getConstraint().isEmpty())
+                    .forEach(tagConstraintsOperations::insertConstraint);
         }
 
         // Update calibration records from experiment
