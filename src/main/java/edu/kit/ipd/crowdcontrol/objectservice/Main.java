@@ -45,7 +45,7 @@ public class Main {
         String readOnlyPassword = trimIfNotNull.apply(properties.getProperty("database.readonly.password"));
 
         SQLDialect dialect = SQLDialect.valueOf(properties.getProperty("database.dialect").trim());
-        DatabaseManager databaseManager = null;
+        DatabaseManager databaseManager;
 
         try {
             databaseManager = new DatabaseManager(username, password, url, databasePool, dialect);
@@ -70,6 +70,7 @@ public class Main {
         AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext());
         TagConstraintsOperations tagConstraintsOperations = new TagConstraintsOperations(databaseManager.getContext());
         AlgorithmOperations algorithmsOperations = new AlgorithmOperations(databaseManager.getContext());
+        WorkerCalibrationOperations workerCalibrationOperations = new WorkerCalibrationOperations(databaseManager.getContext());
 
         new Router(
                 new TemplateResource(templateOperations),
@@ -79,8 +80,8 @@ public class Main {
                 new CalibrationResource(calibrationOperations),
                 new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations),
                 new AlgorithmResources(algorithmsOperations),
-                new AnswerRatingResource(experimentOperations, answerRatingOperations, workerOperations)
-        )
-        .init();
+                new AnswerRatingResource(experimentOperations, answerRatingOperations, workerOperations),
+                new WorkerCalibrationResource(workerCalibrationOperations)
+        ).init();
     }
 }
