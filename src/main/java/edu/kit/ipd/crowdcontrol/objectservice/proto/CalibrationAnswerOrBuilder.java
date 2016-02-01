@@ -8,12 +8,7 @@ public interface CalibrationAnswerOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>optional int32 worker_id = 1;</code>
-   */
-  int getWorkerId();
-
-  /**
-   * <code>optional int32 answer_id = 2;</code>
+   * <code>optional int32 answer_id = 1;</code>
    */
   int getAnswerId();
 }

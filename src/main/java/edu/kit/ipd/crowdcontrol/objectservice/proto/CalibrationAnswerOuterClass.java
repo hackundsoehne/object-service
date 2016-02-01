@@ -23,9 +23,9 @@ public final class CalibrationAnswerOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\030calibration_answer.proto\022\014crowdcontrol" +
-      "\"9\n\021CalibrationAnswer\022\021\n\tworker_id\030\001 \001(\005" +
-      "\022\021\n\tanswer_id\030\002 \001(\005B0\n,edu.kit.ipd.crowd" +
-      "control.objectservice.protoP\001b\006proto3"
+      "\"&\n\021CalibrationAnswer\022\021\n\tanswer_id\030\001 \001(\005" +
+      "B0\n,edu.kit.ipd.crowdcontrol.objectservi" +
+      "ce.protoP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -44,7 +44,7 @@ public final class CalibrationAnswerOuterClass {
     internal_static_crowdcontrol_CalibrationAnswer_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_crowdcontrol_CalibrationAnswer_descriptor,
-        new java.lang.String[] { "WorkerId", "AnswerId", });
+        new java.lang.String[] { "AnswerId", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

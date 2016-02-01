@@ -41,15 +41,20 @@ public class Router implements SparkApplication {
     private final ExperimentResource experimentResource;
     private final AlgorithmResources algorithmResources;
     private final AnswerRatingResource answerRatingResource;
+    private final WorkerCalibrationResource workerCalibrationResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
-    public Router(TemplateResource templateResource, NotificationResource notificationResource,
-                  PlatformResource platformResource, WorkerResource workerResource,
+    public Router(TemplateResource templateResource,
+                  NotificationResource notificationResource,
+                  PlatformResource platformResource,
+                  WorkerResource workerResource,
                   CalibrationResource calibrationResource,
-                  ExperimentResource experimentResource, AlgorithmResources algorithmResources,
-                  AnswerRatingResource answerRatingResource) {
+                  ExperimentResource experimentResource,
+                  AlgorithmResources algorithmResources,
+                  AnswerRatingResource answerRatingResource,
+                  WorkerCalibrationResource workerCalibrationResource) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
@@ -58,6 +63,7 @@ public class Router implements SparkApplication {
         this.experimentResource = experimentResource;
         this.algorithmResources = algorithmResources;
         this.answerRatingResource = answerRatingResource;
+        this.workerCalibrationResource = workerCalibrationResource;
     }
 
     @Override
@@ -126,6 +132,7 @@ public class Router implements SparkApplication {
         get("/workers", workerResource::all);
         get("/workers/:id", workerResource::get);
         delete("/workers/:id", workerResource::delete);
+        put("/workers/:id/calibrations", workerCalibrationResource::put, CalibrationAnswer.class);
 
         get("/algorithms", algorithmResources::getAllAlgortihms);
 

@@ -15,7 +15,6 @@ public  final class CalibrationAnswer extends
     super(builder);
   }
   private CalibrationAnswer() {
-    workerId_ = 0;
     answerId_ = 0;
   }
 
@@ -45,11 +44,6 @@ public  final class CalibrationAnswer extends
           }
           case 8: {
 
-            workerId_ = input.readInt32();
-            break;
-          }
-          case 16: {
-
             answerId_ = input.readInt32();
             break;
           }
@@ -77,19 +71,10 @@ public  final class CalibrationAnswer extends
             edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer.class, edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer.Builder.class);
   }
 
-  public static final int WORKER_ID_FIELD_NUMBER = 1;
-  private int workerId_;
-  /**
-   * <code>optional int32 worker_id = 1;</code>
-   */
-  public int getWorkerId() {
-    return workerId_;
-  }
-
-  public static final int ANSWER_ID_FIELD_NUMBER = 2;
+  public static final int ANSWER_ID_FIELD_NUMBER = 1;
   private int answerId_;
   /**
-   * <code>optional int32 answer_id = 2;</code>
+   * <code>optional int32 answer_id = 1;</code>
    */
   public int getAnswerId() {
     return answerId_;
@@ -107,11 +92,8 @@ public  final class CalibrationAnswer extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (workerId_ != 0) {
-      output.writeInt32(1, workerId_);
-    }
     if (answerId_ != 0) {
-      output.writeInt32(2, answerId_);
+      output.writeInt32(1, answerId_);
     }
   }
 
@@ -120,13 +102,9 @@ public  final class CalibrationAnswer extends
     if (size != -1) return size;
 
     size = 0;
-    if (workerId_ != 0) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(1, workerId_);
-    }
     if (answerId_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(2, answerId_);
+        .computeInt32Size(1, answerId_);
     }
     memoizedSize = size;
     return size;
@@ -239,8 +217,6 @@ public  final class CalibrationAnswer extends
     }
     public Builder clear() {
       super.clear();
-      workerId_ = 0;
-
       answerId_ = 0;
 
       return this;
@@ -265,7 +241,6 @@ public  final class CalibrationAnswer extends
 
     public edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer buildPartial() {
       edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer result = new edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer(this);
-      result.workerId_ = workerId_;
       result.answerId_ = answerId_;
       onBuilt();
       return result;
@@ -282,9 +257,6 @@ public  final class CalibrationAnswer extends
 
     public Builder mergeFrom(edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer other) {
       if (other == edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer.getDefaultInstance()) return this;
-      if (other.getWorkerId() != 0) {
-        setWorkerId(other.getWorkerId());
-      }
       if (other.getAnswerId() != 0) {
         setAnswerId(other.getAnswerId());
       }
@@ -314,41 +286,15 @@ public  final class CalibrationAnswer extends
       return this;
     }
 
-    private int workerId_ ;
-    /**
-     * <code>optional int32 worker_id = 1;</code>
-     */
-    public int getWorkerId() {
-      return workerId_;
-    }
-    /**
-     * <code>optional int32 worker_id = 1;</code>
-     */
-    public Builder setWorkerId(int value) {
-      
-      workerId_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>optional int32 worker_id = 1;</code>
-     */
-    public Builder clearWorkerId() {
-      
-      workerId_ = 0;
-      onChanged();
-      return this;
-    }
-
     private int answerId_ ;
     /**
-     * <code>optional int32 answer_id = 2;</code>
+     * <code>optional int32 answer_id = 1;</code>
      */
     public int getAnswerId() {
       return answerId_;
     }
     /**
-     * <code>optional int32 answer_id = 2;</code>
+     * <code>optional int32 answer_id = 1;</code>
      */
     public Builder setAnswerId(int value) {
       
@@ -357,7 +303,7 @@ public  final class CalibrationAnswer extends
       return this;
     }
     /**
-     * <code>optional int32 answer_id = 2;</code>
+     * <code>optional int32 answer_id = 1;</code>
      */
     public Builder clearAnswerId() {
       
