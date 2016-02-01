@@ -76,12 +76,13 @@ public class Main {
         WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
         CalibrationOperations calibrationOperations = new CalibrationOperations(databaseManager.getContext());
         ExperimentOperations experimentOperations = new ExperimentOperations(databaseManager.getContext());
-        AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext());
         TagConstraintsOperations tagConstraintsOperations = new TagConstraintsOperations(databaseManager.getContext());
         AlgorithmOperations algorithmsOperations = new AlgorithmOperations(databaseManager.getContext());
         WorkerCalibrationOperations workerCalibrationOperations = new WorkerCalibrationOperations(databaseManager.getContext());
+        AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext(), calibrationOperations, workerCalibrationOperations);
 
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
+        maintainer.start();
 
         new Router(
                 new TemplateResource(templateOperations),

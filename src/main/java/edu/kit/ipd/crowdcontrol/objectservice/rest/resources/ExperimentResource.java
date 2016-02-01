@@ -378,6 +378,11 @@ public class ExperimentResource {
             throw new IllegalStateException("experiment lacks information needed for publishing");
         }
 
+        //TODO publish
+        if (experiment.getState().equals(Experiment.State.PUBLISHED)) {
+            calibrationOperations.createExperimentsCalibration(id);
+        }
+
         resulting = fetchExperiment(id);
         resulting = resulting.toBuilder().setState(experiment.getState()).build();
         return resulting;
