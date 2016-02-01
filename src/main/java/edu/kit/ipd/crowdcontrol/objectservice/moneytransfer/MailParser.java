@@ -17,7 +17,7 @@ public class MailParser {
 
     protected static GiftCodeRecord parseAmazonGiftCode(Message msg) throws MessagingException, IOException, AmazonMailFormatChangedException{
         //Extract Message
-        String message = "";
+        String message;
         try {
             Multipart parts = (Multipart) msg.getContent();
             BodyPart body = parts.getBodyPart(0);

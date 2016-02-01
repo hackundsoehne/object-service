@@ -1,6 +1,13 @@
 Dear Worker,
+
 We thank you for your work and send you in this mail the the Amazon giftcodes you earned.
 You can redeem them here: https://www.amazon.de/gc/redeem/ref=gc_redeem_new_exp
 Please note, that the amount of the payment can be under the amount of money you earned.
 The giftcodes with corresponding amount of money first have to be bought, or if the amount of money missing is below 15ct, you have to complete more tasks to get the complete amount of money.
 Your Giftcodes:
+
+{{GiftCodes}}
+
+Yours sincerely
+
+The CreativeCrowd-Team

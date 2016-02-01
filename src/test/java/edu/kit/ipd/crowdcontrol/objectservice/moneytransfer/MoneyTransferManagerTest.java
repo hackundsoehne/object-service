@@ -6,15 +6,18 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Work
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.jooq.Result;
+import org.jooq.util.derby.sys.Sys;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.stubbing.Answer;
 
 import javax.mail.Message;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -105,17 +108,31 @@ public class MoneyTransferManagerTest {
         doAnswer(answer0).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
         doAnswer(answer1).when(payops).addDebit(anyInt(), anyInt(), eq(code1.getIdGiftCode()));
         doAnswer(answer2).when(payops).addDebit(anyInt(), anyInt(), eq(code2.getIdGiftCode()));
+        StringBuilder content = new StringBuilder();
+        try {
+            FileReader file = new FileReader("src/main/resources/PaymentMessage.txt");
+            BufferedReader reader = new BufferedReader(file);
 
-        String message = "Dear Worker, <br/>We thank you for your work and send you in this mail the the Amazon giftcodes you earned. " +
-                "You can redeem them <a href=\"https://www.amazon.de/gc/redeem/ref=gc_redeem_new_exp\">here!</a>" +
-                "Please note, that the amount of the giftcodes can be under the amount of money you earned. " +
-                "The giftcodes with corresponding amount of money first have to be bought, or if the amount of money missing is below 15ct, you have to complete more tasks to get the complete amount of money.<br/>";
-        String codesWorker1 = "Your Giftcodes:</br>QWER-TZUI</br>";
-        String codesWorker2 = "Your Giftcodes:</br>ASDF-GHJK</br>";
+            String messageLine;
+            while ((messageLine = reader.readLine()) != null) {
+                content.append(messageLine);
+                content.append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("GiftCodes", "QWER-TZUI" + System.getProperty("line.separator"));
+
+        Map<String, String> map2 = new HashMap<>();
+        map2.put("GiftCodes", "ASDF-GHJK" + System.getProperty("line.separator"));
+
+        String codesWorker1 = Template.apply(content.toString(), map1);
+        String codesWorker2 = Template.apply(content.toString(), map2);
 
         mng.payOff();
 
-        verify(handler).sendMail("pseipd@gmail.com","Your payment for your Crowdworking", message + codesWorker1);
-        verify(handler).sendMail("pse2016@web.de", "Your payment for your Crowdworking", message + codesWorker2);
+        verify(handler).sendMail("pseipd@gmail.com","Your payment for your Crowdworking", codesWorker1);
+        verify(handler).sendMail("pse2016@web.de", "Your payment for your Crowdworking", codesWorker2);
     }
 }

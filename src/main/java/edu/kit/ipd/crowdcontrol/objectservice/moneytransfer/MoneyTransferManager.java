@@ -5,10 +5,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Work
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.jooq.Result;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.*;
 
 import javax.mail.Message;
@@ -28,7 +28,7 @@ public class MoneyTransferManager {
     int payOffThreshold;
     int minGiftCodesCount;
     String notificationMailAddress;
-    String notificationTextHTML;
+    StringBuilder notificationText;
 
 
     public MoneyTransferManager(MailHandler mailHandler, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, String notificationMailAddress) throws MessagingException {
@@ -38,6 +38,7 @@ public class MoneyTransferManager {
         this.minGiftCodesCount = 10;
         this.payOffThreshold = 0;
         this.notificationMailAddress = notificationMailAddress;
+        this.notificationText = new StringBuilder();
     }
 
     /**
@@ -55,7 +56,7 @@ public class MoneyTransferManager {
      */
     public void payOff() {
         fetchNewGiftCodes();
-        //Choose giftcodes and pay workers
+
         Result<WorkerRecord> workers = workerOperations.getWorkerWithCreditBalanceGreaterOrEqual(payOffThreshold);
         Iterator<WorkerRecord> workerIt = workers.iterator();
         List<GiftCodeRecord> giftCodes = workerBalanceOperations.getUnusedGiftCodes();
@@ -68,9 +69,9 @@ public class MoneyTransferManager {
             payWorker(worker, payedCodesForWorker);
         }
         if (giftCodes.size() < minGiftCodesCount) {
-            notificationTextHTML = notificationTextHTML + "There are less than " + minGiftCodesCount + " giftcodes in the database. It is recommended to add more.<br/>";
+            notificationText.append("There are less than ").append(minGiftCodesCount).append(" giftcodes in the database. It is recommended to add more.").append(System.getProperty("line.separator"));
         }
-        //Send notification to scientist
+
         sendNotification();
     }
 
@@ -81,6 +82,7 @@ public class MoneyTransferManager {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+
         for (Message message : messages) {
             try {
                 GiftCodeRecord rec = MailParser.parseAmazonGiftCode(message);
@@ -93,7 +95,7 @@ public class MoneyTransferManager {
                 } catch (MessagingException f) {
                     f.printStackTrace();
                 }
-                notificationTextHTML = notificationTextHTML + "It seems, that amazon changed the format of the giftcode E-Mails. You need to adjust the parser to import giftcodes in future.";
+                notificationText.append("It seems, that amazon changed the format of the giftcode E-Mails. You need to adjust the parser to import giftcodes in future.");
             }
         }
     }
@@ -102,6 +104,7 @@ public class MoneyTransferManager {
         List<GiftCodeRecord> payedCodes = new LinkedList<>();
         int creditBalance = workerBalanceOperations.getBalance(worker.getIdWorker());
         Iterator<GiftCodeRecord> giftCodesIt = giftCodes.iterator();
+
         while (giftCodesIt.hasNext()) {
             if (creditBalance == 0) {
                 break;
@@ -113,21 +116,28 @@ public class MoneyTransferManager {
                 creditBalance -= nextCode.getAmount();
             }
         }
+
         if (!giftCodesIt.hasNext() && creditBalance >= 15) {
-            notificationTextHTML = notificationTextHTML + "A worker has pending Payments in the amount of " + creditBalance + "ct. Please add giftcodes, so the payment of the worker can be continued.<br/>";
+            notificationText = notificationText.append("A worker has pending Payments in the amount of ").append(creditBalance).append("ct. Please add giftcodes, so the payment of the worker can be continued.").append(System.getProperty("line.separator"));
         }
         return payedCodes;
     }
 
     private void payWorker(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
         if (!giftCodes.isEmpty()) {
-            String message; //TODO message input per fileLoader
-            Iterator<GiftCodeRecord> it = giftCodes.iterator();
-            while (it.hasNext()) {
-                message = message + it.next().getCode() + "</br>";
+            StringBuilder paymentMessage = loadMessage("src/main/resources/PaymentMessage.txt");
+            StringBuilder giftCodeMessage = new StringBuilder();
+
+            for (GiftCodeRecord rec : giftCodes) {
+                giftCodeMessage.append(rec.getCode()).append(System.getProperty("line.separator"));
             }
+
+            Map<String, String> map = new HashMap<>();
+            map.put("GiftCodes", giftCodeMessage.toString());
+            paymentMessage = new StringBuilder(Template.apply(paymentMessage.toString(), map));
+
             try {
-                mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", message);
+                mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage.toString());
             } catch (UnsupportedEncodingException | MessagingException e) {
                 e.printStackTrace();
             }
@@ -136,9 +146,27 @@ public class MoneyTransferManager {
 
     private void sendNotification() {
         try {
-            mailHandler.sendMail(notificationMailAddress, "Payment Notification", notificationTextHTML);
+            mailHandler.sendMail(notificationMailAddress, "Payment Notification", notificationText.toString());
         } catch (UnsupportedEncodingException | MessagingException e) {
             e.printStackTrace();
         }
+    }
+
+    private StringBuilder loadMessage(String path) {
+        StringBuilder content = new StringBuilder();
+        try {
+            FileReader file = new FileReader(path);
+            BufferedReader reader = new BufferedReader(file);
+
+            String messageLine;
+
+            while ((messageLine = reader.readLine()) != null) {
+                content.append(messageLine);
+                content.append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return content;
     }
 }
