@@ -13,9 +13,9 @@ public class Notification implements Runnable {
     private int ID;
     private String name;
     private String description;
-    private long sendThreshold;
+    private int sendThreshold;
     private Instant lastSent;
-    private long checkPeriod;
+    private int checkPeriod;
     private String query;
     private NotificationPolicy policy;
 
@@ -29,7 +29,7 @@ public class Notification implements Runnable {
      * @param query         the query which defines a constraint to check
      * @param policy        the policy to check and send a notification
      */
-    public Notification(int ID, String name, String description, long sendThreshold, long checkPeriod, String query, NotificationPolicy policy) {
+    public Notification(int ID, String name, String description, int sendThreshold, int checkPeriod, String query, NotificationPolicy policy) {
         this.ID = ID;
         this.name = name;
         this.description = description;
@@ -38,7 +38,7 @@ public class Notification implements Runnable {
         this.query = query;
         this.policy = policy;
 
-        // set last sent in past to allow immediate checking after creation
+        // set last sent in past to allow immediate sending after creation
         setLastSent(Instant.now().minus(sendThreshold, ChronoUnit.SECONDS));
     }
 
@@ -122,8 +122,8 @@ public class Notification implements Runnable {
         int result = ID;
         result = 31 * result + name.hashCode();
         result = 31 * result + description.hashCode();
-        result = 31 * result + (int) (sendThreshold ^ (sendThreshold >>> 32));
-        result = 31 * result + (int) (checkPeriod ^ (checkPeriod >>> 32));
+        result = 31 * result + (sendThreshold ^ (sendThreshold >>> 32));
+        result = 31 * result + (checkPeriod ^ (checkPeriod >>> 32));
         result = 31 * result + query.hashCode();
         result = 31 * result + policy.hashCode();
         return result;

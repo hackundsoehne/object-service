@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class NotificationTest {
     private Notification notification;
-    private static final long THRESHOLD = 60 * 60 * 24;
+    private static final int THRESHOLD = 60 * 60 * 24;
 
     @Before
     public void setUp() throws Exception {
