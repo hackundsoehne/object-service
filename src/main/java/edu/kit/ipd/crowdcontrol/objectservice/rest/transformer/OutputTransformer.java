@@ -27,7 +27,7 @@ public class OutputTransformer implements Route {
     // Request and Response objects. We need access to the accept header and must change the type of
     // the response.
 
-    private static final JsonFormat.Printer PRINTER = JsonFormat.printer();
+    private static final JsonFormat.Printer PRINTER = JsonFormat.printer().includingDefaultValueFields();
     private static final String TYPE_JSON = "application/json";
     private static final String TYPE_PROTOBUF = "application/protobuf";
     private static final List<String> SUPPORTED_TYPES;
@@ -67,12 +67,12 @@ public class OutputTransformer implements Route {
         if (result instanceof Message) {
             message = (Message) result;
         } else if (result instanceof Paginated) {
-            Paginated paginated = (Paginated) result;
+            Paginated<?> paginated = (Paginated) result;
             StringBuilder linkBuilder = new StringBuilder();
 
             if (paginated.hasPrevious()) {
                 Map<String, String> params = new HashMap<>();
-                params.put("from", paginated.getLeft().toString());
+                paginated.getLeft().ifPresent(x -> params.put("from", x.toString()));
                 params.put("asc", "false");
 
                 linkBuilder.append("<").append(link(request, params)).append(">; rel=\"prev\", ");
@@ -80,7 +80,7 @@ public class OutputTransformer implements Route {
 
             if (paginated.hasNext()) {
                 Map<String, String> params = new HashMap<>();
-                params.put("from", paginated.getRight().toString());
+                paginated.getRight().ifPresent(x -> params.put("from", x.toString()));
                 params.put("asc", "true");
 
                 linkBuilder.append("<").append(link(request, params)).append(">; rel=\"next\", ");

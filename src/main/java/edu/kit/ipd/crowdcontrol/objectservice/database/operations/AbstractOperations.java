@@ -8,9 +8,8 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableRecordImpl;
 
+import java.util.*;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,8 +35,9 @@ public abstract class AbstractOperations {
      * @param function the function to execute
      * @param <R> the return type
      * @return the result of the function
+     * @throws IllegalStateException if the experiment is running
      */
-    protected <R> R doIfNotRunning(int experimentID, Function<Configuration, R> function) {
+    protected <R> R doIfNotRunning(int experimentID, Function<Configuration, R> function) throws IllegalStateException {
         return create.transactionResult(trans -> {
             boolean running = DSL.using(trans).fetchExists(
                     DSL.selectFrom(Tables.TASK)
@@ -47,8 +47,30 @@ public abstract class AbstractOperations {
             if (!running) {
                 return function.apply(trans);
             } else {
-                //TODO other exception?
-                throw new IllegalArgumentException("Experiment is running: " + experimentID);
+                throw new IllegalStateException("Experiment is running: " + experimentID);
+            }
+        });
+    }
+
+    /**
+     * executes the function if the experiment is running.
+     * @param experimentID the id of the experiment
+     * @param function the function to execute
+     * @param <R> the return type
+     * @return the result of the function
+     * @throws IllegalStateException if the experiment is not running
+     */
+    protected <R> R doIfRunning(int experimentID, Function<Configuration, R> function) throws IllegalStateException {
+        return create.transactionResult(trans -> {
+            boolean running = DSL.using(trans).fetchExists(
+                    DSL.selectFrom(Tables.TASK)
+                            .where(Tables.TASK.EXPERIMENT.eq(experimentID))
+                            .and(Tables.TASK.STATUS.eq(TaskStatus.running).or(Tables.TASK.STATUS.eq(TaskStatus.stopping)))
+            );
+            if (running) {
+                return function.apply(trans);
+            } else {
+                throw new IllegalStateException("Experiment is running: " + experimentID);
             }
         });
     }
@@ -123,11 +145,11 @@ public abstract class AbstractOperations {
      * @param limit the max. amount of the range, may be smaller
      * @param <R> the type of the records
      * @return an instance of Range
-     * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
+     * @see #getNextRange(SelectWhereStep, Field, Table, Object, boolean, int, Comparator)
      */
-    protected <R extends org.jooq.Record> Range<R, Integer> getNextRange(SelectWhereStep<R> query, Field<Integer> primaryKey,
+    protected <R extends org.jooq.Record> Range<R, Integer> getNextRange(SelectWhereStep<R> query, Field<Integer> primaryKey, Table<?> tablePrimaryKey,
                                                                       Integer start, boolean next, int limit) {
-        return getNextRange(query, primaryKey, start, next, limit, Comparator.naturalOrder());
+        return getNextRange(query, primaryKey, tablePrimaryKey, start, next, limit, Comparator.naturalOrder());
     }
 
     /**
@@ -141,11 +163,11 @@ public abstract class AbstractOperations {
      * @param limit the max. amount of the range, may be smaller
      * @param <R> the type of the records
      * @return an instance of Range
-     * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
+     * @see #getNextRange(SelectWhereStep, Field, Table, Object, boolean, int, Comparator)
      */
-    protected <R extends org.jooq.Record> Range<R, Integer> getNextRange(SelectConditionStep<R> query, Field<Integer> primaryKey,
+    protected <R extends org.jooq.Record> Range<R, Integer> getNextRange(SelectConditionStep<R> query, Field<Integer> primaryKey, Table<?> tablePrimaryKey,
                                                                          Integer start, boolean next, int limit) {
-        return getNextRange(query, primaryKey, start, next, limit, Comparator.naturalOrder());
+        return getNextRange(query, primaryKey, tablePrimaryKey, start, next, limit, Comparator.naturalOrder());
     }
 
     /**
@@ -161,11 +183,11 @@ public abstract class AbstractOperations {
      * @param <R> the type of the records
      * @param <K> the type of the primary-key
      * @return an instance of Range
-     * @see #getNextRange(SelectWhereStep, Field, Object, boolean, int, Comparator)
+     * @see #getNextRange(SelectWhereStep, Field, Table, Object, boolean, int, Comparator)
      */
-    protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectWhereStep<R> query, Field<K> primaryKey,
+    protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectWhereStep<R> query, Field<K> primaryKey, Table<?> tablePrimaryKey,
                                                             K start, boolean next, int limit, Comparator<K> sort) {
-        return getNextRange(query.where(true), primaryKey, start, next, limit, sort);
+        return getNextRange(query.where(true), primaryKey, tablePrimaryKey, start, next, limit, sort);
     }
 
     /**
@@ -186,11 +208,12 @@ public abstract class AbstractOperations {
      * @param <K> the type of the primary-key
      * @return an instance of Range
      */
-    protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectConditionStep<R> query, Field<K> primaryKey,
+    protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectConditionStep<R> query, Field<K> primaryKey, Table<?> tablePrimaryKey,
                                                             K start, boolean next, int limit, Comparator<K> sort) {
+        //right now no support for joins with a 1 to n relationship
         Condition primaryKeyCondition = next
-                            ? primaryKey.greaterOrEqual(start)
-                            : primaryKey.lessOrEqual(start);
+                ? primaryKey.greaterOrEqual(start)
+                : primaryKey.lessOrEqual(start);
 
         SortField<K> sortField = next
                 ? primaryKey.asc()
@@ -225,9 +248,95 @@ public abstract class AbstractOperations {
         boolean hasSuccessors = results.size() == (limit + 2);
 
         if (next) {
-            return new Range<>(sortedResults, left, right, hasPredecessors, hasSuccessors);
+            return Range.of(sortedResults, left, right, hasPredecessors, hasSuccessors);
         } else {
-            return new Range<>(sortedResults, left, right, hasSuccessors, hasPredecessors);
+            return Range.of(sortedResults, left, right, hasSuccessors, hasPredecessors);
         }
     }
+
+    //experimental, do not use in production!
+    @SuppressWarnings("unused")
+    private <R extends Record, K> Range<R, K> getNextRangeJoinExperimental(SelectConditionStep<R> query, Field<K> primaryKey,
+                                                                           Table<?> tablePrimaryKey, K start, boolean next,
+                                                                           int limit, Comparator<K> sort) {
+        Condition primaryKeyCondition = next
+                            ? primaryKey.greaterOrEqual(start)
+                            : primaryKey.lessOrEqual(start);
+
+        SortField<K> sortField = next
+                ? primaryKey.asc()
+                : primaryKey.desc();
+
+        Field<Integer> f1 = DSL.field("@outerval:=@outerval+1", Integer.class);
+
+        Table<Record1<K>> limit1 = DSL.select(primaryKey)
+                .from(tablePrimaryKey)
+                .where(primaryKeyCondition)
+                .limit(limit + 2).asTable("limit");
+
+        Field<K> limitPrim = limit1.field(primaryKey);
+
+        query.getQuery().addJoin(limit1, JoinType.JOIN, primaryKey.eq(limitPrim));
+
+        SelectSeekStep1<R, K> finalQuery = query
+                .orderBy(sortField);
+        Result<R> results = finalQuery
+                .fetch();
+
+        int toSkip = 0;
+
+        if (results.isNotEmpty() && results.get(0).getValue(primaryKey).equals(start)) {
+            toSkip++;
+        }
+
+        List<R> sortedResults = results.stream()
+                .skip(toSkip)
+                .sorted(Comparator.comparing(record -> record.getValue(primaryKey), sort))
+                .collect(Collectors.toList());
+
+        boolean hasPredecessors = !results.isEmpty() && results.get(0).getValue(primaryKey).equals(start);
+        boolean hasSuccessors = results.size() == (limit + 2);
+
+        if (hasPredecessors) {
+            ListIterator<R> rListIterator = sortedResults.listIterator();
+            while (rListIterator.hasNext()) {
+                R nextValue = rListIterator.next();
+                if (nextValue.getValue(primaryKey).equals(start)) {
+                    rListIterator.remove();
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if (hasSuccessors) {
+            K lastPrimaryKey = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
+            for (int i = (sortedResults.size() - 1); i > 0; i--) {
+                R nextValue = sortedResults.get(i);
+                if (nextValue.getValue(primaryKey).equals(lastPrimaryKey)) {
+                    sortedResults.remove(i);
+                } else {
+                    //finished
+                    i = 0;
+                }
+            }
+
+        }
+
+        K left = null;
+        K right = null;
+
+        if (!sortedResults.isEmpty()) {
+            left = sortedResults.get(0).getValue(primaryKey);
+            right = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
+        }
+
+        if (next) {
+            return Range.of(sortedResults, left, right, hasPredecessors, hasSuccessors);
+        } else {
+            return Range.of(sortedResults, left, right, hasSuccessors, hasPredecessors);
+        }
+    }
+
+
 }

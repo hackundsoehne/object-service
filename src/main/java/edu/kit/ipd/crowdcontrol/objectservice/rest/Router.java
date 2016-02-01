@@ -4,6 +4,15 @@ import com.google.protobuf.Message;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ExperimentResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.WorkerResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.InputTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.OutputTransformer;
 import spark.Request;
@@ -28,19 +37,33 @@ public class Router implements SparkApplication {
     private final NotificationResource notificationResource;
     private final PlatformResource platformResource;
     private final WorkerResource workerResource;
-    private final PopulationResource populationResource;
+    private final CalibrationResource calibrationResource;
+    private final ExperimentResource experimentResource;
+    private final AlgorithmResources algorithmResources;
+    private final AnswerRatingResource answerRatingResource;
+    private final WorkerCalibrationResource workerCalibrationResource;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
-    public Router(TemplateResource templateResource, NotificationResource notificationResource,
-                  PlatformResource platformResource, WorkerResource workerResource,
-                  PopulationResource populationResource) {
+    public Router(TemplateResource templateResource,
+                  NotificationResource notificationResource,
+                  PlatformResource platformResource,
+                  WorkerResource workerResource,
+                  CalibrationResource calibrationResource,
+                  ExperimentResource experimentResource,
+                  AlgorithmResources algorithmResources,
+                  AnswerRatingResource answerRatingResource,
+                  WorkerCalibrationResource workerCalibrationResource) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
-        this.populationResource = populationResource;
+        this.calibrationResource = calibrationResource;
         this.workerResource = workerResource;
+        this.experimentResource = experimentResource;
+        this.algorithmResources = algorithmResources;
+        this.answerRatingResource = answerRatingResource;
+        this.workerCalibrationResource = workerCalibrationResource;
     }
 
     @Override
@@ -99,16 +122,29 @@ public class Router implements SparkApplication {
         get("/platforms", platformResource::all);
         get("/platforms/:id", platformResource::get);
 
-        put("/populations", populationResource::put, Population.class);
-        get("/populations", populationResource::all);
-        get("/populations/:id", populationResource::get);
-        delete("/populations/:id", populationResource::delete);
+        put("/calibrations", calibrationResource::put, Calibration.class);
+        get("/calibrations", calibrationResource::all);
+        get("/calibrations/:id", calibrationResource::get);
+        delete("/calibrations/:id", calibrationResource::delete);
 
         get("/workers/:platform/identity", workerResource::identify);
         put("/workers", workerResource::put, Worker.class);
         get("/workers", workerResource::all);
         get("/workers/:id", workerResource::get);
         delete("/workers/:id", workerResource::delete);
+        put("/workers/:id/calibrations", workerCalibrationResource::put, CalibrationAnswer.class);
+
+        get("/algorithms", algorithmResources::getAllAlgortihms);
+
+        put("/experiments", experimentResource::put, Experiment.class);
+        get("/experiments", experimentResource::all);
+        get("/experiments/:id", experimentResource::get);
+        patch("/experiments/:id", experimentResource::patch, Experiment.class);
+        delete("/experiments/:id", experimentResource::delete);
+        put("/experiments/:id/answers", answerRatingResource::putAnswer, Answer.class);
+        get("/experiments/:id/answers", answerRatingResource::getAnswers);
+        get("/experiments/:id/answers/:aid", answerRatingResource::getAnswer);
+        put("/experiments/:id/answers/:aid/rating", answerRatingResource::putRating, Rating.class);
     }
 
     /**
