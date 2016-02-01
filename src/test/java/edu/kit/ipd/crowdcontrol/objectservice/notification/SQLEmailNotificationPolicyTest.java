@@ -80,7 +80,7 @@ public class SQLEmailNotificationPolicyTest {
     @Test
     public void testSend() throws Exception {
         policy.send(notification, result);
-        verify(mailSender).sendMail(eq(RECEIVER), eq(notification.getName()), messageCaptor.capture());
-        System.out.println(messageCaptor.getValue());
+        verify(mailSender).sendMail(eq(RECEIVER), messageCaptor.capture(), messageCaptor.capture());
+        System.out.println(messageCaptor.getAllValues().toString());
     }
 }
