@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.jooq.AggregateFunction;
 import org.jooq.DSLContext;
@@ -99,12 +99,12 @@ public class WorkerOperations extends AbstractOperations {
                         .fetchOptional()
                         .orElseGet(() ->
                                 DSL.using(configuration).insertInto(Tables.WORKER)
-                                        .set(new WorkerRecord(null, "Anonymous Worker", toAnonymize.getPlatform(), null))
+                                        .set(new WorkerRecord(null, "Anonymous Worker", toAnonymize.getPlatform(), null, null))
                                         .returning()
                                         .fetchOne()));
         create.transaction(conf -> {
-            DSL.using(conf).deleteFrom(Tables.POPULATION_RESULT)
-                    .where(Tables.POPULATION_RESULT.WORKER.eq(toAnonymize.getIdWorker()))
+            DSL.using(conf).deleteFrom(Tables.CALIBRATION_RESULT)
+                    .where(Tables.CALIBRATION_RESULT.WORKER.eq(toAnonymize.getIdWorker()))
                     .execute();
 
             DSL.using(conf).update(Tables.ANSWER)
@@ -160,7 +160,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Optional<Worker> getWorkerProto(int id) {
         return create.fetchOptional(WORKER, WORKER.ID_WORKER.eq(id))
-                .map(WorkerTransform::toProto);
+                .map(WorkerTransformer::toProto);
     }
 
     /**
@@ -172,8 +172,8 @@ public class WorkerOperations extends AbstractOperations {
      * @return List of workers
      */
     public Range<Worker, Integer> getWorkersFrom(int cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, cursor, next, limit)
-                .map(WorkerTransform::toProto);
+        return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, WORKER, cursor, next, limit)
+                .map(WorkerTransformer::toProto);
     }
 
     /**
@@ -187,10 +187,10 @@ public class WorkerOperations extends AbstractOperations {
     public Worker insertWorker(Worker toStore, String identity) {
         assertHasField(toStore, Worker.PLATFORM_FIELD_NUMBER);
 
-        WorkerRecord record = WorkerTransform.mergeRecord(create.newRecord(WORKER), toStore);
+        WorkerRecord record = WorkerTransformer.mergeRecord(create.newRecord(WORKER), toStore);
         record.setIdentification(identity);
         record.store();
 
-        return WorkerTransform.toProto(record);
+        return WorkerTransformer.toProto(record);
     }
 }

@@ -4,7 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.NotificationTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.NotificationTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
@@ -66,8 +66,8 @@ public class NotificationOperations extends AbstractOperations {
      * @return a list of notifications
      */
     public Range<Notification, Integer> getNotificationsFrom(int cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(NOTIFICATION), NOTIFICATION.ID_NOTIFICATION, cursor, next, limit)
-                .map(NotificationTransform::toProto);
+        return getNextRange(create.selectFrom(NOTIFICATION), NOTIFICATION.ID_NOTIFICATION, NOTIFICATION, cursor, next, limit)
+                .map(NotificationTransformer::toProto);
     }
 
     /**
@@ -99,10 +99,10 @@ public class NotificationOperations extends AbstractOperations {
                 Notification.CHECK_PERIOD_FIELD_NUMBER,
                 Notification.SEND_THRESHOLD_FIELD_NUMBER);
 
-        NotificationRecord record = NotificationTransform.mergeRecord(create.newRecord(NOTIFICATION), toStore);
+        NotificationRecord record = NotificationTransformer.mergeRecord(create.newRecord(NOTIFICATION), toStore);
         record.store();
 
-        return NotificationTransform.toProto(record);
+        return NotificationTransformer.toProto(record);
     }
 
     /**
@@ -137,7 +137,7 @@ public class NotificationOperations extends AbstractOperations {
      */
     public Optional<Notification> getNotification(int id) {
         return create.fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
-                .map(NotificationTransform::toProto);
+                .map(NotificationTransformer::toProto);
     }
 
     /**
@@ -164,10 +164,10 @@ public class NotificationOperations extends AbstractOperations {
                 .fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
                 .orElseThrow(() -> new NotFoundException("Notification does not exist!"));
 
-        record = NotificationTransform.mergeRecord(record, notification);
+        record = NotificationTransformer.mergeRecord(record, notification);
         record.update();
 
-        return NotificationTransform.toProto(record);
+        return NotificationTransformer.toProto(record);
     }
 
     /**

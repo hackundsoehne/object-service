@@ -2,6 +2,8 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import com.google.protobuf.Message;
 
+import java.util.Optional;
+
 /**
  * Represents a page containing the items and whether there's a next / previous page.
  *
@@ -49,8 +51,8 @@ public class Paginated<X> {
      *
      * @return Key, or empty if the list is empty.
      */
-    public X getLeft() {
-        return left;
+    public Optional<X> getLeft() {
+        return Optional.ofNullable(left);
     }
 
     /**
@@ -58,8 +60,8 @@ public class Paginated<X> {
      *
      * @return Key, or empty if the list is empty.
      */
-    public X getRight() {
-        return right;
+    public Optional<X> getRight() {
+        return Optional.ofNullable(right);
     }
 
     /**
