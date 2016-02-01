@@ -1,6 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.event;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +16,7 @@ public class EventLog {
      * Create a new Log
      */
     public EventLog() {
-        logs = new LinkedList<>();
+        logs = new ArrayList<>();
         name = "";
     }
 
