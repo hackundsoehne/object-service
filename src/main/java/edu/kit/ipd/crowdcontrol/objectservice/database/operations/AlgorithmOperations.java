@@ -297,6 +297,7 @@ public class AlgorithmOperations extends AbstractOperations {
             if (!existing.isPresent()) {
                 DSL.using(config).executeInsert(record);
             } else if (!existing.get().getValue().equals(value)) {
+                record.setIdChoosenTaskChooserParam(existing.get().getIdChoosenTaskChooserParam());
                 DSL.using(config).update(CHOSEN_TASK_CHOOSER_PARAM)
                         .set(record)
                         .where(CHOSEN_TASK_CHOOSER_PARAM.EXPERIMENT.eq(experimentID))
@@ -323,6 +324,7 @@ public class AlgorithmOperations extends AbstractOperations {
             if (!existing.isPresent()) {
                 DSL.using(config).executeInsert(record);
             } else if (!existing.get().getValue().equals(value)) {
+                record.setIdAlgorithmAnswerQualityParamChosen(existing.get().getIdAlgorithmAnswerQualityParamChosen());
                 DSL.using(config).update(CHOSEN_ANSWER_QUALITY_PARAM)
                         .set(record)
                         .where(CHOSEN_ANSWER_QUALITY_PARAM.EXPERIMENT.eq(experimentID))
@@ -349,6 +351,7 @@ public class AlgorithmOperations extends AbstractOperations {
             if (!existing.isPresent()) {
                 DSL.using(config).executeInsert(record);
             } else if (!existing.get().getValue().equals(value)) {
+                record.setIdAlgorithmRatingQualityChosen(existing.get().getIdAlgorithmRatingQualityChosen());
                 DSL.using(config).update(CHOSEN_RATING_QUALITY_PARAM)
                         .set(record)
                         .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(experimentID))
