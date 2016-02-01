@@ -153,14 +153,14 @@ public class PlatformManager {
                 .orElseThrow(() -> new IllegalArgumentException("Platform not found!"))
                 .handle((s1, throwable) -> {
                     //if the creation was successful update the task
-                    if (s1 != null && throwable == null) {
+                    if (s1 != null && throwable == null && !s1.isEmpty()) {
                         result.setPlatformData(s1);
                         if (!tasksOps.updateTask(result)) {
                             throw new IllegalStateException("Updating record for published task failed");
                         }
                     }
                     //if there is no useful key throw!
-                    if (s1 == null || s1.isEmpty()) {
+                    if (s1 != null && s1.isEmpty()) {
                         tasksOps.deleteTask(result);
                         throw new IllegalStateException("Platform "+name+" does not provide any useful key");
                     }
