@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.stubbing.Answer;
 
+import javax.mail.Message;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class MoneyTransferManagerTest {
         WorkerRecord worker1 = mock(WorkerRecord.class);
 
         doReturn("pseipd@gmail.com").when(worker0).getEmail();
-        doReturn("pseipd@gmail.com").when(worker1).getEmail();
+        doReturn("pse2016@web.de").when(worker1).getEmail();
 
         doReturn(0).when(worker0).getIdWorker();
         doReturn(1).when(worker1).getIdWorker();
@@ -65,15 +66,20 @@ public class MoneyTransferManagerTest {
         GiftCodeRecord code1 = new GiftCodeRecord();
         GiftCodeRecord code2 = new GiftCodeRecord();
 
-        code0.setCode("qwer");
-        code1.setCode("asdf");
-        code2.setCode("yxcv");
+        code0.setCode("QWER-TZUI");
+        code1.setCode("ASDF-GHJK");
+        code2.setCode("YXCV-BNM");
 
         code0.setAmount(30);
         code1.setAmount(25);
         code2.setAmount(10);
 
+        code0.setIdGiftCode(0);
+        code1.setIdGiftCode(1);
+        code2.setIdGiftCode(2);
+
         LinkedList<GiftCodeRecord> codeList = new LinkedList<>();
+        doReturn(codeList).when(payops).getUnusedGiftCodes();
 
         codeList.addLast(code0);
         codeList.addLast(code1);
@@ -85,25 +91,29 @@ public class MoneyTransferManagerTest {
         };
 
         Answer answer1 = invocation -> {
-            codeList.remove(code0);
+            codeList.remove(code1);
             return null;
         };
 
         Answer answer2 = invocation -> {
-            codeList.remove(code0);
+            codeList.remove(code2);
             return null;
         };
 
-        doAnswer(answer0).when(payops).addDebit(any(), any(), any(), code0.getIdGiftCode());
-        doAnswer(answer1).when(payops).addDebit(any(), any(), any(), code1.getIdGiftCode());
-        doAnswer(answer2).when(payops).addDebit(any(), any(), any(), code2.getIdGiftCode());
+        doReturn(new Message[0]).when(handler).fetchUnseen(any());
+
+        doReturn(true).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
+        doReturn(true).when(payops).addDebit(anyInt(), anyInt(), eq(code1.getIdGiftCode()));
+        doReturn(true).when(payops).addDebit(anyInt(), anyInt(), eq(code2.getIdGiftCode()));
 
         String message = "Dear Worker, <br/>We thank you for your work and send you in this mail the the Amazon giftcodes you earned. " +
                 "You can redeem them <a href=\"https://www.amazon.de/gc/redeem/ref=gc_redeem_new_exp\">here!</a>" +
                 "Please note, that the amount of the giftcodes can be under the amount of money you earned. " +
                 "The giftcodes with corresponding amount of money first have to be bought, or if the amount of money missing is below 15ct, you have to complete more tasks to get the complete amount of money.<br/>" +
                 "qwer</br>";
-        verify(handler).sendMail(null,"Your Payment for your Crowdworking", message);
+
         mng.payOff();
+
+        verify(handler).sendMail("pseipd@gmail.com",eq("Your payment for your Crowdworking"), eq(message));
     }
 }

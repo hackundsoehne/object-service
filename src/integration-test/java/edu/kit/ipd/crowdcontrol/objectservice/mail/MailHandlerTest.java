@@ -20,7 +20,7 @@ public abstract class MailHandlerTest {
     protected String folder;
 
     @Test
-    public void test() throws Exception {
+    public void testDeletion() throws Exception {
         String uuid = UUID.randomUUID().toString();
         String subject = "[test] " + uuid;
 
@@ -46,6 +46,16 @@ public abstract class MailHandlerTest {
                 break;
             }
         }
+        messages = handler.fetchFolder(folder);
+        boolean deleted = true;
+
+        for (Message message : messages) {
+            if (message.getSubject().equals(subject)) {
+                deleted = false;
+            }
+        }
+
+        assertTrue(deleted);
         assertTrue(found);
     }
 }

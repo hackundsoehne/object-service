@@ -108,7 +108,7 @@ public class MoneyTransferManager {
             }
             GiftCodeRecord nextCode = giftCodesIt.next();
             if (nextCode.getAmount() <= creditBalance) {
-                //workerBalanceOperations.addDebit(worker.getIdWorker(), nextCode.getAmount(), nextCode.getCode());
+                workerBalanceOperations.addDebit(worker.getIdWorker(), nextCode.getAmount(), nextCode.getIdGiftCode());
                 payedCodes.add(nextCode);
             }
         }
