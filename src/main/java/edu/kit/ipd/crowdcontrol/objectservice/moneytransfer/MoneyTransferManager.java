@@ -110,6 +110,7 @@ public class MoneyTransferManager {
             if (nextCode.getAmount() <= creditBalance) {
                 workerBalanceOperations.addDebit(worker.getIdWorker(), nextCode.getAmount(), nextCode.getIdGiftCode());
                 payedCodes.add(nextCode);
+                creditBalance -= nextCode.getAmount();
             }
         }
         if (!giftCodesIt.hasNext() && creditBalance >= 15) {
@@ -120,11 +121,7 @@ public class MoneyTransferManager {
 
     private void payWorker(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
         if (!giftCodes.isEmpty()) {
-            String message = "Dear Worker, <br/>We thank you for your work and send you in this mail the the Amazon giftcodes you earned. " +
-                    "You can redeem them <a href=\"https://www.amazon.de/gc/redeem/ref=gc_redeem_new_exp\">here!</a>" +
-                    "Please note, that the amount of the giftcodes can be under the amount of money you earned. " +
-                    "The giftcodes with corresponding amount of money first have to be bought, or if the amount of money missing is below 15ct, you have to complete more tasks to get the complete amount of money.<br/>" +
-                    "Your Giftcodes:</br>";
+            String message; //TODO message input per fileLoader
             Iterator<GiftCodeRecord> it = giftCodes.iterator();
             while (it.hasNext()) {
                 message = message + it.next().getCode() + "</br>";

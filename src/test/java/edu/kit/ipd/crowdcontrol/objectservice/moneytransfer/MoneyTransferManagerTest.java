@@ -87,33 +87,35 @@ public class MoneyTransferManagerTest {
 
         Answer answer0 = invocation -> {
             codeList.remove(code0);
-            return null;
+            return true;
         };
 
         Answer answer1 = invocation -> {
             codeList.remove(code1);
-            return null;
+            return true;
         };
 
         Answer answer2 = invocation -> {
             codeList.remove(code2);
-            return null;
+            return true;
         };
 
         doReturn(new Message[0]).when(handler).fetchUnseen(any());
 
-        doReturn(true).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
-        doReturn(true).when(payops).addDebit(anyInt(), anyInt(), eq(code1.getIdGiftCode()));
-        doReturn(true).when(payops).addDebit(anyInt(), anyInt(), eq(code2.getIdGiftCode()));
+        doAnswer(answer0).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
+        doAnswer(answer1).when(payops).addDebit(anyInt(), anyInt(), eq(code1.getIdGiftCode()));
+        doAnswer(answer2).when(payops).addDebit(anyInt(), anyInt(), eq(code2.getIdGiftCode()));
 
         String message = "Dear Worker, <br/>We thank you for your work and send you in this mail the the Amazon giftcodes you earned. " +
                 "You can redeem them <a href=\"https://www.amazon.de/gc/redeem/ref=gc_redeem_new_exp\">here!</a>" +
                 "Please note, that the amount of the giftcodes can be under the amount of money you earned. " +
-                "The giftcodes with corresponding amount of money first have to be bought, or if the amount of money missing is below 15ct, you have to complete more tasks to get the complete amount of money.<br/>" +
-                "qwer</br>";
+                "The giftcodes with corresponding amount of money first have to be bought, or if the amount of money missing is below 15ct, you have to complete more tasks to get the complete amount of money.<br/>";
+        String codesWorker1 = "Your Giftcodes:</br>QWER-TZUI</br>";
+        String codesWorker2 = "Your Giftcodes:</br>ASDF-GHJK</br>";
 
         mng.payOff();
 
-        verify(handler).sendMail("pseipd@gmail.com",eq("Your payment for your Crowdworking"), eq(message));
+        verify(handler).sendMail("pseipd@gmail.com","Your payment for your Crowdworking", message + codesWorker1);
+        verify(handler).sendMail("pse2016@web.de", "Your payment for your Crowdworking", message + codesWorker2);
     }
 }
