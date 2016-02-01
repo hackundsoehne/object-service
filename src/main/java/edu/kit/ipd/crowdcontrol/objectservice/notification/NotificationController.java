@@ -19,8 +19,7 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0
  */
 public class NotificationController {
-    private final ScheduledExecutorService scheduler =
-            Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private HashMap<Integer, ScheduledFuture<?>> handleMap;
     private NotificationOperations operations;
     private NotificationPolicy policy;
@@ -74,6 +73,7 @@ public class NotificationController {
      * Deletes a notificationProto
      *
      * @param notificationProto the notification to delete
+     * @throws IllegalArgumentException if the given notification does not exist inside the module
      */
     public void deleteNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto) {
         deleteNotification(notificationProto.getId());
@@ -83,14 +83,20 @@ public class NotificationController {
      * Deletes a notification
      *
      * @param notification the notification to delete
+     * @throws IllegalArgumentException if the given notification does not exist inside the module
      */
     public void deleteNotification(Notification notification) {
         deleteNotification(notification.getID());
     }
 
     private void deleteNotification(int id) {
-        ScheduledFuture<?> notificationHandle = handleMap.get(id);
-        notificationHandle.cancel(true);
+        if (handleMap.containsKey(id)) {
+            ScheduledFuture<?> notificationHandle = handleMap.get(id);
+            notificationHandle.cancel(false);
+        } else {
+            throw new IllegalArgumentException("The notification with ID=" + Integer.toString(id) +
+                    " does not exist (is not scheduled)!");
+        }
     }
 
     /**

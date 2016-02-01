@@ -20,7 +20,7 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<Result<Record
 
 
     /**
-     * @param mailSender an implementation of the MailSender interfac
+     * @param mailSender an implementation of the MailSender interface
      * @param receiver   email address of the receiver
      * @param operation  instance of the notification operations
      */
@@ -45,12 +45,14 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<Result<Record
         StringBuilder message = new StringBuilder();
         message.append(notification.getDescription());
         message.append("\n");
-        for (Record record : token) {
-            message.append(record.toString());
+        int count = token.size() <= 10 ? token.size() : 10;
+        for (int i = 0; i < count; i++) {
+            message.append(token.get(i).toString());
         }
 
+        String subject = "[CrowdControl Notification] " + notification.getName();
         try {
-            mailSender.sendMail(receiver, notification.getName(), message.toString());
+            mailSender.sendMail(receiver, subject, message.toString());
         } catch (Exception e) {
             throw new NotificationNotSentException(e);
         }

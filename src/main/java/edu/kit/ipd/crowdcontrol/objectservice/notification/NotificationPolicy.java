@@ -25,10 +25,11 @@ public abstract class NotificationPolicy<T> {
     protected abstract T check(Notification notification);
 
     /**
-     * Sends a notification
+     * Sends a notification.
      *
      * @param notification the notification to send
-     * @param token        a token acquired from a check. Can be null.
+     * @param token        a token acquired from a check that can be null
+     * @throws NotificationNotSentException if a notification could not be sent
      */
     protected abstract void send(Notification notification, T token);
 }
