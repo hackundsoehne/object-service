@@ -7,18 +7,17 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.GetHITRes
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.HIT;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
- * Created by marcel on 02.02.16.
+ * Get a HIT from mturk
+ * @version 1.0
+ * @author MarcelHollerbach
  */
 public class GetHIT extends MturkRestCommand<HIT, GetHITResponse> {
     /**
-     * Get a HIT from a given platform
-     * @param con
-     * @param id
+     * Get a HIT
+     * @param con connection to use
+     * @param id id of the HIT to get
      */
     public GetHIT(MTurkConnection con, String id){
         super(con,

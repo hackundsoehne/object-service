@@ -8,10 +8,12 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.DisableHI
 import java.util.HashMap;
 
 /**
- * Created by marcel on 02.02.16.
+ * Remove a HIT from mturk
+ * @version 1.0
+ * @author MarcelHollerbach
  */
 public class UnpublishHIT extends MturkRestCommand<Boolean, DisableHITResponse> {
-    public UnpublishHIT(MTurkConnection connection, String id, String uniqueRestToken) {
+    public UnpublishHIT(MTurkConnection connection, String id) {
         super(connection,
                 "DisableHIT","Request","2014-08-15",DisableHITResponse.class,
                 () -> {

@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Create a HIT
+ * @version 1.0
+ * @author MarcelHollerbach
  */
 public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
     /**
