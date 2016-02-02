@@ -4,7 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Answ
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 
@@ -60,7 +60,7 @@ public class PaymentCalculator {
 
         //For all good answers of the worker, his salary get increased by the payment for an answer
         for (Map.Entry<WorkerRecord,Set<AnswerRecord>> entry : workerAnswerSet.entrySet()) {
-            Worker worker = WorkerTransform.toProto(entry.getKey());
+            Worker worker = WorkerTransformer.toProto(entry.getKey());
 
             if(!map.containsKey(worker)) {
                 map.put(worker, 0);
@@ -75,7 +75,7 @@ public class PaymentCalculator {
 
         //For all good ratings of the worker, his salary get increased by the payment for a rating
         for (Map.Entry<WorkerRecord,Set<RatingRecord>> entry : workerRatingSet.entrySet()) {
-            Worker worker = WorkerTransform.toProto(entry.getKey());
+            Worker worker = WorkerTransformer.toProto(entry.getKey());
 
             if(!map.containsKey(worker)) {
                 map.put(worker, 0);

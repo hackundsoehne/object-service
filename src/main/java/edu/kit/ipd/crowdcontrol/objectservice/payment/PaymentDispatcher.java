@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.payment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
 
 
-    private Observable<ChangeEvent<Experiment>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
+    private Observable<Event<ChangeEvent<Experiment>>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
     private PlatformManager platformManager;
     private PaymentCalculator paymentCalc;
 
@@ -62,7 +63,7 @@ public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
     public void onNext(ChangeEvent<Experiment> experimentChangeEvent) {
 
         if (experimentChangeEvent.getNeww().getState() == Experiment.State.STOPPED
-                && experimentChangeEvent.getOld().getState() == Experiment.State.STOPPING) {
+                && experimentChangeEvent.getOld().getState() == Experiment.State.CREATIVE_STOPPED) {
 
 
             dispatchPayment(experimentChangeEvent.getNeww());

@@ -61,8 +61,8 @@ public class PaymentCalculatorTest {
     @Test
     public void testEstimatePayment() throws Exception {
 
-        WorkerRecord workerOne = new WorkerRecord(0,"","","");
-        WorkerRecord workerTwo = new WorkerRecord(1,"","","");
+        WorkerRecord workerOne = new WorkerRecord(0,"","","",0);
+        WorkerRecord workerTwo = new WorkerRecord(1,"","","",0);
 
         Set<AnswerRecord> answerSetWorkerOne = new HashSet<>();
         answerSetWorkerOne.add(new AnswerRecord(0,workerOne.getIdWorker(),"",null,0,9,true));
@@ -90,8 +90,8 @@ public class PaymentCalculatorTest {
 
 
         Set<RatingRecord> ratingSetWorkerTwo = new HashSet<>();
-        ratingSetWorkerTwo.add(new RatingRecord(0,exp.getId(),0,null,6,1,7));
-        ratingSetWorkerTwo.add(new RatingRecord(1,exp.getId(),0,null,5,1,9));
+        ratingSetWorkerTwo.add(new RatingRecord(0,exp.getId(),0,null,6,"",1,7));
+        ratingSetWorkerTwo.add(new RatingRecord(1,exp.getId(),0,null,5,"",1,9));
 
         workerRatingMap.put(workerTwo,ratingSetWorkerTwo);
 
