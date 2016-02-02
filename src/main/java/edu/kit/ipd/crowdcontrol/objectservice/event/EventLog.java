@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.event;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Can be used to create a stack of messages from a event subscriber.
@@ -10,13 +11,13 @@ import java.util.List;
  */
 public class EventLog {
     private String name;
-    private List<LogEntry> logs;
+    private ConcurrentLinkedQueue<LogEntry> logs;
 
     /**
      * Create a new Log
      */
     public EventLog() {
-        logs = new ArrayList<>();
+        logs = new ConcurrentLinkedQueue<>();
         name = "";
     }
 
