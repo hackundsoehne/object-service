@@ -70,15 +70,10 @@ public class MailParserTest {
         java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
         props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
-        Properties properties = new Properties();
-        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/test/resources/gmailLogin.properties"));
-        properties.load(stream);
-        stream.close();
-
         auth = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
+                return new PasswordAuthentication(null, null);
             }
         };
     }
