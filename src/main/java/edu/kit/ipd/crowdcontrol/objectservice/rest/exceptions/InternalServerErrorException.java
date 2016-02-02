@@ -8,8 +8,10 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions;
  */
 public class InternalServerErrorException extends RuntimeException {
     /**
-     * @param message Error details. Forwarded to the client.
-     * @param args    Arguments for {@link String#format(String, Object...)}.
+     * @param message
+     *         Error details. Forwarded to the client.
+     * @param args
+     *         Arguments for {@link String#format(String, Object...)}.
      */
     public InternalServerErrorException(String message, Object... args) {
         super(String.format(message, args));

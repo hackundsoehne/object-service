@@ -13,6 +13,7 @@ public class WorkerTransformer extends AbstractTransformer {
      * Converts a worker record to its protobuf representation.
      *
      * @param record worker record
+     *
      * @return Worker.
      */
     public static Worker toProto(WorkerRecord record) {
@@ -29,16 +30,15 @@ public class WorkerTransformer extends AbstractTransformer {
      *
      * @param target record to merge into
      * @param worker message to merge from
+     *
      * @return Merged worker record.
      */
     public static WorkerRecord mergeRecord(WorkerRecord target, Worker worker) {
         return merge(target, worker, (field, record) -> {
             switch (field) {
-                case Worker.PLATFORM_FIELD_NUMBER:
-                    record.setPlatform(worker.getPlatform());
+                case Worker.PLATFORM_FIELD_NUMBER: record.setPlatform(worker.getPlatform());
                     break;
-                case Worker.EMAIL_FIELD_NUMBER:
-                    record.setEmail(worker.getEmail());
+                case Worker.EMAIL_FIELD_NUMBER: record.setEmail(worker.getEmail());
                     break;
             }
         });
