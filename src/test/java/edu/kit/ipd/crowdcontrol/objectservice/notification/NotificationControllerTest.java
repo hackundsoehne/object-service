@@ -1,7 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.junit.Before;
@@ -10,6 +9,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import java.util.ArrayList;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -35,18 +36,15 @@ public class NotificationControllerTest {
     @Before
     public void setUp() throws Exception {
         notificationController = new NotificationController(notificationOperations, policy);
-        Notification.Builder builder = Notification.newBuilder();
-        builder.setId(5);
-        builder.setName("Test Notification");
-        builder.setDescription("This is a test notification");
-        builder.setSendThreshold(60 * 60 * 24);
-        builder.setCheckPeriod(CHECKPERIOD);
-        builder.setQuery("SELECT");
-        notificationProto = builder.buildPartial();
 
-        notification = new edu.kit.ipd.crowdcontrol.objectservice.notification.Notification(notificationProto.getId(),
-                notificationProto.getName(), notificationProto.getDescription(), notificationProto.getSendThreshold(),
-                notificationProto.getCheckPeriod(), notificationProto.getQuery(), policy);
+        ArrayList<String> receiverEmails = new ArrayList<>();
+        receiverEmails.add("mail-a@example.com");
+        receiverEmails.add("mail-b@example.com");
+
+        notification = new edu.kit.ipd.crowdcontrol.objectservice.notification.Notification(3, "Test Notification",
+                "This describes the Test notification", CHECKPERIOD, "SELECT test", false, receiverEmails, policy);
+
+        notificationProto = notification.toProtobuf();
     }
 
     @Test

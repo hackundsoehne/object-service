@@ -13,8 +13,6 @@ import org.jooq.Result;
 import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,7 +84,7 @@ public class NotificationOperations extends AbstractOperations {
      * Creates a new notification.
      * <p>
      * the passed notification must have the following fields set:<br>
-     * name, description, query, check_period and send_threshold
+     * name, description, query, check_period, emails and send_once
      * @param toStore Notification to save
      * @return an instance of notification with ID assigned
      * @throws IllegalArgumentException if one of the specified fields is not set
@@ -97,7 +95,8 @@ public class NotificationOperations extends AbstractOperations {
                 Notification.DESCRIPTION_FIELD_NUMBER,
                 Notification.QUERY_FIELD_NUMBER,
                 Notification.CHECK_PERIOD_FIELD_NUMBER,
-                Notification.SEND_THRESHOLD_FIELD_NUMBER);
+                Notification.EMAILS_FIELD_NUMBER,
+                Notification.SEND_ONCE_FIELD_NUMBER);
 
         NotificationRecord record = NotificationTransformer.mergeRecord(create.newRecord(NOTIFICATION), toStore);
         record.store();
@@ -138,19 +137,6 @@ public class NotificationOperations extends AbstractOperations {
     public Optional<Notification> getNotification(int id) {
         return create.fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
                 .map(NotificationTransformer::toProto);
-    }
-
-    /**
-     * updates the notifications lastSend field
-     *
-     * @param notificationID the primary key of the notification
-     * @return true if updated, false if not found
-     */
-    public boolean updateLastSentForNotification(int notificationID, Instant now) {
-        return create.update(Tables.NOTIFICATION)
-                .set(Tables.NOTIFICATION.LASTSENT, Timestamp.from(now))
-                .where(Tables.NOTIFICATION.ID_NOTIFICATION.eq(notificationID))
-                .execute() == 1;
     }
 
     /**

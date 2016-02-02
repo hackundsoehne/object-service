@@ -3,8 +3,8 @@ package edu.kit.ipd.crowdcontrol.objectservice.notification;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
-import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -32,16 +32,16 @@ public class NotificationController {
 
         loadNotificationsFromDatabase();
 
-        EventManager.NOTIFICATION_CREATE.getObservable().subscribe(this::createNotification);
-        EventManager.NOTIFICATION_DELETE.getObservable().subscribe(this::deleteNotification);
-        EventManager.NOTIFICATION_UPDATE.getObservable().subscribe(this::updateNotification);
+        //TODO subscribe events
     }
 
     private void loadNotificationsFromDatabase() {
         List<NotificationRecord> notificationList = operations.getAllNotifications();
         for (NotificationRecord record : notificationList) {
             createNotification(new Notification(record.getIdNotification(), record.getName(), record.getDescription(),
-                    record.getSendthreshold(), record.getCheckperiod(), record.getQuery(), policy));
+                    record.getCheckperiod(), record.getQuery(),
+                    //TODO apply changes
+                    true, new ArrayList<>(), policy));
         }
     }
 
@@ -51,12 +51,10 @@ public class NotificationController {
      * @param notificationProto the notification to create
      */
     public void createNotification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto) {
-        Notification notification = new Notification(notificationProto.getId(), notificationProto.getName(),
-                notificationProto.getDescription(), notificationProto.getSendThreshold(),
-                notificationProto.getCheckPeriod(), notificationProto.getQuery(), policy);
-
+        Notification notification = Notification.fromProtobuf(notificationProto, policy);
         createNotification(notification);
     }
+
 
     /**
      * Creates a new Notification and adds it to the scheduler

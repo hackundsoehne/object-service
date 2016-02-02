@@ -1,5 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
+
 /**
  * NotificationPolicy encapsulates strategies to check and send notifications.
  *
@@ -7,13 +10,22 @@ package edu.kit.ipd.crowdcontrol.objectservice.notification;
  * @version 1.0
  */
 public abstract class NotificationPolicy<T> {
+    private NotificationOperations operations;
+
     public void invoke(Notification notification) {
-        if (notification.thresholdPassed()) {
             T token = check(notification);
             if (token != null) {
                 send(notification, token);
+
+                //TODO handle error
+                operations.deleteNotification(notification.getID());
+                // will cause the notification to be removed from the scheduler
+                EventManager.NOTIFICATION_DELETE.emit(notification.toProtobuf());
             }
-        }
+    }
+
+    public NotificationPolicy(NotificationOperations operations) {
+        this.operations = operations;
     }
 
     /**

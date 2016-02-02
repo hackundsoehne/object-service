@@ -5,8 +5,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import org.jooq.Record;
 import org.jooq.Result;
 
-import java.time.Instant;
-
 /**
  * The SQLEmailNotificationPolicy checks given queries in a SQL-Database and sends notifications via email.
  *
@@ -16,23 +14,24 @@ import java.time.Instant;
 public class SQLEmailNotificationPolicy extends NotificationPolicy<Result<Record>> {
     private MailSender mailSender;
     private String receiver;
-    private NotificationOperations operation;
+    private NotificationOperations operations;
 
 
     /**
      * @param mailSender an implementation of the MailSender interface
      * @param receiver   email address of the receiver
-     * @param operation  instance of the notification operations
+     * @param operations  instance of the notification operations
      */
-    public SQLEmailNotificationPolicy(MailSender mailSender, String receiver, NotificationOperations operation) {
+    public SQLEmailNotificationPolicy(MailSender mailSender, String receiver, NotificationOperations operations) {
+        super(operations);
         this.mailSender = mailSender;
         this.receiver = receiver;
-        this.operation = operation;
+        this.operations = operations;
     }
 
     @Override
     protected Result<Record> check(Notification notification) {
-        Result<Record> result = operation.runReadOnlySQL(notification.getQuery());
+        Result<Record> result = operations.runReadOnlySQL(notification.getQuery());
         if (result.isNotEmpty()) {
             return result;
         } else {
@@ -44,7 +43,7 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<Result<Record
     protected void send(Notification notification, Result<Record> token) {
         StringBuilder message = new StringBuilder();
         message.append(notification.getDescription());
-        message.append("\n");
+        message.append("\n\n");
         int count = token.size() <= 10 ? token.size() : 10;
         for (int i = 0; i < count; i++) {
             message.append(token.get(i).toString());
@@ -56,11 +55,6 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<Result<Record
         } catch (Exception e) {
             throw new NotificationNotSentException(e);
         }
-
-        // update lastSent
-        Instant now = Instant.now();
-        notification.setLastSent(now);
-        operation.updateLastSentForNotification(notification.getID(), now);
     }
 }
 

@@ -19,6 +19,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
@@ -56,7 +57,8 @@ public class SQLEmailNotificationPolicyTest {
         result.add(record);
 
         notification = new Notification(record.getIdNotification(), record.getName(), record.getDescription(),
-                record.getSendthreshold(), record.getCheckperiod(), TESTQUERY, policy);
+                // TODO apply changes
+                record.getCheckperiod(), TESTQUERY, true, new ArrayList<>(), policy);
     }
 
     @Test
