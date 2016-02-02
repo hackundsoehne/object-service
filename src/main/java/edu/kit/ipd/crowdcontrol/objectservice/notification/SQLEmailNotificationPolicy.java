@@ -5,13 +5,15 @@ import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import org.jooq.Record;
 import org.jooq.Result;
 
+import java.util.ArrayList;
+
 /**
  * The SQLEmailNotificationPolicy checks given queries in a SQL-Database and sends notifications via email.
  *
  * @author Simon Korz
  * @version 1.0
  */
-public class SQLEmailNotificationPolicy extends NotificationPolicy<Result<Record>> {
+public class SQLEmailNotificationPolicy extends NotificationPolicy<ArrayList<String>, String> {
     private MailSender mailSender;
     private String receiver;
     private NotificationOperations operations;
@@ -30,7 +32,7 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<Result<Record
     }
 
     @Override
-    protected Result<Record> check(Notification notification) {
+    protected ArrayList<String> check(Notification notification) {
         Result<Record> result = operations.runReadOnlySQL(notification.getQuery());
         if (result.isNotEmpty()) {
             return result;
@@ -40,7 +42,7 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<Result<Record
     }
 
     @Override
-    protected void send(Notification notification, Result<Record> token) {
+    protected void send(Notification notification, String token) {
         StringBuilder message = new StringBuilder();
         message.append(notification.getDescription());
         message.append("\n\n");
