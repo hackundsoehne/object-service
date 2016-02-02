@@ -10,16 +10,10 @@ import java.util.concurrent.CompletableFuture;
  * Created by marcel on 01.02.16.
  */
 public class MTurkRestApi {
-    private final String url;
-    private final Map<String, Object> staticDefaultValues;
-    private final String awsSecretAccessKey;
+    private final MTurkConnection connection;
 
     public MTurkRestApi(String awsAccessKeyId, String awsSecretAccessKey, String url) {
-        this.awsSecretAccessKey = awsSecretAccessKey;
-        this.url = url;
-        staticDefaultValues = new HashMap<>();
-        staticDefaultValues.put("AWSAccessKeyId",awsAccessKeyId);
-        staticDefaultValues.put("Service", "AWSMechanicalTurkRequester");
+        this.connection = new MTurkConnection(awsAccessKeyId,awsSecretAccessKey,url);
     }
 
     /**
@@ -58,10 +52,10 @@ public class MTurkRestApi {
         //FIXME assignmentReviewPolicy?
         //FIXME HITReviewPolicy
         values.put("RequesterAnnotation", data);
-        values.put("UniqueRequestToken", uniqueRequestToken);
 
-        return new MturkRestCommand<>(url, "CreateHIT", values, staticDefaultValues,
-                CreateHITResponse.class, awsSecretAccessKey, "Minimal", "2014-08-15", createHITResponse -> {
+        return new MturkRestCommand<>(connection,uniqueRequestToken,
+                "CreateHIT","Minimal","2014-08-15",
+                CreateHITResponse.class,values,createHITResponse -> {
             // check if we got a hit at all
             if (createHITResponse.getHIT().size() == 0) {
                 throw new IllegalStateException("No result HIT!");
@@ -76,6 +70,10 @@ public class MTurkRestApi {
             //return HITId
             return created.getHITId();
         });
+
+/*        return new MturkRestCommand<>(url, "CreateHIT", values, staticDefaultValues,
+                CreateHITResponse.class, awsSecretAccessKey, "Minimal", "2014-08-15",
+                uniqueRequestToken,*/
     }
 
     /**
@@ -83,19 +81,23 @@ public class MTurkRestApi {
      * @param id hit id which is used to find the HIT
      * @return True on success otherwise a exception
      */
-    public CompletableFuture<Boolean> unpublishHIT(String id) {
+    public CompletableFuture<Boolean> unpublishHIT(String id,String uniqueRestToken) {
         HashMap<String, Object> values = new HashMap<>();
         values.put("HITId",id);
-        return new MturkRestCommand<>(url, "DisableHIT", values, staticDefaultValues,
+        return new MturkRestCommand<>(connection, uniqueRestToken,
+                "DisableHIT","Request","2014-08-15",DisableHITResponse.class,
+                values,disableHITResult -> {
+
+                    //throw exception if there was a error
+                    Utils.handleRequest(disableHITResult.getDisableHITResult().get(0).getRequest());
+
+                    //if not everything is fine
+                    return true;
+                });
+
+        /*return new MturkRestCommand<>(url, "DisableHIT", values, staticDefaultValues,
                 DisableHITResponse.class, awsSecretAccessKey,
-                "Request","2014-08-15",disableHITResult -> {
-
-            //throw exception if there was a error
-            Utils.handleRequest(disableHITResult.getDisableHITResult().get(0).getRequest());
-
-            //if not everything is fine
-            return true;
-        });
+                "Request","2014-08-15",*/
     }
 
     /**
@@ -103,15 +105,23 @@ public class MTurkRestApi {
      * @param id hit id which was returned by CreateHIT
      * @return the datastructure of a exception
      */
-    public CompletableFuture<HIT> getHit(String id) {
+    public CompletableFuture<HIT> getHit(String id, String uniqueRestToken) {
         HashMap<String, Object> values = new HashMap<>();
         values.put("HITId", id);
-        return new MturkRestCommand<>(url, "GetHIT", values, staticDefaultValues,
+        return new MturkRestCommand<>(connection,uniqueRestToken,
+                "GetHIT","HITDetail","2014-08-15", GetHITResponse.class,
+                values,getHITResponse -> {
+                    if (getHITResponse.getHIT().size() < 1)
+                        throw new IllegalArgumentException("Hit "+id+" not found!");
+                    Utils.handleRequest(getHITResponse.getHIT().get(0).getRequest());
+                    return getHITResponse.getHIT().get(0);
+                });
+        /*return new MturkRestCommand<>(url, "GetHIT", values, staticDefaultValues,
                 GetHITResponse.class, awsSecretAccessKey, "HITDetail","2014-08-15",getHITResponse -> {
             if (getHITResponse.getHIT().size() < 1)
                 throw new IllegalArgumentException("Hit "+id+" not found!");
             Utils.handleRequest(getHITResponse.getHIT().get(0).getRequest());
             return getHITResponse.getHIT().get(0);
-        });
+        });*/
     }
 }
