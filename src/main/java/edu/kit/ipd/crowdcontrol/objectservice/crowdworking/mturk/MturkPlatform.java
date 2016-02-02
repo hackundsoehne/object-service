@@ -1,16 +1,18 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
-import com.mashape.unirest.http.Unirest;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentification;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.Assignment;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.AssignmentStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 
 /**
@@ -18,8 +20,10 @@ import java.util.concurrent.CompletableFuture;
  */
 public class MturkPlatform implements Platform,Payment,WorkerIdentification {
 
-    public MturkPlatform() {
+    private final MTurkConnection connection;
 
+    public MturkPlatform(String user, String password, String url) {
+        connection = new MTurkConnection(user, password, url);
     }
 
     @Override
@@ -45,13 +49,15 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
-
-        return null;
+        String tags = experiment.getTagsList().stream().map(tag -> tag.getName()).collect(Collectors.joining(","));
+        return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),experiment.getPaymentBase()/100,
+                60*60*2,60*60*24*31*12/*FIXME this is a year*/,tags,experiment.getNeededAnswers()*experiment.getRatingsPerAnswer(),
+                60*60*60/*FIXME*/,"");
     }
 
     @Override
     public CompletableFuture<Boolean> unpublishTask(String id) {
-        return null;
+        return new UnpublishHIT(connection, id);
     }
 
     @Override
@@ -60,12 +66,57 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
     }
 
     @Override
-    public CompletableFuture<Boolean> payWorker(Worker worker, int amount) {
+    public String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException {
         return null;
     }
 
     @Override
-    public String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException {
+    public CompletableFuture<Boolean> payExperiment(String id, Experiment experiment, List<PaymentJob> paymentJobs) {
+        /**
+         * this code works under the assumation that basepayment is part of the amout!!!!!!
+         */
+        Map<String, Assignment> workerAssignmentId = new HashMap<>();
+        try {
+            //first get a hashmap of all assignmentids and worker ids
+            List<Assignment> assignmentList = new GetAssignments(connection,id,0).get();
+            while (assignmentList.size() > 0) {
+                for(Assignment assignment : assignmentList) {
+                    workerAssignmentId.put(assignment.getWorkerId(), assignment);
+                }
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        for(PaymentJob paymentJob : paymentJobs) {
+            Assignment assignment = workerAssignmentId.get(paymentJob.getWorkerRecord().getIdentification());
+            if (assignment == null) {
+                //FIXME this is fatal!! we cannot pay a worker here!!
+                continue;
+            }
+            //check if we should pay at all
+            if (paymentJob.getAmount() < experiment.getPaymentBase()) {
+
+                //amount is smaller than payment base ? REJECT!
+                new RejectAssignment(connection,assignment.getAssignmentId(),"You answer did not match the wanted rating criteria");
+            }else {
+
+                //basepayment is triggered by approve
+                int amount = paymentJob.getAmount() - experiment.getPaymentBase();
+
+                //apporve the assignment if it is not right now
+                //FIXME if not we are in really bad state!!
+                if (assignment.getAssignmentStatus().equals(AssignmentStatus.SUBMITTED)) {
+                    //approving here triggers base payment
+                    new ApproveAssignment(connection,assignment.getAssignmentId(),"Thx for passing your answer!");
+                }
+
+                //if there is money left pay a bonus
+                if (amount > 0) {
+                    new BonusPayment(connection,assignment.getAssignmentId(),
+                            paymentJob.getWorkerRecord().getIdentification(),amount/100,"This is the bonus for a high rating!");
+                }
+            }
+        }
         return null;
     }
 }
