@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Crowdcontrol extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -364994924;
+	private static final long serialVersionUID = -1027688361;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol</code>
@@ -53,6 +53,8 @@ public class Crowdcontrol extends org.jooq.impl.SchemaImpl {
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatforms.EXPERIMENTS_PLATFORMS,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.GiftCode.GIFT_CODE,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Notification.NOTIFICATION,
+			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.NotificationReceiverEmail.NOTIFICATION_RECEIVER_EMAIL,
+			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.NotificationToken.NOTIFICATION_TOKEN,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Platform.PLATFORM,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingOptionExperiment.RATING_OPTION_EXPERIMENT,
