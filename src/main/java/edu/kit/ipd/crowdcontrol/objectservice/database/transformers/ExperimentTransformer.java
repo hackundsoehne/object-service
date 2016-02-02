@@ -146,6 +146,10 @@ public class ExperimentTransformer extends AbstractTransformer {
                     record.setBonusRating(experiment.getPaymentRating());
                     break;
                 case Experiment.PLACEHOLDERS_FIELD_NUMBER:
+                    if (experiment.getPlaceholders().size() == 0) {
+                        break;
+                    }
+
                     record.setTemplateData(new JSONObject(experiment.getPlaceholders()).toString());
                     break;
                 case Experiment.POPULATIONS_FIELD_NUMBER:
