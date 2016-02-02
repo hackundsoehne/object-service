@@ -15,6 +15,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
+import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import spark.Request;
 import spark.Response;
 
@@ -82,6 +83,13 @@ public class ExperimentResource {
         Experiment experiment = request.attribute("input");
 
         ExperimentRecord record = ExperimentTransformer.mergeProto(new ExperimentRecord(), experiment);
+
+        Map<String, String> placeholders = experiment.getPlaceholders();
+        String description = experiment.getDescription();
+
+        if (!Template.parse(description).keySet().equals(placeholders.keySet())) {
+            throw new BadRequestException("Description and placeholder keys must match.");
+        }
 
         int id = experimentOperations.insertNewExperiment(record);
 
@@ -250,12 +258,25 @@ public class ExperimentResource {
      */
     private Experiment updateExperimentInfo(int id, Experiment experiment, Experiment old, ExperimentRecord oldRecord) {
         Experiment resulting;
+
         if (!old.getState().equals(Experiment.State.DRAFT)) {
             throw new IllegalStateException("When an experiment is running, only the state is allowed to be changed.");
         }
 
         ExperimentRecord experimentRecord = ExperimentTransformer.mergeProto(oldRecord, experiment);
         experimentRecord.setIdExperiment(id);
+
+        Map<String, String> placeholders = experiment.getPlaceholders().size() > 0
+                ? experiment.getPlaceholders()
+                : old.getPlaceholders();
+
+        String description = experiment.getDescription().equals("")
+                ? old.getDescription()
+                : experiment.getDescription();
+
+        if (!Template.parse(description).keySet().equals(placeholders.keySet())) {
+            throw new BadRequestException("Description and placeholder keys must match.");
+        }
 
         //update tags if they were updated
         List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);

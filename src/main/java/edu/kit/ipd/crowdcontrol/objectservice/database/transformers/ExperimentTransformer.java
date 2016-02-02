@@ -146,6 +146,10 @@ public class ExperimentTransformer extends AbstractTransformer {
                     record.setBonusRating(experiment.getPaymentRating());
                     break;
                 case Experiment.PLACEHOLDERS_FIELD_NUMBER:
+                    if (experiment.getPlaceholders().size() == 0) {
+                        break;
+                    }
+
                     record.setTemplateData(new JSONObject(experiment.getPlaceholders()).toString());
                     break;
                 case Experiment.POPULATIONS_FIELD_NUMBER:
@@ -157,7 +161,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                 case Experiment.STATE_FIELD_NUMBER:
                     // this is not merged into the database this event will
                     // start the platforms to populate this experiment
-                    // which results in entrys in the database which will mark the experiment as published
+                    // which results in entries in the database which will mark the experiment as published
                     break;
                 case Experiment.TAGS_FIELD_NUMBER:
                     // has to be done manual with TagConstraintTransform
