@@ -148,7 +148,7 @@ public abstract class AbstractOperations {
      * @see #getNextRange(SelectWhereStep, Field, Table, Object, boolean, int, Comparator)
      */
     protected <R extends org.jooq.Record> Range<R, Integer> getNextRange(SelectWhereStep<R> query, Field<Integer> primaryKey, Table<?> tablePrimaryKey,
-                                                                         Integer start, boolean next, int limit) {
+                                                                      Integer start, boolean next, int limit) {
         return getNextRange(query, primaryKey, tablePrimaryKey, start, next, limit, Comparator.naturalOrder());
     }
 
@@ -186,7 +186,7 @@ public abstract class AbstractOperations {
      * @see #getNextRange(SelectWhereStep, Field, Table, Object, boolean, int, Comparator)
      */
     protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectWhereStep<R> query, Field<K> primaryKey, Table<?> tablePrimaryKey,
-                                                                      K start, boolean next, int limit, Comparator<K> sort) {
+                                                            K start, boolean next, int limit, Comparator<K> sort) {
         return getNextRange(query.where(true), primaryKey, tablePrimaryKey, start, next, limit, sort);
     }
 
@@ -209,7 +209,7 @@ public abstract class AbstractOperations {
      * @return an instance of Range
      */
     protected <R extends org.jooq.Record, K> Range<R, K> getNextRange(SelectConditionStep<R> query, Field<K> primaryKey, Table<?> tablePrimaryKey,
-                                                                      K start, boolean next, int limit, Comparator<K> sort) {
+                                                            K start, boolean next, int limit, Comparator<K> sort) {
         //right now no support for joins with a 1 to n relationship
         Condition primaryKeyCondition = next
                 ? primaryKey.greaterOrEqual(start)
@@ -260,8 +260,8 @@ public abstract class AbstractOperations {
                                                                            Table<?> tablePrimaryKey, K start, boolean next,
                                                                            int limit, Comparator<K> sort) {
         Condition primaryKeyCondition = next
-                ? primaryKey.greaterOrEqual(start)
-                : primaryKey.lessOrEqual(start);
+                            ? primaryKey.greaterOrEqual(start)
+                            : primaryKey.lessOrEqual(start);
 
         SortField<K> sortField = next
                 ? primaryKey.asc()
