@@ -260,8 +260,8 @@ public abstract class AbstractOperations {
                                                                            Table<?> tablePrimaryKey, K start, boolean next,
                                                                            int limit, Comparator<K> sort) {
         Condition primaryKeyCondition = next
-                            ? primaryKey.greaterOrEqual(start)
-                            : primaryKey.lessOrEqual(start);
+                ? primaryKey.greaterOrEqual(start)
+                : primaryKey.lessOrEqual(start);
 
         SortField<K> sortField = next
                 ? primaryKey.asc()
