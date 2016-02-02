@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Expe
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityByRatings;
@@ -35,7 +36,7 @@ public class QualityIdentificator implements Observer<Rating> {
     final static int MINIMUM_QUALITY = 0;
 
 
-    private Observable<Rating> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
+    private Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
 
     private AnswerRatingOperations operations;
     private ExperimentOperations experimentOperations;

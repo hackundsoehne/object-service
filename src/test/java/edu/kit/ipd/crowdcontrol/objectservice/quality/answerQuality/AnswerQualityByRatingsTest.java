@@ -43,17 +43,17 @@ public class AnswerQualityByRatingsTest {
 
     @Test (expected = IllegalArgumentException.class)
     public void throwExceptionIllegalRating(){
-        ratings.add(new RatingRecord(0,0,0,null,-1,0,0));
+        ratings.add(new RatingRecord(0,0,0,null,-1,"",0,0));
         identifier.identifyAnswerQuality(answer,ratings, maxQuality,minQuality);
     }
 
     @Test
     public void answerQualityIsAverageOfRatings(){
 
-        ratings.add(new RatingRecord(0,0,0,null,0,0,0));
-        ratings.add(new RatingRecord(0,0,0,null,2,0,0));
-        ratings.add(new RatingRecord(0,0,0,null,8,0,0));
-        ratings.add(new RatingRecord(0,0,0,null,6,0,0));
+        ratings.add(new RatingRecord(0,0,0,null,0,"",0,0));
+        ratings.add(new RatingRecord(0,0,0,null,2,"",0,0));
+        ratings.add(new RatingRecord(0,0,0,null,8,"",0,0));
+        ratings.add(new RatingRecord(0,0,0,null,6,"",0,0));
 
         int answerQuality = identifier.identifyAnswerQuality(answer,ratings,maxQuality,minQuality);
 

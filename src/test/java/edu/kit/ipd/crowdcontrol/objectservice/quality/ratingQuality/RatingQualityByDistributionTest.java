@@ -36,7 +36,7 @@ public class RatingQualityByDistributionTest {
 
    @Test (expected = IllegalArgumentException.class)
     public void throwExceptionInvalidRating(){
-       ratings.add(new RatingRecord(-1,0,0,null,-1,0,-1));
+       ratings.add(new RatingRecord(-1,0,0,null,-1,"",0,-1));
        identifier.identifyRatingQuality(ratings, maxQuality, minQuality);
 
     }
@@ -44,12 +44,12 @@ public class RatingQualityByDistributionTest {
 
     @Test
     public void optimalRatingEqualsMostChosenRating(){
-        ratings.add(new RatingRecord(1,0,0,null,0,0,0));
-        ratings.add(new RatingRecord(1,0,0,null,9,0,0));
-        ratings.add(new RatingRecord(1,0,0,null,3,0,0));
-        ratings.add(new RatingRecord(1,0,0,null,3,0,0));
-        ratings.add(new RatingRecord(1,0,0,null,3,0,0));
-        RatingRecord ratingRecord = new RatingRecord(1,0,0,null,3,0,0);
+        ratings.add(new RatingRecord(1,0,0,null,0,"",0,0));
+        ratings.add(new RatingRecord(1,0,0,null,9,"",0,0));
+        ratings.add(new RatingRecord(1,0,0,null,3,"",0,0));
+        ratings.add(new RatingRecord(1,0,0,null,3,"",0,0));
+        ratings.add(new RatingRecord(1,0,0,null,3,"",0,0));
+        RatingRecord ratingRecord = new RatingRecord(1,0,0,null,3,"",0,0);
         ratings.add(ratingRecord);
 
 
@@ -61,13 +61,13 @@ public class RatingQualityByDistributionTest {
 
     @Test
     public void optimalRatingEqualsAverageOfMostChosenRatings(){
-        RatingRecord r1a = new RatingRecord(1,0,0,null,0,0,0);
-        RatingRecord r1b = new RatingRecord(1,0,0,null,0,0,0);
+        RatingRecord r1a = new RatingRecord(1,0,0,null,0,"",0,0);
+        RatingRecord r1b = new RatingRecord(1,0,0,null,0,"",0,0);
 
-        RatingRecord r2a = new RatingRecord(1,0,0,null,8,0,0);
-        RatingRecord r2b = new RatingRecord(1,0,0,null,8,0,0);
+        RatingRecord r2a = new RatingRecord(1,0,0,null,8,"",0,0);
+        RatingRecord r2b = new RatingRecord(1,0,0,null,8,"",0,0);
 
-        RatingRecord r3 = new RatingRecord(1,0,0,null,4,0,0);
+        RatingRecord r3 = new RatingRecord(1,0,0,null,4,"",0,0);
 
 
         ratings.add(r1a);
