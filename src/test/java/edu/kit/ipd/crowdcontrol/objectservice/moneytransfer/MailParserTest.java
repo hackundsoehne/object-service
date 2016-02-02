@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the parsing of mail with amazon giftcodes.
+ *
  * @author Felix Rittler
  */
 public class MailParserTest {
@@ -25,7 +26,7 @@ public class MailParserTest {
 
     @Test
     public void test() throws Exception {
-        Session session = Session.getInstance(props,auth);
+        Session session = Session.getInstance(props,auth );
 
         MimeMessage mail = new MimeMessage(session);
 
@@ -53,7 +54,7 @@ public class MailParserTest {
 
         innerBody.setContent(content, "text/plain");
         GiftCodeRecord rec = MailParser.parseAmazonGiftCode(mail);
-        assertTrue(rec.getAmount()==15);
+        assertTrue(rec.getAmount() == 15);
         assertTrue(rec.getCode().equals("5X4F-H8359N-Q2JM"));
 
     }
@@ -61,14 +62,6 @@ public class MailParserTest {
     @Before
     public void setUp() throws Exception {
         props = new Properties();
-        props.put("mail.store.protocol", "imap");
-        props.put("mail.imap.host", "imap.gmail.com");
-        props.put("mail.imap.port", "993");
-        props.put("mail.imap.ssl", "true");
-        props.put("mail.imap.ssl.enable", "true");
-
-        java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-        props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
         auth = new Authenticator() {
             @Override
