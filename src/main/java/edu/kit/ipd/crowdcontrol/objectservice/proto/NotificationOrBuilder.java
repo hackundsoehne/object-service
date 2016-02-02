@@ -48,7 +48,26 @@ public interface NotificationOrBuilder extends
   int getCheckPeriod();
 
   /**
-   * <code>optional int32 send_threshold = 6;</code>
+   * <code>optional bool send_once = 6;</code>
    */
-  int getSendThreshold();
+  boolean getSendOnce();
+
+  /**
+   * <code>repeated string emails = 7;</code>
+   */
+  com.google.protobuf.ProtocolStringList
+      getEmailsList();
+  /**
+   * <code>repeated string emails = 7;</code>
+   */
+  int getEmailsCount();
+  /**
+   * <code>repeated string emails = 7;</code>
+   */
+  java.lang.String getEmails(int index);
+  /**
+   * <code>repeated string emails = 7;</code>
+   */
+  com.google.protobuf.ByteString
+      getEmailsBytes(int index);
 }
