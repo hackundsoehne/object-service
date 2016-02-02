@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
@@ -50,7 +49,7 @@ public class MTurkRestApiTest {
         assertEquals(hit.getAutoApprovalDelayInSeconds(), new Long(2000000));
         assertEquals(hit.getRequesterAnnotation(), "data");
 
-        assertTrue(new UnpublishHIT(connection,id,"").get());
+        assertTrue(new UnpublishHIT(connection,id).get());
 
         assertEquals(new GetHIT(connection,id).get().getHITStatus(), HITStatus.DISPOSED);
 
