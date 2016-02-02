@@ -267,7 +267,7 @@ public class ExperimentOperations extends AbstractOperations {
             DSL.using(conf).deleteFrom(EXPERIMENTS_PLATFORMS)
                     .where(EXPERIMENTS_PLATFORMS.EXPERIMENT.eq(experimentId))
                     .and(EXPERIMENTS_PLATFORMS.PLATFORM.notIn(platforms))
-                    .returning();
+                    .execute();
 
             Set<String> existing = DSL.using(conf).select(EXPERIMENTS_PLATFORMS.PLATFORM)
                     .from(EXPERIMENTS_PLATFORMS)

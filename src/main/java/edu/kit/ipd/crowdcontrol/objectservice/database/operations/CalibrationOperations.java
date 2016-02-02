@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.CalibrationAnswerOption;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationAnswerOptionRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
@@ -153,5 +154,55 @@ public class CalibrationOperations extends AbstractOperations {
     public Optional<CalibrationAnswerOptionRecord> getCalibrationAnswerOption(int id) {
         return create.fetchOptional(CALIBRATION_ANSWER_OPTION,
                 CALIBRATION_ANSWER_OPTION.ID_CALIBRATION_ANSWER_OPTION.eq(id));
+    }
+
+    /**
+     * gets the CalibrationAnswerOption associated with the experiment
+     * @param experimentID the id of the experiment
+     * @return the record if found
+     */
+    public Optional<CalibrationAnswerOptionRecord> getCalibrationForExperiment(int experimentID) {
+        return create.selectFrom(CALIBRATION_ANSWER_OPTION)
+                .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(
+                        DSL.select(CALIBRATION.ID_CALIBRATION)
+                                .from(CALIBRATION)
+                                .where(CALIBRATION.EXPERIMENT.eq(experimentID))
+                ))
+                .fetchOptional();
+    }
+
+    /**
+     * create the internal Calibration used to connect worker to experiments.
+     * @param experimentId the experiment
+     */
+    public void createExperimentsCalibration(int experimentId) {
+        String description = "experiment: " + experimentId;
+        CalibrationRecord record = new CalibrationRecord(null, description, description, experimentId);
+        CalibrationAnswerOptionRecord answer = new CalibrationAnswerOptionRecord(null, null, description);
+        create.transactionResult(conf -> {
+                    boolean exists = DSL.using(conf).fetchExists(
+                            DSL.selectFrom(CALIBRATION)
+                                    .where(CALIBRATION.EXPERIMENT.eq(experimentId))
+                    );
+                    if (!exists) {
+                        return create.insertInto(CALIBRATION)
+                                .set(record)
+                                .returning()
+                                .fetchOptional();
+                    }
+                    return Optional.<CalibrationRecord>empty();
+                })
+                .map(CalibrationRecord::getIdCalibration)
+                .ifPresent(id -> create.transaction(conf -> {
+                    boolean exists = DSL.using(conf).fetchExists(
+                            DSL.selectFrom(CALIBRATION_ANSWER_OPTION)
+                                    .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(id))
+                    );
+                    if (!exists) {
+                        create.insertInto(CALIBRATION_ANSWER_OPTION)
+                                .set(answer)
+                                .execute();
+                    }
+                }));
     }
 }
