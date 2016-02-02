@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Rating implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1097801915;
+	private static final long serialVersionUID = 369296939;
 
 	private java.lang.Integer  idRating;
 	private java.lang.Integer  experiment;
@@ -21,6 +21,7 @@ public class Rating implements java.io.Serializable {
 	private java.lang.String   feedback;
 	private java.lang.Integer  workerId;
 	private java.lang.Integer  quality;
+	private java.lang.Integer  constraint;
 
 	public Rating() {}
 
@@ -32,7 +33,8 @@ public class Rating implements java.io.Serializable {
 		java.lang.Integer  rating,
 		java.lang.String   feedback,
 		java.lang.Integer  workerId,
-		java.lang.Integer  quality
+		java.lang.Integer  quality,
+		java.lang.Integer  constraint
 	) {
 		this.idRating = idRating;
 		this.experiment = experiment;
@@ -42,6 +44,7 @@ public class Rating implements java.io.Serializable {
 		this.feedback = feedback;
 		this.workerId = workerId;
 		this.quality = quality;
+		this.constraint = constraint;
 	}
 
 	public java.lang.Integer getIdRating() {
@@ -106,5 +109,13 @@ public class Rating implements java.io.Serializable {
 
 	public void setQuality(java.lang.Integer quality) {
 		this.quality = quality;
+	}
+
+	public java.lang.Integer getConstraint() {
+		return this.constraint;
+	}
+
+	public void setConstraint(java.lang.Integer constraint) {
+		this.constraint = constraint;
 	}
 }
