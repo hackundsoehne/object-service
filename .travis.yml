@@ -13,7 +13,5 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-sudo: false
-
 notifications:
   email: false
