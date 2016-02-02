@@ -14,6 +14,9 @@ import java.util.function.Function;
 
 /**
  * This class abstracts a unirest request to mturk
+ *
+ * if a unirest exception happens a (timeout or something like that)
+ * the resulting exception will contain the unique rest token and the url to call again
  * @param <T> The result of the request
  * @param <K> The Internal value which is returned by the request
  */
@@ -23,6 +26,17 @@ public class MturkRestCommand<T,K> extends CompletableFuture<T> implements Callb
     private final Class<K> klass;
     private final String uniqueRestToken;
 
+    /**
+     * Creates a new command
+     * @param con connection to use
+     * @param uniqueRestToken unique rest token to call the operation under
+     * @param operation name of the operation to call
+     * @param responseGroup the group which should be returned by mturk
+     * @param version version of the api to use
+     * @param klass the class of the resulting structure
+     * @param values the values which are needed by the operation
+     * @param transformer the transformer which transforms the instance of klass into T
+     */
     public MturkRestCommand(MTurkConnection con, String uniqueRestToken, String operation,
                             String responseGroup, String version,
                             Class<K> klass, Map<String, Object> values, Function<K, T> transformer) {

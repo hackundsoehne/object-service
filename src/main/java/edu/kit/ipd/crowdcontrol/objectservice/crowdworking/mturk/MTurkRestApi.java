@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Created by marcel on 01.02.16.
+ * Class to deal with rest api provided by mturk
+ * @author MarcelHollerbach
+ * @version 0.1
  */
 public class MTurkRestApi {
     private final MTurkConnection connection;
