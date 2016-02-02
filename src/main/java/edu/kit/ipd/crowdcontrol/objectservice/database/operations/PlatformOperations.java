@@ -28,6 +28,7 @@ public class PlatformOperations extends AbstractOperations {
      * @param cursor pagination cursor
      * @param next   {@code true} for next, {@code false} for previous
      * @param limit  number of records
+     *
      * @return List of platforms.
      */
     public Range<Platform, String> getPlatformList(String cursor, boolean next, int limit) {
@@ -39,6 +40,7 @@ public class PlatformOperations extends AbstractOperations {
      * Returns a single platform.
      *
      * @param id ID of the platform
+     *
      * @return The platform.
      */
     public Optional<Platform> getPlatform(String id) {
@@ -50,7 +52,9 @@ public class PlatformOperations extends AbstractOperations {
      * Insert new platform into the database
      *
      * @param platformRecord The platform to insert
+     *
      * @return true if inserted, false if existing
+     *
      * @throws IllegalArgumentException if the record has no primary key
      */
     public boolean createPlatform(PlatformRecord platformRecord) throws IllegalArgumentException {

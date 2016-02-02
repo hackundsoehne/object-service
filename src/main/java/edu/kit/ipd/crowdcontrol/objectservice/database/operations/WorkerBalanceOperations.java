@@ -14,7 +14,6 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKE
 
 /**
  * contains all the Operations concerned with paying the workers.
- *
  * @author LeanderK
  * @version 1.0
  */
@@ -25,7 +24,6 @@ public class WorkerBalanceOperations extends AbstractOperations {
 
     /**
      * returns all the unused GiftCodes in the system
-     *
      * @return a list with all the gift-codes
      */
     public List<GiftCodeRecord> getUnusedGiftCodes() {
@@ -39,8 +37,7 @@ public class WorkerBalanceOperations extends AbstractOperations {
 
     /**
      * persists the giftCode in the database
-     *
-     * @param code   the code of the giftCode
+     * @param code the code of the giftCode
      * @param amount the amount its worth
      * @return true if successful
      */
@@ -53,9 +50,8 @@ public class WorkerBalanceOperations extends AbstractOperations {
 
     /**
      * adds a credit to the balance-sheet of the workers wages.
-     *
-     * @param workerID   the primary key of the worker the credit belongs to
-     * @param amount     the amount the worker has earned
+     * @param workerID the primary key of the worker the credit belongs to
+     * @param amount the amount the worker has earned
      * @param experiment the experiment the worker worked on
      * @return true of successful
      */
@@ -72,11 +68,10 @@ public class WorkerBalanceOperations extends AbstractOperations {
 
     /**
      * adds a debit to the balance-sheet of the workers wages.
-     *
-     * @param workerID   the primary key of the worker the debit belongs to
-     * @param amount     the amount that got payed
+     * @param workerID the primary key of the worker the debit belongs to
+     * @param amount the amount that got payed
      * @param experiment the experiment the worker worked on
-     * @param giftCode   the giftCode used
+     * @param giftCode the giftCode used
      * @return true if successful
      */
     public boolean addDebit(int workerID, int amount, int experiment, int giftCode) {
@@ -93,7 +88,6 @@ public class WorkerBalanceOperations extends AbstractOperations {
 
     /**
      * gets the balance of the worker.
-     *
      * @param workerID the primary key of the worker to get the balance for
      * @return the balance
      * @throws ArithmeticException if the balance does not fit into an int

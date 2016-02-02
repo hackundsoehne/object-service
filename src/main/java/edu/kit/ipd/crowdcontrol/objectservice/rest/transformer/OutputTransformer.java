@@ -42,7 +42,8 @@ public class OutputTransformer implements Route {
     private final Route route;
 
     /**
-     * @param route Actual route to handle the request.
+     * @param route
+     *         Actual route to handle the request.
      */
     public OutputTransformer(Route route) {
         this.route = route;
@@ -106,9 +107,12 @@ public class OutputTransformer implements Route {
      * Transforms a protocol buffer object into an JSON / protocol buffer response based on the
      * accept header of the request.
      *
-     * @param request  Request provided by Spark.
-     * @param response Response provided by Spark.
-     * @param message  Protocol buffer to transform.
+     * @param request
+     *         Request provided by Spark.
+     * @param response
+     *         Response provided by Spark.
+     * @param message
+     *         Protocol buffer to transform.
      */
     public static String transform(Request request, Response response, Message message) {
         String bestMatch = MimeParse.bestMatch(SUPPORTED_TYPES, request.headers("accept"));
