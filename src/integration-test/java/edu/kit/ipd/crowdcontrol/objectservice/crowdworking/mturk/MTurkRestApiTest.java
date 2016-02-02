@@ -1,5 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.GetHIT;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.PublishHIT;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.UnpublishHIT;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.HIT;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.HITStatus;
 import org.junit.Before;
@@ -16,13 +19,12 @@ import static org.junit.Assert.*;
  * Created by marcel on 01.02.16.
  */
 public class MTurkRestApiTest {
-    private MTurkRestApi api;
-
+    private MTurkConnection connection;
     @Before
     public void setUp() throws Exception {
         Properties properties = new Properties();
         properties.load(new FileInputStream("src/integration-test/resources/mturk.properties"));
-        api = new MTurkRestApi(
+        connection = new MTurkConnection(
                 properties.getProperty("User"),
                 properties.getProperty("Password"),
                 "https://mechanicalturk.sandbox.amazonaws.com/");
@@ -30,13 +32,13 @@ public class MTurkRestApiTest {
 
     @Test
     public void testPublishHIT() throws Exception {
-        String id = api.publishHIT("Description2","Title1",
+        String id = new PublishHIT(connection, new Date().toString(),"Title1", "Description",
                 0.20,60,2000,"test,for,everything",
-                2,2000000,"data",new Date().toString()).get();
+                2,2000000,"data").get();
 
         assertNotEquals(id, null);
 
-        HIT hit = api.getHit(id).get();
+        HIT hit = new GetHIT(connection,id,"").get();
 
         assertEquals(hit.getTitle(), "Title1");
         assertEquals(hit.getDescription(), "Description2");
@@ -48,9 +50,9 @@ public class MTurkRestApiTest {
         assertEquals(hit.getAutoApprovalDelayInSeconds(), new Long(2000000));
         assertEquals(hit.getRequesterAnnotation(), "data");
 
-        assertTrue(api.unpublishHIT(id).get());
+        assertTrue(new UnpublishHIT(connection,id,"").get());
 
-        assertEquals(api.getHit(id).get().getHITStatus(), HITStatus.DISPOSED);
+        assertEquals(new GetHIT(connection,id,"").get().getHITStatus(), HITStatus.DISPOSED);
 
     }
 }

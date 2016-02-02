@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * This class abstracts a unirest request to mturk
@@ -20,7 +21,7 @@ import java.util.function.Function;
  * @param <T> The result of the request
  * @param <K> The Internal value which is returned by the request
  */
-public class MturkRestCommand<T,K> extends CompletableFuture<T> implements Callback<String> {
+public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> implements Callback<String> {
     private final Function<K,T> transformer;
     private final HttpRequest request;
     private final Class<K> klass;
@@ -34,27 +35,28 @@ public class MturkRestCommand<T,K> extends CompletableFuture<T> implements Callb
      * @param responseGroup the group which should be returned by mturk
      * @param version version of the api to use
      * @param klass the class of the resulting structure
-     * @param values the values which are needed by the operation
+     * @param supplier method to generate the parameters for the operation
      * @param transformer the transformer which transforms the instance of klass into T
      */
     public MturkRestCommand(MTurkConnection con, String uniqueRestToken, String operation,
-                            String responseGroup, String version,
-                            Class<K> klass, Map<String, Object> values, Function<K, T> transformer) {
+                            String responseGroup, String version, Class<K> klass,
+                            Supplier<Map<String, Object>> supplier, Function<K, T> transformer) {
         this.uniqueRestToken = uniqueRestToken;
         this.klass = klass;
         this.transformer = transformer;
 
-        request = Unirest.get(con.getUrl())
+        request = Unirest.get(con.url)
                 .queryString("UniqueRestToken", uniqueRestToken)
                 .queryString(con.getCallParameter(operation,responseGroup,version))
-                .queryString(values);
+                .queryString(supplier.get());
+        request.asStringAsync(this);
     }
     @Override
     public void completed(HttpResponse<String> response) {
         JAXBContext context;
         try {
             context = JAXBContext.newInstance(klass);
-            K k = (K) context.createUnmarshaller().unmarshal(response.getRawBody());
+            @SuppressWarnings("unchecked") K k = (K) context.createUnmarshaller().unmarshal(response.getRawBody());
             complete(transformer.apply(k));
         } catch (JAXBException e) {
             completeExceptionally(new RuntimeException(e));

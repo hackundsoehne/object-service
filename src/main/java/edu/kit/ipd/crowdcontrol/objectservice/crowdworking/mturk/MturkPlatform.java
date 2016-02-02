@@ -17,10 +17,9 @@ import java.util.concurrent.CompletableFuture;
  * Created by marcel on 31.01.16.
  */
 public class MturkPlatform implements Platform,Payment,WorkerIdentification {
-    private final MTurkRestApi api;
 
     public MturkPlatform() {
-        this.api = new MTurkRestApi("","","");
+
     }
 
     @Override

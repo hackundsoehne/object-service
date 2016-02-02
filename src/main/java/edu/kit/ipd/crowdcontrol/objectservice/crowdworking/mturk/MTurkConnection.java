@@ -11,16 +11,25 @@ import java.util.Map;
 import java.util.TimeZone;
 
 /**
- * Holds data and functions which are used for the same connection to a mturk instance
+ * Instance which carrys all none changing values for the same connection
  * @author MarcelHollerbach
  * @version 1.0
  */
 public class MTurkConnection {
-    private final String url;
+    final String url;
     private final Map<String, Object> staticDefaultValues;
     private final String awsSecretAccessKey;
     private final SimpleDateFormat simpleDateFormat;
 
+    /**
+     * Creates a new connection object
+     *
+     * this object carries all values which are needed for commands to be executed
+     *
+     * @param awsAccessKeyId access key to use
+     * @param awsSecretAccessKey password to the access key
+     * @param url url to find the mturk instance behindc
+     */
     public MTurkConnection(String awsAccessKeyId, String awsSecretAccessKey, String url) {
         this.awsSecretAccessKey = awsSecretAccessKey;
         this.url = url;
@@ -34,23 +43,7 @@ public class MTurkConnection {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    /**
-     * Get the Url this instance is running on
-     * @return
-     */
-    public String getUrl() {
-        return url;
-    }
-
-    /**
-     * Get the secret Access Key of the given instance
-     * @return
-     */
-    public String getAwsSecretAccessKey() {
-        return awsSecretAccessKey;
-    }
-
-    public Map<String, Object> getCallParameter(String operation, String responseGroup, String version) {
+    Map<String, Object> getCallParameter(String operation, String responseGroup, String version) {
         Map<String, Object> result = new HashMap<>();
 
         result.putAll(staticDefaultValues);
