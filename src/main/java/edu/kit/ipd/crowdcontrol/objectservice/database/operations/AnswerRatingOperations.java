@@ -67,6 +67,16 @@ public class AnswerRatingOperations extends AbstractOperations {
         return result;
     }
 
+    /**
+     * this method adds a worker to the experiment-calibration.
+     * <p>
+     * Every experiment has calibration with one answer-option, which gets auto-generated when the event got published.
+     * If a worker now submits a rating/answer, the worker gets linked to the calibration. This is used to exclude workers,
+     * who have worked on a specific event, from working on another.
+     *
+     * @param workerID the worker to link to the calibration
+     * @param experimentId the experiment the calibration belongs to
+     */
     private void addToExperimentCalibration(int workerID, int experimentId) {
         Supplier<Optional<CalibrationAnswer>> doAdd = () -> calibrationOperations
                 .getCalibrationForExperiment(experimentId)
