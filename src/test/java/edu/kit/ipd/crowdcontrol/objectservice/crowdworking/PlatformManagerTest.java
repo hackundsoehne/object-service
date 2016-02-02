@@ -49,7 +49,7 @@ public class PlatformManagerTest {
 
         manager = new PlatformManager(platforms,
                 param -> "42",
-                (worker, amount) -> CompletableFuture.completedFuture(true),
+                (id, experiment1, paymentJob) -> CompletableFuture.completedFuture(true),
                 tasksOps,
                 platformOps,
                 workerOps);
@@ -201,14 +201,13 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public CompletableFuture<Boolean> payWorker(Worker worker, int amount) {
-            return CompletableFuture.completedFuture(true);
-        }
-
-        @Override
         public String identifyWorker(Map<String, String[]> param) {
             return "50";
         }
 
+        @Override
+        public CompletableFuture<Boolean> payExperiment(String id, Experiment experiment, List<PaymentJob> paymentJob) {
+            return CompletableFuture.completedFuture(true);
+        }
     }
 }
