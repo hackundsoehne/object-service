@@ -24,8 +24,8 @@ public class PaymentCalculatorTest {
 
     AnswerRatingOperations ops;
     Experiment exp;
-    Map<WorkerRecord,Set<AnswerRecord>> workerAnswerMap;
-    Map<WorkerRecord,Set<RatingRecord>> workerRatingMap;
+    Map<WorkerRecord,List<AnswerRecord>> workerAnswerMap;
+    Map<WorkerRecord,List<RatingRecord>> workerRatingMap;
     PaymentCalculator calculator;
 
     @Before
@@ -64,14 +64,14 @@ public class PaymentCalculatorTest {
         WorkerRecord workerOne = new WorkerRecord(0,"","","",0);
         WorkerRecord workerTwo = new WorkerRecord(1,"","","",0);
 
-        Set<AnswerRecord> answerSetWorkerOne = new HashSet<>();
+        List<AnswerRecord> answerSetWorkerOne = new ArrayList<>();
         answerSetWorkerOne.add(new AnswerRecord(0,workerOne.getIdWorker(),"",null,0,9,true));
         answerSetWorkerOne.add(new AnswerRecord(1,workerOne.getIdWorker(),"",null,0,9,true));
         answerSetWorkerOne.add(new AnswerRecord(2,workerOne.getIdWorker(),"",null,0,9,true));
         answerSetWorkerOne.add(new AnswerRecord(3,workerOne.getIdWorker(),"",null,0,9,true));
         answerSetWorkerOne.add(new AnswerRecord(4,workerOne.getIdWorker(),"",null,0,9,true));
 
-        Set<AnswerRecord> answerSetWorkerTwo = new HashSet<>();
+        List<AnswerRecord> answerSetWorkerTwo = new ArrayList<>();
         answerSetWorkerTwo.add(new AnswerRecord(0,workerTwo.getIdWorker(),"",null,0,9,true));
         answerSetWorkerTwo.add(new AnswerRecord(1,workerTwo.getIdWorker(),"",null,0,9,true));
 
@@ -89,7 +89,7 @@ public class PaymentCalculatorTest {
         assertEquals((int)resultAnswers.get(sortedResult.get(1)), exp.getPaymentBase()+(exp.getPaymentAnswer()*answerSetWorkerTwo.size()));
 
 
-        Set<RatingRecord> ratingSetWorkerTwo = new HashSet<>();
+        List<RatingRecord> ratingSetWorkerTwo = new ArrayList<>();
         ratingSetWorkerTwo.add(new RatingRecord(0,exp.getId(),0,null,6,"",1,7));
         ratingSetWorkerTwo.add(new RatingRecord(1,exp.getId(),0,null,5,"",1,9));
 
