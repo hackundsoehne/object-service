@@ -49,7 +49,7 @@ public class Notification implements Runnable {
      * @param policy            the notification policy
      */
     public Notification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto, NotificationPolicy policy) {
-        new Notification(notificationProto.getId(), notificationProto.getName(), notificationProto.getDescription(),
+        this(notificationProto.getId(), notificationProto.getName(), notificationProto.getDescription(),
                 notificationProto.getCheckPeriod(), notificationProto.getQuery(), notificationProto.getSendOnce(),
                 new ArrayList<>(notificationProto.getEmailsList()), policy);
     }
@@ -77,6 +77,8 @@ public class Notification implements Runnable {
         builder.setDescription(getDescription());
         builder.setCheckPeriod(getCheckPeriod());
         builder.setQuery(getQuery());
+        builder.setSendOnce(isSendOnce());
+        builder.addAllEmails(getReceiverEmails());
         return builder.buildPartial();
     }
 
