@@ -101,3 +101,4 @@ gmailLogin.properties
 webLogin.properties
 mailHandlerTestProps.properties
 config.yaml
+mturk.properties
