@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.PlatformTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.PlatformTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Platform;
 import org.jooq.DSLContext;
 
@@ -32,8 +32,8 @@ public class PlatformOperations extends AbstractOperations {
      * @return List of platforms.
      */
     public Range<Platform, String> getPlatformList(String cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(PLATFORM), PLATFORM.ID_PLATFORM, cursor, next, limit, String::compareTo)
-                .map(PlatformTransform::toProto);
+        return getNextRange(create.selectFrom(PLATFORM), PLATFORM.ID_PLATFORM, PLATFORM, cursor, next, limit, String::compareTo)
+                .map(PlatformTransformer::toProto);
     }
 
     /**
@@ -45,7 +45,7 @@ public class PlatformOperations extends AbstractOperations {
      */
     public Optional<Platform> getPlatform(String id) {
         return create.fetchOptional(PLATFORM, PLATFORM.ID_PLATFORM.eq(id))
-                .map(PlatformTransform::toProto);
+                .map(PlatformTransformer::toProto);
     }
 
     /**

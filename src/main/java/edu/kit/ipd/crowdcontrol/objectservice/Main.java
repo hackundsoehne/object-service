@@ -45,7 +45,7 @@ public class Main {
         String readOnlyPassword = trimIfNotNull.apply(properties.getProperty("database.readonly.password"));
 
         SQLDialect dialect = SQLDialect.valueOf(properties.getProperty("database.dialect").trim());
-        DatabaseManager databaseManager = null;
+        DatabaseManager databaseManager;
 
         try {
             databaseManager = new DatabaseManager(username, password, url, databasePool, dialect);
@@ -65,14 +65,23 @@ public class Main {
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnlyDBUser, readOnlyDBPassword);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
         WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
-        PopulationOperations populationOperations = new PopulationOperations(databaseManager.getContext());
+        CalibrationOperations calibrationOperations = new CalibrationOperations(databaseManager.getContext());
+        ExperimentOperations experimentOperations = new ExperimentOperations(databaseManager.getContext());
+        AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext());
+        TagConstraintsOperations tagConstraintsOperations = new TagConstraintsOperations(databaseManager.getContext());
+        AlgorithmOperations algorithmsOperations = new AlgorithmOperations(databaseManager.getContext());
+        WorkerCalibrationOperations workerCalibrationOperations = new WorkerCalibrationOperations(databaseManager.getContext());
 
         new Router(
                 new TemplateResource(templateOperations),
                 new NotificationResource(notificationRestOperations),
                 new PlatformResource(platformOperations),
                 new WorkerResource(workerOperations, platformManager),
-                new PopulationResource(populationOperations)
+                new CalibrationResource(calibrationOperations),
+                new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations),
+                new AlgorithmResources(algorithmsOperations),
+                new AnswerRatingResource(experimentOperations, answerRatingOperations, workerOperations),
+                new WorkerCalibrationResource(workerCalibrationOperations)
         ).init();
     }
 }

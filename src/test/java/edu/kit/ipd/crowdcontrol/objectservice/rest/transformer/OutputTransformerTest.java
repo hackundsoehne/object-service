@@ -1,7 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.transformer;
 
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotAcceptableException;
 import org.junit.Before;
@@ -33,7 +32,7 @@ public class OutputTransformerTest {
         String output = OutputTransformer.transform(request, response, error);
 
         verify(response).type("application/json");
-        assertEquals("{\n  \"code\": \"OK\"\n}", output);
+        assertEquals("{\n  \"code\": \"OK\",\n  \"detail\": \"\"\n}", output);
     }
 
     @Test
@@ -63,7 +62,7 @@ public class OutputTransformerTest {
         String output = OutputTransformer.transform(request, response, error);
 
         verify(response).type("application/json");
-        assertEquals("{\n  \"code\": \"OK\"\n}", output);
+        assertEquals("{\n  \"code\": \"OK\",\n  \"detail\": \"\"\n}", output);
     }
 
     @Test
@@ -80,12 +79,12 @@ public class OutputTransformerTest {
     @Test
     public void handleAndTransformDefault() throws Exception {
         when(request.headers("accept")).thenReturn("*/*");
-        when(route.handle(request, response)).thenReturn(Template.newBuilder().build());
+        when(route.handle(request, response)).thenReturn(ErrorResponse.newBuilder().build());
 
         OutputTransformer transformer = new OutputTransformer(route);
         String output = transformer.handle(request, response);
 
-        assertEquals("{\n}", output);
+        assertEquals("{\n  \"code\": \"\",\n  \"detail\": \"\"\n}", output);
     }
 
     @Test (expected = InternalServerErrorException.class)
