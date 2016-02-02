@@ -39,7 +39,7 @@ public class DatabaseMaintainer {
      */
     public synchronized void start() {
         if (schedule != null) {
-            schedule = scheduler.schedule(this::doCleanUp, cleanUpInterval, TimeUnit.HOURS);
+            schedule = scheduler.scheduleAtFixedRate(this::doCleanUp, 0, cleanUpInterval, TimeUnit.HOURS);
         } else {
             throw new IllegalStateException("run() was called twice!");
         }
