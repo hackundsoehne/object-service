@@ -111,7 +111,6 @@ public class MoneyTransferManager {
             }
             GiftCodeRecord nextCode = giftCodesIt.next();
             if (nextCode.getAmount() <= creditBalance) {
-                workerBalanceOperations.addDebit(worker.getIdWorker(), nextCode.getAmount(), nextCode.getIdGiftCode());
                 payedCodes.add(nextCode);
                 creditBalance -= nextCode.getAmount();
             }
@@ -129,6 +128,7 @@ public class MoneyTransferManager {
             StringBuilder giftCodeMessage = new StringBuilder();
 
             for (GiftCodeRecord rec : giftCodes) {
+                workerBalanceOperations.addDebit(worker.getIdWorker(), rec.getAmount(), rec.getIdGiftCode());
                 giftCodeMessage.append(rec.getCode()).append(System.getProperty("line.separator"));
             }
 
