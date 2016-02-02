@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 public interface Payment {
     /**
      * Called to pay a worker the given amount of Money
-     *
      * @param worker The given worker to pay
      * @param amount The amount to pay, this should be calculated as cents of dollars
      * @return True if everything went fine, false if not

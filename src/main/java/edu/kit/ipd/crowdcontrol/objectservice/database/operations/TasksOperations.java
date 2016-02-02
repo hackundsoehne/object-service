@@ -9,7 +9,6 @@ import java.util.Optional;
 
 /**
  * Responsible for the operations involving the creation of tasks.
- *
  * @author LeanderK
  * @version 1.0
  */
@@ -20,7 +19,6 @@ public class TasksOperations extends AbstractOperations {
 
     /**
      * Inserts the TaskRecord into the database.
-     *
      * @param taskRecord the task to create
      * @return the resulting TaskRecord existing in the DB
      */
@@ -36,7 +34,6 @@ public class TasksOperations extends AbstractOperations {
 
     /**
      * Updates a Task.
-     *
      * @param taskRecord the update
      * @return whether the update was successful
      * @throws IllegalArgumentException if the record has no primary key
@@ -48,8 +45,7 @@ public class TasksOperations extends AbstractOperations {
 
     /**
      * Searches for a task specified by platform and experimentId.
-     *
-     * @param platform     the string of the platform
+     * @param platform the string of the platform
      * @param experimentId the primary key of the experiment
      * @return the found task or empty if not found
      */

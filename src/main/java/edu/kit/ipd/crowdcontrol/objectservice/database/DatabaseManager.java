@@ -22,7 +22,6 @@ import java.util.Objects;
 /**
  * Initializes and holds the connection to the database and eventually the database itself.
  * When the system-property dropSchema is set to true, if will drop the schema first.
- *
  * @author LeanderK
  * @version 1.0
  */
@@ -33,11 +32,10 @@ public class DatabaseManager {
 
     /**
      * creates new DatabaseManager.
-     *
      * @param providedDBPoolName the name of the provided ConnectionPool
-     * @param sqlDialect         the dialect to use
+     * @param sqlDialect the dialect to use
      * @throws NamingException if there was a problem establishing a connection to the provided database-pool
-     * @throws SQLException    if there was a problem establishing a connection to the database
+     * @throws SQLException if there was a problem establishing a connection to the database
      */
     public DatabaseManager(String providedDBPoolName, SQLDialect sqlDialect) throws NamingException, SQLException {
         this(null, null, null, Objects.requireNonNull(providedDBPoolName), sqlDialect);
@@ -48,13 +46,12 @@ public class DatabaseManager {
      * <p>
      * if the system-property 'providedDBPool' is set, it will use the ConnectionPool provided by the application-server
      * instead of creating an own connection-pool.
-     *
-     * @param userName   the username for the database
-     * @param password   the password for the database
-     * @param url        the url to the database
+     * @param userName the username for the database
+     * @param password the password for the database
+     * @param url the url to the database
      * @param sqlDialect the dialect to use
      * @throws NamingException if there was a problem establishing a connection to the provided database-pool
-     * @throws SQLException    if there was a problem establishing a connection to the database
+     * @throws SQLException if there was a problem establishing a connection to the database
      */
     public DatabaseManager(String userName, String password, String url, SQLDialect sqlDialect) throws NamingException, SQLException {
         this(userName, password, url, System.getProperty("providedDBPool"), sqlDialect);
@@ -63,13 +60,13 @@ public class DatabaseManager {
     /**
      * creates new DatabaseManager.
      *
-     * @param userName           the username for the database
-     * @param password           the password for the database
-     * @param url                the url to the database
+     * @param userName the username for the database
+     * @param password the password for the database
+     * @param url the url to the database
      * @param providedDBPoolName if not null, it will use the built in Connection pool with the passed Name
-     * @param sqlDialect         the dialect to use
+     * @param sqlDialect the dialect to use
      * @throws NamingException if there was a problem establishing a connection to the provided database-pool
-     * @throws SQLException    if there was a problem establishing a connection to the database
+     * @throws SQLException if there was a problem establishing a connection to the database
      */
     public DatabaseManager(String userName, String password, String url, String providedDBPoolName, SQLDialect sqlDialect) throws NamingException, SQLException {
         this.url = url;
@@ -121,7 +118,6 @@ public class DatabaseManager {
 
     /**
      * returns the Context used to communicate with the database
-     *
      * @return an instance of DSLContext
      */
     public DSLContext getContext() {
@@ -130,7 +126,6 @@ public class DatabaseManager {
 
     /**
      * returns the Connection used to communicate with the database.
-     *
      * @return an instance of Connection
      */
     public Connection getConnection() throws SQLException {
@@ -139,7 +134,6 @@ public class DatabaseManager {
 
     /**
      * returns the URL to the database
-     *
      * @return the url as a String
      */
     public String getUrl() {
