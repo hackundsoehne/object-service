@@ -2,18 +2,16 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import org.jooq.DSLContext;
 import org.jooq.Result;
-
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.ANSWER;
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATING;
