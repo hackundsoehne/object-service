@@ -20,8 +20,9 @@ public class GetHIT extends MturkRestCommand<HIT, GetHITResponse> {
      * @param con
      * @param id
      */
-    public GetHIT(MTurkConnection con, String id, String uniqueRestToken){
-        super(con, uniqueRestToken, "GetHIT","HITDetail","2014-08-15", GetHITResponse.class,
+    public GetHIT(MTurkConnection con, String id){
+        super(con,
+                "GetHIT","HITDetail","2014-08-15", GetHITResponse.class,
                 () -> {
                     HashMap<String, Object> values = new HashMap<>();
                     values.put("HITId", id);

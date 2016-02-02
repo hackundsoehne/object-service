@@ -16,7 +16,6 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
     /**
      * Tries to publish a hit with the given parameters
      * @param connection connection to use for creating the HIT
-     * @param uniqueRestToken unique Rest Token to use for this command
      * @param title The title which is displayed representing for the hit
      * @param description The description of the HIT
      * @param reward money a worker gets when he finished the hit
@@ -27,13 +26,13 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
      * @param autoApprovalDelayInSeconds after how many seconds a assignment is approved
      * @param data is attached to the hit and can be accessed later
      */
-    public PublishHIT(MTurkConnection connection, String uniqueRestToken, Object title,
+    public PublishHIT(MTurkConnection connection, Object title,
                       String description, double reward, int assignmentDurationInSeconds,
                       int lifetimeInSeconds, String keywords, int maxAssignments,
                       int autoApprovalDelayInSeconds, String data) {
-        super(connection,uniqueRestToken,
-                "PublishHIT","Minimal","2014-08-15",
-                CreateHITResponse.class,() -> {
+        super(connection,
+                "CreateHIT","Minimal","2014-08-15",CreateHITResponse.class,
+                () -> {
                     Map<String, Object> values = new HashMap<>();
 
                     values.put("Title", title);

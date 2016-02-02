@@ -9,6 +9,7 @@ import com.mashape.unirest.request.HttpRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,7 +31,6 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
     /**
      * Creates a new command
      * @param con connection to use
-     * @param uniqueRestToken unique rest token to call the operation under
      * @param operation name of the operation to call
      * @param responseGroup the group which should be returned by mturk
      * @param version version of the api to use
@@ -38,10 +38,11 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
      * @param supplier method to generate the parameters for the operation
      * @param transformer the transformer which transforms the instance of klass into T
      */
-    public MturkRestCommand(MTurkConnection con, String uniqueRestToken, String operation,
+    public MturkRestCommand(MTurkConnection con, String operation,
                             String responseGroup, String version, Class<K> klass,
                             Supplier<Map<String, Object>> supplier, Function<K, T> transformer) {
-        this.uniqueRestToken = uniqueRestToken;
+        this.uniqueRestToken = UUID.randomUUID().toString().substring(0,20);
+        System.out.println("USING "+uniqueRestToken);
         this.klass = klass;
         this.transformer = transformer;
 

@@ -32,13 +32,13 @@ public class MTurkRestApiTest {
 
     @Test
     public void testPublishHIT() throws Exception {
-        String id = new PublishHIT(connection, new Date().toString(),"Title1", "Description",
+        String id = new PublishHIT(connection,"Title1", "Description2",
                 0.20,60,2000,"test,for,everything",
                 2,2000000,"data").get();
 
         assertNotEquals(id, null);
 
-        HIT hit = new GetHIT(connection,id,"").get();
+        HIT hit = new GetHIT(connection,id).get();
 
         assertEquals(hit.getTitle(), "Title1");
         assertEquals(hit.getDescription(), "Description2");
@@ -52,7 +52,7 @@ public class MTurkRestApiTest {
 
         assertTrue(new UnpublishHIT(connection,id,"").get());
 
-        assertEquals(new GetHIT(connection,id,"").get().getHITStatus(), HITStatus.DISPOSED);
+        assertEquals(new GetHIT(connection,id).get().getHITStatus(), HITStatus.DISPOSED);
 
     }
 }
