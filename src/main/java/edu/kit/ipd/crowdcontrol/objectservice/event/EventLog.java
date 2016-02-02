@@ -46,7 +46,7 @@ public class EventLog {
      * @param shortmessage a short explanation on what this message is about. No linebreaks allowed.
      * @param longmessage detailed message what happends exactly. Linebreaks allowed.
      */
-    public synchronized void addEntry(String shortmessage, String longmessage) {
+    public void addEntry(String shortmessage, String longmessage) {
         logs.add(new LogEntry(shortmessage, longmessage));
     }
 
