@@ -9,6 +9,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,10 +57,10 @@ public class PaymentCalculator {
         }
 
         //Gets a all answers of a worker above the specified threshold
-        Map<WorkerRecord,Set<AnswerRecord>> workerAnswerSet = ops.getGoodAnswersOfExperiment(experiment.getId(), 0); //TODO params
+        Map<WorkerRecord, List<AnswerRecord>> workerAnswerSet = ops.getGoodAnswersOfExperiment(experiment.getId(), 0); //TODO params
 
         //For all good answers of the worker, his salary get increased by the payment for an answer
-        for (Map.Entry<WorkerRecord,Set<AnswerRecord>> entry : workerAnswerSet.entrySet()) {
+        for (Map.Entry<WorkerRecord, List<AnswerRecord>> entry : workerAnswerSet.entrySet()) {
             Worker worker = WorkerTransformer.toProto(entry.getKey());
 
             if(!map.containsKey(worker)) {
@@ -71,10 +72,10 @@ public class PaymentCalculator {
             }
         }
 
-        Map<WorkerRecord,Set<RatingRecord>> workerRatingSet = ops.getGoodRatingsOfExperiment(experiment.getId(), 0); //TODO ratings params
+        Map<WorkerRecord, List<RatingRecord>> workerRatingSet = ops.getGoodRatingsOfExperiment(experiment.getId(), 0); //TODO ratings params
 
         //For all good ratings of the worker, his salary get increased by the payment for a rating
-        for (Map.Entry<WorkerRecord,Set<RatingRecord>> entry : workerRatingSet.entrySet()) {
+        for (Map.Entry<WorkerRecord, List<RatingRecord>> entry : workerRatingSet.entrySet()) {
             Worker worker = WorkerTransformer.toProto(entry.getKey());
 
             if(!map.containsKey(worker)) {
