@@ -42,7 +42,6 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
                             String responseGroup, String version, Class<K> klass,
                             Supplier<Map<String, Object>> supplier, Function<K, T> transformer) {
         this.uniqueRestToken = UUID.randomUUID().toString().substring(0,20);
-        System.out.println("USING "+uniqueRestToken);
         this.klass = klass;
         this.transformer = transformer;
 
