@@ -9,6 +9,8 @@ import java.util.Set;
 
 /**
  * Created by lucaskrauss at 02.02.2016
+ *
+ *
  */
 public class StringSimilarity {
 
@@ -32,8 +34,6 @@ public class StringSimilarity {
     public static float getJaccardCoefficient(String stringA, String stringB){
         Set<String> shinglesA = Shingle.getShingle(stringA);
         Set<String> shinglesB = Shingle.getShingle(stringB);
-        System.out.println(Sets.intersection(shinglesA,shinglesB).size());
-        System.out.println(Sets.union(shinglesA,shinglesB).size());
         float intersection = Sets.intersection(shinglesA,shinglesB).size();
         float union = Sets.union(shinglesA,shinglesB).size();
         return intersection/union;
@@ -73,6 +73,7 @@ public class StringSimilarity {
 
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
+
             }
 
             //set hast-vector
