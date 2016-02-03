@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.Assignment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.AssignmentStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
 
 import java.util.HashMap;
 import java.util.List;
@@ -109,7 +110,6 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                 int amount = paymentJob.getAmount() - experiment.getPaymentBase();
 
                 //apporve the assignment if it is not right now
-                //FIXME if not we are in really bad state!!
                 if (assignment.getAssignmentStatus().equals(AssignmentStatus.SUBMITTED)) {
                     //approving here triggers base payment
                     new ApproveAssignment(connection,assignment.getAssignmentId(),"Thx for passing your answer!");
