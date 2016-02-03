@@ -134,9 +134,6 @@ public class ExperimentTransformer extends AbstractTransformer {
                 case Experiment.DESCRIPTION_FIELD_NUMBER:
                     record.setDescription(experiment.getDescription());
                     break;
-                case Experiment.ID_FIELD_NUMBER:
-                    record.setIdExperiment(experiment.getId());
-                    break;
                 case Experiment.PAYMENT_ANSWER_FIELD_NUMBER:
                     record.setBonusAnswer(experiment.getPaymentAnswer());
                     break;
