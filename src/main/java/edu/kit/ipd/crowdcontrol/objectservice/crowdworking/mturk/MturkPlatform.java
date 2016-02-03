@@ -14,12 +14,18 @@ import java.util.stream.Collectors;
 
 
 /**
- * Created by marcel on 31.01.16.
+ * Platform implementation for a mturk instance
  */
 public class MturkPlatform implements Platform,Payment,WorkerIdentification {
 
     private final MTurkConnection connection;
 
+    /**
+     * A new mturk platform instance
+     * @param user user to login
+     * @param password password to use
+     * @param url instance to connect to
+     */
     public MturkPlatform(String user, String password, String url) {
         connection = new MTurkConnection(user, password, url);
     }
@@ -120,6 +126,7 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                 }
             }
         }
+        //FIXME mark id as read
         return CompletableFuture.supplyAsync(() ->
                 jobs.stream().map(CompletableFuture::join)
                 .filter(aBoolean -> !aBoolean).count() == 0);
