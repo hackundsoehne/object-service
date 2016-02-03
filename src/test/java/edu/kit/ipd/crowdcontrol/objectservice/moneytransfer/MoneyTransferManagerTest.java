@@ -159,7 +159,7 @@ public class MoneyTransferManagerTest {
         String codesWorker2 = Template.apply(content.toString(), map2);
         String codesWorker3 = Template.apply(content.toString(), map3);
 
-        mng.payOff();
+        mng.submitGiftCodes();
 
         verify(handler).sendMail("pseipd@gmail.com","Your payment for your Crowdworking", codesWorker1);
         verify(handler).sendMail("pse2016@web.de", "Your payment for your Crowdworking", codesWorker2);

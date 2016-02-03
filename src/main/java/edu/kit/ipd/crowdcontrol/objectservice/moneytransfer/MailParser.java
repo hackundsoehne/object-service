@@ -15,17 +15,23 @@ import java.util.regex.Pattern;
  */
 public class MailParser {
 
-    protected static GiftCodeRecord parseAmazonGiftCode(Message msg) throws MessagingException, IOException, AmazonMailFormatChangedException{
+    protected static GiftCodeRecord parseAmazonGiftCode(Message msg) throws AmazonMailFormatChangedException{
         //Extract Message
-        String message;
+        String message = "";
         try {
             Multipart parts = (Multipart) msg.getContent();
             BodyPart body = parts.getBodyPart(0);
             Multipart innerMsg = (Multipart) body.getContent();
             BodyPart textBody = innerMsg.getBodyPart(0);
             message = textBody.getContent().toString();
-        } catch (ClassCastException e) {
-            throw new AmazonMailFormatChangedException();
+        } catch (ClassCastException | MessagingException | IOException e) {
+            try {
+                if (msg.getFrom()[0].toString().equals("\"Amazon.de\" <gutschein-order@gc.email.amazon.de>")) {
+                    throw new AmazonMailFormatChangedException();
+                }
+            } catch (MessagingException f) {
+                throw new AmazonMailFormatChangedException();
+            }
         }
         //Parse Message
         String messageStr = message.replaceAll(" ","");

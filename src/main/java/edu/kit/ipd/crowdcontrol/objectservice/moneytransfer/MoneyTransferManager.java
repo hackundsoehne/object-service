@@ -6,10 +6,15 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceO
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
+import org.eclipse.jetty.util.IO;
 import org.jooq.Result;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -21,17 +26,29 @@ import javax.mail.MessagingException;
  */
 public class MoneyTransferManager {
 
-    MailHandler mailHandler;
-    WorkerBalanceOperations workerBalanceOperations;
-    WorkerOperations workerOperations;
+    private MailHandler mailHandler;
+    private WorkerBalanceOperations workerBalanceOperations;
+    private WorkerOperations workerOperations;
 
-    int payOffThreshold;
-    int minGiftCodesCount;
-    String notificationMailAddress;
-    StringBuilder notificationText;
+    private int payOffThreshold;
+    private int minGiftCodesCount;
+
+    private String notificationMailAddress;
+    private StringBuilder notificationText;
+
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> schedule = null;
 
 
-    public MoneyTransferManager(MailHandler mailHandler, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, String notificationMailAddress) throws MessagingException {
+    /**
+     * Creates a new instance of the MoneyTransferManager
+     *
+     * @param mailHandler             the mailhandler, used to fetch new giftcodes and send notification and payment messages
+     * @param workerBalanceOperations the workerBalanceOperations, used to change the credit balance of a worker
+     * @param workerOperations        the workerOperations, used to do operations on workers
+     * @param notificationMailAddress the mail address to send notifications
+     */
+    public MoneyTransferManager(MailHandler mailHandler, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, String notificationMailAddress) {
         this.mailHandler = mailHandler;
         this.workerOperations = workerOperations;
         this.workerBalanceOperations = workerBalanceOperations;
@@ -39,6 +56,27 @@ public class MoneyTransferManager {
         this.payOffThreshold = 0;
         this.notificationMailAddress = notificationMailAddress;
         this.notificationText = new StringBuilder();
+    }
+
+    /**
+     * Starts the MoneyTransferManager, so giftcodes become submitted to workers every 7 days.
+     */
+    public synchronized void start() {
+        if (schedule != null) {
+            throw new IllegalStateException("run() was called twice!");
+        }
+
+        //schedule = scheduler.scheduleAtFixedRate(this::submitGiftCodes, 7, 7, TimeUnit.DAYS);
+
+    }
+
+    /**
+     * Shuts the MoneyTransferManager down.
+     */
+    public synchronized void shutdown() {
+        schedule.cancel(false);
+        scheduler.shutdown();
+        schedule = null;
     }
 
     /**
@@ -54,7 +92,7 @@ public class MoneyTransferManager {
     /**
      * Pays all workers depending on their logged money transfers.
      */
-    public void payOff() {
+    public void submitGiftCodes() throws AmazonMailFormatChangedException, MessagingException, IOException {
         fetchNewGiftCodes();
 
         Result<WorkerRecord> workers = workerOperations.getWorkerWithCreditBalanceGreaterOrEqual(payOffThreshold);
@@ -75,27 +113,22 @@ public class MoneyTransferManager {
         sendNotification();
     }
 
-    private void fetchNewGiftCodes() {
-        Message[] messages = new Message[0];
-        try {
-            messages = mailHandler.fetchUnseen("inbox");
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
+    private void fetchNewGiftCodes() throws AmazonMailFormatChangedException, MessagingException {
+        Message[] messages;
+
+        messages = mailHandler.fetchUnseen("inbox");
 
         for (Message message : messages) {
             try {
                 GiftCodeRecord rec = MailParser.parseAmazonGiftCode(message);
                 workerBalanceOperations.addGiftCode(rec.getCode(), rec.getAmount());
-            } catch (MessagingException | IOException e) {
-                e.printStackTrace();
             } catch (AmazonMailFormatChangedException e) {
                 try {
                     mailHandler.markAsUnseen(message);
+                    throw new AmazonMailFormatChangedException();
                 } catch (MessagingException f) {
                     f.printStackTrace();
                 }
-                notificationText.append("It seems, that amazon changed the format of the giftcode E-Mails. You need to adjust the parser to import giftcodes in future.");
             }
         }
     }
@@ -122,7 +155,7 @@ public class MoneyTransferManager {
         return payedCodes;
     }
 
-    private void payWorker(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
+    private void payWorker(WorkerRecord worker, List<GiftCodeRecord> giftCodes) throws MessagingException, IOException {
         if (!giftCodes.isEmpty()) {
             StringBuilder paymentMessage = loadMessage("src/main/resources/PaymentMessage.txt");
             StringBuilder giftCodeMessage = new StringBuilder();
@@ -136,37 +169,31 @@ public class MoneyTransferManager {
             map.put("GiftCodes", giftCodeMessage.toString());
             paymentMessage = new StringBuilder(Template.apply(paymentMessage.toString(), map));
 
-            try {
-                mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage.toString());
-            } catch (UnsupportedEncodingException | MessagingException e) {
-                e.printStackTrace();
-            }
+
+            mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage.toString());
+
         }
     }
 
-    private void sendNotification() {
-        try {
-            mailHandler.sendMail(notificationMailAddress, "Payment Notification", notificationText.toString());
-        } catch (UnsupportedEncodingException | MessagingException e) {
-            e.printStackTrace();
-        }
+    private void sendNotification() throws UnsupportedEncodingException, MessagingException {
+
+        mailHandler.sendMail(notificationMailAddress, "Payment Notification", notificationText.toString());
+
     }
 
-    private StringBuilder loadMessage(String path) {
+    private StringBuilder loadMessage(String path) throws IOException {
         StringBuilder content = new StringBuilder();
-        try {
-            FileReader file = new FileReader(path);
-            BufferedReader reader = new BufferedReader(file);
 
-            String messageLine;
+        FileReader file = new FileReader(path);
+        BufferedReader reader = new BufferedReader(file);
 
-            while ((messageLine = reader.readLine()) != null) {
-                content.append(messageLine);
-                content.append(System.getProperty("line.separator"));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        String messageLine;
+
+        while ((messageLine = reader.readLine()) != null) {
+            content.append(messageLine);
+            content.append(System.getProperty("line.separator"));
         }
+
         return content;
     }
 }
