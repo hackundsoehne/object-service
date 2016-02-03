@@ -49,10 +49,15 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
-        String tags = experiment.getTagsList().stream().map(tag -> tag.getName()).collect(Collectors.joining(","));
-        return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),experiment.getPaymentBase()/100,
-                60*60*2,60*60*24*31*12/*FIXME this is a year*/,tags,experiment.getNeededAnswers()*experiment.getRatingsPerAnswer(),
-                60*60*60/*FIXME*/,"");
+        String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
+        return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
+                experiment.getPaymentBase()/100, //we are getting cents passed and have to pass dallers
+                60*60*24, //you have 24 hours to do the assignment
+                60*60*24*31*12, // the experiment is staying for ONE year
+                tags,
+                experiment.getNeededAnswers()*experiment.getRatingsPerAnswer(),
+                31*24*60*60, //this is a little problem we have to specify when autoapproval is kicking in this is happening after a month
+                "");
     }
 
     @Override
