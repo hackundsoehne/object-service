@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Crowdcontrol extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -1027688361;
+	private static final long serialVersionUID = 1099458775;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol</code>
@@ -57,11 +57,14 @@ public class Crowdcontrol extends org.jooq.impl.SchemaImpl {
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.NotificationToken.NOTIFICATION_TOKEN,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Platform.PLATFORM,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING,
+			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingConstraints.RATING_CONSTRAINTS,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingOptionExperiment.RATING_OPTION_EXPERIMENT,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingOptionTemplate.RATING_OPTION_TEMPLATE,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Tag.TAG,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Template.TEMPLATE,
+			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.TemplateConstraint.TEMPLATE_CONSTRAINT,
+			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.TemplateTag.TEMPLATE_TAG,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Worker.WORKER,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.WorkerBalance.WORKER_BALANCE);
 	}
