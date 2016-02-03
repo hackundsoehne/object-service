@@ -57,7 +57,7 @@ public class MTurkConnection {
         }
 
         result.put("Timestamp", simpleDateFormat.format(new Date()));
-        result.put("ResponseGroup", responseGroup);
+        if (responseGroup != null) result.put("ResponseGroup", responseGroup);
         result.put("Version", version);
         return result;
     }

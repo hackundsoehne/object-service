@@ -22,7 +22,7 @@ public class RejectAssignment extends MturkRestCommand<Boolean, RejectAssignment
      * @param message a short string why the assignment was rejected
      */
     public RejectAssignment(MTurkConnection connection, String assignmentId, String message) {
-        super(connection,"RejectAssignment","RejectAssignmentResult","2014-08-15",
+        super(connection,"RejectAssignment",null,"2014-08-15",
                 RejectAssignmentResponse.class,
                 () -> {
                     Map<String, Object> values = new HashMap<String, Object>();

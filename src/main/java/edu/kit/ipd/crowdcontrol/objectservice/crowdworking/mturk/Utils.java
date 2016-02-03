@@ -35,7 +35,6 @@ public class Utils {
                     builder.append(pair.getKey()+" = "+pair.getValue());
                 }
             }
-
             throw new RuntimeException(builder.toString());
         }
     }

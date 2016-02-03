@@ -22,7 +22,7 @@ public class ApproveAssignment extends MturkRestCommand<Boolean, ApproveAssignme
      * @param message message to pass to the worker
      */
     public ApproveAssignment(MTurkConnection connection, String assignmentId, String message) {
-        super(connection,"ApproveAssignment","ApproveAssignmentResult","2014-08-15",
+        super(connection,"ApproveAssignment",null,"2014-08-15",
                 ApproveAssignmentResponse.class,
                 () -> {
                     Map<String, Object> values = new HashMap<String, Object>();

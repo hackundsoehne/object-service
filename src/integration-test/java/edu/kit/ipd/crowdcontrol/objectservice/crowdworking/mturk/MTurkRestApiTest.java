@@ -1,8 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.GetHIT;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.PublishHIT;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.UnpublishHIT;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.Assignment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.HIT;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.HITStatus;
 import org.junit.Before;
@@ -10,7 +9,9 @@ import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.*;
 
@@ -39,6 +40,19 @@ public class MTurkRestApiTest {
 
         HIT hit = new GetHIT(connection,id).get();
 
+        try {
+            new RejectAssignment(connection,"alpha","bla").get();
+            new ApproveAssignment(connection,"alpha","bla").get();
+        } catch (ExecutionException e) {
+            assertEquals(e.getCause().getCause().getMessage().replaceAll("\\d",""),
+                   "AWS.MechanicalTurk.AssignmentDoesNotExist : " +
+                            "Assignment ALPHA does not exist. ( s)\nAssignmentId = ALPHA");
+        }
+
+        List<Assignment> assignments = new GetAssignments(connection, id, 1).join();
+
+        assertEquals(assignments.size(), 0);
+
         assertEquals(hit.getTitle(), "Title1");
         assertEquals(hit.getDescription(), "Description2");
         assertTrue(hit.getReward().getAmount().subtract(new BigDecimal(0.20)).doubleValue() < 0.0001);
@@ -52,6 +66,7 @@ public class MTurkRestApiTest {
         assertTrue(new UnpublishHIT(connection,id).get());
 
         assertEquals(new GetHIT(connection,id).get().getHITStatus(), HITStatus.DISPOSED);
+
 
     }
 }

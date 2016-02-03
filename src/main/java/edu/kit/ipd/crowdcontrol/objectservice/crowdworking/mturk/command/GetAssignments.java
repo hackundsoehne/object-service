@@ -25,7 +25,7 @@ public class GetAssignments extends MturkRestCommand<List<Assignment>, GetAssign
      * @param pagenumber this is paged by a size of 100 assignments per page
      */
     public GetAssignments(MTurkConnection connection, String id, int pagenumber) {
-        super(connection,"GetAssignmentsForHIT", "", "2014-08-15", GetAssignmentsForHITResponse.class,
+        super(connection,"GetAssignmentsForHIT", "Minimal", "2014-08-15", GetAssignmentsForHITResponse.class,
                 () -> {
                     HashMap<String, Object> hashMap = new HashMap<>();
                     hashMap.put("HITId", id);
@@ -36,7 +36,6 @@ public class GetAssignments extends MturkRestCommand<List<Assignment>, GetAssign
                 getAssignmentsForHITResponse -> {
                     Utils.handleRequest(getAssignmentsForHITResponse.getGetAssignmentsForHITResult().get(0)
                             .getRequest());
-
                     return getAssignmentsForHITResponse.getGetAssignmentsForHITResult().get(0).getAssignment();
                 });
     }
