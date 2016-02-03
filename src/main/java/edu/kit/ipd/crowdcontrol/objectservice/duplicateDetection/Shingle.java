@@ -12,6 +12,7 @@ public class Shingle {
     public static Set<String> getShingle(String input){
 
         Set<String> shingles = new HashSet<>();
+        input = input.replace(" ","").toLowerCase();
         for (int i = 0; i < input.length() - (NGRAM_SIZE - 1); i++){
 
             String ngram = input.substring(i,i + NGRAM_SIZE);
@@ -20,4 +21,5 @@ public class Shingle {
         return shingles;
 
     }
+
 }
