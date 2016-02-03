@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Rating extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord> {
 
-	private static final long serialVersionUID = 1408183689;
+	private static final long serialVersionUID = -1470090821;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Rating</code>
@@ -67,6 +67,11 @@ public class Rating extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.obj
 	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord, java.lang.Integer> QUALITY = createField("quality", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
+	 * The column <code>crowdcontrol.Rating.constraint</code>.
+	 */
+	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord, java.lang.Integer> CONSTRAINT = createField("constraint", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
 	 * Create a <code>crowdcontrol.Rating</code> table reference
 	 */
 	public Rating() {
@@ -117,7 +122,7 @@ public class Rating extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.obj
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord, ?>>asList(edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDEXPERIMENTRATING, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDANSWERSRATINS, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.WORKERRATED);
+		return java.util.Arrays.<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord, ?>>asList(edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDEXPERIMENTRATING, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDANSWERSRATINGS, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.WORKERRATED, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.OFFENDEDCONSTRAINT);
 	}
 
 	/**

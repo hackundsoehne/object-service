@@ -109,6 +109,16 @@ public class Tables {
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Notification NOTIFICATION = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Notification.NOTIFICATION;
 
 	/**
+	 * The table crowdcontrol.Notification_Receiver_Email
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.NotificationReceiverEmail NOTIFICATION_RECEIVER_EMAIL = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.NotificationReceiverEmail.NOTIFICATION_RECEIVER_EMAIL;
+
+	/**
+	 * The table crowdcontrol.Notification_Token
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.NotificationToken NOTIFICATION_TOKEN = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.NotificationToken.NOTIFICATION_TOKEN;
+
+	/**
 	 * The table crowdcontrol.Platform
 	 */
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Platform PLATFORM = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Platform.PLATFORM;
