@@ -5,6 +5,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErro
 import spark.Request;
 
 public class RequestUtil {
+    private RequestUtil() {
+        // utility class
+    }
+
     public static int getParamInt(Request request, String param) {
         String paramValue = request.params(param);
 
@@ -40,6 +44,15 @@ public class RequestUtil {
             return defaultValue;
         }
 
-        return Boolean.parseBoolean(paramValue);
+        switch(paramValue.toLowerCase()) {
+            case "1":
+            case "true":
+                return true;
+            case "0":
+            case "false":
+                return false;
+            default:
+                throw new BadRequestException("Query parameter '%s' must be a valid boolean, '%s' given. Use true / 1 / false / 0.", param, paramValue);
+        }
     }
 }
