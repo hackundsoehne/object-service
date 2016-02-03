@@ -65,6 +65,7 @@ public class ExperimentResource {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
+        // TODO: (low priority) Optimize fetchExperiment for multiple experiments
         return experimentOperations.getExperimentsFrom(from, asc, 20)
                 .map(experimentRecord -> fetchExperiment(experimentRecord.getIdExperiment()))
                 .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
