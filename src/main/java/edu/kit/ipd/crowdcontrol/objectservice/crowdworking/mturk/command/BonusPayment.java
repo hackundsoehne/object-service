@@ -1,9 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command;
 
+import com.amazonaws.mturk.requester.doc._2014_08_15.GrantBonusResponse;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MTurkConnection;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkRestCommand;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.Utils;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.GrantBonusResponse;
 
 import java.util.HashMap;
 import java.util.Map;

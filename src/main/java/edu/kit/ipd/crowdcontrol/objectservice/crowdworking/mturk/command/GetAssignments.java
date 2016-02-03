@@ -1,16 +1,13 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command;
 
+import com.amazonaws.mturk.requester.doc._2014_08_15.Assignment;
+import com.amazonaws.mturk.requester.doc._2014_08_15.GetAssignmentsForHITResponse;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MTurkConnection;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkRestCommand;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.Utils;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.Assignment;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.GetAssignmentsForHITResponse;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Get all assignments of a hit

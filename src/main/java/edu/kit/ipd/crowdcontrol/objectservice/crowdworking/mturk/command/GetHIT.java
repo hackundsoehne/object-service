@@ -1,14 +1,11 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command;
 
+import com.amazonaws.mturk.requester.doc._2014_08_15.GetHITResponse;
+import com.amazonaws.mturk.requester.doc._2014_08_15.HIT;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MTurkConnection;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkRestCommand;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.Utils;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.GetHITResponse;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.HIT;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
-import org.jooq.Result;
 
-import javax.mail.Message;
 import java.util.HashMap;
 
 /**

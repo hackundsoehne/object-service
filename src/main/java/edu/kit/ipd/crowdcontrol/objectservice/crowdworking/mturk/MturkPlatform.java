@@ -1,9 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
+import com.amazonaws.mturk.requester.doc._2014_08_15.Assignment;
+import com.amazonaws.mturk.requester.doc._2014_08_15.AssignmentStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.Assignment;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.AssignmentStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
 
