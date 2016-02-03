@@ -22,9 +22,9 @@ import java.util.Map;
 public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
 
 
-    private Observable<Event<ChangeEvent<Experiment>>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
-    private PlatformManager platformManager;
-    private PaymentCalculator paymentCalc;
+    private final Observable<Event<ChangeEvent<Experiment>>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
+    private final PlatformManager platformManager;
+    private final PaymentCalculator paymentCalc;
 
 
     /**
@@ -79,10 +79,8 @@ public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
      * @param exp the finished experiment
      */
     private void dispatchPayment(Experiment exp) {
-        Map<Worker, Integer> map;
-        map = paymentCalc.estimatePayment(exp);
-
-        map.forEach((Worker, Integer) -> platformManager.payWorker("", Worker, Integer));
+        Map<Worker, Integer> map = paymentCalc.estimatePayment(exp);
+        map.forEach((Worker, Integer) -> platformManager.payWorker(Worker.getPlatform(), Worker, Integer));
 
     }
 

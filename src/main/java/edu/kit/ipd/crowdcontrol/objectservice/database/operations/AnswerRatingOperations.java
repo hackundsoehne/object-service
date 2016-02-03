@@ -72,6 +72,19 @@ public class AnswerRatingOperations extends AbstractOperations {
 
 
     /**
+     * Fetches the number all answers of the specified experiment with a quality-value equal or above
+     * the given threshold
+     *
+     * @param expID     of the experiment
+     * @param threshold specifying good answers. A good answer has at least a quality-value of given threshold
+     * @return Map of workers and a number of matching answerRecords.
+     */
+    public Map<WorkerRecord, Integer> getNumOfGoodAnswersOfExperiment(int expID, int threshold){
+        return null; //TODO
+    }
+
+
+    /**
      * Fetches all ratings of the specified experiment with a quality-value equal or above
      * the given threshold
      *
@@ -88,6 +101,19 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .and(ANSWER.QUALITY.greaterOrEqual(threshold))
                 .fetchGroups(WORKER, record -> record.into(RATING));
     }
+
+    /**
+     * Fetches the number of all ratings of the specified experiment with a quality-value equal or above
+     * the given threshold
+     *
+     * @param expID     of the experiment
+     * @param threshold specifying good rating. A good rating has at least a quality-value of given threshold
+     * @return Map of workers and a number of matching ratings.
+     */
+    public Map<WorkerRecord, Integer> getNumOfGoodRatingsOfExperiment(int expID, int threshold){
+        return null; //TODO
+    }
+
 
 
     /**
