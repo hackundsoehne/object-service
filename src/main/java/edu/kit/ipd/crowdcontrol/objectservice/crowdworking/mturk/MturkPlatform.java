@@ -7,10 +7,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.Assignmen
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -82,6 +79,7 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
          * this code works under the assumation that basepayment is part of the amout!!!!!!
          */
         Map<String, Assignment> workerAssignmentId = new HashMap<>();
+        List<CompletableFuture<Boolean>> jobs = new ArrayList<>();
         try {
             //first get a hashmap of all assignmentids and worker ids
             List<Assignment> assignmentList = new GetAssignments(connection,id,0).get();
@@ -103,7 +101,7 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
             if (paymentJob.getAmount() < experiment.getPaymentBase()) {
 
                 //amount is smaller than payment base ? REJECT!
-                new RejectAssignment(connection,assignment.getAssignmentId(),"You answer did not match the wanted rating criteria");
+                jobs.add(new RejectAssignment(connection,assignment.getAssignmentId(),"You answer did not match the wanted rating criteria"));
             }else {
 
                 //basepayment is triggered by approve
@@ -112,16 +110,18 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                 //apporve the assignment if it is not right now
                 if (assignment.getAssignmentStatus().equals(AssignmentStatus.SUBMITTED)) {
                     //approving here triggers base payment
-                    new ApproveAssignment(connection,assignment.getAssignmentId(),"Thx for passing your answer!");
+                    jobs.add(new ApproveAssignment(connection,assignment.getAssignmentId(),"Thx for passing your answer!"));
                 }
 
                 //if there is money left pay a bonus
                 if (amount > 0) {
-                    new BonusPayment(connection,assignment.getAssignmentId(),
-                            paymentJob.getWorkerRecord().getIdentification(),amount/100,"This is the bonus for a high rating!");
+                    jobs.add(new BonusPayment(connection,assignment.getAssignmentId(),
+                               paymentJob.getWorkerRecord().getIdentification(),amount/100,"This is the bonus for a high rating!"));
                 }
             }
         }
-        return null;
+        return CompletableFuture.supplyAsync(() ->
+                jobs.stream().map(CompletableFuture::join)
+                .filter(aBoolean -> !aBoolean).count() == 0);
     }
 }
