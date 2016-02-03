@@ -49,6 +49,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                 .set(record.getBonusAnswer(), Experiment.Builder::setPaymentAnswer)
                 .set(record.getBonusRating(), Experiment.Builder::setPaymentRating)
                 .set(record.getTemplateData(), ((builder, s) -> builder.putAllPlaceholders(new Gson().fromJson(s, type))))
+                .set(record.getTemplate(), Experiment.Builder::setTemplateId)
                 .set(record.getWorkerQualityThreshold(), Experiment.Builder::setWorkerQualityThreshold)
                 .getBuilder()
                 .build();
