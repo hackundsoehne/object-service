@@ -67,18 +67,19 @@ public class Notification implements Runnable {
 
     /**
      * Create a new protobuf from this notification
+     *
      * @return the protobuf representation of this notification
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Notification toProtobuf() {
         edu.kit.ipd.crowdcontrol.objectservice.proto.Notification.Builder builder =
-                edu.kit.ipd.crowdcontrol.objectservice.proto.Notification.newBuilder();
-        builder.setId(getID());
-        builder.setName(getName());
-        builder.setDescription(getDescription());
-        builder.setCheckPeriod(getCheckPeriod());
-        builder.setQuery(getQuery());
-        builder.setSendOnce(isSendOnce());
-        builder.addAllEmails(getReceiverEmails());
+                edu.kit.ipd.crowdcontrol.objectservice.proto.Notification.newBuilder()
+                        .setId(getID())
+                        .setName(getName())
+                        .setDescription(getDescription())
+                        .setCheckPeriod(getCheckPeriod())
+                        .setQuery(getQuery())
+                        .setSendOnce(isSendOnce())
+                        .addAllEmails(getReceiverEmails());
         return builder.buildPartial();
     }
 

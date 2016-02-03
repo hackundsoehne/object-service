@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationReceiverEmailRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.NotificationTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
@@ -13,6 +14,7 @@ import org.jooq.Result;
 import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +53,7 @@ public class NotificationOperations extends AbstractOperations {
      * @return a list of notifications
      */
     public List<NotificationRecord> getAllNotifications() {
+        // TODO fill with email list
         return create.selectFrom(Tables.NOTIFICATION)
                 .fetch();
     }
@@ -64,6 +67,7 @@ public class NotificationOperations extends AbstractOperations {
      * @return a list of notifications
      */
     public Range<Notification, Integer> getNotificationsFrom(int cursor, boolean next, int limit) {
+        // TODO fetch email list
         return getNextRange(create.selectFrom(NOTIFICATION), NOTIFICATION.ID_NOTIFICATION, NOTIFICATION, cursor, next, limit)
                 .map(NotificationTransformer::toProto);
     }
@@ -90,6 +94,7 @@ public class NotificationOperations extends AbstractOperations {
      * @throws IllegalArgumentException if one of the specified fields is not set
      */
     public Notification insertNotification(Notification toStore) throws IllegalArgumentException {
+        // TODO apply emails list
         assertHasField(toStore,
                 Notification.NAME_FIELD_NUMBER,
                 Notification.DESCRIPTION_FIELD_NUMBER,
@@ -101,7 +106,9 @@ public class NotificationOperations extends AbstractOperations {
         NotificationRecord record = NotificationTransformer.mergeRecord(create.newRecord(NOTIFICATION), toStore);
         record.store();
 
-        return NotificationTransformer.toProto(record);
+        // TODO fill with data
+        ArrayList<NotificationReceiverEmailRecord> notificationReceiverEmailRecords = new ArrayList<>();
+        return NotificationTransformer.toProto(record, notificationReceiverEmailRecords);
     }
 
     /**
@@ -135,6 +142,7 @@ public class NotificationOperations extends AbstractOperations {
      * @return the notification of empty if not found
      */
     public Optional<Notification> getNotification(int id) {
+        // TODO fill with email list
         return create.fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
                 .map(NotificationTransformer::toProto);
     }
