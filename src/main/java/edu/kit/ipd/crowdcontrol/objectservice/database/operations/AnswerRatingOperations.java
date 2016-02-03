@@ -3,9 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
-import org.jooq.DSLContext;
-import org.jooq.Result;
-import org.jooq.SelectConditionStep;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.util.List;
@@ -80,7 +78,15 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @return Map of workers and a number of matching answerRecords.
      */
     public Map<WorkerRecord, Integer> getNumOfGoodAnswersOfExperiment(int expID, int threshold){
-        return null; //TODO
+        Field<Integer> count = DSL.count(ANSWER.ID_ANSWER).as("count");
+        return create.select(WORKER.fields())
+                .select(count)
+                .from(WORKER)
+                .rightJoin(ANSWER).onKey()
+                .where(ANSWER.EXPERIMENT.eq(expID))
+                .and(ANSWER.QUALITY.greaterOrEqual(threshold))
+                .groupBy(WORKER.fields())
+                .fetchMap(WORKER, record -> record.getValue(count));
     }
 
 
@@ -111,7 +117,15 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @return Map of workers and a number of matching ratings.
      */
     public Map<WorkerRecord, Integer> getNumOfGoodRatingsOfExperiment(int expID, int threshold){
-        return null; //TODO
+        Field<Integer> count = DSL.count(RATING.ID_RATING).as("count");
+        return create.select(WORKER.fields())
+                .select(count)
+                .from(WORKER)
+                .rightJoin(RATING).onKey()
+                .where(ANSWER.EXPERIMENT.eq(expID))
+                .and(ANSWER.QUALITY.greaterOrEqual(threshold))
+                .groupBy(WORKER.fields())
+                .fetchMap(WORKER, record -> record.getValue(count));
     }
 
 
