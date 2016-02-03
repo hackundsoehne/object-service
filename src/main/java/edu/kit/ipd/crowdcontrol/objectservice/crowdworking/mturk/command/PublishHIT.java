@@ -45,14 +45,12 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
                                     "  <FrameHeight>400</FrameHeight>\n" +
                                     "</ExternalQuestion>");//FIXME external reference
                     values.put("Reward.Amount", reward);
-                    values.put("Reward.CurrencyCode", "USD"); //FIXME
+                    values.put("Reward.CurrencyCode", "USD");
                     values.put("AssignmentDurationInSeconds", assignmentDurationInSeconds);
                     values.put("LifetimeInSeconds", lifetimeInSeconds);
                     values.put("Keywords", keywords);
                     values.put("MaxAssignments", maxAssignments);
                     values.put("AutoApprovalDelayInSeconds", autoApprovalDelayInSeconds);
-                    //FIXME assignmentReviewPolicy?
-                    //FIXME HITReviewPolicy
                     values.put("RequesterAnnotation", data);
                     return values;
                 },
