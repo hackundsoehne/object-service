@@ -7,6 +7,8 @@ import org.jooq.impl.DSL;
 
 import java.util.Optional;
 
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
+
 /**
  * Responsible for the operations involving the creation of tasks.
  * @author LeanderK
@@ -26,7 +28,7 @@ public class TasksOperations extends AbstractOperations {
         taskRecord.setIdTask(null);
         return doIfNotRunning(taskRecord.getExperiment(), trans ->
                 DSL.using(trans)
-                        .insertInto(Tables.TASK)
+                        .insertInto(TASK)
                         .set(taskRecord)
                         .returning()
                         .fetchOne());
@@ -50,9 +52,19 @@ public class TasksOperations extends AbstractOperations {
      * @return the found task or empty if not found
      */
     public Optional<TaskRecord> getTask(String platform, int experimentId) {
-        return create.selectFrom(Tables.TASK)
-                .where(Tables.TASK.CROWD_PLATFORM.eq(platform))
-                .and(Tables.TASK.EXPERIMENT.eq(experimentId))
+        return create.selectFrom(TASK)
+                .where(TASK.CROWD_PLATFORM.eq(platform))
+                .and(TASK.EXPERIMENT.eq(experimentId))
                 .fetchOptional();
+    }
+
+    /**
+     * deletes a TaskRecord matching the primary key of the passed TaskRecord
+     * @param result a TaskRecord with the primary key set
+     */
+    public void deleteTask(TaskRecord result) {
+        assertHasPrimaryKey(result);
+        create.deleteFrom(TASK)
+                .where(TASK.ID_TASK.eq(result.getIdTask()));
     }
 }
