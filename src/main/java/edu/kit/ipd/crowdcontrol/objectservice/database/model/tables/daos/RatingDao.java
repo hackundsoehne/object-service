@@ -95,11 +95,4 @@ public class RatingDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.ob
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByQuality(java.lang.Integer... values) {
 		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.QUALITY, values);
 	}
-
-	/**
-	 * Fetch records that have <code>constraint IN (values)</code>
-	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Rating> fetchByConstraint(java.lang.Integer... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING.CONSTRAINT, values);
-	}
 }
