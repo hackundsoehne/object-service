@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Noti
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Transforms notification protocol buffers to database records.
@@ -25,10 +26,9 @@ public class NotificationTransformer extends AbstractTransformer {
                 .setDescription(notificationRecord.getDescription())
                 .setQuery(notificationRecord.getQuery())
                 .setCheckPeriod(notificationRecord.getCheckperiod())
-                .setSendOnce(notificationRecord.getSendOnce());
-        for (NotificationReceiverEmailRecord emailRecord : emailRecordList) {
-            builder.addEmails(emailRecord.getEmail());
-        }
+                .setSendOnce(notificationRecord.getSendOnce())
+                .addAllEmails(emailRecordList.stream().map(NotificationReceiverEmailRecord::getEmail)
+                        .collect(Collectors.toList()));
         return builder.build();
     }
 
@@ -40,7 +40,6 @@ public class NotificationTransformer extends AbstractTransformer {
      * @return Merged notification record.
      */
     public static NotificationRecord mergeRecord(NotificationRecord target, Notification notification) {
-        //TODO apply changes
         return merge(target, notification, (field, record) -> {
             switch (field) {
                 case Notification.NAME_FIELD_NUMBER:
@@ -54,6 +53,9 @@ public class NotificationTransformer extends AbstractTransformer {
                     break;
                 case Notification.CHECK_PERIOD_FIELD_NUMBER:
                     record.setCheckperiod(notification.getCheckPeriod());
+                    break;
+                case Notification.SEND_ONCE_FIELD_NUMBER:
+                    record.setSendOnce(notification.getSendOnce());
                     break;
             }
         });
