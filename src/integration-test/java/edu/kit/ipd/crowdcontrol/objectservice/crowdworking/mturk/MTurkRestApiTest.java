@@ -1,9 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
+import com.amazonaws.mturk.requester.doc._2014_08_15.Assignment;
+import com.amazonaws.mturk.requester.doc._2014_08_15.HIT;
+import com.amazonaws.mturk.requester.doc._2014_08_15.HITStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.Assignment;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.HIT;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.mturk.HITStatus;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +43,7 @@ public class MTurkRestApiTest {
         try {
             new RejectAssignment(connection,"alpha","bla").get();
             new ApproveAssignment(connection,"alpha","bla").get();
+            new GetBonusPayments(connection,id,"bla2",1).get();
         } catch (ExecutionException e) {
             assertEquals(e.getCause().getCause().getMessage().replaceAll("\\d",""),
                    "AWS.MechanicalTurk.AssignmentDoesNotExist : " +

@@ -5,9 +5,13 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import javax.xml.stream.events.Namespace;
+import javax.xml.transform.sax.SAXSource;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -27,6 +31,7 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
     private final HttpRequest request;
     private final Class<K> klass;
     private final String uniqueRestToken;
+    private final String version;
 
     /**
      * Creates a new command
@@ -44,6 +49,7 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
         this.uniqueRestToken = UUID.randomUUID().toString().substring(0,20);
         this.klass = klass;
         this.transformer = transformer;
+        this.version = version;
 
         request = Unirest.get(con.url)
                 .queryString("UniqueRestToken", uniqueRestToken)
@@ -56,8 +62,19 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
     public void completed(HttpResponse<String> response) {
         JAXBContext context;
         try {
+            //FIXME we should append a version, but this leads to a bug ;)
+            final String bla = "http://requester.mturk.amazonaws.com/doc/2014-08-15";
+
+            NamespaceFilter filter =
+                    new NamespaceFilter(bla,true);
+            XMLReader reader
+                    = XMLReaderFactory.createXMLReader();
+            filter.setParent(reader);
+
             context = JAXBContext.newInstance(klass);
-            @SuppressWarnings("unchecked") K k = (K) context.createUnmarshaller().unmarshal(response.getRawBody());
+            SAXSource source = new SAXSource(filter, new InputSource(response.getRawBody()));
+
+            @SuppressWarnings("unchecked") K k = (K) context.createUnmarshaller().unmarshal(source);
             complete(transformer.apply(k));
         } catch (Exception e) {
             completeExceptionally(new RuntimeException(e));

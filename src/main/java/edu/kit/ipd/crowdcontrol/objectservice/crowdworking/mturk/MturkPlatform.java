@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 /**
  * Platform implementation for a mturk instance
+ * @author MarcelHollerbach
+ * @version 0.1
  */
 public class MturkPlatform implements Platform,Payment,WorkerIdentification {
 
