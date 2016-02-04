@@ -13,7 +13,7 @@ import java.util.Map;
  * @author MarcelHollerbach
  * @version 1.0
  */
-public class BonusPayment extends MturkRestCommand<Boolean, GrantBonusResponse> {
+public class GrantBonus extends MturkRestCommand<Boolean, GrantBonusResponse> {
 
     /**
      * Pay bonus money for a assignment
@@ -23,7 +23,7 @@ public class BonusPayment extends MturkRestCommand<Boolean, GrantBonusResponse> 
      * @param amount amount of money to pay
      * @param message message why you are paying this
      */
-    public BonusPayment(MTurkConnection connection, String assignmentId, String workerId, double amount, String message) {
+    public GrantBonus(MTurkConnection connection, String assignmentId, String workerId, double amount, String message) {
         super(connection,"GrantBonus", "GrantBonusResult","2014-08-15",
                 GrantBonusResponse.class,
                 () -> {

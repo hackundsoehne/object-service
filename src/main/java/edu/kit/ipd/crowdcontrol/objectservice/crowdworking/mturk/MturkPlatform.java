@@ -2,11 +2,13 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
 import com.amazonaws.mturk.requester.doc._2014_08_15.Assignment;
 import com.amazonaws.mturk.requester.doc._2014_08_15.AssignmentStatus;
+import com.amazonaws.mturk.requester.doc._2014_08_15.BonusPayment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -85,7 +87,9 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
          * this code works under the assumation that basepayment is part of the amout!!!!!!
          */
         Map<String, Assignment> workerAssignmentId = new HashMap<>();
+        Map<String, BigDecimal> bonusPayed = new HashMap<>();
         List<CompletableFuture<Boolean>> jobs = new ArrayList<>();
+
         try {
             //first get a hashmap of all assignmentids and worker ids
             List<Assignment> assignmentList = new GetAssignments(connection,id,0).get();
@@ -95,40 +99,80 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                 }
             }
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            CompletableFuture<Boolean> completableFuture= new CompletableFuture<>();
+            completableFuture.completeExceptionally(e);
+            return completableFuture;
         }
+
+        //check if each passed worker got a assignment id
         for(PaymentJob paymentJob : paymentJobs) {
             Assignment assignment = workerAssignmentId.get(paymentJob.getWorkerRecord().getIdentification());
+            //check if each worker gets a assignment
             if (assignment == null) {
-                //FIXME this is fatal!! we cannot pay a worker here!!
-                continue;
+                throw new IllegalArgumentException("Worker "+paymentJob.getWorkerRecord().getIdentification()+" does not have a assignment id");
             }
-            //check if we should pay at all
-            if (paymentJob.getAmount() < experiment.getPaymentBase()) {
+            //check if assignments are already submitted
+            if (assignment.getAssignmentStatus().equals(AssignmentStatus.APPROVED)) {
 
-                //amount is smaller than payment base ? REJECT!
-                jobs.add(new RejectAssignment(connection,assignment.getAssignmentId(),"You answer did not match the wanted rating criteria"));
-            }else {
-
-                //basepayment is triggered by approve
-                int amount = paymentJob.getAmount() - experiment.getPaymentBase();
-
-                //apporve the assignment if it is not right now
-                if (assignment.getAssignmentStatus().equals(AssignmentStatus.SUBMITTED)) {
-                    //approving here triggers base payment
-                    jobs.add(new ApproveAssignment(connection,assignment.getAssignmentId(),"Thx for passing your answer!"));
-                }
-
-                //if there is money left pay a bonus
-                if (amount > 0) {
-                    jobs.add(new BonusPayment(connection,assignment.getAssignmentId(),
-                               paymentJob.getWorkerRecord().getIdentification(),amount/100,"This is the bonus for a high rating!"));
+                //try to get bonus payments information
+                BigDecimal bonusAmount = new BigDecimal(0);
+                try {
+                    List<BonusPayment> bonusPayment = new GetBonusPayments(connection, id, assignment.getAssignmentId(), 1).get();
+                    //calculate how much bonus we payed
+                    for (BonusPayment bonusPayment1 : bonusPayment)
+                        bonusAmount = bonusAmount.add(bonusPayment1.getBonusAmount().getAmount());
+                    //mark it in the map
+                    bonusPayed.put(assignment.getAssignmentId(), bonusAmount);
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new IllegalArgumentException("Failed to fetch Bonus Payments information", e);
                 }
             }
         }
-        //FIXME mark id as read
+
+        //do the real paying
+        for(PaymentJob paymentJob : paymentJobs) {
+            Assignment assignment =
+                    workerAssignmentId.get(paymentJob.getWorkerRecord().getIdentification());
+            //check if we should pay at all
+            if (paymentJob.getAmount() < experiment.getPaymentBase()) {
+                //amount is smaller than payment base ? REJECT!
+                jobs.add(new RejectAssignment(connection,assignment.getAssignmentId(),
+                        "You answer did not match the wanted rating criteria"));
+            }else {
+                //pay the worker regular
+                int amount = paymentJob.getAmount() - experiment.getPaymentBase();
+                //approve the assignment if it is not right now
+                if (assignment.getAssignmentStatus().equals(AssignmentStatus.SUBMITTED)) {
+                    //approving here triggers base payment
+                    jobs.add(new ApproveAssignment(connection,assignment.getAssignmentId(),
+                            "Thx for passing your answer!"));
+                    jobs.add(payBonus(paymentJob, assignment, amount));
+                } else if (assignment.getAssignmentStatus().equals(AssignmentStatus.APPROVED)) {
+                    //the assignment is already approved
+                    //check if a bonus was payed
+                    BigDecimal payedBonus = bonusPayed.get(assignment.getAssignmentId());
+                    double dollars = amount / 100;
+
+                    //check if we payed enough bonus
+                    if (payedBonus.doubleValue() < dollars) {
+                        //we need to pay the rest of the bonus
+                        jobs.add(payBonus(paymentJob, assignment, ((int)(dollars - payedBonus.doubleValue())*100)));
+                    }
+                }
+            }
+        }
+        //concat all future objects to one big object
         return CompletableFuture.supplyAsync(() ->
                 jobs.stream().map(CompletableFuture::join)
                 .filter(aBoolean -> !aBoolean).count() == 0);
+    }
+
+    private CompletableFuture<Boolean> payBonus(PaymentJob paymentJob, Assignment assignment, int amount) {
+        //if there is money left pay a bonus
+        if (amount > 0) {
+            new GrantBonus(connection,assignment.getAssignmentId(),
+                       paymentJob.getWorkerRecord().getIdentification(),amount/100,"This is the bonus for a high rating!");
+        }
+        return CompletableFuture.completedFuture(true);
     }
 }
