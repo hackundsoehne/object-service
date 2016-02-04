@@ -102,7 +102,7 @@ public class TemplateTransformer extends AbstractTransformer {
 
         return merge(constraintRecord, constraint, (fieldNumber, record) -> {
             switch (fieldNumber) {
-                case Tag.NAME_FIELD_NUMBER:
+                case Constraint.NAME_FIELD_NUMBER:
                     record.setConstraint(constraint.getName());
                     break;
             }
