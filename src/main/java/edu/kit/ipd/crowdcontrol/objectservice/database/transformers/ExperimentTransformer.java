@@ -59,6 +59,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                 .set(record.getTemplateData(), ((builder, s) -> builder.putAllPlaceholders(new Gson().fromJson(s, type))))
                 .set(toInteger(record.getWorkerQualityThreshold()), Experiment.Builder::setWorkerQualityThreshold)
                 .set(toInteger(record.getTemplate()), Experiment.Builder::setTemplateId)
+                .set(toInteger(record.getPaymentQualityThreshold()), Experiment.Builder::setPaymentQualityThreshold)
                 .getBuilder()
                 .build();
     }
@@ -188,6 +189,9 @@ public class ExperimentTransformer extends AbstractTransformer {
                     break;
                 case Experiment.WORKER_QUALITY_THRESHOLD_FIELD_NUMBER:
                     record.setWorkerQualityThreshold(experiment.getWorkerQualityThreshold().getValue());
+                    break;
+                case Experiment.PAYMENT_QUALITY_THRESHOLD_FIELD_NUMBER:
+                    record.setPaymentQualityThreshold(experiment.getPaymentQualityThreshold().getValue());
                     break;
             }
         });
