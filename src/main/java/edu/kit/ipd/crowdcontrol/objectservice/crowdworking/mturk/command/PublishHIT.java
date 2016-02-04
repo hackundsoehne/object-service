@@ -59,7 +59,6 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
                     if (createHITResponse.getHIT().size() == 0) {
                         throw new IllegalStateException("No result HIT!");
                     }
-
                     //get the created HIT
                     HIT created = createHITResponse.getHIT().get(0);
 

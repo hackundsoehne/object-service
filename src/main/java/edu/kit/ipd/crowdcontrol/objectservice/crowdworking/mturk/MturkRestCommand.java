@@ -52,7 +52,7 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
         this.version = version;
 
         request = Unirest.get(con.url)
-                .queryString("UniqueRestToken", uniqueRestToken)
+                .queryString("UniqueRequestToken", uniqueRestToken)
                 .queryString(con.getCallParameter(operation,responseGroup,version))
                 .queryString(supplier.get());
         request.asStringAsync(this);
