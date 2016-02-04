@@ -148,14 +148,15 @@ public class ExperimentOperations extends AbstractOperations {
                 || experimentRecord.getNeededAnswers() == null
                 || experimentRecord.getRatingsPerAnswer() == null
                 || experimentRecord.getAnwersPerWorker() == null
-                || experimentRecord.getRatingsPerAnswer() == null
+                || experimentRecord.getRatingsPerWorker() == null
                 || experimentRecord.getAlgorithmTaskChooser() == null
                 || experimentRecord.getAlgorithmQualityAnswer() == null
                 || experimentRecord.getAlgorithmQualityRating() == null
                 || experimentRecord.getBasePayment() == null
                 || experimentRecord.getBonusAnswer() == null
                 || experimentRecord.getBonusRating() == null
-                || experimentRecord.getWorkerQualityThreshold() == null) {
+                || experimentRecord.getWorkerQualityThreshold() == null
+                || experimentRecord.getPaymentQualityThreshold() == null) {
             return false;
         }
         int ratings = create.fetchCount(
