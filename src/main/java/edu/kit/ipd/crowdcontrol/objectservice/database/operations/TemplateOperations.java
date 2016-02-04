@@ -102,7 +102,7 @@ public class TemplateOperations extends AbstractOperations {
         create.batchInsert(tags).execute();
 
         List<TemplateConstraintRecord> constraints = toStore.getConstraintsList().stream()
-                .filter(constraint -> constraint.getName().isEmpty())
+                .filter(constraint -> !constraint.getName().isEmpty())
                 .map(constraint -> TemplateTransformer.toRecord((Constraint) constraint, record.getIdTemplate()))
                 .collect(Collectors.toList());
 
@@ -143,7 +143,7 @@ public class TemplateOperations extends AbstractOperations {
 
         if (!template.getTagsList().isEmpty()) {
             List<TemplateTagRecord> toInsert = template.getTagsList().stream()
-                    .filter(tag -> tag.getName().isEmpty())
+                    .filter(tag -> !tag.getName().isEmpty())
                     .map(tag -> TemplateTransformer.toRecord((Tag) tag, id))
                     .collect(Collectors.toList());
 
@@ -158,7 +158,7 @@ public class TemplateOperations extends AbstractOperations {
 
         if (!template.getConstraintsList().isEmpty()) {
             List<TemplateConstraintRecord> toInsert = template.getConstraintsList().stream()
-                    .filter(constraint -> constraint.getName().isEmpty())
+                    .filter(constraint -> !constraint.getName().isEmpty())
                     .map(constraint -> TemplateTransformer.toRecord((Constraint) constraint, id))
                     .collect(Collectors.toList());
 
