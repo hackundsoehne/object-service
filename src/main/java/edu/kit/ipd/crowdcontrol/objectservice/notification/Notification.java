@@ -14,7 +14,7 @@ import java.util.List;
  * @version 1.0
  */
 public class Notification implements Runnable {
-    private static final Logger LOGGER = LogManager.getRootLogger();
+    private static final Logger LOGGER = LogManager.getLogger(Notification.class);
 
     private int id;
     private String name;

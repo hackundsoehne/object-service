@@ -29,11 +29,18 @@ public class NotificationController {
 
         handleMap = new HashMap<>();
 
-        loadNotificationsFromDatabase();
 
         EventManager.NOTIFICATION_CREATE.getObservable().subscribe(notificationEvent -> createNotification(notificationEvent.getData()));
         EventManager.NOTIFICATION_UPDATE.getObservable().subscribe(changeEvent -> updateNotification(changeEvent.getData()));
         EventManager.NOTIFICATION_DELETE.getObservable().subscribe(notificationEvent -> deleteNotification(notificationEvent.getData()));
+    }
+
+    /**
+     * Initializes the NotificationController.
+     * This loads stored notifications from the database.
+     */
+    public void init() {
+        loadNotificationsFromDatabase();
     }
 
     private void loadNotificationsFromDatabase() {
