@@ -43,7 +43,7 @@ public class MoneyTransferManager {
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> schedule = null;
 
-    private static final Logger LOGGER = LogManager.getRootLogger();
+    private static final Logger LOGGER = LogManager.getLogger(MoneyTransferManager.class);
 
 
     /**
