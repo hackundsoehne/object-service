@@ -1,11 +1,13 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
-import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
+import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.SQLDialect;
 
 import javax.naming.NamingException;
@@ -19,13 +21,23 @@ import java.util.function.Function;
  * @author Niklas Keller
  */
 public class Main {
+    private static final Logger LOGGER = LogManager.getRootLogger();
+
+    static {
+        // Disable jOOQ's self-advertising
+        // http://stackoverflow.com/a/28283538/2373138
+        System.setProperty("org.jooq.no-logo", "true");
+    }
+
     public static void main(String[] args) throws IOException {
+        LOGGER.trace("Entering application.");
+
         Properties properties = new Properties();
 
         try (InputStream in = Main.class.getResourceAsStream("/config.properties")) {
             properties.load(in);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error("Could not read application configuration.", e);
             System.exit(1);
         }
 

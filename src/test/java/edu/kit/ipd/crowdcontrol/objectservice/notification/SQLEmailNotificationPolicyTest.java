@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
  */
 public class SQLEmailNotificationPolicyTest {
     private static final String TESTQUERY = "SELECT test query";
-    private static final List<String> RECEIVER_EMAILS = new ArrayList<>(Arrays.asList("maila@example.com", "mailb@example.com"));
+    private static final List<String> RECEIVER_EMAILS = Arrays.asList("maila@example.com", "mailb@example.com");
     static SQLEmailNotificationPolicy policy;
     static Notification notification;
     static Result<Record> resultNoIdAndToken;

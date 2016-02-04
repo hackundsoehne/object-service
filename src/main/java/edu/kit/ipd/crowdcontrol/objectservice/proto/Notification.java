@@ -20,7 +20,6 @@ public  final class Notification extends
     description_ = "";
     query_ = "";
     checkPeriod_ = 0;
-    sendOnce_ = false;
     emails_ = com.google.protobuf.LazyStringArrayList.EMPTY;
   }
 
@@ -76,9 +75,17 @@ public  final class Notification extends
             checkPeriod_ = input.readInt32();
             break;
           }
-          case 48: {
+          case 50: {
+            edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder subBuilder = null;
+            if (sendOnce_ != null) {
+              subBuilder = sendOnce_.toBuilder();
+            }
+            sendOnce_ = input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(sendOnce_);
+              sendOnce_ = subBuilder.buildPartial();
+            }
 
-            sendOnce_ = input.readBool();
             break;
           }
           case 58: {
@@ -239,12 +246,24 @@ public  final class Notification extends
   }
 
   public static final int SEND_ONCE_FIELD_NUMBER = 6;
-  private boolean sendOnce_;
+  private edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean sendOnce_;
   /**
-   * <code>optional bool send_once = 6;</code>
+   * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
    */
-  public boolean getSendOnce() {
-    return sendOnce_;
+  public boolean hasSendOnce() {
+    return sendOnce_ != null;
+  }
+  /**
+   * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean getSendOnce() {
+    return sendOnce_ == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.getDefaultInstance() : sendOnce_;
+  }
+  /**
+   * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+   */
+  public edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder getSendOnceOrBuilder() {
+    return getSendOnce();
   }
 
   public static final int EMAILS_FIELD_NUMBER = 7;
@@ -303,8 +322,8 @@ public  final class Notification extends
     if (checkPeriod_ != 0) {
       output.writeInt32(5, checkPeriod_);
     }
-    if (sendOnce_ != false) {
-      output.writeBool(6, sendOnce_);
+    if (sendOnce_ != null) {
+      output.writeMessage(6, getSendOnce());
     }
     for (int i = 0; i < emails_.size(); i++) {
       com.google.protobuf.GeneratedMessage.writeString(output, 7, emails_.getRaw(i));
@@ -333,9 +352,9 @@ public  final class Notification extends
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(5, checkPeriod_);
     }
-    if (sendOnce_ != false) {
+    if (sendOnce_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(6, sendOnce_);
+        .computeMessageSize(6, getSendOnce());
     }
     {
       int dataSize = 0;
@@ -466,8 +485,12 @@ public  final class Notification extends
 
       checkPeriod_ = 0;
 
-      sendOnce_ = false;
-
+      if (sendOnceBuilder_ == null) {
+        sendOnce_ = null;
+      } else {
+        sendOnce_ = null;
+        sendOnceBuilder_ = null;
+      }
       emails_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       bitField0_ = (bitField0_ & ~0x00000040);
       return this;
@@ -499,7 +522,11 @@ public  final class Notification extends
       result.description_ = description_;
       result.query_ = query_;
       result.checkPeriod_ = checkPeriod_;
-      result.sendOnce_ = sendOnce_;
+      if (sendOnceBuilder_ == null) {
+        result.sendOnce_ = sendOnce_;
+      } else {
+        result.sendOnce_ = sendOnceBuilder_.build();
+      }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         emails_ = emails_.getUnmodifiableView();
         bitField0_ = (bitField0_ & ~0x00000040);
@@ -539,8 +566,8 @@ public  final class Notification extends
       if (other.getCheckPeriod() != 0) {
         setCheckPeriod(other.getCheckPeriod());
       }
-      if (other.getSendOnce() != false) {
-        setSendOnce(other.getSendOnce());
+      if (other.hasSendOnce()) {
+        mergeSendOnce(other.getSendOnce());
       }
       if (!other.emails_.isEmpty()) {
         if (emails_.isEmpty()) {
@@ -838,30 +865,121 @@ public  final class Notification extends
       return this;
     }
 
-    private boolean sendOnce_ ;
+    private edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean sendOnce_ = null;
+    private com.google.protobuf.SingleFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean, edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder> sendOnceBuilder_;
     /**
-     * <code>optional bool send_once = 6;</code>
+     * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
      */
-    public boolean getSendOnce() {
-      return sendOnce_;
+    public boolean hasSendOnce() {
+      return sendOnceBuilder_ != null || sendOnce_ != null;
     }
     /**
-     * <code>optional bool send_once = 6;</code>
+     * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
      */
-    public Builder setSendOnce(boolean value) {
-      
-      sendOnce_ = value;
-      onChanged();
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean getSendOnce() {
+      if (sendOnceBuilder_ == null) {
+        return sendOnce_ == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.getDefaultInstance() : sendOnce_;
+      } else {
+        return sendOnceBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+     */
+    public Builder setSendOnce(edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean value) {
+      if (sendOnceBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        sendOnce_ = value;
+        onChanged();
+      } else {
+        sendOnceBuilder_.setMessage(value);
+      }
+
       return this;
     }
     /**
-     * <code>optional bool send_once = 6;</code>
+     * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+     */
+    public Builder setSendOnce(
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder builderForValue) {
+      if (sendOnceBuilder_ == null) {
+        sendOnce_ = builderForValue.build();
+        onChanged();
+      } else {
+        sendOnceBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+     */
+    public Builder mergeSendOnce(edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean value) {
+      if (sendOnceBuilder_ == null) {
+        if (sendOnce_ != null) {
+          sendOnce_ =
+            edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.newBuilder(sendOnce_).mergeFrom(value).buildPartial();
+        } else {
+          sendOnce_ = value;
+        }
+        onChanged();
+      } else {
+        sendOnceBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
      */
     public Builder clearSendOnce() {
-      
-      sendOnce_ = false;
-      onChanged();
+      if (sendOnceBuilder_ == null) {
+        sendOnce_ = null;
+        onChanged();
+      } else {
+        sendOnce_ = null;
+        sendOnceBuilder_ = null;
+      }
+
       return this;
+    }
+    /**
+     * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder getSendOnceBuilder() {
+
+      onChanged();
+      return getSendOnceFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder getSendOnceOrBuilder() {
+      if (sendOnceBuilder_ != null) {
+        return sendOnceBuilder_.getMessageOrBuilder();
+      } else {
+        return sendOnce_ == null ?
+            edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.getDefaultInstance() : sendOnce_;
+      }
+    }
+    /**
+     * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean, edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder>
+        getSendOnceFieldBuilder() {
+      if (sendOnceBuilder_ == null) {
+        sendOnceBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean, edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder>(
+                getSendOnce(),
+                getParentForChildren(),
+                isClean());
+        sendOnce_ = null;
+      }
+      return sendOnceBuilder_;
     }
 
     private com.google.protobuf.LazyStringList emails_ = com.google.protobuf.LazyStringArrayList.EMPTY;

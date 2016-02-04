@@ -129,6 +129,11 @@ public class Tables {
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating RATING = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING;
 
 	/**
+	 * The table crowdcontrol.Rating_Constraint
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingConstraint RATING_CONSTRAINT = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingConstraint.RATING_CONSTRAINT;
+
+	/**
 	 * The table crowdcontrol.Rating_Option_Experiment
 	 */
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingOptionExperiment RATING_OPTION_EXPERIMENT = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingOptionExperiment.RATING_OPTION_EXPERIMENT;
@@ -152,6 +157,16 @@ public class Tables {
 	 * The table crowdcontrol.Template
 	 */
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Template TEMPLATE = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Template.TEMPLATE;
+
+	/**
+	 * The table crowdcontrol.Template_Constraint
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.TemplateConstraint TEMPLATE_CONSTRAINT = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.TemplateConstraint.TEMPLATE_CONSTRAINT;
+
+	/**
+	 * The table crowdcontrol.Template_Tag
+	 */
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.TemplateTag TEMPLATE_TAG = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.TemplateTag.TEMPLATE_TAG;
 
 	/**
 	 * The table crowdcontrol.Worker

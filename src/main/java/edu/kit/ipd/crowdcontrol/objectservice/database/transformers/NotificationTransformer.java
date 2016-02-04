@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationReceiverEmailRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 
 import java.util.List;
@@ -20,16 +21,15 @@ public class NotificationTransformer extends AbstractTransformer {
      * @return Notification.
      */
     public static Notification toProto(NotificationRecord notificationRecord, List<NotificationReceiverEmailRecord> emailRecordList) {
-        Notification.Builder builder = Notification.newBuilder()
+        return Notification.newBuilder()
                 .setId(notificationRecord.getIdNotification())
                 .setName(notificationRecord.getName())
                 .setDescription(notificationRecord.getDescription())
                 .setQuery(notificationRecord.getQuery())
                 .setCheckPeriod(notificationRecord.getCheckperiod())
-                .setSendOnce(notificationRecord.getSendOnce())
-                .addAllEmails(emailRecordList.stream().map(NotificationReceiverEmailRecord::getEmail)
-                        .collect(Collectors.toList()));
-        return builder.build();
+                .setSendOnce(Boolean.newBuilder().setValue(notificationRecord.getSendOnce()).build())
+                .addAllEmails(emailRecordList.stream().map(NotificationReceiverEmailRecord::getEmail).collect(Collectors.toList()))
+                .build();
     }
 
     /**
@@ -55,7 +55,7 @@ public class NotificationTransformer extends AbstractTransformer {
                     record.setCheckperiod(notification.getCheckPeriod());
                     break;
                 case Notification.SEND_ONCE_FIELD_NUMBER:
-                    record.setSendOnce(notification.getSendOnce());
+                    record.setSendOnce(notification.getSendOnce().getValue());
                     break;
             }
         });

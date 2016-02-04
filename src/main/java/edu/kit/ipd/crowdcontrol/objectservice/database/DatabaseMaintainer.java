@@ -2,7 +2,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.database;
 
 import org.jooq.DSLContext;
 
-import java.io.Closeable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -11,7 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATING;
 
 /**
  * this class periodically performs cleanup-tasks.
@@ -39,10 +38,10 @@ public class DatabaseMaintainer {
      */
     public synchronized void start() {
         if (schedule != null) {
-            schedule = scheduler.scheduleAtFixedRate(this::doCleanUp, 0, cleanUpInterval, TimeUnit.HOURS);
-        } else {
             throw new IllegalStateException("run() was called twice!");
         }
+
+        schedule = scheduler.scheduleAtFixedRate(this::doCleanUp, 0, cleanUpInterval, TimeUnit.HOURS);
     }
 
     /**

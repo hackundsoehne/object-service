@@ -48,9 +48,17 @@ public interface NotificationOrBuilder extends
   int getCheckPeriod();
 
   /**
-   * <code>optional bool send_once = 6;</code>
+   * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
    */
-  boolean getSendOnce();
+  boolean hasSendOnce();
+  /**
+   * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean getSendOnce();
+  /**
+   * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder getSendOnceOrBuilder();
 
   /**
    * <code>repeated string emails = 7;</code>

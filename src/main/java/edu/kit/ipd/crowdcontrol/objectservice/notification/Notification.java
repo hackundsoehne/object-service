@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +53,7 @@ public class Notification implements Runnable {
      */
     public Notification(edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto, NotificationPolicy policy) {
         this(notificationProto.getId(), notificationProto.getName(), notificationProto.getDescription(),
-                notificationProto.getCheckPeriod(), notificationProto.getQuery(), notificationProto.getSendOnce(),
+                notificationProto.getCheckPeriod(), notificationProto.getQuery(), notificationProto.getSendOnce().getValue(),
                 new ArrayList<>(notificationProto.getEmailsList()), policy);
     }
 
@@ -79,7 +81,7 @@ public class Notification implements Runnable {
                         .setDescription(getDescription())
                         .setCheckPeriod(getCheckPeriod())
                         .setQuery(getQuery())
-                        .setSendOnce(isSendOnce())
+                        .setSendOnce(Boolean.newBuilder().setValue(isSendOnce()).build())
                         .addAllEmails(getReceiverEmails());
         return builder.buildPartial();
     }
