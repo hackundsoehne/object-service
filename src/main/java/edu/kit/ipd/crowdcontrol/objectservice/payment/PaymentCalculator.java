@@ -8,6 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Created by lucaskrauss at 28.01.2016
@@ -40,40 +41,35 @@ public class PaymentCalculator {
      * @param experiment representation of the experiment whose workers will have their payment estimated
      * @return a mapping of workers to their salary
      */
-    public Map<Worker, Integer> estimatePayment(Experiment experiment)throws IllegalArgumentException {
-
-
-        Map<Worker, Integer> map = new HashMap<>();
-        int paymentBase = experiment.getPaymentBase();
-        int paymentAnswer = experiment.getPaymentAnswer();
-        int paymentRating = experiment.getPaymentRating();
+    public Map<WorkerRecord, Integer> estimatePayment(Experiment experiment)throws IllegalArgumentException {
+        Map<WorkerRecord, Integer> map = new HashMap<>();
+        int paymentBase = experiment.getPaymentBase().getValue();
+        int paymentAnswer = experiment.getPaymentAnswer().getValue();
+        int paymentRating = experiment.getPaymentRating().getValue();
+        int qualityThreshold = experiment.getPaymentQualityThreshold().getValue();
 
         if(paymentAnswer < 0 || paymentBase < 0 || paymentRating < 0){
             throw new IllegalArgumentException("Error in "+this.getClass()+"! Payment-values must not be less than zero!");
         }
 
         //Gets number of all answers of a worker above the specified threshold
-        Map<WorkerRecord,Integer> workerAnswerMap = ops.getNumOfGoodAnswersOfExperiment(experiment.getId(), 0); //TODO params
+        Map<WorkerRecord,Integer> workerAnswerMap = ops.getNumOfGoodAnswersOfExperiment(experiment.getId(), qualityThreshold);
 
         //For all good answers of the worker, his salary get increased by the payment for an answer
         for (Map.Entry<WorkerRecord,Integer> entry :workerAnswerMap.entrySet()) {
-            Worker worker = WorkerTransformer.toProto(entry.getKey());
-            map.put(worker, (entry.getValue()* paymentAnswer));
+            map.put(entry.getKey(), (entry.getValue()* paymentAnswer));
 
         }
 
-        Map<WorkerRecord, Integer> workerRatingMap = ops.getNumOfGoodRatingsOfExperiment(experiment.getId(), 0); //TODO ratings params
+        Map<WorkerRecord, Integer> workerRatingMap = ops.getNumOfGoodRatingsOfExperiment(experiment.getId(), qualityThreshold);
 
         //For all good ratings of the worker, his salary get increased by the payment for a rating
         for (Map.Entry<WorkerRecord, Integer> entry : workerRatingMap.entrySet()) {
-            Worker worker = WorkerTransformer.toProto(entry.getKey());
-            map.put(worker,map.get(worker) + (entry.getValue() * paymentRating));
+            map.put(entry.getKey(),map.get(entry.getKey()) + (entry.getValue() * paymentRating));
         }
 
-
         //Now all workers participating in the experiment are present in the map and the base-payment can be added to their salary
-        map.forEach((worker,payment) -> map.put(worker,payment+paymentBase));
-
+        map.replaceAll((workerRecord, payment) -> payment + paymentBase);
 
         return map;
     }

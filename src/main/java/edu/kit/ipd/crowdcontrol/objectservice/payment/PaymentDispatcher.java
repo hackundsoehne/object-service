@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.payment;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
@@ -10,7 +11,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import rx.Observable;
 import rx.Observer;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by lucaskrauss at 28.01.2016
@@ -79,9 +82,13 @@ public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
      * @param exp the finished experiment
      */
     private void dispatchPayment(Experiment exp) {
-        Map<Worker, Integer> map = paymentCalc.estimatePayment(exp);
-        map.forEach((Worker, Integer) -> platformManager.payWorker(Worker.getPlatform(), Worker, Integer));
-
+        paymentCalc.estimatePayment(exp).entrySet().stream()
+                .collect(Collectors.groupingBy(
+                        entry -> entry.getKey().getPlatform(),
+                        Collectors.mapping(entry -> new PaymentJob(entry.getKey(), entry.getValue()), Collectors.toList())
+                ))
+                //TODO: replace platformId
+                .forEach((platform, paymentJobs) -> platformManager.payExperiment(platform, null, exp, paymentJobs));
     }
 
 
