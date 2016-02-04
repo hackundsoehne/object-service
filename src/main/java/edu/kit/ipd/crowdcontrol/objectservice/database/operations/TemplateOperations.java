@@ -163,8 +163,8 @@ public class TemplateOperations extends AbstractOperations {
                     .collect(Collectors.toList());
 
             create.transaction(conf -> {
-                DSL.using(conf).deleteFrom(TEMPLATE_TAG)
-                        .where(TEMPLATE_TAG.TEMPLATE.eq(id))
+                DSL.using(conf).deleteFrom(TEMPLATE_CONSTRAINT)
+                        .where(TEMPLATE_CONSTRAINT.TEMPLATE.eq(id))
                         .execute();
 
                 DSL.using(conf).batchInsert(toInsert).execute();
