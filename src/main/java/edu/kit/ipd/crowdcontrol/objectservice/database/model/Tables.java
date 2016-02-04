@@ -129,9 +129,9 @@ public class Tables {
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating RATING = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating.RATING;
 
 	/**
-	 * The table crowdcontrol.Rating_Constraints
+	 * The table crowdcontrol.Rating_Constraint
 	 */
-	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingConstraints RATING_CONSTRAINTS = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingConstraints.RATING_CONSTRAINTS;
+	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingConstraint RATING_CONSTRAINT = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.RatingConstraint.RATING_CONSTRAINT;
 
 	/**
 	 * The table crowdcontrol.Rating_Option_Experiment
