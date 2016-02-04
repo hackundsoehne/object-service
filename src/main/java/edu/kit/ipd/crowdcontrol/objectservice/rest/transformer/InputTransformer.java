@@ -5,6 +5,8 @@ import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.UnsupportedMediaTypeException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -17,6 +19,7 @@ import java.lang.reflect.Method;
  * @author Niklas Keller
  */
 public class InputTransformer implements Route {
+    private static final Logger LOGGER = LogManager.getLogger(InputTransformer.class);
     private static final JsonFormat.Parser PARSER = JsonFormat.parser();
 
     private final Route next;
@@ -54,10 +57,12 @@ public class InputTransformer implements Route {
         try {
             switch (contentType) {
                 case "application/json":
+                    LOGGER.trace("Parsing request body as application/json.");
                     PARSER.merge(body, builder);
                     break;
+                // https://tools.ietf.org/html/draft-rfernando-protocol-buffers-00
                 case "application/protobuf":
-                    // https://tools.ietf.org/html/draft-rfernando-protocol-buffers-00
+                    LOGGER.trace("Parsing request body as application/protobuf.");
                     builder.mergeFrom(body.getBytes());
                     break;
                 default:
