@@ -130,6 +130,7 @@ public class Router implements SparkApplication {
         put("/workers", workerResource::put, Worker.class);
         get("/workers", workerResource::all);
         get("/workers/:id", workerResource::get);
+        patch("/workers/:id", workerResource::patch, Worker.class);
         delete("/workers/:id", workerResource::delete);
         put("/workers/:id/calibrations", workerCalibrationResource::put, CalibrationAnswer.class);
 

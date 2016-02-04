@@ -15,6 +15,7 @@ public class EventManager {
     public static final EventObservable<Answer> ANSWER_CREATE = new EventObservable<>();
     public static final EventObservable<Rating> RATINGS_CREATE = new EventObservable<>();
     public static final EventObservable<Worker> WORKER_CREATE = new EventObservable<>();
+    public static final EventObservable<Worker> WORKER_CHANGE = new EventObservable<>();
     public static final EventObservable<Worker> WORKER_DELETE = new EventObservable<>();
     public static final EventObservable<CalibrationAnswer> WORKER_CALIBRATION_CREATE = new EventObservable<>();
     public static final EventObservable<Template> TEMPLATE_CREATE = new EventObservable<>();

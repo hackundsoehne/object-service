@@ -46,7 +46,7 @@ public class WorkerResource {
             Optional<WorkerRecord> optionalRecord = manager.getWorker(platform, request.queryMap().toMap());
             if (optionalRecord.isPresent()) {
                 worker = optionalRecord.get();
-            } else if (!manager.getNeedemail(platform) || Objects.equals(request.queryParams("email"), String.valueOf(true))){
+            } else if (!manager.getNeedemail(platform) || (!request.queryParams("email").isEmpty())){
                 String identify = manager.identifyWorker(platform, request.queryMap().toMap());
                 WorkerRecord workerRecord = new WorkerRecord(null, identify, platform, null, null);
                 worker = operations.insertWorker(workerRecord);
@@ -104,6 +104,26 @@ public class WorkerResource {
         worker = operations.insertWorker(worker, identity);
 
         EventManager.WORKER_CREATE.emit(worker);
+
+        response.status(201);
+        response.header("Location", "/workers/" + worker.getId());
+
+        return worker;
+    }
+
+    /**
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
+     *
+     * @return patched worker.
+     */
+    public Worker patch(Request request, Response response) {
+        Worker worker = request.attribute("input");
+        int id = getParamInt(request, "id");
+
+        worker = operations.updateWorker(worker, id);
+
+        EventManager.WORKER_CHANGE.emit(worker);
 
         response.status(201);
         response.header("Location", "/workers/" + worker.getId());
