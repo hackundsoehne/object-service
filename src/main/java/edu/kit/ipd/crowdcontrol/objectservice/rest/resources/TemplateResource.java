@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TemplateOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
@@ -8,6 +10,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestExceptio
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
+
+import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
@@ -63,6 +67,8 @@ public class TemplateResource {
             throw new BadRequestException("Missing at least one required parameter.");
         }
 
+        EventManager.TEMPLATE_CREATE.emit(template);
+
         response.status(201);
         response.header("Location", "/templates/" + template.getId());
 
@@ -76,8 +82,15 @@ public class TemplateResource {
      * @return Modified template.
      */
     public Template patch(Request request, Response response) {
-        Template template = request.attribute("input");
-        return operations.updateTemplate(getParamInt(request, "id"), template);
+        int id = getParamInt(request, "id");
+        Template patch = request.attribute("input");
+
+        Template oldTemplate = operations.getTemplate(id).orElseThrow(NotFoundException::new);
+        Template newTemplate = operations.updateTemplate(id, patch);
+
+        EventManager.TEMPLATE_UPDATE.emit(new ChangeEvent<>(oldTemplate, newTemplate));
+
+        return newTemplate;
     }
 
     /**
@@ -87,7 +100,12 @@ public class TemplateResource {
      * @return {@code null}.
      */
     public Template delete(Request request, Response response) {
-        boolean existed = operations.deleteTemplate(getParamInt(request, "id"));
+        int id = getParamInt(request, "id");
+
+        Optional<Template> template = operations.getTemplate(id);
+        template.map(EventManager.TEMPLATE_DELETE::emit);
+
+        boolean existed = operations.deleteTemplate(id);
 
         if (!existed) {
             throw new NotFoundException();
