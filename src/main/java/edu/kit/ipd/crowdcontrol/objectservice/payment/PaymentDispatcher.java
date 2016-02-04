@@ -2,17 +2,18 @@ package edu.kit.ipd.crowdcontrol.objectservice.payment;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import rx.Observable;
 import rx.Observer;
 
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -23,8 +24,7 @@ import java.util.stream.Collectors;
  * and uses the results of that calculation to dispatch the payments to the PlatformManager.
  */
 public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
-
-
+    private final Logger log = LogManager.getLogger(PaymentDispatcher.class);
     private final Observable<Event<ChangeEvent<Experiment>>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
     private final PlatformManager platformManager;
     private final PaymentCalculator paymentCalc;
@@ -64,13 +64,9 @@ public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
      */
     @Override
     public void onNext(ChangeEvent<Experiment> experimentChangeEvent) {
-
         if (experimentChangeEvent.getNeww().getState() == Experiment.State.STOPPED
                 && experimentChangeEvent.getOld().getState() == Experiment.State.CREATIVE_STOPPED) {
-
-
             dispatchPayment(experimentChangeEvent.getNeww());
-
         }
     }
 
@@ -87,8 +83,14 @@ public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
                         entry -> entry.getKey().getPlatform(),
                         Collectors.mapping(entry -> new PaymentJob(entry.getKey(), entry.getValue()), Collectors.toList())
                 ))
-                //TODO: replace platformId
-                .forEach((platform, paymentJobs) -> platformManager.payExperiment(platform, null, exp, paymentJobs));
+                .forEach((platform, paymentJobs) -> {
+                    try {
+                        platformManager.payExperiment(platform, exp, paymentJobs);
+                    } catch (TaskOperationException e) {
+                        //TODO maybe notify researcher?
+                        log.fatal(String.format("Unable to pay workers for platform %s", platform), e);
+                    }
+                });
     }
 
 
