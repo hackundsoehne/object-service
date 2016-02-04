@@ -4,17 +4,10 @@ import com.google.protobuf.Message;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.ErrorResponse;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ExperimentResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.NotificationResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.PlatformResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.TemplateResource;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.WorkerResource;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.InputTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.OutputTransformer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -33,6 +26,8 @@ import static spark.Spark.exception;
  * @author Niklas Keller
  */
 public class Router implements SparkApplication {
+    private static final Logger LOGGER = LogManager.getLogger(Router.class);
+
     private final TemplateResource templateResource;
     private final NotificationResource notificationResource;
     private final PlatformResource platformResource;
@@ -68,6 +63,8 @@ public class Router implements SparkApplication {
 
     @Override
     public void init() {
+        LOGGER.trace("Setting up routes for Spark.");
+
         exception(BadRequestException.class, (exception, request, response) -> {
             response.status(400);
             response.body(error(request, response, "badRequest", exception.getMessage()));
@@ -145,6 +142,8 @@ public class Router implements SparkApplication {
         get("/experiments/:id/answers", answerRatingResource::getAnswers);
         get("/experiments/:id/answers/:aid", answerRatingResource::getAnswer);
         put("/experiments/:id/answers/:aid/rating", answerRatingResource::putRating, Rating.class);
+
+        LOGGER.trace("Finished setting up routes for Spark.");
     }
 
     /**
