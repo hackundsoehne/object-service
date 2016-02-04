@@ -104,32 +104,27 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
             return completableFuture;
         }
 
-        //check if each passed worker got a assignment id
-        for(PaymentJob paymentJob : paymentJobs) {
-            Assignment assignment = workerAssignmentId.get(paymentJob.getWorkerRecord().getIdentification());
-            //check if each worker gets a assignment
-            if (assignment == null) {
-                throw new IllegalArgumentException("Worker "+paymentJob.getWorkerRecord().getIdentification()+" does not have a assignment id");
-            }
-            //check if assignments are already submitted
-            if (assignment.getAssignmentStatus().equals(AssignmentStatus.APPROVED)) {
-
-                //try to get bonus payments information
-                BigDecimal bonusAmount = new BigDecimal(0);
-                try {
-                    List<BonusPayment> bonusPayment = new GetBonusPayments(connection, id, assignment.getAssignmentId(), 1).get();
-                    //calculate how much bonus we payed
-                    for (BonusPayment bonusPayment1 : bonusPayment)
-                        bonusAmount = bonusAmount.add(bonusPayment1.getBonusAmount().getAmount());
-                    //mark it in the map
-                    bonusPayed.put(assignment.getAssignmentId(), bonusAmount);
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new IllegalArgumentException("Failed to fetch Bonus Payments information", e);
-                }
-            }
-        }
+        //verify and get all data
+        verifyConsistence(id, paymentJobs, workerAssignmentId, bonusPayed);
 
         //do the real paying
+        flushPayment(experiment, paymentJobs, workerAssignmentId, bonusPayed, jobs);
+
+        //concat all future objects to one big object
+        return CompletableFuture.supplyAsync(() ->
+                jobs.stream().map(CompletableFuture::join)
+                .filter(aBoolean -> !aBoolean).count() == 0);
+    }
+
+    /**
+     * Approve a assignment of a payment job if it is not yet and pay the bonus (or the rest of bonus) which is left
+     * @param experiment experiment to pay
+     * @param paymentJobs a list of payment jobs
+     * @param workerAssignmentId all assignments
+     * @param bonusPayed payed bonuses per assignment
+     * @param jobs list of jobs where to append new completables
+     */
+    private void flushPayment(Experiment experiment, List<PaymentJob> paymentJobs, Map<String, Assignment> workerAssignmentId, Map<String, BigDecimal> bonusPayed, List<CompletableFuture<Boolean>> jobs) {
         for(PaymentJob paymentJob : paymentJobs) {
             Assignment assignment =
                     workerAssignmentId.get(paymentJob.getWorkerRecord().getIdentification());
@@ -161,10 +156,44 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                 }
             }
         }
-        //concat all future objects to one big object
-        return CompletableFuture.supplyAsync(() ->
-                jobs.stream().map(CompletableFuture::join)
-                .filter(aBoolean -> !aBoolean).count() == 0);
+    }
+
+    /**
+     * verify if the map of assignments contains a assignment for all payment Jobs
+     *
+     * and if a assignment was already approved check how much bonus we need to pay left
+     *
+     * @param id if of the hit
+     * @param paymentJobs payment jobs
+     * @param workerAssignmentId workerid to assignment id map
+     * @param bonusPayed map which gives every assignmentid a amount of payed bonus
+     * @throws IllegalArgumentException
+     */
+    private void verifyConsistence(String id, List<PaymentJob> paymentJobs, Map<String, Assignment> workerAssignmentId, Map<String, BigDecimal> bonusPayed) throws IllegalArgumentException {
+        //check if each passed worker got a assignment id
+        for(PaymentJob paymentJob : paymentJobs) {
+            Assignment assignment = workerAssignmentId.get(paymentJob.getWorkerRecord().getIdentification());
+            //check if each worker gets a assignment
+            if (assignment == null) {
+                throw new IllegalArgumentException("Worker "+paymentJob.getWorkerRecord().getIdentification()+" does not have a assignment id");
+            }
+            //check if assignments are already submitted
+            if (assignment.getAssignmentStatus().equals(AssignmentStatus.APPROVED)) {
+
+                //try to get bonus payments information
+                BigDecimal bonusAmount = new BigDecimal(0);
+                try {
+                    List<BonusPayment> bonusPayment = new GetBonusPayments(connection, id, assignment.getAssignmentId(), 1).get();
+                    //calculate how much bonus we payed
+                    for (BonusPayment bonusPayment1 : bonusPayment)
+                        bonusAmount = bonusAmount.add(bonusPayment1.getBonusAmount().getAmount());
+                    //mark it in the map
+                    bonusPayed.put(assignment.getAssignmentId(), bonusAmount);
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new IllegalArgumentException("Failed to fetch Bonus Payments information", e);
+                }
+            }
+        }
     }
 
     private CompletableFuture<Boolean> payBonus(PaymentJob paymentJob, Assignment assignment, int amount) {
