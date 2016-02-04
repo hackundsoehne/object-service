@@ -93,12 +93,15 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
         List<CompletableFuture<Boolean>> jobs = new ArrayList<>();
 
         try {
+            int i = 0;
             //first get a hashmap of all assignmentids and worker ids
-            List<Assignment> assignmentList = new GetAssignments(connection,id,0).get();
+            List<Assignment> assignmentList = new GetAssignments(connection,id,1).get();
             while (assignmentList.size() > 0) {
                 for(Assignment assignment : assignmentList) {
                     workerAssignmentId.put(assignment.getWorkerId(), assignment);
                 }
+                i++;
+                assignmentList = new GetAssignments(connection,id,i).get();
             }
         } catch (InterruptedException | ExecutionException e) {
             CompletableFuture<Boolean> completableFuture= new CompletableFuture<>();
