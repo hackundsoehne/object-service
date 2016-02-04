@@ -4,6 +4,12 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestExceptio
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import spark.Request;
 
+/**
+ * Utility class to simplify access to request variables. Static methods can be used in the resource
+ * classes handling the HTTP requests.
+ *
+ * @author Niklas Keller
+ */
 public class RequestUtil {
     private RequestUtil() {
         // utility class

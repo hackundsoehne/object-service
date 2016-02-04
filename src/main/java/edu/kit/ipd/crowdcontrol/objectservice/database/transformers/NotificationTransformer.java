@@ -22,7 +22,6 @@ public class NotificationTransformer extends AbstractTransformer {
                 .setName(record.getName())
                 .setDescription(record.getDescription())
                 .setQuery(record.getQuery())
-                .setSendThreshold(record.getSendthreshold())
                 .setCheckPeriod(record.getCheckperiod())
                 .build();
     }
@@ -43,8 +42,6 @@ public class NotificationTransformer extends AbstractTransformer {
                 case Notification.DESCRIPTION_FIELD_NUMBER: record.setDescription(notification.getDescription());
                     break;
                 case Notification.QUERY_FIELD_NUMBER: record.setQuery(notification.getQuery());
-                    break;
-                case Notification.SEND_THRESHOLD_FIELD_NUMBER: record.setSendthreshold(notification.getSendThreshold());
                     break;
                 case Notification.CHECK_PERIOD_FIELD_NUMBER: record.setCheckperiod(notification.getCheckPeriod());
                     break;

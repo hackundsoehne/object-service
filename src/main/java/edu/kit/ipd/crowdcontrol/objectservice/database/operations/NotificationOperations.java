@@ -96,8 +96,7 @@ public class NotificationOperations extends AbstractOperations {
                 Notification.NAME_FIELD_NUMBER,
                 Notification.DESCRIPTION_FIELD_NUMBER,
                 Notification.QUERY_FIELD_NUMBER,
-                Notification.CHECK_PERIOD_FIELD_NUMBER,
-                Notification.SEND_THRESHOLD_FIELD_NUMBER);
+                Notification.CHECK_PERIOD_FIELD_NUMBER);
 
         NotificationRecord record = NotificationTransformer.mergeRecord(create.newRecord(NOTIFICATION), toStore);
         record.store();

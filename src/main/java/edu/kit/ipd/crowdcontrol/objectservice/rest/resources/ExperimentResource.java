@@ -94,8 +94,14 @@ public class ExperimentResource {
         List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);
         List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment, id);
 
-        tags.forEach(tagConstraintsOperations::insertTag);
-        constraints.forEach(tagConstraintsOperations::insertConstraint);
+        tags.stream()
+                .filter(tagRecord -> !tagRecord.getTag().isEmpty())
+                .forEach(tagConstraintsOperations::insertTag);
+
+        constraints.stream()
+                .filter(constraintRecord -> !constraintRecord.getConstraint().isEmpty())
+                .forEach(tagConstraintsOperations::insertConstraint);
+
         experiment.getPopulationsList().forEach(population -> {
             List<Integer> answerIDs = population.getCalibrationsList().stream()
                     .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
