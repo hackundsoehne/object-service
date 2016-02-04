@@ -6,8 +6,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Cons
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingOptionExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TagRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.tools.json.JSONObject;
 
 import java.lang.reflect.Type;
@@ -24,10 +26,6 @@ import java.util.stream.Collectors;
  * @author Niklas Keller
  */
 public class ExperimentTransformer extends AbstractTransformer {
-    private static Integer toInteger(int value) {
-        return Integer.newBuilder().setValue(value).build();
-    }
-
     /**
      * Convert a experiment record to a proto object with the given additional information.
      *
