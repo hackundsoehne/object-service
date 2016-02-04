@@ -127,12 +127,15 @@ public class MoneyTransferManager {
             notificationText.append("There are less than ").append(minGiftCodesCount).append(" giftcodes in the database. It is recommended to add more.").append(System.getProperty("line.separator"));
         }
         LOGGER.trace("Completed submission of giftcodes to workers.");
+
+        //sends a notification about problems with submission of giftcodes
         sendNotification();
     }
 
     private void fetchNewGiftCodes() throws MoneyTransferException {
         Message[] messages;
 
+        //fetch new mails
         try {
             messages = mailHandler.fetchUnseen("inbox");
         } catch (MessagingException e) {
@@ -140,6 +143,7 @@ public class MoneyTransferManager {
                     "It seems, that there is either a problem with the server or with the properties file.");
         }
 
+        //extract giftcodes and save them to the database
         for (Message message : messages) {
             try {
                 GiftCodeRecord rec = MailParser.parseAmazonGiftCode(message);
@@ -180,15 +184,18 @@ public class MoneyTransferManager {
             StringBuilder paymentMessage = loadMessage("src/main/resources/PaymentMessage.txt");
             StringBuilder giftCodeMessage = new StringBuilder();
 
+            //saves payment to the database
             for (GiftCodeRecord rec : giftCodes) {
                 workerBalanceOperations.addDebit(worker.getIdWorker(), rec.getAmount(), rec.getIdGiftCode());
                 giftCodeMessage.append(rec.getCode()).append(System.getProperty("line.separator"));
             }
 
+            //creates payment message
             Map<String, String> map = new HashMap<>();
             map.put("GiftCodes", giftCodeMessage.toString());
             paymentMessage = new StringBuilder(Template.apply(paymentMessage.toString(), map));
 
+            //sends payment message
             try {
                 mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage.toString());
             } catch (MessagingException e) {
