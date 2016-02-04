@@ -6,22 +6,21 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceO
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.Result;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
 import java.io.*;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Describes a Manager for money transfers. The Manager can log payments and pay off.
@@ -30,20 +29,16 @@ import org.apache.logging.log4j.Logger;
  */
 public class MoneyTransferManager {
 
+    private static final Logger LOGGER = LogManager.getLogger(MoneyTransferManager.class);
     private MailHandler mailHandler;
     private WorkerBalanceOperations workerBalanceOperations;
     private WorkerOperations workerOperations;
-
     private int payOffThreshold;
     private int minGiftCodesCount;
-
     private String notificationMailAddress;
     private StringBuilder notificationText;
-
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> schedule = null;
-
-    private static final Logger LOGGER = LogManager.getLogger(MoneyTransferManager.class);
 
 
     /**
@@ -76,7 +71,11 @@ public class MoneyTransferManager {
             try {
                 submitGiftCodes();
             } catch (MoneyTransferException e) {
-                sendErrorMessage(e.toString());
+                try {
+                    sendNotification(e.toString(), true);
+                } catch (MoneyTransferException f) {
+                    LOGGER.error(f);
+                }
                 LOGGER.error(e);
             }
         };
@@ -107,6 +106,7 @@ public class MoneyTransferManager {
 
     /**
      * Pays all workers depending on their logged money transfers.
+     * @throws MoneyTransferException gets thrown, if an error occurred
      */
     public void submitGiftCodes() throws MoneyTransferException {
         LOGGER.trace("Started fetching new giftcodes.");
@@ -129,9 +129,14 @@ public class MoneyTransferManager {
         LOGGER.trace("Completed submission of giftcodes to workers.");
 
         //sends a notification about problems with submission of giftcodes
-        sendNotification();
+        sendNotification(notificationText.toString(), false);
     }
 
+    /**
+     * Fetches new giftcodes from the mailbox and saves them in the database.
+     *
+     * @throws MoneyTransferException gets thrown, if an error occurred
+     */
     private void fetchNewGiftCodes() throws MoneyTransferException {
         Message[] messages;
 
@@ -147,7 +152,9 @@ public class MoneyTransferManager {
         for (Message message : messages) {
             try {
                 GiftCodeRecord rec = MailParser.parseAmazonGiftCode(message);
-                workerBalanceOperations.addGiftCode(rec.getCode(), rec.getAmount());
+                if (rec != null) {
+                    workerBalanceOperations.addGiftCode(rec.getCode(), rec.getAmount());
+                }
             } catch (MoneyTransferException e) {
                 try {
                     mailHandler.markAsUnseen(message);
@@ -159,6 +166,13 @@ public class MoneyTransferManager {
         }
     }
 
+    /**
+     * Chooses the giftcodes, a worker receives as payment.
+     *
+     * @param worker    the worker to pay
+     * @param giftCodes all giftcodes
+     * @return returns the list of the chosen giftcodes
+     */
     private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
         List<GiftCodeRecord> payedCodes = new ArrayList<>();
         int creditBalance = workerBalanceOperations.getBalance(worker.getIdWorker());
@@ -179,6 +193,13 @@ public class MoneyTransferManager {
         return payedCodes;
     }
 
+    /**
+     * Builds the payment message and sends giftcodes to the worker.
+     *
+     * @param worker    the worker to pay
+     * @param giftCodes the giftcodes to send
+     * @throws MoneyTransferException gets thrown, if an error occured
+     */
     private void payWorker(WorkerRecord worker, List<GiftCodeRecord> giftCodes) throws MoneyTransferException {
         if (!giftCodes.isEmpty()) {
             StringBuilder paymentMessage = loadMessage("src/main/resources/PaymentMessage.txt");
@@ -186,7 +207,6 @@ public class MoneyTransferManager {
 
             //saves payment to the database
             for (GiftCodeRecord rec : giftCodes) {
-                workerBalanceOperations.addDebit(worker.getIdWorker(), rec.getAmount(), rec.getIdGiftCode());
                 giftCodeMessage.append(rec.getCode()).append(System.getProperty("line.separator"));
             }
 
@@ -198,6 +218,9 @@ public class MoneyTransferManager {
             //sends payment message
             try {
                 mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage.toString());
+                for (GiftCodeRecord rec : giftCodes) {
+                    workerBalanceOperations.addDebit(worker.getIdWorker(), rec.getAmount(), rec.getIdGiftCode());
+                }
             } catch (MessagingException e) {
                 throw new MoneyTransferException("The MailHandler couldnt send mails to crowdworkers." +
                         "It seems, that there is either a problem with the server or with the properties file.");
@@ -207,17 +230,30 @@ public class MoneyTransferManager {
         }
     }
 
-    private void sendNotification() throws MoneyTransferException {
-        StringBuilder message = new StringBuilder();
-        message.append("Dear administrator, ").append(System.getProperty("line.separator"));
-        message.append("we want to give you the following information:").append(System.getProperty("line.separator"));
-        message.append(notificationText);
+    /**
+     * Sends a notification about problems or errors during payment to the administrator.
+     *
+     * @param message the message to send
+     * @param criticalError the urgency of the problem
+     * @throws MoneyTransferException gets thrown, if an error occurred
+     */
+    private void sendNotification(String message, boolean criticalError) throws MoneyTransferException {
+        StringBuilder mail;
+        String subject;
+        if (criticalError) {
+            mail = loadMessage("src/main/resources/errorMoneyTransferMessage.txt");
+            subject = "Payment Error occurred";
+        } else {
+            mail = loadMessage("src/main/resources/notificationMoneyTransferMessage.txt");
+            subject = "Payment Notification";
+        }
 
+        mail = mail.append(message);
         try {
             if (notificationText.length() != 0) {
-                LOGGER.trace("Started sending a notification about problems with submission of giftcodes.");
-                mailHandler.sendMail(notificationMailAddress, "Payment Notification", message.toString());
-                LOGGER.trace("Completed sending a notification about problems with submission of giftcodes.");
+                LOGGER.trace("Started sending a notification about problems or errors with submission of giftcodes.");
+                mailHandler.sendMail(notificationMailAddress, subject, mail.toString());
+                LOGGER.trace("Completed sending a notification about problems or errors with submission of giftcodes.");
             }
         } catch (MessagingException e) {
             throw new MoneyTransferException("The MailHandler couldnt send mails to the administrator." +
@@ -227,19 +263,14 @@ public class MoneyTransferManager {
         }
     }
 
-    private void sendErrorMessage(String errorMessage) {
-        StringBuilder message = new StringBuilder();
-        message.append("Dear administrator, ").append(System.getProperty("line.separator"));
-        message.append("it seems, that a critical error during payment occured:").append(System.getProperty("line.separator"));
-        message.append(errorMessage);
 
-        try {
-            mailHandler.sendMail(notificationMailAddress, "Payment Error occured", errorMessage);
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            LOGGER.error(e);
-        }
-    }
-
+    /**
+     * Loads a string from a file.
+     *
+     * @param path the path to the file
+     * @return the StringBuilder to return
+     * @throws MoneyTransferException gets thrown, if an error occurred
+     */
     private StringBuilder loadMessage(String path) throws MoneyTransferException {
         StringBuilder content = new StringBuilder();
 

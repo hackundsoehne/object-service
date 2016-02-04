@@ -15,9 +15,23 @@ import java.util.regex.Pattern;
  */
 public class MailParser {
 
+    /**
+     * Extracts a giftcode out of a message.
+     *
+     * @param msg the message, to extract the code
+     * @return returns the giftcode
+     * @throws MoneyTransferException gets thrown, if an error occurred during parsing
+     */
     protected static GiftCodeRecord parseAmazonGiftCode(Message msg) throws MoneyTransferException {
         //Extract Message
         String message = "";
+        try {
+            if (!msg.getFrom()[0].toString().toLowerCase().contains("amazon.de")) {
+                return null;
+            }
+        } catch (MessagingException e) {
+            return null;
+        }
         try {
             Multipart parts = (Multipart) msg.getContent();
             BodyPart body = parts.getBodyPart(0);
@@ -25,13 +39,7 @@ public class MailParser {
             BodyPart textBody = innerMsg.getBodyPart(0);
             message = textBody.getContent().toString();
         } catch (ClassCastException | MessagingException | IOException e) {
-            try {
-                if (msg.getFrom()[0].toString().toLowerCase().contains("amazon.de")) {
-                    throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.");
-                }
-            } catch (MessagingException f) {
-                //Nothing to do
-            }
+            throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.");
         }
         //Parse Message
         String messageStr = message.replaceAll(" ", "");
@@ -60,7 +68,12 @@ public class MailParser {
         return rec;
     }
 
-
+    /**
+     * Checks, whether all groups of a matcher are identical.
+     *
+     * @param matcher the matcher to check
+     * @return returns, whether the groups are identical
+     */
     private static boolean checkMatches(Matcher matcher) {
         boolean match = true;
         //checks, if the groups of the matcher are identical

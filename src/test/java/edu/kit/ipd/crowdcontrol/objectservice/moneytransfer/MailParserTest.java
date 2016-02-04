@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.mail.*;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
@@ -29,6 +30,7 @@ public class MailParserTest {
         Session session = Session.getInstance(props,auth );
 
         MimeMessage mail = new MimeMessage(session);
+        mail.setFrom(new InternetAddress("\"Amazon.de\" <gutschein-order@gc.email.amazon.de>"));
 
         MimeMultipart part = new MimeMultipart();
         mail.setContent(part);

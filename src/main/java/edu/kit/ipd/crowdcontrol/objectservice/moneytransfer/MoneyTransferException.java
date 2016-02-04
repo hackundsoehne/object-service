@@ -7,6 +7,10 @@ package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
  */
 public class MoneyTransferException extends Exception {
 
+    /**
+     * Creates a new MoneyTransferException
+     * @param message the message of the exception
+     */
     public MoneyTransferException(String message) {
         super(message);
     }
