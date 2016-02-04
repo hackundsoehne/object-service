@@ -4,6 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.apache.logging.log4j.LogManager;
@@ -95,6 +96,7 @@ public class Main {
 
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
+        QualityIdentificator.init(answerRatingOperations,experimentOperations);
 
         new Router(
                 new TemplateResource(templateOperations),

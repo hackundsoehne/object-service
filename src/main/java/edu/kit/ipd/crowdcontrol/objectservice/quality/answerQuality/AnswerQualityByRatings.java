@@ -14,6 +14,10 @@ import java.util.List;
  */
 public class AnswerQualityByRatings implements AnswerQualityStrategy {
 
+    private final String algorithmName = "AnswerQualityByRatings";
+    private final String algorithmDescription = "Identifies the quality of answers based on its ratings. " +
+            "\nThe answer's quality is equal to the rounded average of all its ratings ";
+
     /**
      * Identifies the quality of an answer based on its ratings.
      * The answer's quality is equal to the average (rounded down) of all its ratings.
@@ -37,10 +41,18 @@ public class AnswerQualityByRatings implements AnswerQualityStrategy {
             }
             answerQuality += rating.getRating();
         }
-
-        answerQuality = answerQuality / ratings.size();
-
+        answerQuality = (int)Math.round(answerQuality / (double)ratings.size());
         return answerQuality;
+    }
+
+    @Override
+    public String getAlgorithmName() {
+        return algorithmName;
+    }
+
+    @Override
+    public String getAlgorithmDescription() {
+        return algorithmDescription;
     }
 
 

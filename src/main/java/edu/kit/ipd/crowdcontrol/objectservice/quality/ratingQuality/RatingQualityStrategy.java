@@ -14,6 +14,8 @@ import java.util.Map;
  */
 public interface RatingQualityStrategy {
 
+
+
     /**
      * Identifies the quality of a set of ratings
      *
@@ -22,4 +24,16 @@ public interface RatingQualityStrategy {
      * @throws IllegalArgumentException If ratings have a illegal value
      */
     Map<RatingRecord, Integer> identifyRatingQuality(List<RatingRecord> ratings, int maximumQuality, int minimumQuality) throws IllegalArgumentException;
+
+    /**
+     * Get the name of the implementing algorithm
+     * @return name of the algorithm
+     */
+    String getAlgorithmName();
+
+    /**
+     * Gets the description of the implementing algorithm
+     * @return a description of the algorithm
+     */
+    String getAlgorithmDescription();
 }
