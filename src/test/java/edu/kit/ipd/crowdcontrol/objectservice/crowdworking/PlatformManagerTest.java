@@ -1,14 +1,12 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,9 +35,9 @@ public class PlatformManagerTest {
     @BeforeClass
     public static void setUp() {
         platforms = new ArrayList<>();
-        platforms.add( new PlatformTest("test1", true, false, false, false));
-        platforms.add( new PlatformTest("test2", false, true, false, true));
-        platforms.add( new PlatformTest("test3", true, false, true, true));
+        platforms.add( new PlatformTest("test1", "test 1", true, false, false, false));
+        platforms.add( new PlatformTest("test2", "test 2", false, true, false, true));
+        platforms.add( new PlatformTest("test3", "test 3", true, false, true, true));
     }
     @Before
     public void prepare() {
@@ -75,8 +73,8 @@ public class PlatformManagerTest {
             record.setStatus(TaskStatus.running);
             record2.setStatus(TaskStatus.running);
 
-            record.setCrowdPlatform(platform.getName());
-            record2.setCrowdPlatform(platform.getName());
+            record.setCrowdPlatform(platform.getType());
+            record2.setCrowdPlatform(platform.getType());
 
             record2.setPlatformData(42 + "");
 
@@ -84,7 +82,7 @@ public class PlatformManagerTest {
             when(tasksOps.updateTask(record2)).thenReturn(true);
 
             try {
-                manager.publishTask(platform.getName(), experiment).join();
+                manager.publishTask(platform.getType(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
@@ -103,9 +101,9 @@ public class PlatformManagerTest {
             record.setStatus(TaskStatus.running);
             record.setPlatformData(42 + "");
 
-            when(tasksOps.getTask(platform.getName(), experiment.getId())).thenReturn(Optional.of(record));
+            when(tasksOps.getTask(platform.getType(), experiment.getId())).thenReturn(Optional.of(record));
             try {
-                manager.updateTask(platform.getName(), experiment).join();
+                manager.updateTask(platform.getType(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
@@ -117,13 +115,13 @@ public class PlatformManagerTest {
         platforms.forEach(platform -> {
             TaskRecord record = new TaskRecord();
             record.setExperiment(42);
-            record.setCrowdPlatform(platform.getName());
+            record.setCrowdPlatform(platform.getType());
             record.setStatus(TaskStatus.running);
             record.setPlatformData(42+"");
 
-            when(tasksOps.getTask(platform.getName(),experiment.getId())).thenReturn(Optional.of(record));
+            when(tasksOps.getTask(platform.getType(),experiment.getId())).thenReturn(Optional.of(record));
             try {
-                manager.unpublishTask(platform.getName(), experiment).join();
+                manager.unpublishTask(platform.getType(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
@@ -138,20 +136,21 @@ public class PlatformManagerTest {
         private boolean handleWorker;
         private boolean renderCalib;
         private String name;
+        private String type;
 
-        public PlatformTest(String name, boolean needEmail, boolean handlePayment,
+        public PlatformTest(String type, String name, boolean needEmail, boolean handlePayment,
                             boolean renderCalib, boolean handleWorker) {
             this.name = name;
             this.needEmail = needEmail;
             this.handlePayment = handlePayment;
             this.renderCalib = renderCalib;
             this.handleWorker = handleWorker;
-
+            this.type = type;
         }
 
         public PlatformRecord toRecord() {
             PlatformRecord record = new PlatformRecord();
-
+            record.setIdPlatform(type);
             record.setName(name);
             record.setNeedsEmail(needEmail);
             record.setRenderCalibrations(renderCalib);
@@ -178,6 +177,11 @@ public class PlatformManagerTest {
         @Override
         public String getName() {
             return name;
+        }
+
+        @Override
+        public String getType() {
+            return type;
         }
 
         @Override
