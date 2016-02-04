@@ -12,6 +12,7 @@ import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKER;
@@ -193,5 +194,16 @@ public class WorkerOperations extends AbstractOperations {
         record.store();
 
         return WorkerTransformer.toProto(record);
+    }
+
+    /**
+     * Get Workers which gave at least one answer on a experiment, from the given platform
+     * @param experimentId experiment which was worked on
+     * @param platformname name of the platform of the worker
+     * @return A list of workerrecords
+     */
+    public List<WorkerRecord> getWorkerWithWork(int experimentId, String platformname) {
+        //TODO FIXME LEANDER AAAAAH!
+        return null;
     }
 }
