@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.CalibrationOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
@@ -9,6 +10,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.ConflictException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
+
+import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
@@ -67,6 +70,8 @@ public class CalibrationResource {
             throw new BadRequestException("Missing at least one required parameter.");
         }
 
+        EventManager.CALIBRATION_CREATE.emit(calibration);
+
         response.status(201);
         response.header("Location", "/calibrations/" + calibration.getId());
 
@@ -80,8 +85,13 @@ public class CalibrationResource {
      * @return {@code null}.
      */
     public Calibration delete(Request request, Response response) {
+        int id = getParamInt(request, "id");
+
         try {
-            boolean existed = operations.deleteCalibration(getParamInt(request, "id"));
+            Optional<Calibration> calibration = operations.getCalibration(id);
+            calibration.map(EventManager.CALIBRATION_DELETE::emit);
+
+            boolean existed = operations.deleteCalibration(id);
 
             if (!existed) {
                 throw new NotFoundException("Calibration does not exist!");
