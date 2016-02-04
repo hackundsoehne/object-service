@@ -6,11 +6,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceO
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
-import org.eclipse.jetty.util.IO;
+
 import org.jooq.Result;
-import org.jooq.util.derby.sys.Sys;
 
 import java.io.*;
+
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,6 +19,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Describes a Manager for money transfers. The Manager can log payments and pay off.
@@ -39,6 +42,8 @@ public class MoneyTransferManager {
 
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> schedule = null;
+
+    private static final Logger LOGGER = LogManager.getRootLogger();
 
 
     /**
@@ -72,7 +77,7 @@ public class MoneyTransferManager {
                 submitGiftCodes();
             } catch (MoneyTransferException e) {
                 sendErrorMessage(e.toString());
-                //TODO: log to stderr
+                LOGGER.error(e);
             }
         };
 
@@ -104,8 +109,11 @@ public class MoneyTransferManager {
      * Pays all workers depending on their logged money transfers.
      */
     public void submitGiftCodes() throws MoneyTransferException {
+        LOGGER.trace("Started fetching new giftcodes.");
         fetchNewGiftCodes();
+        LOGGER.trace("Completed fetching new giftcodes.");
 
+        LOGGER.trace("Started submission of giftcodes to workers.");
         Result<WorkerRecord> workers = workerOperations.getWorkerWithCreditBalanceGreaterOrEqual(payOffThreshold);
         List<GiftCodeRecord> giftCodes = workerBalanceOperations.getUnusedGiftCodes();
 
@@ -118,7 +126,7 @@ public class MoneyTransferManager {
         if (giftCodes.size() < minGiftCodesCount) {
             notificationText.append("There are less than ").append(minGiftCodesCount).append(" giftcodes in the database. It is recommended to add more.").append(System.getProperty("line.separator"));
         }
-
+        LOGGER.trace("Completed submission of giftcodes to workers.");
         sendNotification();
     }
 
@@ -187,21 +195,28 @@ public class MoneyTransferManager {
                 throw new MoneyTransferException("The MailHandler couldnt send mails to crowdworkers." +
                         "It seems, that there is either a problem with the server or with the properties file.");
             } catch (UnsupportedEncodingException e) {
-                //TODO: log to stderr
+                LOGGER.error(e);
             }
         }
     }
 
-    private void sendNotification() {
+    private void sendNotification() throws MoneyTransferException {
         StringBuilder message = new StringBuilder();
         message.append("Dear administrator, ").append(System.getProperty("line.separator"));
         message.append("we want to give you the following information:").append(System.getProperty("line.separator"));
         message.append(notificationText);
 
         try {
-            mailHandler.sendMail(notificationMailAddress, "Payment Notification", message.toString());
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            //TODO: log to stderr
+            if (notificationText.length() != 0) {
+                LOGGER.trace("Started sending a notification about problems with submission of giftcodes.");
+                mailHandler.sendMail(notificationMailAddress, "Payment Notification", message.toString());
+                LOGGER.trace("Completed sending a notification about problems with submission of giftcodes.");
+            }
+        } catch (MessagingException e) {
+            throw new MoneyTransferException("The MailHandler couldnt send mails to the administrator." +
+                    "It seems, that there is either a problem with the server or with the properties file.");
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error(e);
         }
     }
 
@@ -214,7 +229,7 @@ public class MoneyTransferManager {
         try {
             mailHandler.sendMail(notificationMailAddress, "Payment Error occured", errorMessage);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            //TODO: log to stderr
+            LOGGER.error(e);
         }
     }
 
