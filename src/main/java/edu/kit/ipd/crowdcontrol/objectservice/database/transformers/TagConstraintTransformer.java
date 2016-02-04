@@ -10,11 +10,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * handles the transformation of the Tags and Constraints from and to the protobuf-definitions
- * @author Marcel Hollderbach
+ * Handles transformations of tags and constraints from and to the protocol buffer messages.
+ *
+ * @author Marcel Hollerbach
  */
 public class TagConstraintTransformer extends AbstractTransformer {
-
     /**
      * Converts a record into a proto object
      * @param record The record to convert

@@ -96,8 +96,7 @@ public class NotificationOperations extends AbstractOperations {
                 Notification.NAME_FIELD_NUMBER,
                 Notification.DESCRIPTION_FIELD_NUMBER,
                 Notification.QUERY_FIELD_NUMBER,
-                Notification.CHECK_PERIOD_FIELD_NUMBER,
-                Notification.SEND_THRESHOLD_FIELD_NUMBER);
+                Notification.CHECK_PERIOD_FIELD_NUMBER);
 
         NotificationRecord record = NotificationTransformer.mergeRecord(create.newRecord(NOTIFICATION), toStore);
         record.store();
@@ -146,10 +145,11 @@ public class NotificationOperations extends AbstractOperations {
      * @return tre if updated, false if not found
      */
     public boolean updateLastSendForNotification(int notificationID) {
-        return create.update(Tables.NOTIFICATION)
-                .set(Tables.NOTIFICATION.LASTSENT, Timestamp.valueOf(LocalDateTime.now()))
-                .where(Tables.NOTIFICATION.ID_NOTIFICATION.eq(notificationID))
-                .execute() == 1;
+        //TODO? wait for simon!
+        return true;//create.update(Tables.NOTIFICATION)
+                //.set(Tables.NOTIFICATION.LASTSENT, Timestamp.valueOf(LocalDateTime.now()))
+                //.where(Tables.NOTIFICATION.ID_NOTIFICATION.eq(notificationID))
+                //.execute() == 1;
     }
 
     /**

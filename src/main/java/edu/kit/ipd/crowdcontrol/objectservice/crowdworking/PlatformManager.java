@@ -131,6 +131,8 @@ public class PlatformManager {
      * Publish the given experiment on the platform.
      * The method will update the database with the new public task
      *
+     * If a exception is thrown NO TaskRecord is created, this means the Experiment will still be known as "unpublished"
+     *
      * @param name The name of the platform
      * @param experiment The experiment to publish
      * @return None if the platform does not exist
@@ -150,13 +152,22 @@ public class PlatformManager {
                 .map(platform1 -> platform1.publishTask(experiment))
                 .orElseThrow(() -> new IllegalArgumentException("Platform not found!"))
                 .handle((s1, throwable) -> {
-                    if (s1 != null) {
+                    //if the creation was successful update the task
+                    if (s1 != null && throwable == null && !s1.isEmpty()) {
                         result.setPlatformData(s1);
-                    } else {
-                        result.setStatus(TaskStatus.stopped);
+                        if (!tasksOps.updateTask(result)) {
+                            throw new IllegalStateException("Updating record for published task failed");
+                        }
                     }
-                    if (!tasksOps.updateTask(result)) {
-                        throw new IllegalStateException("Updating record for published task failed");
+                    //if there is no useful key throw!
+                    if (s1 != null && s1.isEmpty()) {
+                        tasksOps.deleteTask(result);
+                        throw new IllegalStateException("Platform "+name+" does not provide any useful key");
+                    }
+                    //if not rethrow the exception and delete the task
+                    if (throwable != null) {
+                        tasksOps.deleteTask(result);
+                        throw new RuntimeException(throwable);
                     }
                     return true;
                 });
@@ -229,13 +240,19 @@ public class PlatformManager {
     }
 
     /**
-     * Pay a worker
-     * @param name The name of the platform
-     * @param worker Worker to pay
-     * @param amount The amount of money
-     * @return A completable future which returns the success of the call
+     * Pay all worker of a experiment
+     *
+     * The passed list of paymentJobs contains all worker which have submitted a answer.
+     * If the worker should not get payed because of bad ratings the amount should be smaller
+     * than the basepayment of the experiment.
+     *
+     * @param name name of the platform
+     * @param id id which is returned by publishTask
+     * @param experiment experiment which is published
+     * @param paymentJobs tuples which are defining the amount to pay
+     * @return
      */
-    public CompletableFuture<Boolean> payWorker(String name, Worker worker, int amount) {
-        return getPlatformPayment(name).payWorker(worker, amount);
+    public CompletableFuture<Boolean> payExperiment(String name, String id, Experiment experiment, List<PaymentJob> paymentJobs) {
+        return getPlatformPayment(name).payExperiment(id, experiment,paymentJobs);
     }
 }
