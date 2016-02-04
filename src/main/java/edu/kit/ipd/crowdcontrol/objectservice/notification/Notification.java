@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +14,9 @@ import java.util.List;
  * @version 1.0
  */
 public class Notification implements Runnable {
-    private int ID;
+    private static final Logger LOGGER = LogManager.getRootLogger();
+
+    private int id;
     private String name;
     private String description;
     private int checkPeriod;
@@ -24,7 +28,7 @@ public class Notification implements Runnable {
     /**
      * Creates a new instance of Notification.
      *
-     * @param ID             the id of the notification
+     * @param id             the id of the notification
      * @param name           the name of the notification
      * @param description    the description of the notification
      * @param checkPeriod    the period of time in seconds that has to pass before the next check
@@ -33,9 +37,9 @@ public class Notification implements Runnable {
      * @param receiverEmails email addresses the notification will be sent to
      * @param policy         the policy to check and send a notification
      */
-    public Notification(int ID, String name, String description, int checkPeriod, String query, boolean sendOnce,
+    public Notification(int id, String name, String description, int checkPeriod, String query, boolean sendOnce,
                         List<String> receiverEmails, NotificationPolicy policy) {
-        this.ID = ID;
+        this.id = id;
         this.name = name;
         this.description = description;
         this.checkPeriod = checkPeriod;
@@ -76,7 +80,7 @@ public class Notification implements Runnable {
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Notification toProtobuf() {
         edu.kit.ipd.crowdcontrol.objectservice.proto.Notification.Builder builder =
                 edu.kit.ipd.crowdcontrol.objectservice.proto.Notification.newBuilder()
-                        .setId(getID())
+                        .setId(getId())
                         .setName(getName())
                         .setDescription(getDescription())
                         .setCheckPeriod(getCheckPeriod())
@@ -92,10 +96,9 @@ public class Notification implements Runnable {
     public void run() {
         try {
             policy.invoke(this);
-        } catch (RuntimeException re) {
-            // TODO logger
+        } catch (RuntimeException e) {
+            LOGGER.error("An Exception occurred while checking or sending a notification.", e);
         }
-
     }
 
     /**
@@ -120,10 +123,10 @@ public class Notification implements Runnable {
     }
 
     /**
-     * @return the ID
+     * @return the id
      */
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
     /**
@@ -154,7 +157,7 @@ public class Notification implements Runnable {
 
         Notification that = (Notification) o;
 
-        if (ID != that.ID) return false;
+        if (id != that.id) return false;
         if (checkPeriod != that.checkPeriod) return false;
         if (sendOnce != that.sendOnce) return false;
         if (!name.equals(that.name)) return false;
@@ -167,7 +170,7 @@ public class Notification implements Runnable {
 
     @Override
     public int hashCode() {
-        int result = ID;
+        int result = id;
         result = 31 * result + name.hashCode();
         result = 31 * result + description.hashCode();
         result = 31 * result + checkPeriod;

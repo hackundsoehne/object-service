@@ -52,11 +52,11 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
                 // the result has the required columns, so we can bring it in a handier format
                 Map<Integer, NotificationTokenRecord> tokenRecords = result.stream()
                         .map(record -> new NotificationTokenRecord(null, record.getValue("id", Integer.class),
-                                record.getValue("token", String.class), notification.getID())
+                                record.getValue("token", String.class), notification.getId())
                         )
                         .collect(Collectors.toMap(NotificationTokenRecord::getResultId, Function.identity()));
 
-                List<String> newTokenList = operations.diffTokenRecords(tokenRecords, notification.getID()).stream()
+                List<String> newTokenList = operations.diffTokenRecords(tokenRecords, notification.getId()).stream()
                         .map(NotificationTokenRecord::getResultToken)
                         .collect(Collectors.toList());
                 if (!newTokenList.isEmpty()) {
@@ -74,7 +74,7 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
     protected void send(Notification notification, List<String> tokens) {
         StringBuilder message = new StringBuilder();
 
-        // TODO fancy pancy html + css styled body with beautiful design and chocolate flavor
+        // TODO fancy pancy html + css styled body with beautiful design and chocolate flavor ...if there is time
         if (tokens.isEmpty()) {
             message.append(notification.getDescription());
         } else {
@@ -88,12 +88,12 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
             }
         }
 
-        String subject = "[CrowdControl Benachrichtigung] " + notification.getName();
+        String subject = "[CrowdControl] " + notification.getName();
         try {
             for (String receiver : notification.getReceiverEmails())
             mailSender.sendMail(receiver, subject, message.toString());
         } catch (Exception e) {
-            throw new NotificationNotSentException("notification with id=" + notification.getID() + "could not be sent", e);
+            throw new NotificationNotSentException("notification with id=" + notification.getId() + "could not be sent", e);
         }
     }
 

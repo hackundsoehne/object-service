@@ -62,7 +62,7 @@ public class NotificationController {
     public void createNotification(Notification notification) {
         final ScheduledFuture<?> notificationHandle =
                 scheduler.scheduleAtFixedRate(notification, 0, notification.getCheckPeriod(), TimeUnit.SECONDS);
-        handleMap.put(notification.getID(), notificationHandle);
+        handleMap.put(notification.getId(), notificationHandle);
     }
 
     /**
@@ -82,7 +82,7 @@ public class NotificationController {
      * @throws IllegalArgumentException if the given notification does not exist inside the module
      */
     public void deleteNotification(Notification notification) {
-        deleteNotification(notification.getID());
+        deleteNotification(notification.getId());
     }
 
     private void deleteNotification(int id) {

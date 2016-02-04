@@ -71,7 +71,7 @@ public class SQLEmailNotificationPolicyTest {
             idTokenRecord.setValue(idField, i);
             idTokenRecord.setValue(tokenField, token);
             resultWithIdAndToken.add(idTokenRecord);
-            tokenRecordMap.put(i, new NotificationTokenRecord(null, i, token, notification.getID()));
+            tokenRecordMap.put(i, new NotificationTokenRecord(null, i, token, notification.getId()));
         }
     }
 
@@ -99,7 +99,7 @@ public class SQLEmailNotificationPolicyTest {
     @Test
     public void testCheckWithIdAndToken2NewRecords() throws Exception {
         when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(resultWithIdAndToken);
-        when(notificationOperations.diffTokenRecords(tokenRecordMap, notification.getID()))
+        when(notificationOperations.diffTokenRecords(tokenRecordMap, notification.getId()))
                 //only return the first 2 records
                 .thenReturn(tokenRecordMap.values().stream().limit(2).collect(Collectors.toList()));
         List<String> tokens = policy.check(notification);
@@ -109,7 +109,7 @@ public class SQLEmailNotificationPolicyTest {
     @Test
     public void testCheckWithIdAndTokenNoNewRecords() throws Exception {
         when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(resultWithIdAndToken);
-        when(notificationOperations.diffTokenRecords(tokenRecordMap, notification.getID()))
+        when(notificationOperations.diffTokenRecords(tokenRecordMap, notification.getId()))
                 .thenReturn(Collections.emptyList());
         List<String> tokens = policy.check(notification);
         assertNull(tokens);

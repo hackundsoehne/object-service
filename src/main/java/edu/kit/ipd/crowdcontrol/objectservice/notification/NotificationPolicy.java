@@ -15,13 +15,18 @@ import java.util.Collection;
 public abstract class NotificationPolicy<T extends Collection<?>> {
     private NotificationOperations operations;
 
+    /**
+     * Checks a notification's condition and sends the notification if the condition is met
+     *
+     * @param notification the notification to check and send
+     */
     public void invoke(Notification notification) {
             T tokens = check(notification);
             if (tokens != null) {
                 send(notification, tokens);
 
                 if (notification.isSendOnce()) {
-                    operations.deleteNotification(notification.getID());
+                    operations.deleteNotification(notification.getId());
                     // will cause the notification to be removed from the scheduler
                     EventManager.NOTIFICATION_DELETE.emit(notification.toProtobuf());
                 }
