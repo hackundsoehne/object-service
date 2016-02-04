@@ -4,6 +4,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestExceptio
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import spark.Request;
 
+/**
+ * Utility class to simplify access to request variables.
+ *
+ * @author Niklas Keller
+ */
 public class RequestUtil {
     private RequestUtil() {
         // utility class
