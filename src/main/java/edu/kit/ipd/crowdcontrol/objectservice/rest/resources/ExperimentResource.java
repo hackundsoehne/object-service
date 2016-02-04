@@ -334,7 +334,8 @@ public class ExperimentResource {
 
         experiment.getAlgorithmQualityRating().getParametersList().forEach(param -> algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue()));
 
-        if (!Objects.equals(old.getTemplateId(), experimentRecord.getTemplate())) {
+        //TODO fix!
+        if (!Objects.equals(old.getTemplateId() , experimentRecord.getTemplate())) {
             experimentOperations.deleteRatingOptions(id);
         }
 

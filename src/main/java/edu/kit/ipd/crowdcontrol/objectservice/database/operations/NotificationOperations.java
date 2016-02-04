@@ -145,10 +145,11 @@ public class NotificationOperations extends AbstractOperations {
      * @return tre if updated, false if not found
      */
     public boolean updateLastSendForNotification(int notificationID) {
-        return create.update(Tables.NOTIFICATION)
-                .set(Tables.NOTIFICATION.LASTSENT, Timestamp.valueOf(LocalDateTime.now()))
-                .where(Tables.NOTIFICATION.ID_NOTIFICATION.eq(notificationID))
-                .execute() == 1;
+        //TODO? wait for simon!
+        return true;//create.update(Tables.NOTIFICATION)
+                //.set(Tables.NOTIFICATION.LASTSENT, Timestamp.valueOf(LocalDateTime.now()))
+                //.where(Tables.NOTIFICATION.ID_NOTIFICATION.eq(notificationID))
+                //.execute() == 1;
     }
 
     /**
