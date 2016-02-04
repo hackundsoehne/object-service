@@ -85,7 +85,7 @@ public class MoneyTransferManager {
      * @param workerID the id of the worker, who gets the money
      * @param amount   the amount of money in ct
      */
-    public void logMoneyTransfer(int workerID, int amount, int expID) {
+    public void addMoneyTransfer(int workerID, int amount, int expID) {
         workerBalanceOperations.addCredit(workerID, amount, expID);
     }
 
@@ -96,11 +96,9 @@ public class MoneyTransferManager {
         fetchNewGiftCodes();
 
         Result<WorkerRecord> workers = workerOperations.getWorkerWithCreditBalanceGreaterOrEqual(payOffThreshold);
-        Iterator<WorkerRecord> workerIt = workers.iterator();
         List<GiftCodeRecord> giftCodes = workerBalanceOperations.getUnusedGiftCodes();
 
-        while (workerIt.hasNext()) {
-            WorkerRecord worker = workerIt.next();
+        for (WorkerRecord worker : workers) {
             List<GiftCodeRecord> payedCodesForWorker = chooseGiftCodes(worker, giftCodes);
 
             giftCodes = workerBalanceOperations.getUnusedGiftCodes();
@@ -136,20 +134,18 @@ public class MoneyTransferManager {
     private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
         List<GiftCodeRecord> payedCodes = new LinkedList<>();
         int creditBalance = workerBalanceOperations.getBalance(worker.getIdWorker());
-        Iterator<GiftCodeRecord> giftCodesIt = giftCodes.iterator();
 
-        while (giftCodesIt.hasNext()) {
+        for (GiftCodeRecord nextCode : giftCodes) {
             if (creditBalance == 0) {
                 break;
             }
-            GiftCodeRecord nextCode = giftCodesIt.next();
             if (nextCode.getAmount() <= creditBalance) {
                 payedCodes.add(nextCode);
                 creditBalance -= nextCode.getAmount();
             }
         }
 
-        if (!giftCodesIt.hasNext() && creditBalance >= 15) {
+        if (creditBalance >= payOffThreshold && creditBalance >= 15 && !payedCodes.isEmpty()) {
             notificationText = notificationText.append("A worker has pending Payments in the amount of ").append(creditBalance).append("ct. Please add giftcodes, so the payment of the worker can be continued.").append(System.getProperty("line.separator"));
         }
         return payedCodes;
