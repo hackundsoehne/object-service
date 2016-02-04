@@ -259,77 +259,64 @@ public interface ExperimentOrBuilder extends
   getPlaceholders();
 
   /**
-   * <code>optional .crowdcontrol.Integer payment_quality_threshold_answer = 20;</code>
+   * <code>optional .crowdcontrol.Integer payment_quality_threshold = 20;</code>
    */
-  boolean hasPaymentQualityThresholdAnswer();
+  boolean hasPaymentQualityThreshold();
   /**
-   * <code>optional .crowdcontrol.Integer payment_quality_threshold_answer = 20;</code>
+   * <code>optional .crowdcontrol.Integer payment_quality_threshold = 20;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getPaymentQualityThresholdAnswer();
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getPaymentQualityThreshold();
   /**
-   * <code>optional .crowdcontrol.Integer payment_quality_threshold_answer = 20;</code>
+   * <code>optional .crowdcontrol.Integer payment_quality_threshold = 20;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getPaymentQualityThresholdAnswerOrBuilder();
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getPaymentQualityThresholdOrBuilder();
 
   /**
-   * <code>optional .crowdcontrol.Integer payment_quality_threshold_rating = 21;</code>
-   */
-  boolean hasPaymentQualityThresholdRating();
-  /**
-   * <code>optional .crowdcontrol.Integer payment_quality_threshold_rating = 21;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getPaymentQualityThresholdRating();
-  /**
-   * <code>optional .crowdcontrol.Integer payment_quality_threshold_rating = 21;</code>
-   */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getPaymentQualityThresholdRatingOrBuilder();
-
-  /**
-   * <code>optional .crowdcontrol.Integer worker_quality_threshold = 22;</code>
+   * <code>optional .crowdcontrol.Integer worker_quality_threshold = 21;</code>
    */
   boolean hasWorkerQualityThreshold();
   /**
-   * <code>optional .crowdcontrol.Integer worker_quality_threshold = 22;</code>
+   * <code>optional .crowdcontrol.Integer worker_quality_threshold = 21;</code>
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getWorkerQualityThreshold();
   /**
-   * <code>optional .crowdcontrol.Integer worker_quality_threshold = 22;</code>
+   * <code>optional .crowdcontrol.Integer worker_quality_threshold = 21;</code>
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getWorkerQualityThresholdOrBuilder();
 
   /**
-   * <code>optional .crowdcontrol.Integer template_id = 23;</code>
+   * <code>optional .crowdcontrol.Integer template_id = 22;</code>
    */
   boolean hasTemplateId();
   /**
-   * <code>optional .crowdcontrol.Integer template_id = 23;</code>
+   * <code>optional .crowdcontrol.Integer template_id = 22;</code>
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getTemplateId();
   /**
-   * <code>optional .crowdcontrol.Integer template_id = 23;</code>
+   * <code>optional .crowdcontrol.Integer template_id = 22;</code>
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getTemplateIdOrBuilder();
 
   /**
-   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 24;</code>
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
    */
   java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption> 
       getRatingOptionsList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 24;</code>
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption getRatingOptions(int index);
   /**
-   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 24;</code>
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
    */
   int getRatingOptionsCount();
   /**
-   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 24;</code>
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
    */
   java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder> 
       getRatingOptionsOrBuilderList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 24;</code>
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder getRatingOptionsOrBuilder(
       int index);

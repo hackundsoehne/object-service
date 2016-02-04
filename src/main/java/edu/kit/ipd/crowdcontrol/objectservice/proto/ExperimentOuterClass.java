@@ -40,7 +40,7 @@ public final class ExperimentOuterClass {
       "\n\020experiment.proto\022\014crowdcontrol\032\021answer" +
       "_type.proto\032\020constraint.proto\032\021calibrati" +
       "on.proto\032\ttag.proto\032\026algorithm_option.pr" +
-      "oto\032\rinteger.proto\"\307\013\n\nExperiment\022\n\n\002id\030" +
+      "oto\032\rinteger.proto\"\377\n\n\nExperiment\022\n\n\002id\030" +
       "\001 \001(\005\022\r\n\005title\030\002 \001(\t\022\023\n\013description\030\003 \001(" +
       "\t\022-\n\005state\030\004 \001(\0162\036.crowdcontrol.Experime" +
       "nt.State\022-\n\013answer_type\030\005 \001(\0162\030.crowdcon" +
@@ -62,23 +62,22 @@ public final class ExperimentOuterClass {
       "gs\030\021 \003(\0132\021.crowdcontrol.Tag\0228\n\013populatio" +
       "ns\030\022 \003(\0132#.crowdcontrol.Experiment.Popul" +
       "ation\022@\n\014placeholders\030\023 \003(\0132*.crowdcontr" +
-      "ol.Experiment.PlaceholdersEntry\022?\n payme" +
-      "nt_quality_threshold_answer\030\024 \001(\0132\025.crow" +
-      "dcontrol.Integer\022?\n payment_quality_thre" +
-      "shold_rating\030\025 \001(\0132\025.crowdcontrol.Intege" +
-      "r\0227\n\030worker_quality_threshold\030\026 \001(\0132\025.cr",
-      "owdcontrol.Integer\022*\n\013template_id\030\027 \001(\0132" +
-      "\025.crowdcontrol.Integer\022=\n\016rating_options" +
-      "\030\030 \003(\0132%.crowdcontrol.Experiment.RatingO" +
-      "ption\0323\n\021PlaceholdersEntry\022\013\n\003key\030\001 \001(\t\022" +
-      "\r\n\005value\030\002 \001(\t:\0028\001\032R\n\nPopulation\022\023\n\013plat" +
-      "form_id\030\001 \001(\t\022/\n\014calibrations\030\002 \003(\0132\031.cr" +
-      "owdcontrol.Calibration\032I\n\014RatingOption\022\034" +
-      "\n\024experiment_rating_id\030\001 \001(\005\022\014\n\004name\030\002 \001" +
-      "(\t\022\r\n\005value\030\003 \001(\005\"Q\n\005State\022\013\n\007INVALID\020\000\022" +
-      "\t\n\005DRAFT\020\001\022\r\n\tPUBLISHED\020\002\022\024\n\020CREATIVE_ST",
-      "OPPED\020\003\022\013\n\007STOPPED\020\004B0\n,edu.kit.ipd.crow" +
-      "dcontrol.objectservice.protoP\001b\006proto3"
+      "ol.Experiment.PlaceholdersEntry\0228\n\031payme" +
+      "nt_quality_threshold\030\024 \001(\0132\025.crowdcontro" +
+      "l.Integer\0227\n\030worker_quality_threshold\030\025 " +
+      "\001(\0132\025.crowdcontrol.Integer\022*\n\013template_i" +
+      "d\030\026 \001(\0132\025.crowdcontrol.Integer\022=\n\016rating",
+      "_options\030\027 \003(\0132%.crowdcontrol.Experiment" +
+      ".RatingOption\0323\n\021PlaceholdersEntry\022\013\n\003ke" +
+      "y\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032R\n\nPopulation" +
+      "\022\023\n\013platform_id\030\001 \001(\t\022/\n\014calibrations\030\002 " +
+      "\003(\0132\031.crowdcontrol.Calibration\032I\n\014Rating" +
+      "Option\022\034\n\024experiment_rating_id\030\001 \001(\005\022\014\n\004" +
+      "name\030\002 \001(\t\022\r\n\005value\030\003 \001(\005\"Q\n\005State\022\013\n\007IN" +
+      "VALID\020\000\022\t\n\005DRAFT\020\001\022\r\n\tPUBLISHED\020\002\022\024\n\020CRE" +
+      "ATIVE_STOPPED\020\003\022\013\n\007STOPPED\020\004B0\n,edu.kit." +
+      "ipd.crowdcontrol.objectservice.protoP\001b\006",
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -103,7 +102,7 @@ public final class ExperimentOuterClass {
     internal_static_crowdcontrol_Experiment_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_crowdcontrol_Experiment_descriptor,
-        new java.lang.String[] { "Id", "Title", "Description", "State", "AnswerType", "AlgorithmTaskChooser", "AlgorithmQualityAnswer", "AlgorithmQualityRating", "AnswersPerWorker", "RatingsPerWorker", "RatingsPerAnswer", "NeededAnswers", "PaymentBase", "PaymentAnswer", "PaymentRating", "Constraints", "Tags", "Populations", "Placeholders", "PaymentQualityThresholdAnswer", "PaymentQualityThresholdRating", "WorkerQualityThreshold", "TemplateId", "RatingOptions", });
+        new java.lang.String[] { "Id", "Title", "Description", "State", "AnswerType", "AlgorithmTaskChooser", "AlgorithmQualityAnswer", "AlgorithmQualityRating", "AnswersPerWorker", "RatingsPerWorker", "RatingsPerAnswer", "NeededAnswers", "PaymentBase", "PaymentAnswer", "PaymentRating", "Constraints", "Tags", "Populations", "Placeholders", "PaymentQualityThreshold", "WorkerQualityThreshold", "TemplateId", "RatingOptions", });
     internal_static_crowdcontrol_Experiment_PlaceholdersEntry_descriptor =
       internal_static_crowdcontrol_Experiment_descriptor.getNestedTypes().get(0);
     internal_static_crowdcontrol_Experiment_PlaceholdersEntry_fieldAccessorTable = new
