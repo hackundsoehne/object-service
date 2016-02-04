@@ -9,10 +9,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Noti
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.NotificationTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
-import org.jooq.DSLContext;
-import org.jooq.Query;
-import org.jooq.Record;
-import org.jooq.Result;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
@@ -179,22 +176,36 @@ public class NotificationOperations extends AbstractOperations {
         return readOnlyCreate.fetch(sql);
     }
 
+
+    /**
+     * This method will check if the passed NotificationTokenRecords are already stored in the database.
+     * It does so by comparing the resultId of each record for the specified notification.
+     *
+     * @param newTokenRecords the new records from a current fetch query
+     * @param notificationId  the id of the notification
+     * @return a list of newly added NotificationTokenRecords
+     */
     public List<NotificationTokenRecord> diffTokenRecords(Map<Integer, NotificationTokenRecord> newTokenRecords, int notificationId) {
         List<Query> queries = new ArrayList<>();
 
-        create.selectFrom(NOTIFICATION_TOKEN).where(NOTIFICATION_TOKEN.NOTIFICATION.eq(notificationId)).fetchLazy()
-                .stream().forEach(storedRecord -> {
-            int storedTokenId = storedRecord.getResultId();
-            if (newTokenRecords.containsValue(storedTokenId)) {
-                // condition still holds true keep token in db, but remove from new tokens
-                newTokenRecords.remove(storedTokenId);
-            } else {
-                // condition defined by query isn't true anymore, so we can delete the old token.
-                queries.add(create.delete(NOTIFICATION_TOKEN)
-                        .where(NOTIFICATION_TOKEN.ID_NOTIFICATION_TOKEN.eq(storedRecord.getIdNotificationToken())));
-            }
-        });
+        try (Cursor<NotificationTokenRecord> recordCursor = create.selectFrom(NOTIFICATION_TOKEN)
+                .where(NOTIFICATION_TOKEN.NOTIFICATION.eq(notificationId))
+                .fetchLazy()) {
+            recordCursor.stream().forEach(storedRecord -> {
+                int storedTokenId = storedRecord.getResultId();
+                if (newTokenRecords.containsValue(storedTokenId)) {
+                    // condition still holds true keep token in db, but remove from new tokens
+                    newTokenRecords.remove(storedTokenId);
+                } else {
+                    // condition defined by query isn't true anymore, so we can delete the old token.
+                    queries.add(create.delete(NOTIFICATION_TOKEN)
+                            .where(NOTIFICATION_TOKEN.ID_NOTIFICATION_TOKEN.eq(storedRecord.getIdNotificationToken())));
+                }
+            });
+        }
+
         create.batch(queries).execute();
+        // all remaining tokens in the map are new and have to be added to the database
         if (!newTokenRecords.isEmpty()) {
             ArrayList<NotificationTokenRecord> tokenRecordList = new ArrayList<>(newTokenRecords.values());
             create.batchInsert(tokenRecordList).execute();
