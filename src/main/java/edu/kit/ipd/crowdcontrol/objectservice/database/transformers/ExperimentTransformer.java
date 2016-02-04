@@ -185,7 +185,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                     record.setNeededAnswers(experiment.getNeededAnswers().getValue());
                     break;
                 case Experiment.RATINGS_PER_WORKER_FIELD_NUMBER:
-                    record.setRatingsPerAnswer(experiment.getRatingsPerWorker().getValue());
+                    record.setRatingsPerWorker(experiment.getRatingsPerWorker().getValue());
                     break;
                 case Experiment.WORKER_QUALITY_THRESHOLD_FIELD_NUMBER:
                     record.setWorkerQualityThreshold(experiment.getWorkerQualityThreshold().getValue());
