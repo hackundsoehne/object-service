@@ -59,11 +59,11 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
     public CompletableFuture<String> publishTask(Experiment experiment) {
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
-                experiment.getPaymentBase()/100, //we are getting cents passed and have to pass dallers
+                experiment.getPaymentBase().getValue()/100, //we are getting cents passed and have to pass dallers
                 60*60*24, //you have 24 hours to do the assignment
                 60*60*24*31*12, // the experiment is staying for ONE year
                 tags,
-                experiment.getNeededAnswers()*experiment.getRatingsPerAnswer(),
+                experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
                 31*24*60*60, //this is a little problem we have to specify when autoapproval is kicking in this is happening after a month
                 "");
     }
@@ -131,13 +131,13 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
             Assignment assignment =
                     workerAssignmentId.get(paymentJob.getWorkerRecord().getIdentification());
             //check if we should pay at all
-            if (paymentJob.getAmount() < experiment.getPaymentBase()) {
+            if (paymentJob.getAmount() < experiment.getPaymentBase().getValue()) {
                 //amount is smaller than payment base ? REJECT!
                 jobs.add(new RejectAssignment(connection,assignment.getAssignmentId(),
                         "You answer did not match the wanted rating criteria"));
             }else {
                 //pay the worker regular
-                int amount = paymentJob.getAmount() - experiment.getPaymentBase();
+                int amount = paymentJob.getAmount() - experiment.getPaymentBase().getValue();
                 //approve the assignment if it is not right now
                 if (assignment.getAssignmentStatus().equals(AssignmentStatus.SUBMITTED)) {
                     //approving here triggers base payment
