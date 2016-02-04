@@ -104,7 +104,6 @@ public class ExperimentTransformer extends AbstractTransformer {
 
     private static Experiment.RatingOption transform(RatingOptionExperimentRecord record) {
         return Experiment.RatingOption.newBuilder()
-                .setExperimentRatingId(record.getIdRatingOptionExperiment())
                 .setName(record.getName())
                 .setValue(record.getValue())
                 .build();
@@ -203,20 +202,16 @@ public class ExperimentTransformer extends AbstractTransformer {
      */
     public static List<RatingOptionExperimentRecord> toRecord(Experiment experiment) {
         return experiment.getRatingOptionsList().stream()
-                .map(ratingOption ->
-                                merge(new RatingOptionExperimentRecord(), ratingOption, (field, record) -> {
-                                    switch (field) {
-                                        case Experiment.RatingOption.EXPERIMENT_RATING_ID_FIELD_NUMBER:
-                                            record.setIdRatingOptionExperiment(ratingOption.getExperimentRatingId());
-                                            break;
-                                        case Experiment.RatingOption.NAME_FIELD_NUMBER:
-                                            record.setName(ratingOption.getName());
-                                            break;
-                                        case Experiment.RatingOption.VALUE_FIELD_NUMBER:
-                                            record.setValue(ratingOption.getValue());
-                                            break;
-                                    }
-                                })
+                .map(ratingOption -> merge(new RatingOptionExperimentRecord(), ratingOption, (field, record) -> {
+                            switch (field) {
+                                case Experiment.RatingOption.NAME_FIELD_NUMBER:
+                                    record.setName(ratingOption.getName());
+                                    break;
+                                case Experiment.RatingOption.VALUE_FIELD_NUMBER:
+                                    record.setValue(ratingOption.getValue());
+                                    break;
+                            }
+                        })
                 )
                 .collect(Collectors.toList());
     }
