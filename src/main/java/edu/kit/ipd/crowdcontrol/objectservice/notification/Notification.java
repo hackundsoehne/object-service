@@ -88,7 +88,12 @@ public class Notification implements Runnable {
      * Invokes checking and sending a notification
      */
     public void run() {
-        policy.invoke(this);
+        try {
+            policy.invoke(this);
+        } catch (RuntimeException re) {
+            // TODO logger
+        }
+
     }
 
     /**

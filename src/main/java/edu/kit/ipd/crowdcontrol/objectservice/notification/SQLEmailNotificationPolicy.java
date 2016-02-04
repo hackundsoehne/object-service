@@ -3,12 +3,14 @@ package edu.kit.ipd.crowdcontrol.objectservice.notification;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationTokenRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
-import org.jooq.DataType;
+import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.impl.DSL;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -36,54 +38,79 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
     }
 
     private boolean resultHasIdAndTokenField(Result<Record> result) {
-        Field<?> idField = result.field("id");
-        Field<?> tokenField = result.field("token");
-        if (idField != null && tokenField != null) {
-            DataType<?> idType = idField.getDataType();
-            DataType<?> tokenType = tokenField.getDataType();
-            if (idType.isNumeric() && tokenType.isString()) {
-                return true;
-            }
-        }
-        return false;
+        Field<Integer> idField = DSL.field("id", Integer.class);
+        Field<String> tokenField = DSL.field("token", String.class);
+
+        return (result.get(0).field(idField) != null) && (result.get(0).field(tokenField) != null);
     }
 
     @Override
     protected List<String> check(Notification notification) {
         Result<Record> result = operations.runReadOnlySQL(notification.getQuery());
-        List<String> tokenList = new ArrayList<>();
         if (result.isNotEmpty()) {
             if (resultHasIdAndTokenField(result)) {
-                // TODO diffi diffi
+                // the result has the required columns, so we can bring it in a handier format
                 Map<Integer, NotificationTokenRecord> tokenRecords = result.stream()
                         .map(record -> new NotificationTokenRecord(null, record.getValue("id", Integer.class),
                                 record.getValue("token", String.class), notification.getID())
                         )
                         .collect(Collectors.toMap(NotificationTokenRecord::getResultId, Function.identity()));
-                return operations.diffTokenRecords(tokenRecords, notification.getID()).stream()
+
+                List<String> newTokenList = operations.diffTokenRecords(tokenRecords, notification.getID()).stream()
                         .map(NotificationTokenRecord::getResultToken)
                         .collect(Collectors.toList());
+                if (!newTokenList.isEmpty()) {
+                    return newTokenList;
+                }
+            } else {
+                // the result has any other form and we cannot provide any tokens
+                return Collections.emptyList();
             }
-            return tokenList;
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
     protected void send(Notification notification, List<String> tokens) {
         StringBuilder message = new StringBuilder();
-        message.append(notification.getDescription());
-        message.append("\n\n");
 
+        // TODO fancy pancy html + css styled body with beautiful design and chocolate flavor
+        if (tokens.isEmpty()) {
+            message.append(notification.getDescription());
+        } else {
+            // search for placeholders in description
+            Map<String, String> placeholderMap = new HashMap<>();
+            placeholderMap.put("tokens", concatTokens(tokens));
+            try {
+                message.append(Template.apply(notification.getDescription(), placeholderMap));
+            } catch (IllegalArgumentException iae) {
+                message.append(notification.getDescription());
+            }
+        }
 
-        String subject = "[CrowdControl Notification] " + notification.getName();
+        String subject = "[CrowdControl Benachrichtigung] " + notification.getName();
         try {
             for (String receiver : notification.getReceiverEmails())
             mailSender.sendMail(receiver, subject, message.toString());
         } catch (Exception e) {
-            throw new NotificationNotSentException(e);
+            throw new NotificationNotSentException("notification with id=" + notification.getID() + "could not be sent", e);
         }
+    }
+
+    private String concatTokens(List<String> tokens) {
+        StringBuilder concatedTokens = new StringBuilder();
+        if (tokens.size() > 1) {
+            int i;
+            for (i = 0; i < tokens.size() - 1; i++) {
+                concatedTokens.append(tokens.get(i));
+                concatedTokens.append(", ");
+            }
+            concatedTokens.append("und ");
+            concatedTokens.append(tokens.get(i));
+        } else {
+            concatedTokens.append(tokens.get(0));
+        }
+        return concatedTokens.toString();
     }
 }
 

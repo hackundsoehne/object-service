@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,9 @@ public class NotificationController {
 
         loadNotificationsFromDatabase();
 
-        //TODO subscribe events
+        EventManager.NOTIFICATION_CREATE.getObservable().subscribe(notificationEvent -> createNotification(notificationEvent.getData()));
+        EventManager.NOTIFICATION_UPDATE.getObservable().subscribe(changeEvent -> updateNotification(changeEvent.getData()));
+        EventManager.NOTIFICATION_DELETE.getObservable().subscribe(notificationEvent -> deleteNotification(notificationEvent.getData()));
     }
 
     private void loadNotificationsFromDatabase() {

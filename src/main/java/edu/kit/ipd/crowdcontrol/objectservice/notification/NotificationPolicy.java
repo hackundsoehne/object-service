@@ -20,10 +20,11 @@ public abstract class NotificationPolicy<T extends Collection<?>> {
             if (tokens != null) {
                 send(notification, tokens);
 
-                //TODO handle error
-                operations.deleteNotification(notification.getID());
-                // will cause the notification to be removed from the scheduler
-                EventManager.NOTIFICATION_DELETE.emit(notification.toProtobuf());
+                if (notification.isSendOnce()) {
+                    operations.deleteNotification(notification.getID());
+                    // will cause the notification to be removed from the scheduler
+                    EventManager.NOTIFICATION_DELETE.emit(notification.toProtobuf());
+                }
             }
     }
 
@@ -33,9 +34,11 @@ public abstract class NotificationPolicy<T extends Collection<?>> {
 
     /**
      * Checks the query of a notification.
+     * Note that an empty collection returned, still is an indicator for a positive check.
      *
      * @param notification the notification to check
-     * @return instance of a generic result as token if the check was positive, else null
+     * @return instance of a generic collection of tokens if the check was positive, else null
+     *
      */
     protected abstract T check(Notification notification);
 
@@ -43,8 +46,9 @@ public abstract class NotificationPolicy<T extends Collection<?>> {
      * Sends a notification.
      *
      * @param notification the notification to send
-     * @param tokens        a token acquired from a check that can be null
+     * @param tokens        a list of tokens, can be empty
      * @throws NotificationNotSentException if a notification could not be sent
      */
     protected abstract void send(Notification notification, T tokens);
+
 }
