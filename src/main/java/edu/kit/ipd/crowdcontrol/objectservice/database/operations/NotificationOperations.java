@@ -5,21 +5,21 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationReceiverEmailRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationTokenRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.NotificationTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.jooq.DSLContext;
+import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.NOTIFICATION;
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.NOTIFICATION_RECEIVER_EMAIL;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
 /**
  * contains all Operations needed to interact with the notifications-table.
@@ -177,5 +177,29 @@ public class NotificationOperations extends AbstractOperations {
      */
     public Result<Record> runReadOnlySQL(String sql) {
         return readOnlyCreate.fetch(sql);
+    }
+
+    public List<NotificationTokenRecord> diffTokenRecords(Map<Integer, NotificationTokenRecord> newTokenRecords, int notificationId) {
+        List<Query> queries = new ArrayList<>();
+
+        create.selectFrom(NOTIFICATION_TOKEN).where(NOTIFICATION_TOKEN.NOTIFICATION.eq(notificationId)).fetchLazy()
+                .stream().forEach(storedRecord -> {
+            int storedTokenId = storedRecord.getResultId();
+            if (newTokenRecords.containsValue(storedTokenId)) {
+                // condition still holds true keep token in db, but remove from new tokens
+                newTokenRecords.remove(storedTokenId);
+            } else {
+                // condition defined by query isn't true anymore, so we can delete the old token.
+                queries.add(create.delete(NOTIFICATION_TOKEN)
+                        .where(NOTIFICATION_TOKEN.ID_NOTIFICATION_TOKEN.eq(storedRecord.getIdNotificationToken())));
+            }
+        });
+        create.batch(queries).execute();
+        if (!newTokenRecords.isEmpty()) {
+            ArrayList<NotificationTokenRecord> tokenRecordList = new ArrayList<>(newTokenRecords.values());
+            create.batchInsert(tokenRecordList).execute();
+            return tokenRecordList;
+        }
+        return Collections.emptyList();
     }
 }

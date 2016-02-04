@@ -1,8 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
-import org.jooq.Record;
-import org.jooq.Result;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,6 +9,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -28,7 +27,7 @@ public class NotificationControllerTest {
     private edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto;
     private edu.kit.ipd.crowdcontrol.objectservice.notification.Notification notification;
     @Mock
-    private NotificationPolicy<Result<Record>> policy;
+    private NotificationPolicy<List<String>> policy;
 
     @Mock
     private NotificationOperations notificationOperations;

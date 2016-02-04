@@ -12,18 +12,15 @@ import java.util.Collection;
  * @version 1.0
  */
 
-public abstract class NotificationPolicy<T extends Collection<U>, U> {
+public abstract class NotificationPolicy<T extends Collection<?>> {
     private NotificationOperations operations;
 
     public void invoke(Notification notification) {
             T tokens = check(notification);
             if (tokens != null) {
-                for (U token : tokens) {
-                    send(notification, token);
-                }
+                send(notification, tokens);
 
                 //TODO handle error
-
                 operations.deleteNotification(notification.getID());
                 // will cause the notification to be removed from the scheduler
                 EventManager.NOTIFICATION_DELETE.emit(notification.toProtobuf());
@@ -46,8 +43,8 @@ public abstract class NotificationPolicy<T extends Collection<U>, U> {
      * Sends a notification.
      *
      * @param notification the notification to send
-     * @param token        a token acquired from a check that can be null
+     * @param tokens        a token acquired from a check that can be null
      * @throws NotificationNotSentException if a notification could not be sent
      */
-    protected abstract void send(Notification notification, U token);
+    protected abstract void send(Notification notification, T tokens);
 }

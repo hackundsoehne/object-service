@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Notification class represents a complete Notification.
@@ -15,7 +16,7 @@ public class Notification implements Runnable {
     private int checkPeriod;
     private String query;
     private boolean sendOnce = false;
-    private ArrayList<String> receiverEmails;
+    private List<String> receiverEmails;
     private NotificationPolicy policy;
 
     /**
@@ -31,7 +32,7 @@ public class Notification implements Runnable {
      * @param policy         the policy to check and send a notification
      */
     public Notification(int ID, String name, String description, int checkPeriod, String query, boolean sendOnce,
-                        ArrayList<String> receiverEmails, NotificationPolicy policy) {
+                        List<String> receiverEmails, NotificationPolicy policy) {
         this.ID = ID;
         this.name = name;
         this.description = description;
@@ -128,7 +129,7 @@ public class Notification implements Runnable {
     /**
      * @return the emails of the receivers
      */
-    public ArrayList<String> getReceiverEmails() {
+    public List<String> getReceiverEmails() {
         return receiverEmails;
     }
 

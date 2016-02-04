@@ -1,10 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -36,12 +34,9 @@ public class NotificationController {
     }
 
     private void loadNotificationsFromDatabase() {
-        List<NotificationRecord> notificationList = operations.getAllNotifications();
-        for (NotificationRecord record : notificationList) {
-            createNotification(new Notification(record.getIdNotification(), record.getName(), record.getDescription(),
-                    record.getCheckperiod(), record.getQuery(),
-                    //TODO apply changes
-                    true, new ArrayList<>(), policy));
+        List<edu.kit.ipd.crowdcontrol.objectservice.proto.Notification> notificationList = operations.getAllNotifications();
+        for (edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto : notificationList) {
+            createNotification(Notification.fromProtobuf(notificationProto, policy));
         }
     }
 
