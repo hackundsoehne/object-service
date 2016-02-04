@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class MailParser {
 
-    protected static GiftCodeRecord parseAmazonGiftCode(Message msg) throws AmazonMailFormatChangedException{
+    protected static GiftCodeRecord parseAmazonGiftCode(Message msg) throws MoneyTransferException {
         //Extract Message
         String message = "";
         try {
@@ -26,15 +26,15 @@ public class MailParser {
             message = textBody.getContent().toString();
         } catch (ClassCastException | MessagingException | IOException e) {
             try {
-                if (msg.getFrom()[0].toString().equals("\"Amazon.de\" <gutschein-order@gc.email.amazon.de>")) {
-                    throw new AmazonMailFormatChangedException();
+                if (msg.getFrom()[0].toString().toLowerCase().contains("amazon.de")) {
+                    throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.");
                 }
             } catch (MessagingException f) {
-                throw new AmazonMailFormatChangedException();
+                //Nothing to do
             }
         }
         //Parse Message
-        String messageStr = message.replaceAll(" ","");
+        String messageStr = message.replaceAll(" ", "");
 
         String codePatternStr = "[0-9A-Z]+(-[0-9A-Z]+)+";
         Pattern codePattern = Pattern.compile(codePatternStr);
@@ -45,13 +45,13 @@ public class MailParser {
         Matcher amountMatcher = amountPattern.matcher(messageStr);
 
         if (!checkMatches(codeMatcher) || !checkMatches(amountMatcher)) {
-            throw new AmazonMailFormatChangedException();
+            throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.");
         }
 
         String giftCode = codeMatcher.group(0);
 
         String amountStr = amountMatcher.group(0);
-        amountStr = amountStr.replaceAll(",", "").replaceAll("\\.","").replaceAll("€","");
+        amountStr = amountStr.replaceAll(",", "").replaceAll("\\.", "").replaceAll("€", "");
 
         GiftCodeRecord rec = new GiftCodeRecord();
         rec.setAmount(Integer.parseInt(amountStr));
@@ -60,9 +60,10 @@ public class MailParser {
         return rec;
     }
 
+
     private static boolean checkMatches(Matcher matcher) {
         boolean match = true;
-
+        //checks, if the groups of the matcher are identical
         if (matcher.find()) {
             int groupCount = matcher.groupCount();
             for (int j = 0; j < groupCount; j++) {

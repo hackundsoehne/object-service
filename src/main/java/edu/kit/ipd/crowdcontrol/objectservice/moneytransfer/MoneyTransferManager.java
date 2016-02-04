@@ -8,6 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.eclipse.jetty.util.IO;
 import org.jooq.Result;
+import org.jooq.util.derby.sys.Sys;
 
 import java.io.*;
 import java.util.*;
@@ -66,7 +67,17 @@ public class MoneyTransferManager {
             throw new IllegalStateException("run() was called twice!");
         }
 
-        //schedule = scheduler.scheduleAtFixedRate(this::submitGiftCodes, 7, 7, TimeUnit.DAYS);
+        Runnable runnable = () -> {
+            try {
+                submitGiftCodes();
+            } catch (MoneyTransferException e) {
+                sendErrorMessage(e.toString());
+                //TODO: log to stderr
+            }
+        };
+
+
+        schedule = scheduler.scheduleAtFixedRate(runnable, 7, 7, TimeUnit.DAYS);
 
     }
 
@@ -92,7 +103,7 @@ public class MoneyTransferManager {
     /**
      * Pays all workers depending on their logged money transfers.
      */
-    public void submitGiftCodes() throws AmazonMailFormatChangedException, MessagingException, IOException {
+    public void submitGiftCodes() throws MoneyTransferException {
         fetchNewGiftCodes();
 
         Result<WorkerRecord> workers = workerOperations.getWorkerWithCreditBalanceGreaterOrEqual(payOffThreshold);
@@ -111,19 +122,24 @@ public class MoneyTransferManager {
         sendNotification();
     }
 
-    private void fetchNewGiftCodes() throws AmazonMailFormatChangedException, MessagingException {
+    private void fetchNewGiftCodes() throws MoneyTransferException {
         Message[] messages;
 
-        messages = mailHandler.fetchUnseen("inbox");
+        try {
+            messages = mailHandler.fetchUnseen("inbox");
+        } catch (MessagingException e) {
+            throw new MoneyTransferException("The MailHandler couldn't fetch new giftcodes from the mailserver. " +
+                    "It seems, that there is either a problem with the server or with the properties file.");
+        }
 
         for (Message message : messages) {
             try {
                 GiftCodeRecord rec = MailParser.parseAmazonGiftCode(message);
                 workerBalanceOperations.addGiftCode(rec.getCode(), rec.getAmount());
-            } catch (AmazonMailFormatChangedException e) {
+            } catch (MoneyTransferException e) {
                 try {
                     mailHandler.markAsUnseen(message);
-                    throw new AmazonMailFormatChangedException();
+                    throw new MoneyTransferException(e.getMessage());
                 } catch (MessagingException f) {
                     f.printStackTrace();
                 }
@@ -132,7 +148,7 @@ public class MoneyTransferManager {
     }
 
     private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
-        List<GiftCodeRecord> payedCodes = new LinkedList<>();
+        List<GiftCodeRecord> payedCodes = new ArrayList<>();
         int creditBalance = workerBalanceOperations.getBalance(worker.getIdWorker());
 
         for (GiftCodeRecord nextCode : giftCodes) {
@@ -151,7 +167,7 @@ public class MoneyTransferManager {
         return payedCodes;
     }
 
-    private void payWorker(WorkerRecord worker, List<GiftCodeRecord> giftCodes) throws MessagingException, IOException {
+    private void payWorker(WorkerRecord worker, List<GiftCodeRecord> giftCodes) throws MoneyTransferException {
         if (!giftCodes.isEmpty()) {
             StringBuilder paymentMessage = loadMessage("src/main/resources/PaymentMessage.txt");
             StringBuilder giftCodeMessage = new StringBuilder();
@@ -165,29 +181,58 @@ public class MoneyTransferManager {
             map.put("GiftCodes", giftCodeMessage.toString());
             paymentMessage = new StringBuilder(Template.apply(paymentMessage.toString(), map));
 
-
-            mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage.toString());
-
+            try {
+                mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage.toString());
+            } catch (MessagingException e) {
+                throw new MoneyTransferException("The MailHandler couldnt send mails to crowdworkers." +
+                        "It seems, that there is either a problem with the server or with the properties file.");
+            } catch (UnsupportedEncodingException e) {
+                //TODO: log to stderr
+            }
         }
     }
 
-    private void sendNotification() throws UnsupportedEncodingException, MessagingException {
+    private void sendNotification() {
+        StringBuilder message = new StringBuilder();
+        message.append("Dear administrator, ").append(System.getProperty("line.separator"));
+        message.append("we want to give you the following information:").append(System.getProperty("line.separator"));
+        message.append(notificationText);
 
-        mailHandler.sendMail(notificationMailAddress, "Payment Notification", notificationText.toString());
-
+        try {
+            mailHandler.sendMail(notificationMailAddress, "Payment Notification", message.toString());
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            //TODO: log to stderr
+        }
     }
 
-    private StringBuilder loadMessage(String path) throws IOException {
+    private void sendErrorMessage(String errorMessage) {
+        StringBuilder message = new StringBuilder();
+        message.append("Dear administrator, ").append(System.getProperty("line.separator"));
+        message.append("it seems, that a critical error during payment occured:").append(System.getProperty("line.separator"));
+        message.append(errorMessage);
+
+        try {
+            mailHandler.sendMail(notificationMailAddress, "Payment Error occured", errorMessage);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            //TODO: log to stderr
+        }
+    }
+
+    private StringBuilder loadMessage(String path) throws MoneyTransferException {
         StringBuilder content = new StringBuilder();
 
-        FileReader file = new FileReader(path);
-        BufferedReader reader = new BufferedReader(file);
-
-        String messageLine;
-
-        while ((messageLine = reader.readLine()) != null) {
-            content.append(messageLine);
-            content.append(System.getProperty("line.separator"));
+        try {
+            FileReader file = new FileReader(path);
+            BufferedReader reader = new BufferedReader(file);
+            String messageLine;
+            while ((messageLine = reader.readLine()) != null) {
+                content.append(messageLine);
+                content.append(System.getProperty("line.separator"));
+            }
+        } catch (FileNotFoundException e) {
+            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.");
+        } catch (IOException e) {
+            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
         }
 
         return content;
