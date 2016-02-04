@@ -94,6 +94,8 @@ public class Router implements SparkApplication {
         });
 
         exception(InternalServerErrorException.class, (exception, request, response) -> {
+            LOGGER.error(exception);
+
             response.status(500);
             response.body(error(request, response, "internalServerError", exception.getMessage()));
         });
