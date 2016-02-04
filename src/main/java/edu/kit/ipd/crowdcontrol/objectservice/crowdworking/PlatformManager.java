@@ -247,12 +247,14 @@ public class PlatformManager {
      * than the basepayment of the experiment.
      *
      * @param name name of the platform
-     * @param id id which is returned by publishTask
      * @param experiment experiment which is published
      * @param paymentJobs tuples which are defining the amount to pay
      * @return
      */
-    public CompletableFuture<Boolean> payExperiment(String name, String id, Experiment experiment, List<PaymentJob> paymentJobs) {
-        return getPlatformPayment(name).payExperiment(id, experiment,paymentJobs);
+    public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws TaskOperationException {
+        TaskRecord record = tasksOps.getTask(name, experiment.getId()).
+                orElseThrow(() -> new TaskOperationException("Experiment was never published"));
+
+        return getPlatformPayment(name).payExperiment(record.getPlatformData(), experiment,paymentJobs);
     }
 }
