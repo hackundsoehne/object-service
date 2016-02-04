@@ -3,7 +3,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.payment;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +35,7 @@ public class PaymentCalculatorTest {
         workerAnswerMap = new HashMap<>();
         workerRatingMap = new HashMap<>();
 
-        exp = Experiment.newBuilder().setId(13).setPaymentAnswer(10).setPaymentRating(8).setPaymentBase(5).build();
+        exp = Experiment.newBuilder().setId(13).setPaymentAnswer(toProtoInt(10)).setPaymentRating(toProtoInt(8)).setPaymentBase(toProtoInt(5)).build();
 
 
         ops = mock(AnswerRatingOperations.class);
@@ -69,42 +68,46 @@ public class PaymentCalculatorTest {
         workerAnswerMap.put(workerOne, 5);
         workerAnswerMap.put(workerTwo, 2);
 
-        Map<Worker, Integer> resultAnswers = calculator.estimatePayment(exp);
+        Map<WorkerRecord, Integer> resultAnswers = calculator.estimatePayment(exp);
         assertNotNull(resultAnswers);
 
 
-        SortedMap<Worker, Integer> sortedResult = sortWorkerMap(resultAnswers);
+        SortedMap<WorkerRecord, Integer> sortedResult = sortWorkerMap(resultAnswers);
 
 
-        assertEquals((int) sortedResult.get(sortedResult.firstKey()), exp.getPaymentBase() + (exp.getPaymentAnswer() * workerAnswerMap.get(workerOne)));
-        assertEquals((int) sortedResult.get(sortedResult.lastKey()), exp.getPaymentBase() + (exp.getPaymentAnswer() * workerAnswerMap.get(workerTwo)));
+        assertEquals((int) sortedResult.get(sortedResult.firstKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerOne)));
+        assertEquals((int) sortedResult.get(sortedResult.lastKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerTwo)));
 
         workerRatingMap.put(workerOne,0);
         workerRatingMap.put(workerTwo, 2);
-        Map<Worker, Integer> resultRatings = calculator.estimatePayment(exp);
+        Map<WorkerRecord, Integer> resultRatings = calculator.estimatePayment(exp);
 
         assertNotNull(resultRatings);
 
         sortedResult = sortWorkerMap(resultRatings);
 
 
-        assertEquals((int) sortedResult.get(sortedResult.firstKey()), exp.getPaymentBase() + (exp.getPaymentAnswer() * workerAnswerMap.get(workerOne) + (exp.getPaymentRating() * workerRatingMap.get(workerOne))));
-        assertEquals((int) sortedResult.get(sortedResult.lastKey()), exp.getPaymentBase() + (exp.getPaymentAnswer() * workerAnswerMap.get(workerTwo) + (exp.getPaymentRating() * workerRatingMap.get(workerTwo))));
+        assertEquals((int) sortedResult.get(sortedResult.firstKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerOne) + (exp.getPaymentRating().getValue() * workerRatingMap.get(workerOne))));
+        assertEquals((int) sortedResult.get(sortedResult.lastKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerTwo) + (exp.getPaymentRating().getValue() * workerRatingMap.get(workerTwo))));
 
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFalsePaymentArgs() {
-        exp = Experiment.newBuilder().setPaymentBase(-1).setPaymentAnswer(4).setPaymentRating(4).build();
+        exp = Experiment.newBuilder().setPaymentBase(toProtoInt(-1)).setPaymentAnswer(toProtoInt(4)).setPaymentRating(toProtoInt(4)).build();
         calculator.estimatePayment(exp);
 
     }
 
 
-    private SortedMap<Worker, Integer> sortWorkerMap(Map<Worker, Integer> map) {
-        SortedMap<Worker, Integer> sortedWorkers = new TreeMap<>((o1, o2) -> Integer.compare(map.get(o2), map.get(o1)));
+    private SortedMap<WorkerRecord, Integer> sortWorkerMap(Map<WorkerRecord, Integer> map) {
+        SortedMap<WorkerRecord, Integer> sortedWorkers = new TreeMap<>((o1, o2) -> Integer.compare(map.get(o2), map.get(o1)));
         sortedWorkers.putAll(map);
         return sortedWorkers;
+    }
+
+    private edu.kit.ipd.crowdcontrol.objectservice.proto.Integer toProtoInt(int x) {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.Integer.newBuilder().setValue(x).build();
     }
 }
