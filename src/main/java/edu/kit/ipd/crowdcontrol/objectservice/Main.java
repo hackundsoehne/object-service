@@ -4,6 +4,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentCalculator;
+import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.apache.logging.log4j.LogManager;
@@ -95,6 +97,9 @@ public class Main {
 
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
+
+        PaymentCalculator paymentCalculator = new PaymentCalculator(answerRatingOperations);
+        PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations);
 
         new Router(
                 new TemplateResource(templateOperations),
