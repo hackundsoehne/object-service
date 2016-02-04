@@ -22,4 +22,15 @@ public interface AnswerQualityStrategy {
      * @return the quality of the answer based on the implementation
      */
     int identifyAnswerQuality(AnswerRecord answer, List<RatingRecord> ratings, int maximumQuality, int minimumQuality) throws IllegalArgumentException;
+    /**
+     * Get the name of the implementing algorithm
+     * @return name of the algorithm
+     */
+    String getAlgorithmName();
+
+    /**
+     * Gets the description of the implementing algorithm
+     * @return a description of the algorithm
+     */
+    String getAlgorithmDescription();
 }

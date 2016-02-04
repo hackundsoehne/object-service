@@ -36,10 +36,10 @@ public class QualityIdentificator implements Observer<Rating> {
     final static int MINIMUM_QUALITY = 0;
 
 
-    private Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
-
-    private AnswerRatingOperations operations;
-    private ExperimentOperations experimentOperations;
+    private final Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
+    private final QualityIdentificator qualityIdentificator;
+    private final AnswerRatingOperations operations;
+    private final ExperimentOperations experimentOperations;
     private AnswerQualityStrategy answerIdentifier;
     private RatingQualityStrategy ratingIdentifier;
 
@@ -51,15 +51,18 @@ public class QualityIdentificator implements Observer<Rating> {
      */
     private int ratingQualityThreshold = 10;
 
-
-    public QualityIdentificator(AnswerRatingOperations ops, ExperimentOperations experimentOperations) {
-
-        ratingObservable.subscribe();
-        this.operations = ops;
+    private  QualityIdentificator(AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations){
+        this.operations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
+        ratingObservable.subscribe();
         answerIdentifier = new AnswerQualityByRatings();
         ratingIdentifier = new RatingQualityByDistribution();
+        qualityIdentificator = this;
     }
+   public static void init(AnswerRatingOperations ops, ExperimentOperations experimentOperations) {
+        QualityIdentificator qualityIdentificator = new QualityIdentificator(ops,experimentOperations);
+    }
+
 
     @Override
     public void onCompleted() {
@@ -74,9 +77,15 @@ public class QualityIdentificator implements Observer<Rating> {
     @Override
     public void onNext(Rating rating) {
 
-        int expId = rating.getExperimentId();
-        rateQualityOfRatings(expId);
-        rateQualityOfAnswers(expId);
+
+        Optional<ExperimentRecord> exp = experimentOperations.getExperiment(rating.getExperimentId());
+        if(!exp.isPresent()){
+            throw new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID:"+rating.getExperimentId());
+        }
+        //TODO load classes         exp.get().getAlgorithmQualityAnswer()
+
+        qualityIdentificator.rateQualityOfRatings(exp.get());
+        qualityIdentificator.rateQualityOfAnswers(exp.get());
 
 
     }
@@ -86,11 +95,11 @@ public class QualityIdentificator implements Observer<Rating> {
      * Rates and sets quality of all ratings of specified experiment.
      * Ratings to the same answer are grouped and rated together.
      *
-     * @param expId of the experiment
+     * @param experimentRecord whose ratings' qualities are going to be estimated
      */
-    private void rateQualityOfRatings(int expId) {
+    private void rateQualityOfRatings(ExperimentRecord experimentRecord) {
 
-        List<AnswerRecord> answers = operations.getAnswersOfExperiment(expId);
+        List<AnswerRecord> answers = operations.getAnswersOfExperiment(experimentRecord.getIdExperiment());
 
         for (AnswerRecord answer : answers) {
             List<RatingRecord> records = operations.getRatingsOfAnswer(answer);
@@ -109,12 +118,13 @@ public class QualityIdentificator implements Observer<Rating> {
      * quality-assured-bit is set in the database.
      *
      *
-     * @param expId of the experiment
+     * @param experimentRecord the experiment whose answers are going to be rated
      */
-    private void rateQualityOfAnswers(int expId) {
+    private void rateQualityOfAnswers(ExperimentRecord experimentRecord) {
 
-        List<AnswerRecord> answers = operations.getAnswersOfExperiment(expId);
-        Optional<ExperimentRecord> experimentRecord =  experimentOperations.getExperiment(expId);
+
+
+        List<AnswerRecord> answers = operations.getAnswersOfExperiment(experimentRecord.getIdExperiment());
 
         for (AnswerRecord answer : answers) {
             List<RatingRecord> records = operations.getGoodRatingsOfAnswer(answer, ratingQualityThreshold);
@@ -122,7 +132,7 @@ public class QualityIdentificator implements Observer<Rating> {
                 operations.setQualityToAnswer(answer, answerIdentifier.identifyAnswerQuality(answer, records, MAXIMUM_QUALITY, MINIMUM_QUALITY));
 
                 // Checks if quality_assured bit can be set.
-                if (experimentRecord.isPresent() && (((double) records.size() / (double) experimentRecord.get().getRatingsPerAnswer()) >= 0.8)) {
+                if ((((double) records.size() / (double) experimentRecord.getRatingsPerAnswer()) >= 0.8)) {
                     operations.setAnswerQualityAssured(answer);
                 }
             }

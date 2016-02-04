@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.jooq.SQLDialect;
@@ -71,6 +72,7 @@ public class Main {
         TagConstraintsOperations tagConstraintsOperations = new TagConstraintsOperations(databaseManager.getContext());
         AlgorithmOperations algorithmsOperations = new AlgorithmOperations(databaseManager.getContext());
         WorkerCalibrationOperations workerCalibrationOperations = new WorkerCalibrationOperations(databaseManager.getContext());
+        QualityIdentificator.init(answerRatingOperations,experimentOperations);
 
         new Router(
                 new TemplateResource(templateOperations),
