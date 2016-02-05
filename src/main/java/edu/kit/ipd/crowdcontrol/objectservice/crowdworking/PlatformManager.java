@@ -111,8 +111,7 @@ public class PlatformManager {
      * @return The interface used to identify a worker
      */
     public WorkerIdentification getWorker(String name) {
-        return getPlatform(name)
-                .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+        return getPlatformOrThrow(name)
                 .getWorker().orElse(fallbackWorker);
     }
 
@@ -124,8 +123,7 @@ public class PlatformManager {
      * @return The interface used for payment
      */
     public Payment getPlatformPayment(String name) {
-        return getPlatform(name)
-                .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+        return getPlatformOrThrow(name)
                 .getPayment().orElse(fallbackPayment);
     }
 
@@ -150,9 +148,8 @@ public class PlatformManager {
         if (result == null)
             throw new TaskOperationException("Task could not be created");
 
-        return getPlatform(name)
-                .map(platform1 -> platform1.publishTask(experiment))
-                .orElseThrow(() -> new IllegalArgumentException("Platform not found!"))
+        return getPlatformOrThrow(name)
+                .publishTask(experiment)
                 .handle((s1, throwable) -> {
                     //if the creation was successful update the task
                     if (s1 != null && throwable == null && !s1.isEmpty()) {
@@ -190,12 +187,16 @@ public class PlatformManager {
         if (record == null)
             return CompletableFuture.completedFuture(true);
 
-        return getPlatform(name).map(platform -> platform.unpublishTask(record.getPlatformData()))
-                .orElseThrow(() -> new IllegalArgumentException("Experiment not found!"))
+        return getPlatformOrThrow(name).unpublishTask(record.getPlatformData())
                 .thenApply(aBoolean -> {
                     record.setStatus(TaskStatus.finished);
                     return tasksOps.updateTask(record);
                 });
+    }
+
+    private Platform getPlatformOrThrow(String name) {
+        return getPlatform(name)
+                .orElseThrow(() -> new IllegalArgumentException("Platform \""+name+"\" not found"));
     }
 
     /**
@@ -210,9 +211,8 @@ public class PlatformManager {
         record = tasksOps.getTask(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment is not published"));
 
-        return getPlatform(name)
-                .map(platform -> platform.updateTask(record.getPlatformData(), experiment))
-                .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+        return getPlatformOrThrow(name)
+                .updateTask(record.getPlatformData(), experiment)
                 .thenApply(s -> {
                     record.setPlatformData(s);
                     return tasksOps.updateTask(record);
