@@ -205,7 +205,6 @@ public class MoneyTransferManager {
             StringBuilder paymentMessage = loadMessage("src/main/resources/PaymentMessage.txt");
             StringBuilder giftCodeMessage = new StringBuilder();
 
-            //saves payment to the database
             for (GiftCodeRecord rec : giftCodes) {
                 giftCodeMessage.append(rec.getCode()).append(System.getProperty("line.separator"));
             }
@@ -215,7 +214,7 @@ public class MoneyTransferManager {
             map.put("GiftCodes", giftCodeMessage.toString());
             paymentMessage = new StringBuilder(Template.apply(paymentMessage.toString(), map));
 
-            //sends payment message
+            //sends payment message and saves the giftcodes to the database
             try {
                 mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage.toString());
                 for (GiftCodeRecord rec : giftCodes) {
