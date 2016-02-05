@@ -57,14 +57,15 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
+        //TODO auto expand
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
                 experiment.getPaymentBase().getValue()/100, //we are getting cents passed and have to pass dallers
-                60*60*24, //you have 24 hours to do the assignment
-                60*60*24*31*12, // the experiment is staying for ONE year
+                60*60*2, //you have 2 hours to do the assignment
+                60*60*24*10, // the experiment is staying for 10 days - each day the lifetime is extended by 1 day
                 tags,
                 experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
-                31*24*60*60, //this is a little problem we have to specify when autoapproval is kicking in this is happening after a month
+                2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
                 "");
     }
 
@@ -90,7 +91,6 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
          */
         Map<String, Assignment> workerAssignmentId = new HashMap<>();
         Map<String, BigDecimal> bonusPayed = new HashMap<>();
-        List<CompletableFuture<Boolean>> jobs = new ArrayList<>();
 
         try {
             int i = 0;
@@ -103,6 +103,22 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                 i++;
                 assignmentList = new GetAssignments(connection,id,i).get();
             }
+
+            i = 0;
+            List<BonusPayment> bonusPayments = new GetBonusPayments(connection, id, 1).get();
+            while (bonusPayments.size() > 0) {
+                for (BonusPayment bonusPayment : bonusPayments) {
+                    BigDecimal bigDecimal = bonusPayed.get(bonusPayment.getWorkerId());
+                    if (bigDecimal != null) {
+                        bigDecimal = bigDecimal.add(bonusPayment.getBonusAmount().getAmount());
+                    } else {
+                        bigDecimal = bonusPayment.getBonusAmount().getAmount();
+                    }
+                    bonusPayed.put(bonusPayment.getWorkerId(), bigDecimal);
+                }
+                i++;
+                bonusPayments = new GetBonusPayments(connection, id, i).get();
+            }
         } catch (InterruptedException | ExecutionException e) {
             CompletableFuture<Boolean> completableFuture= new CompletableFuture<>();
             completableFuture.completeExceptionally(e);
@@ -113,12 +129,7 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
         verifyConsistence(id, paymentJobs, workerAssignmentId, bonusPayed);
 
         //do the real paying
-        flushPayment(experiment, paymentJobs, workerAssignmentId, bonusPayed, jobs);
-
-        //concat all future objects to one big object
-        return CompletableFuture.supplyAsync(() ->
-                jobs.stream().map(CompletableFuture::join)
-                .filter(aBoolean -> !aBoolean).count() == 0);
+        return flushPayment(experiment, paymentJobs, workerAssignmentId, bonusPayed);
     }
 
     /**
@@ -127,9 +138,10 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
      * @param paymentJobs a list of payment jobs
      * @param workerAssignmentId all assignments
      * @param bonusPayed payed bonuses per assignment
-     * @param jobs list of jobs where to append new completables
      */
-    private void flushPayment(Experiment experiment, List<PaymentJob> paymentJobs, Map<String, Assignment> workerAssignmentId, Map<String, BigDecimal> bonusPayed, List<CompletableFuture<Boolean>> jobs) {
+    private CompletableFuture<Boolean> flushPayment(Experiment experiment, List<PaymentJob> paymentJobs, Map<String, Assignment> workerAssignmentId, Map<String, BigDecimal> bonusPayed) {
+        List<CompletableFuture<Boolean>> jobs = new ArrayList<>();
+
         for(PaymentJob paymentJob : paymentJobs) {
             Assignment assignment =
                     workerAssignmentId.get(paymentJob.getWorkerRecord().getIdentification());
@@ -140,27 +152,37 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                         "You answer did not match the wanted rating criteria"));
             }else {
                 //pay the worker regular
-                int amount = paymentJob.getAmount() - experiment.getPaymentBase().getValue();
+                int restAmount = paymentJob.getAmount() - experiment.getPaymentBase().getValue();
                 //approve the assignment if it is not right now
                 if (assignment.getAssignmentStatus().equals(AssignmentStatus.SUBMITTED)) {
                     //approving here triggers base payment
                     jobs.add(new ApproveAssignment(connection,assignment.getAssignmentId(),
                             "Thx for passing your answer!"));
-                    jobs.add(payBonus(paymentJob, assignment, amount));
+                    jobs.add(payBonus(paymentJob, assignment, restAmount));
                 } else if (assignment.getAssignmentStatus().equals(AssignmentStatus.APPROVED)) {
                     //the assignment is already approved
                     //check if a bonus was payed
-                    BigDecimal payedBonus = bonusPayed.get(assignment.getAssignmentId());
-                    double dollars = amount / 100;
+                    BigDecimal payedBonus = bonusPayed.get(assignment.getWorkerId());
+                    double should = restAmount / 100d;
+
+                    if (payedBonus == null)
+                        payedBonus = new BigDecimal(0.0);
+
+                    double difference = should - payedBonus.doubleValue();
+
+                    System.out.println("We should "+should+" diff: "+ difference+"i");
 
                     //check if we payed enough bonus
-                    if (payedBonus.doubleValue() < dollars) {
+                    if (difference > 0) {
                         //we need to pay the rest of the bonus
-                        jobs.add(payBonus(paymentJob, assignment, ((int)(dollars - payedBonus.doubleValue())*100)));
+                        jobs.add(payBonus(paymentJob, assignment, (int) (difference*100)));
                     }
                 }
             }
         }
+        return CompletableFuture.supplyAsync(() ->
+                jobs.stream().map(CompletableFuture::join)
+                        .filter(aBoolean -> !aBoolean).count() == 0);
     }
 
     /**
@@ -182,30 +204,14 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
             if (assignment == null) {
                 throw new IllegalArgumentException("Worker "+paymentJob.getWorkerRecord().getIdentification()+" does not have a assignment id");
             }
-            //check if assignments are already submitted
-            if (assignment.getAssignmentStatus().equals(AssignmentStatus.APPROVED)) {
-
-                //try to get bonus payments information
-                BigDecimal bonusAmount = new BigDecimal(0);
-                try {
-                    List<BonusPayment> bonusPayment = new GetBonusPayments(connection, id, assignment.getAssignmentId(), 1).get();
-                    //calculate how much bonus we payed
-                    for (BonusPayment bonusPayment1 : bonusPayment)
-                        bonusAmount = bonusAmount.add(bonusPayment1.getBonusAmount().getAmount());
-                    //mark it in the map
-                    bonusPayed.put(assignment.getAssignmentId(), bonusAmount);
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new IllegalArgumentException("Failed to fetch Bonus Payments information", e);
-                }
-            }
         }
     }
 
     private CompletableFuture<Boolean> payBonus(PaymentJob paymentJob, Assignment assignment, int amount) {
         //if there is money left pay a bonus
-        if (amount > 0) {
+        if (amount >= 0) {
             new GrantBonus(connection,assignment.getAssignmentId(),
-                       paymentJob.getWorkerRecord().getIdentification(),amount/100,"This is the bonus for a high rating!");
+                       paymentJob.getWorkerRecord().getIdentification(),(amount/100d),"This is the bonus for a high rating!");
         }
         return CompletableFuture.completedFuture(true);
     }

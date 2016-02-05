@@ -40,10 +40,27 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
                     values.put("Title", title);
                     values.put("Description", description);
                     values.put("Question",
-                            "<ExternalQuestion xmlns=\"http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd\">\n" +
-                                    "  <ExternalURL>https://tictactoe.amazon.com/gamesurvey.cgi?gameid=01523</ExternalURL>\n" +
-                                    "  <FrameHeight>400</FrameHeight>\n" +
-                                    "</ExternalQuestion>");//FIXME external reference
+                            "<HTMLQuestion xmlns=\"http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2011-11-11/HTMLQuestion.xsd\">\n" +
+                                    "  <HTMLContent><![CDATA[\n" +
+                                    "<!DOCTYPE html>\n" +
+                                    "<html>\n" +
+                                    " <head>\n" +
+                                    "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>\n" +
+                                    "  <script type='text/javascript' src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script>\n" +
+                                    " </head>\n" +
+                                    " <body>\n" +
+                                    "  <form name='mturk_form' method='post' id='mturk_form' action='https://www.mturk.com/mturk/externalSubmit'>\n" +
+                                    "  <input type='hidden' value='' name='assignmentId' id='assignmentId'/>\n" +
+                                    "  <h1>What's up?</h1>\n" +
+                                    "  <p><textarea name='comment' cols='80' rows='3'></textarea></p>\n" +
+                                    "  <p><input type='submit' id='submitButton' value='Submit' /></p></form>\n" +
+                                    "  <script language='Javascript'>turkSetAssignmentID();</script>\n" +
+                                    " </body>\n" +
+                                    "</html>\n" +
+                                    "]]>\n" +
+                                    "  </HTMLContent>\n" +
+                                    "  <FrameHeight>450</FrameHeight>\n" +
+                                    "</HTMLQuestion>");
                     values.put("Reward.Amount", reward);
                     values.put("Reward.CurrencyCode", "USD");
                     values.put("AssignmentDurationInSeconds", assignmentDurationInSeconds);

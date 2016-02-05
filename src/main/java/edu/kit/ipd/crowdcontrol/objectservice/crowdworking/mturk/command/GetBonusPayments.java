@@ -15,14 +15,13 @@ import java.util.Map;
  */
 public class GetBonusPayments extends MturkRestCommand<List<BonusPayment>, GetBonusPaymentsResponse> {
 
-    public GetBonusPayments(MTurkConnection connection, String hitId, String assignmentId, int pagenumber) {
+    public GetBonusPayments(MTurkConnection connection, String hitId, int pagenumber) {
         super(connection,
                 "GetBonusPayments",null,"2014-08-15",GetBonusPaymentsResponse.class,
                 () -> {
                     Map<String, Object> map = new HashMap<>();
 
                     map.put("HITId", hitId);
-                    map.put("AssignmentId", assignmentId);
                     map.put("PageSize", "100");
                     map.put("PageNumber", pagenumber);
 

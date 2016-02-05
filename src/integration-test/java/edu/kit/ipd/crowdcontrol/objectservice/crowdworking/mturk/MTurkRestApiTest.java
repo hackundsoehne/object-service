@@ -43,7 +43,7 @@ public class MTurkRestApiTest {
         try {
             new RejectAssignment(connection,"alpha","bla").get();
             new ApproveAssignment(connection,"alpha","bla").get();
-            new GetBonusPayments(connection,id,"bla2",1).get();
+            new GetBonusPayments(connection,id,1).get();
         } catch (ExecutionException e) {
             assertEquals(e.getCause().getCause().getMessage().replaceAll("\\d",""),
                    "AWS.MechanicalTurk.AssignmentDoesNotExist : " +
