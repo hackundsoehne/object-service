@@ -1,13 +1,17 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ConstraintRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Answer;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * handles the transformation of the Answers and Ratings from and to the protobuf-definitions
@@ -25,7 +29,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
      *
      * @return The protobuf object with the given data from answer record and ratings.
      */
-    public static Answer toAnswerProto(AnswerRecord answerRecord, List<RatingRecord> ratings) {
+    public static Answer toAnswerProto(AnswerRecord answerRecord, List<Rating> ratings) {
         return builder(Answer.newBuilder())
                 .set(answerRecord.getQuality(), Answer.Builder::setQuality)
                 .getBuilder()
@@ -34,9 +38,8 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                 .setId(answerRecord.getIdAnswer())
                 .setTime(answerRecord.getTimestamp().getNanos())
                 .setWorker(answerRecord.getWorkerId())
-                .addAllRatings(() -> ratings.stream()
-                        .map(AnswerRatingTransformer::toRatingProto)
-                        .iterator()).build();
+                .addAllRatings(ratings)
+                .build();
     }
 
     /**
@@ -50,18 +53,17 @@ public class AnswerRatingTransformer extends AbstractTransformer {
     public static AnswerRecord toAnswerRecord(Answer answer, int experimentId) {
         AnswerRecord answerRecord = new AnswerRecord();
         answerRecord.setTimestamp(Timestamp.from(Instant.now()));
+        answerRecord.setExperiment(experimentId);
 
         return merge(answerRecord, answer, (field, record) -> {
             switch (field) {
-                case Answer.EXPERIMENT_ID_FIELD_NUMBER:
-                    record.setExperiment(experimentId);
-                    break;
                 case Answer.CONTENT_FIELD_NUMBER:
                     record.setAnswer(answer.getContent());
                     break;
                 case Answer.WORKER_FIELD_NUMBER:
                     record.setWorkerId(answer.getWorker());
                     break;
+
             }
         });
     }
@@ -73,13 +75,16 @@ public class AnswerRatingTransformer extends AbstractTransformer {
      *
      * @return New object created from the record.
      */
-    public static Rating toRatingProto(RatingRecord ratingRecord) {
+    public static Rating toRatingProto(RatingRecord ratingRecord, List<ConstraintRecord> constraints) {
+        Function<ConstraintRecord, Constraint> mapper = (constraintRecord) -> Constraint.newBuilder().setId(constraintRecord.getIdConstraint()).setName(constraintRecord.getConstraint()).build();
+
         return builder(Rating.newBuilder())
                 .set(ratingRecord.getRating(), Rating.Builder::setRating)
                 .set(ratingRecord.getFeedback(), Rating.Builder::setFeedback)
                 .getBuilder()
                 .setTime(ratingRecord.getTimestamp().getNanos())
                 .setWorker(ratingRecord.getWorkerId())
+                .addAllViolatedConstraints(constraints.stream().map(mapper).collect(Collectors.toList()))
                 .build();
     }
 
