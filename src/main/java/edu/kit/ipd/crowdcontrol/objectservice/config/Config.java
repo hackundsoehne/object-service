@@ -1,9 +1,17 @@
 package edu.kit.ipd.crowdcontrol.objectservice.config;
 
 /**
- * Created by marcel on 05.02.16.
+ * Config of which is saved in config file
+ * @author MarcelHollerbach
+ * @version 1.0
  */
 public class Config {
+    /**
+     * Databasepart of the config
+     */
     public Database database;
+    /**
+     * all specified platforms in the config
+     */
     public ConfigPlatform[] platforms;
 }
