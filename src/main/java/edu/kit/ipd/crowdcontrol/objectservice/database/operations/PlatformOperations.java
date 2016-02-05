@@ -66,10 +66,18 @@ public class PlatformOperations extends AbstractOperations {
         return create.executeInsert(platformRecord) == 1;
     }
 
+    /**
+     * Update the record of the given id with the new values
+     * @param rec A new Platformrecord
+     */
     public void updatePlatform(PlatformRecord rec) {
         //TODO LEAAAAANDER
     }
 
+    /**
+     * Get a List of all Platforms
+     * @return List containing all platforms which are currently in the database
+     */
     public List<PlatformRecord> getPlatforms() {
         //TODO LEAAAAANDER
         return Collections.emptyList();
