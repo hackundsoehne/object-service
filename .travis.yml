@@ -18,9 +18,12 @@ before_script:
   - mysql -u "root" < src/main/resources/db.sql
   - cp src/main/resources/config.travis.yml src/main/resources/config.yml
 
+env:
+  - TASK=check
+  - TASK=restTest
+
 script:
-  - ./gradlew check
-  - ./gradlew restTest
+  - ./gradlew $TASK
 
 services:
   - mysql

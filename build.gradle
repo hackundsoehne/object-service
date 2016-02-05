@@ -102,11 +102,17 @@ sourceSets {
 configurations {
     integrationTestCompile.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
+
     restTestCompile.extendsFrom testCompile
     restTestRuntime.extendsFrom testRuntime
 }
 
 task restTest(type: Test) {
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/restTest.exec")
+        classDumpFile = file("$buildDir/classes/restTest")
+    }
+
     testClassesDir = sourceSets.restTest.output.classesDir
     classpath = sourceSets.restTest.runtimeClasspath
 
@@ -116,6 +122,11 @@ task restTest(type: Test) {
 }
 
 task integrationTest(type: Test) {
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/integrationTest.exec")
+        classDumpFile = file("$buildDir/classes/integrationTest")
+    }
+
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath
 
@@ -126,9 +137,12 @@ task integrationTest(type: Test) {
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
+    finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
+    executionData = fileTree(dir: 'build/jacoco', include: '**/*.exec')
+
     reports {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
