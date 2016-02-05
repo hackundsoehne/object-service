@@ -15,7 +15,7 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
  * @version 1.0
  */
 public class TasksOperations extends AbstractOperations {
-    protected TasksOperations(DSLContext create) {
+    public TasksOperations(DSLContext create) {
         super(create);
     }
 

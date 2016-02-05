@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
@@ -15,6 +17,8 @@ import javax.naming.NamingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 
@@ -81,8 +85,6 @@ public class Main {
     }
 
     private static void boot(DatabaseManager databaseManager, String readOnlyDBUser, String readOnlyDBPassword, int cleanupInterval) throws SQLException {
-        PlatformManager platformManager = null; // TODO
-
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnlyDBUser, readOnlyDBPassword);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
@@ -93,9 +95,16 @@ public class Main {
         AlgorithmOperations algorithmsOperations = new AlgorithmOperations(databaseManager.getContext());
         WorkerCalibrationOperations workerCalibrationOperations = new WorkerCalibrationOperations(databaseManager.getContext());
         AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext(), calibrationOperations, workerCalibrationOperations, experimentOperations);
+        TasksOperations tasksOperations = new TasksOperations(databaseManager.getContext());
 
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
+
+        DummyPlatform dummyPlatform = new DummyPlatform();
+        List<Platform> crowdPlatforms = new ArrayList<>();
+        crowdPlatforms.add(dummyPlatform);
+        PlatformManager platformManager = new PlatformManager(crowdPlatforms, new FallbackWorker(), null, tasksOperations, platformOperations,
+                workerOperations); // TODO set fallbackPayment
 
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 

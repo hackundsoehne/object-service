@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
@@ -8,11 +9,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -52,12 +53,13 @@ public class PlatformManager {
 
         //create hashmap of platforms
         platforms = crowdPlatforms.stream()
-                .collect(Collectors.toMap(Platform::getName, Function.identity()));
+                .collect(Collectors.toMap(Platform::getID, Function.identity()));
         //clear database
         platformOps.deleteAllPlatforms();
         //update database
         platforms.forEach((s, platform) -> {
             PlatformRecord rec = new PlatformRecord();
+            rec.setIdPlatform(platform.getID());
             rec.setName(platform.getName());
             rec.setNeedsEmail(false);
 
@@ -249,11 +251,22 @@ public class PlatformManager {
      * @param name name of the platform
      * @param experiment experiment which is published
      * @param paymentJobs tuples which are defining the amount to pay
-     * @return
+     * @return a future object which indicates if the payment was successful or not
+     * @throws IllegalWorkerSetException if this exception is thrown NO payment requests are given to the platform
+     *
      */
-    public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws TaskOperationException {
+    public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws TaskOperationException, IllegalWorkerSetException {
         TaskRecord record = tasksOps.getTask(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment was never published"));
+        List<WorkerRecord> workerRecords = workerOps.getWorkerWithWork(experiment.getId(), name);
+
+        Set<String> given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toSet());
+        Set<String> should = workerRecords.stream().map(WorkerRecord::getIdentification).collect(Collectors.toSet());
+
+        if (!given.equals(should)) {
+            throw new IllegalWorkerSetException(
+                    "The list of payment Jobs need to have all workers which worked on this experiment on the given platform");
+        }
 
         return getPlatformPayment(name).payExperiment(record.getPlatformData(), experiment,paymentJobs);
     }
