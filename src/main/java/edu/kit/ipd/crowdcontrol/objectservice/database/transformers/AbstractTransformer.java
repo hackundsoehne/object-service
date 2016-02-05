@@ -21,7 +21,11 @@ public abstract class AbstractTransformer {
      *
      * @return Encoded integer.
      */
-    protected static edu.kit.ipd.crowdcontrol.objectservice.proto.Integer toInteger(int value) {
+    protected static edu.kit.ipd.crowdcontrol.objectservice.proto.Integer toInteger(Integer value) {
+        if (value == null) {
+            return null;
+        }
+
         return edu.kit.ipd.crowdcontrol.objectservice.proto.Integer.newBuilder().setValue(value).build();
     }
 
