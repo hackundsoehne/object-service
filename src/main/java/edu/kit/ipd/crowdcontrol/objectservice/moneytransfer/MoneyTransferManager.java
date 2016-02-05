@@ -34,12 +34,10 @@ public class MoneyTransferManager {
     private WorkerBalanceOperations workerBalanceOperations;
     private WorkerOperations workerOperations;
     private int payOffThreshold;
-    private int minGiftCodesCount;
     private String notificationMailAddress;
     private StringBuilder notificationText;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> schedule = null;
-
 
     /**
      * Creates a new instance of the MoneyTransferManager
@@ -53,7 +51,6 @@ public class MoneyTransferManager {
         this.mailHandler = mailHandler;
         this.workerOperations = workerOperations;
         this.workerBalanceOperations = workerBalanceOperations;
-        this.minGiftCodesCount = 10;
         this.payOffThreshold = 0;
         this.notificationMailAddress = notificationMailAddress;
         this.notificationText = new StringBuilder();
@@ -122,9 +119,6 @@ public class MoneyTransferManager {
 
             giftCodes = workerBalanceOperations.getUnusedGiftCodes();
             payWorker(worker, payedCodesForWorker);
-        }
-        if (giftCodes.size() < minGiftCodesCount) {
-            notificationText.append("There are less than ").append(minGiftCodesCount).append(" giftcodes in the database. It is recommended to add more.").append(System.getProperty("line.separator"));
         }
         LOGGER.trace("Completed submission of giftcodes to workers.");
 
