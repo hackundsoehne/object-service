@@ -2,24 +2,22 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer;
 import org.jooq.DSLContext;
 import org.jooq.Result;
-
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.ANSWER;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATING;
 
 /**
  * responsible for all queries related to the Answer and Rating Table
@@ -38,6 +36,15 @@ public class AnswerRatingOperations extends AbstractOperations {
         this.workerCalibrationOperations = workerCalibrationOperations;
     }
 
+
+    /**
+     * Returns the number of all good answers of the specified experiment
+     * @param expID of the experiment
+     * @return Returns the number of all good answers of the specified experiment
+     */
+    public int getNumberOfFinalGoodAns(int expID){
+        return 0;
+    }
 
     /**
      * Gets all ratings of a specified answer

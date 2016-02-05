@@ -96,7 +96,7 @@ public class Main {
 
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
-        QualityIdentificator.init(answerRatingOperations,experimentOperations);
+        QualityIdentificator qualityIdentificator = new QualityIdentificator(answerRatingOperations,experimentOperations,experimentController);
 
         new Router(
                 new TemplateResource(templateOperations),
