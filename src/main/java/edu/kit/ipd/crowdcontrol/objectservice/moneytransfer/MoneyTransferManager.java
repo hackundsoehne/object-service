@@ -232,13 +232,17 @@ public class MoneyTransferManager {
      */
     private void sendNotification(String message, boolean criticalError) throws MoneyTransferException {
         StringBuilder mail;
-        String subject;
-        if (criticalError) {
-            mail = loadMessage("src/main/resources/errorMoneyTransferMessage.txt");
-            subject = "Payment Error occurred";
-        } else {
-            mail = loadMessage("src/main/resources/notificationMoneyTransferMessage.txt");
-            subject = "Payment Notification";
+        String subject = "";
+        try {
+            if (criticalError) {
+                subject = "Payment Error occurred";
+                mail = loadMessage("src/main/resources/errorMoneyTransferMessage.txt");
+            } else {
+                subject = "Payment Notification";
+                mail = loadMessage("src/main/resources/notificationMoneyTransferMessage.txt");
+            }
+        } catch (MoneyTransferException e) {
+            mail = new StringBuilder(e.toString());
         }
 
         mail = mail.append(message);
