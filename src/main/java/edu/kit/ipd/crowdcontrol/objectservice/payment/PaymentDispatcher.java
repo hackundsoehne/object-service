@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.payment;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.IllegalWorkerSetException;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
@@ -86,7 +87,7 @@ public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
                 .forEach((platform, paymentJobs) -> {
                     try {
                         platformManager.payExperiment(platform, exp, paymentJobs);
-                    } catch (TaskOperationException e) {
+                    } catch (TaskOperationException | IllegalWorkerSetException e) {
                         //TODO maybe notify researcher?
                         log.fatal(String.format("Unable to pay workers for platform %s", platform), e);
                     }
