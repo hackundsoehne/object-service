@@ -16,6 +16,7 @@ cache:
 
 before_script:
   - mysql -u "root" < src/main/resources/db.sql
+  - cp src/main/resources/config.travis.yml src/main/resources/config.yml
 
 script:
   - ./gradlew check
