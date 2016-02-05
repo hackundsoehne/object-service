@@ -14,12 +14,12 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-before_test:
-  - mysql -u "root" -p "" < src/main/resources/db.sql
+before_script:
+  - mysql -u "root" < src/main/resources/db.sql
 
-test:
-  - gradle check
-  - gradle restTest
+script:
+  - ./gradlew check
+  - ./gradlew restTest
 
 services:
   - mysql
