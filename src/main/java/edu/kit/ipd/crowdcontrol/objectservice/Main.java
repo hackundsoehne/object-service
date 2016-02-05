@@ -81,7 +81,7 @@ public class Main {
 
     private static void boot(DatabaseManager databaseManager, String readOnlyDBUser, String readOnlyDBPassword, int cleanupInterval) throws SQLException {
         PlatformManager platformManager = null; // TODO
-
+        ExperimentController experimentController = new ExperimentController(platformManager);
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnlyDBUser, readOnlyDBPassword);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());

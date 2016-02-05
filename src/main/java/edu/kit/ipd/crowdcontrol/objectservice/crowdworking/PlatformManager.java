@@ -8,7 +8,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 
 import java.util.List;
 import java.util.Map;
@@ -174,7 +173,7 @@ public class PlatformManager {
     }
 
     /**
-     * Unpublish a given experiment from the given platform
+     * Unpublishes a given experiment from the given platform
      *
      * @param name The name of the platform
      * @param experiment The experiment to unpublish
