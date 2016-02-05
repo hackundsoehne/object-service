@@ -334,8 +334,7 @@ public class ExperimentResource {
 
         experiment.getAlgorithmQualityRating().getParametersList().forEach(param -> algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue()));
 
-        //TODO fix!
-        if (!Objects.equals(old.getTemplateId() , experimentRecord.getTemplate())) {
+        if (experiment.hasTemplateId() &&  (!old.hasTemplateId() || !Objects.equals(old.getTemplateId().getValue() , experimentRecord.getTemplate()))) {
             experimentOperations.deleteRatingOptions(id);
         }
 
@@ -383,7 +382,6 @@ public class ExperimentResource {
             throw new IllegalStateException("experiment lacks information needed for publishing");
         }
 
-        //TODO publish
         if (experiment.getState().equals(Experiment.State.PUBLISHED)) {
             calibrationOperations.createExperimentsCalibration(id);
         }
