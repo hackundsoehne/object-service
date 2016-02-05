@@ -37,8 +37,10 @@ public class AnswerRatingOperations extends AbstractOperations {
      * inserts a new answer into the DB
      * @param answerRecord the record to insert
      * @return the resulting record
+     * @throws IllegalArgumentException if the experiment the answers is referring to is not existing
+     * @throws IllegalStateException if the worker is not allowed to submit more answers
      */
-    public AnswerRecord insertNewAnswer(AnswerRecord answerRecord) {
+    public AnswerRecord insertNewAnswer(AnswerRecord answerRecord) throws IllegalArgumentException, IllegalStateException {
         answerRecord.setIdAnswer(null);
         ExperimentRecord experiment = experimentOperations.getExperiment(answerRecord.getExperiment())
                 .orElseThrow(() -> new IllegalArgumentException("Illegal experiment-value in rating record."));
@@ -76,8 +78,10 @@ public class AnswerRatingOperations extends AbstractOperations {
      * inserts a new rating into the DB
      * @param ratingRecord the record to insert
      * @return the resulting record
+     * @throws IllegalArgumentException if the experiment the rating is referring to is not existing
+     * @throws IllegalStateException if the worker is not allowed to submit more ratings
      */
-    public RatingRecord insertNewRating(RatingRecord ratingRecord) {
+    public RatingRecord insertNewRating(RatingRecord ratingRecord) throws IllegalArgumentException, IllegalStateException {
         ratingRecord.setIdRating(null);
         ExperimentRecord experiment = experimentOperations.getExperiment(ratingRecord.getExperiment())
                 .orElseThrow(() -> new IllegalArgumentException("Illegal experiment-value in rating record."));
