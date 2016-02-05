@@ -23,7 +23,7 @@ public class FallbackWorker implements WorkerIdentification {
         //if the worker provides an email-address return it
         if (param.containsKey("email")) {
             String email = param.get("email")[0];
-            if (!EmailValidator.getInstance(false).isValid(email)) {
+            if (!email.isEmpty() && !EmailValidator.getInstance(false).isValid(email)) {
                 throw new UnidentifiedWorkerException(String.format("invalid email: %s!", email));
             }
             return email;
