@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
@@ -8,7 +9,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 
 import java.util.List;
 import java.util.Map;
@@ -27,23 +27,6 @@ public class PlatformManager {
     private final Payment fallbackPayment;
     private TasksOperations tasksOps;
     private WorkerOperations workerOps;
-
-
-    /**
-     * Create a new manager for platforms. The known platforms in the database will be deleted,
-     * and filled with the new.
-     *
-     * @param crowdPlatforms The list of crowdplatforms to be managed by this manager,
-     *                       will be used to setup the list of platforms in the database
-     * @param fallbackPayment handler which is called if a platform does not support payment
-     * @param tasksOps Used for the task operations on the database
-     * @param platformOps Used for the platform operations on the database
-     * @param workerOps Used for the worker operations on the database
-     */
-    public PlatformManager(List<Platform> crowdPlatforms, Payment fallbackPayment, TasksOperations tasksOps,
-                           PlatformOperations platformOps, WorkerOperations workerOps) {
-        this(crowdPlatforms, new FallbackWorker(), fallbackPayment, tasksOps, platformOps, workerOps);
-    }
 
     /**
      * Create a new manager for platforms. The known platforms in the database will be deleted,

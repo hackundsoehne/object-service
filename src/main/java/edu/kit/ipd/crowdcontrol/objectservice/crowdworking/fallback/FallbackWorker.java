@@ -1,5 +1,7 @@
-package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
+package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentification;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.Map;
