@@ -73,8 +73,8 @@ public class PlatformManagerTest {
             record.setStatus(TaskStatus.running);
             record2.setStatus(TaskStatus.running);
 
-            record.setCrowdPlatform(platform.getType());
-            record2.setCrowdPlatform(platform.getType());
+            record.setCrowdPlatform(platform.getID());
+            record2.setCrowdPlatform(platform.getID());
 
             record2.setPlatformData(42 + "");
 
@@ -82,7 +82,7 @@ public class PlatformManagerTest {
             when(tasksOps.updateTask(record2)).thenReturn(true);
 
             try {
-                manager.publishTask(platform.getType(), experiment).join();
+                manager.publishTask(platform.getID(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
@@ -101,9 +101,9 @@ public class PlatformManagerTest {
             record.setStatus(TaskStatus.running);
             record.setPlatformData(42 + "");
 
-            when(tasksOps.getTask(platform.getType(), experiment.getId())).thenReturn(Optional.of(record));
+            when(tasksOps.getTask(platform.getID(), experiment.getId())).thenReturn(Optional.of(record));
             try {
-                manager.updateTask(platform.getType(), experiment).join();
+                manager.updateTask(platform.getID(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
@@ -115,13 +115,13 @@ public class PlatformManagerTest {
         platforms.forEach(platform -> {
             TaskRecord record = new TaskRecord();
             record.setExperiment(42);
-            record.setCrowdPlatform(platform.getType());
+            record.setCrowdPlatform(platform.getID());
             record.setStatus(TaskStatus.running);
             record.setPlatformData(42+"");
 
-            when(tasksOps.getTask(platform.getType(),experiment.getId())).thenReturn(Optional.of(record));
+            when(tasksOps.getTask(platform.getID(),experiment.getId())).thenReturn(Optional.of(record));
             try {
-                manager.unpublishTask(platform.getType(), experiment).join();
+                manager.unpublishTask(platform.getID(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
@@ -180,7 +180,7 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public String getType() {
+        public String getID() {
             return type;
         }
 

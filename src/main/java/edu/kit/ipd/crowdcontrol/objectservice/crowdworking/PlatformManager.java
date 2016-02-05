@@ -52,12 +52,13 @@ public class PlatformManager {
 
         //create hashmap of platforms
         platforms = crowdPlatforms.stream()
-                .collect(Collectors.toMap(Platform::getName, Function.identity()));
+                .collect(Collectors.toMap(Platform::getID, Function.identity()));
         //clear database
         platformOps.deleteAllPlatforms();
         //update database
         platforms.forEach((s, platform) -> {
             PlatformRecord rec = new PlatformRecord();
+            rec.setIdPlatform(platform.getID());
             rec.setName(platform.getName());
             rec.setNeedsEmail(false);
 
