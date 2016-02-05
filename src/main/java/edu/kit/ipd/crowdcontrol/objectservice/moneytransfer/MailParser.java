@@ -24,7 +24,7 @@ public class MailParser {
      */
     protected static GiftCodeRecord parseAmazonGiftCode(Message msg) throws MoneyTransferException {
         //Extract Message
-        String message = "";
+        String message;
         try {
             if (!msg.getFrom()[0].toString().toLowerCase().contains("amazon.de")) {
                 return null;
@@ -43,6 +43,11 @@ public class MailParser {
         }
         //Parse Message
         String messageStr = message.replaceAll(" ", "");
+
+        StringBuilder password = MoneyTransferManager.loadMessage("src/main/resources/parsingPassword.txt");
+        if (!messageStr.contains(password)) {
+            return null;
+        }
 
         String codePatternStr = "[0-9A-Z]+(-[0-9A-Z]+)+";
         Pattern codePattern = Pattern.compile(codePatternStr);

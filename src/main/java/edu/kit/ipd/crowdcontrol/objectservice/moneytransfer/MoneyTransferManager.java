@@ -264,7 +264,7 @@ public class MoneyTransferManager {
      * @return the StringBuilder to return
      * @throws MoneyTransferException gets thrown, if an error occurred
      */
-    private StringBuilder loadMessage(String path) throws MoneyTransferException {
+    protected static StringBuilder loadMessage(String path) throws MoneyTransferException {
         StringBuilder content = new StringBuilder();
 
         try {
