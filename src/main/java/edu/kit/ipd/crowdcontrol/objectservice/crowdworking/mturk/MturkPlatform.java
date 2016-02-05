@@ -68,7 +68,7 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
                 experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dallers
                 60*60*2, //you have 2 hours to do the assignment
-                60*60*24*10, // the experiment is staying for 10 days - each day the lifetime is extended by 1 day
+                60*60*24*30, // the experiment is staying for 30 days
                 tags,
                 experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
                 2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
