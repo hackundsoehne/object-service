@@ -363,19 +363,18 @@ public class ExperimentResource {
                     " is allowed as state change");
 
         //validate its draft -> published
-        if (!(experiment.getState().equals(Experiment.State.PUBLISHED) && old.getState().equals(Experiment.State.DRAFT))) {
-            throw new IllegalArgumentException("Publish is only allowed for DRAFT experiments");
+        if (experiment.getState() == Experiment.State.PUBLISHED && old.getState() != Experiment.State.DRAFT) {
+            throw new IllegalArgumentException("Publish is only allowed for experiments in draft state.");
         }
 
         //validate its published -> creative_stopped
-        if (!(experiment.getState().equals(Experiment.State.CREATIVE_STOPPED) && old.getState().equals(Experiment.State.PUBLISHED))) {
-            throw new IllegalArgumentException("Creative stop is only allowed for published experiments");
+        if (experiment.getState() == Experiment.State.CREATIVE_STOPPED && old.getState() != Experiment.State.PUBLISHED) {
+            throw new IllegalArgumentException("Creative stop is only allowed for published experiments.");
         }
 
         //check that there are enough datas for publish
-        if (experiment.getState().equals(Experiment.State.PUBLISHED)
-                && experimentOperations.verifyExperimentForPublishing(id)) {
-            throw new IllegalStateException("experiment lacks information needed for publishing");
+        if (experiment.getState() == Experiment.State.PUBLISHED && experimentOperations.verifyExperimentForPublishing(id)) {
+            throw new IllegalStateException("Experiment lacks information needed for publishing.");
         }
 
         if (experiment.getState().equals(Experiment.State.PUBLISHED)) {
