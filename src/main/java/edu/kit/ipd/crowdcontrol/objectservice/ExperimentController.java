@@ -55,6 +55,12 @@ public class ExperimentController implements Observer<Event<Experiment>> {
 
     }
 
+    /**
+     * Unpublishes an experiment from all platforms it is meant to be active on.
+     * This method is only called if the initilization of the experiment has failed on one
+     * of its platforms.
+     * @param experiment which is going to be unpublished
+     */
     private void unpublishExperiment(Experiment experiment){
         for (int i = 0; i < experiment.getPopulationsCount(); i++) {
             try {
@@ -66,6 +72,12 @@ public class ExperimentController implements Observer<Event<Experiment>> {
     }
 
 
+    /**
+     * Unpublished the experiment from all its platform. Waits until the time for giving answers and/or ratings
+     * on the platforms (specified in the config-file) has run out. The experimen's state is set to STOPPED and a
+     * matching event is emitted.
+     * @param experiment which is to be ended.
+     */
     public void endExperiment(Experiment experiment){
 
         for (int i = 0; i < experiment.getPopulationsCount(); i++){
@@ -88,12 +100,12 @@ public class ExperimentController implements Observer<Event<Experiment>> {
 
     @Override
     public void onCompleted() {
-
+        //NOP
     }
 
     @Override
     public void onError(Throwable e) {
-
+        //NOP
     }
 
     @Override
