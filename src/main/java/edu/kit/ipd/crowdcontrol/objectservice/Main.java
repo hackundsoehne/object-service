@@ -42,7 +42,7 @@ public class Main {
 
         Config config = Yaml.loadType(Main.class.getResourceAsStream("/config.yaml"), Config.class);
 
-        if (config.database.maintainInterval == 0)
+        if (config.database.maintainInterval < 1)
             config.database.maintainInterval = 24;
 
         SQLDialect dialect = SQLDialect.valueOf(config.database.dialect);
