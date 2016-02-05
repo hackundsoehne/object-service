@@ -8,10 +8,21 @@ after_success:
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+before_test:
+  - mysql -u "root" -p "" < src/main/resources/db.sql
+
+test:
+  - gradle check
+  - gradle restTest
+
+services:
+  - mysql
 
 notifications:
   email: false
