@@ -61,7 +61,7 @@ public class Main {
                     //TODO someone needs to implement pybossa SIIIIMON
                     throw new IllegalArgumentException("Nonono we cannot do this now.");
                 case "dummy":
-                    platformInstance = new DummyPlatform();
+                    platformInstance = new DummyPlatform(platform.name);
                     break;
                 default:
                     throw new ConfigException("Platform type "+platform.type+" not found");
