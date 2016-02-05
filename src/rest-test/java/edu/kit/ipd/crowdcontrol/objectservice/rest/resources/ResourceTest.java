@@ -24,6 +24,7 @@ abstract public class ResourceTest {
     protected <T extends Message> T httpPut(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         HttpResponse<InputStream> response = Unirest.put(ORIGIN + path)
                 .header("accept", "application/protobuf")
+                .header("content-type", "application/protobuf")
                 .body(input.toByteArray())
                 .asBinary();
 
@@ -33,6 +34,7 @@ abstract public class ResourceTest {
     protected <T extends Message> T httpPatch(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         HttpResponse<InputStream> response = Unirest.patch(ORIGIN + path)
                 .header("accept", "application/protobuf")
+                .header("content-type", "application/protobuf")
                 .body(input.toByteArray())
                 .asBinary();
 
