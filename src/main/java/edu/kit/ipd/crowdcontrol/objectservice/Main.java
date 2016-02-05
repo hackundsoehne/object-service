@@ -59,7 +59,7 @@ public class Main {
             switch (platform.type) {
                 case "mturk":
                     //FIXME remove the sandbox url - but I am to paranoid
-                    platformInstance = new MturkPlatform(platform.user, platform.password, "https://mechanicalturk.sandbox.amazonaws.com/");
+                    platformInstance = new MturkPlatform(platform.user, platform.password, "https://mechanicalturk.sandbox.amazonaws.com/", platform.name);
                     break;
                 case "pybossa":
                     //TODO someone needs to implement pybossa SIIIIMON

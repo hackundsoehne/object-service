@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @version 0.1
  */
 public class MturkPlatform implements Platform,Payment,WorkerIdentification {
-
+    private final String name;
     private final MTurkConnection connection;
 
     /**
@@ -30,13 +30,19 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
      * @param password password to use
      * @param url instance to connect to
      */
-    public MturkPlatform(String user, String password, String url) {
+    public MturkPlatform(String user, String password, String url, String name) {
         connection = new MTurkConnection(user, password, url);
+        this.name = name;
     }
 
     @Override
     public String getName() {
-        return "Mturk";
+        return "Mturk "+name;
+    }
+
+    @Override
+    public String getID() {
+        return "mturk"+name.toLowerCase();
     }
 
     @Override
