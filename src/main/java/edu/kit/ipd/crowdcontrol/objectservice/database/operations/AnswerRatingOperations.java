@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer;
 import org.jooq.DSLContext;
@@ -22,12 +23,14 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATIN
 public class AnswerRatingOperations extends AbstractOperations {
     private final CalibrationOperations calibrationOperations;
     private final WorkerCalibrationOperations workerCalibrationOperations;
+    private final ExperimentOperations experimentOperations;
 
     public AnswerRatingOperations(DSLContext create, CalibrationOperations calibrationOperations,
-                                  WorkerCalibrationOperations workerCalibrationOperations) {
+                                  WorkerCalibrationOperations workerCalibrationOperations, ExperimentOperations experimentOperations) {
         super(create);
         this.calibrationOperations = calibrationOperations;
         this.workerCalibrationOperations = workerCalibrationOperations;
+        this.experimentOperations = experimentOperations;
     }
 
     /**
@@ -37,6 +40,14 @@ public class AnswerRatingOperations extends AbstractOperations {
      */
     public AnswerRecord insertNewAnswer(AnswerRecord answerRecord) {
         answerRecord.setIdAnswer(null);
+        ExperimentRecord experiment = experimentOperations.getExperiment(answerRecord.getExperiment())
+                .orElseThrow(() -> new IllegalArgumentException("Illegal experiment-value in rating record."));
+        if (getAnswerCount(answerRecord.getWorkerId()) >= experiment.getAnwersPerWorker()) {
+            throw new IllegalStateException(
+                    String.format("Worker %d already submitted the maximum of allowed ratings", answerRecord.getWorkerId())
+            );
+        }
+
         AnswerRecord result = doIfRunning(answerRecord.getExperiment(), conf ->
                 DSL.using(conf)
                         .insertInto(ANSWER)
@@ -50,12 +61,31 @@ public class AnswerRatingOperations extends AbstractOperations {
     }
 
     /**
+     * returns the number answers a worker has submitted.
+     * @param workerID the primary key of the worker
+     * @return the number of answers
+     */
+    private int getAnswerCount(int workerID) {
+        return create.fetchCount(
+                DSL.selectFrom(ANSWER)
+                        .where(ANSWER.WORKER_ID.eq(workerID))
+        );
+    }
+
+    /**
      * inserts a new rating into the DB
      * @param ratingRecord the record to insert
      * @return the resulting record
      */
     public RatingRecord insertNewRating(RatingRecord ratingRecord) {
         ratingRecord.setIdRating(null);
+        ExperimentRecord experiment = experimentOperations.getExperiment(ratingRecord.getExperiment())
+                .orElseThrow(() -> new IllegalArgumentException("Illegal experiment-value in rating record."));
+        if (getRatingCount(ratingRecord.getWorkerId()) >= experiment.getRatingsPerWorker()) {
+            throw new IllegalStateException(
+                    String.format("Worker %d already submitted the maximum of allowed ratings", ratingRecord.getWorkerId())
+            );
+        }
         RatingRecord result = doIfRunning(ratingRecord.getExperiment(), conf ->
                 DSL.using(conf)
                         .insertInto(RATING)
@@ -65,6 +95,18 @@ public class AnswerRatingOperations extends AbstractOperations {
         );
         addToExperimentCalibration(ratingRecord.getWorkerId(), ratingRecord.getExperiment());
         return result;
+    }
+
+    /**
+     * returns the number of ratings a worker has submitted
+     * @param workerId the workerId to check for
+     * @return the number of ratings
+     */
+    private int getRatingCount(int workerId) {
+        return create.fetchCount(
+                DSL.selectFrom(RATING)
+                        .where(RATING.WORKER_ID.eq(workerId))
+        );
     }
 
     /**
