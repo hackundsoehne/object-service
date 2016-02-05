@@ -37,6 +37,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public WorkerRecord insertWorker(WorkerRecord workerRecord) {
         workerRecord.setIdWorker(null);
+        workerRecord.setQuality(9);
 
         return create.transactionResult(conf -> {
             boolean existing = DSL.using(conf).fetchExists(
