@@ -125,9 +125,6 @@ public class WorkerResource {
 
         EventManager.WORKER_CHANGE.emit(worker);
 
-        response.status(201);
-        response.header("Location", "/workers/" + worker.getId());
-
         return worker;
     }
 
