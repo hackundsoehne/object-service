@@ -13,6 +13,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -259,8 +260,8 @@ public class PlatformManager {
                 orElseThrow(() -> new TaskOperationException("Experiment was never published"));
         List<WorkerRecord> workerRecords = workerOps.getWorkerWithWork(experiment.getId(), name);
 
-        List<String> given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toList());
-        List<String> should = workerRecords.stream().map(WorkerRecord::getIdentification).collect(Collectors.toList());
+        Set<String> given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toSet());
+        Set<String> should = workerRecords.stream().map(WorkerRecord::getIdentification).collect(Collectors.toSet());
 
         if (!given.equals(should)) {
             throw new IllegalWorkerSetException(
