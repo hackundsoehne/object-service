@@ -43,6 +43,13 @@ public class MTurkConnection {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
+    /**
+     * Generates the common call parameters described by amazon
+     * @param operation operation name to call
+     * @param responseGroup group which is expected back
+     * @param version version of the api to call
+     * @return a key value map for query params
+     */
     Map<String, Object> getCallParameter(String operation, String responseGroup, String version) {
         Map<String, Object> result = new HashMap<>();
 

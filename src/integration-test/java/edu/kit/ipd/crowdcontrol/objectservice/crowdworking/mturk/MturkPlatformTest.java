@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -52,7 +53,7 @@ public class MturkPlatformTest {
         platform.unpublishTask(id).join();
 
         //shound not fail
-        platform.payExperiment(id, experiment, null).join();
+        platform.payExperiment(id, experiment, Collections.emptyList()).join();
 
     }
 

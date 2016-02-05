@@ -56,7 +56,6 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
                 .queryString(con.getCallParameter(operation,responseGroup,version))
                 .queryString(supplier.get());
         request.asStringAsync(this);
-        System.out.println("Send "+ request.getUrl());
     }
     @Override
     public void completed(HttpResponse<String> response) {
