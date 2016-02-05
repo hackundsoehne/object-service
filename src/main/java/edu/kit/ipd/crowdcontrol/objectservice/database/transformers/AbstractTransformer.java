@@ -30,6 +30,17 @@ public abstract class AbstractTransformer {
     }
 
     /**
+     * Converts an integer to it's protocol buffer encapsulation.
+     *
+     * @param value integer value to convert
+     *
+     * @return Encoded integer.
+     */
+    protected static edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean toBoolean(boolean value) {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.newBuilder().setValue(value).build();
+    }
+
+    /**
      * merges the MessageOrBuilder Y with X. Only merges the set fields
      *
      * @param x       the x to return

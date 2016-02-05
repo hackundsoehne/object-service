@@ -145,6 +145,9 @@ public class ExperimentTransformer extends AbstractTransformer {
                 case Experiment.DESCRIPTION_FIELD_NUMBER:
                     record.setDescription(experiment.getDescription());
                     break;
+                case Experiment.NEEDED_ANSWERS_FIELD_NUMBER:
+                    record.setNeededAnswers(experiment.getNeededAnswers().getValue());
+                    break;
                 case Experiment.PAYMENT_ANSWER_FIELD_NUMBER:
                     record.setBonusAnswer(experiment.getPaymentAnswer().getValue());
                     break;
@@ -153,6 +156,9 @@ public class ExperimentTransformer extends AbstractTransformer {
                     break;
                 case Experiment.PAYMENT_RATING_FIELD_NUMBER:
                     record.setBonusRating(experiment.getPaymentRating().getValue());
+                    break;
+                case Experiment.PAYMENT_QUALITY_THRESHOLD_FIELD_NUMBER:
+                    record.setPaymentQualityThreshold(experiment.getPaymentQualityThreshold().getValue());
                     break;
                 case Experiment.PLACEHOLDERS_FIELD_NUMBER:
                     if (experiment.getPlaceholders().size() == 0) {
@@ -166,6 +172,9 @@ public class ExperimentTransformer extends AbstractTransformer {
                     break;
                 case Experiment.RATINGS_PER_ANSWER_FIELD_NUMBER:
                     record.setRatingsPerAnswer(experiment.getRatingsPerAnswer().getValue());
+                    break;
+                case Experiment.RATINGS_PER_WORKER_FIELD_NUMBER:
+                    record.setRatingsPerWorker(experiment.getRatingsPerWorker().getValue());
                     break;
                 case Experiment.STATE_FIELD_NUMBER:
                     // this is not merged into the database this event will
@@ -181,17 +190,8 @@ public class ExperimentTransformer extends AbstractTransformer {
                 case Experiment.TITLE_FIELD_NUMBER:
                     record.setTitle(experiment.getTitle());
                     break;
-                case Experiment.NEEDED_ANSWERS_FIELD_NUMBER:
-                    record.setNeededAnswers(experiment.getNeededAnswers().getValue());
-                    break;
-                case Experiment.RATINGS_PER_WORKER_FIELD_NUMBER:
-                    record.setRatingsPerWorker(experiment.getRatingsPerWorker().getValue());
-                    break;
                 case Experiment.WORKER_QUALITY_THRESHOLD_FIELD_NUMBER:
                     record.setWorkerQualityThreshold(experiment.getWorkerQualityThreshold().getValue());
-                    break;
-                case Experiment.PAYMENT_QUALITY_THRESHOLD_FIELD_NUMBER:
-                    record.setPaymentQualityThreshold(experiment.getPaymentQualityThreshold().getValue());
                     break;
             }
         });

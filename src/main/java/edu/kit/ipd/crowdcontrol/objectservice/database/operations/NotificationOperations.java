@@ -13,8 +13,6 @@ import org.jooq.Result;
 import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +25,6 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.NOTIF
  */
 public class NotificationOperations extends AbstractOperations {
     private final DSLContext readOnlyCreate;
-    private final HikariDataSource readOnlyDataSource;
 
     /**
      * creates an new instance of NotificationOperation.
@@ -38,13 +35,16 @@ public class NotificationOperations extends AbstractOperations {
      */
     public NotificationOperations(DatabaseManager manager, String username, String password) throws SQLException {
         super(manager.getContext());
-        readOnlyDataSource = new HikariDataSource();
+
+        HikariDataSource readOnlyDataSource = new HikariDataSource();
         readOnlyDataSource.setJdbcUrl(manager.getUrl());
         readOnlyDataSource.setUsername(username);
         readOnlyDataSource.setPassword(password);
         readOnlyDataSource.setMaximumPoolSize(2);
+
         //don't trust this!
         readOnlyDataSource.setReadOnly(true);
+
         readOnlyCreate = DSL.using(readOnlyDataSource, manager.getContext().configuration().dialect());
     }
 
@@ -102,17 +102,6 @@ public class NotificationOperations extends AbstractOperations {
         record.store();
 
         return NotificationTransformer.toProto(record);
-    }
-
-    /**
-     * deletes a notification from the database
-     * @param notificationID the primary key of the notification
-     * @return true if deleted, false if not found
-     */
-    public boolean delteNotification(int notificationID) {
-        return create.deleteFrom(Tables.NOTIFICATION)
-                .where(Tables.NOTIFICATION.ID_NOTIFICATION.eq(notificationID))
-                .execute() == 1;
     }
 
     /**
