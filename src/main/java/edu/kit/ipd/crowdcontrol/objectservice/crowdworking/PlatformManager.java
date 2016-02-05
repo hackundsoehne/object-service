@@ -258,10 +258,9 @@ public class PlatformManager {
         TaskRecord record = tasksOps.getTask(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment was never published"));
         List<WorkerRecord> workerRecords = workerOps.getWorkerWithWork(experiment.getId(), name);
-        List<String> given, should;
 
-        given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toList());
-        should = workerRecords.stream().map(WorkerRecord::getIdentification).collect(Collectors.toList());
+        List<String> given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toList());
+        List<String> should = workerRecords.stream().map(WorkerRecord::getIdentification).collect(Collectors.toList());
 
         if (!given.equals(should)) {
             throw new IllegalWorkerSetException(
