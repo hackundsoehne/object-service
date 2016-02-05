@@ -6,6 +6,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWork
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.apache.logging.log4j.LogManager;
@@ -104,6 +105,8 @@ public class Main {
         crowdPlatforms.add(dummyPlatform);
         PlatformManager platformManager = new PlatformManager(crowdPlatforms, new FallbackWorker(), null, tasksOperations, platformOperations,
                 workerOperations); // TODO set fallbackPayment
+
+        PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 
         new Router(
                 new TemplateResource(templateOperations),

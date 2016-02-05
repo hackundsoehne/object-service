@@ -7,9 +7,12 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -34,6 +37,145 @@ public class AnswerRatingOperations extends AbstractOperations {
         this.workerCalibrationOperations = workerCalibrationOperations;
         this.experimentOperations = experimentOperations;
     }
+
+
+    /**
+     * Gets all ratings of a specified answer
+     *
+     * @param answerRecord answer, whose ratings are requested
+     * @return list of ratings of a specified answer
+     */
+    public Result<RatingRecord> getRatingsOfAnswer(AnswerRecord answerRecord) {
+        return create.selectFrom(RATING)
+                .where(RATING.ANSWER_R.eq(answerRecord.getIdAnswer()))
+                .fetch();
+    }
+
+
+    /**
+     * Get all answers of the experiment specified by given ID
+     *
+     * @param expID specifying the experiment
+     * @return list of all answers of a experiment
+     */
+    public Result<AnswerRecord> getAnswersOfExperiment(int expID) {
+        return create.selectFrom(ANSWER)
+                .where(ANSWER.EXPERIMENT.eq(expID))
+                .fetch();
+    }
+
+
+    /**
+     * Fetches all answers of the specified experiment with a quality-value equal or above
+     * the given threshold
+     *
+     * @param expID     of the experiment
+     * @param threshold specifying good answers. A good answer has at least a quality-value of given threshold
+     * @return Map of workers and a set of matching answerRecords.
+     */
+    public Map<WorkerRecord, List<AnswerRecord>> getGoodAnswersOfExperiment(int expID, int threshold) {
+        return create.select(WORKER.fields())
+                .select(ANSWER.fields())
+                .from(WORKER)
+                .rightJoin(ANSWER).onKey()
+                .where(ANSWER.EXPERIMENT.eq(expID))
+                .and(ANSWER.QUALITY.greaterOrEqual(threshold))
+                .fetchGroups(WORKER, record -> record.into(ANSWER));
+    }
+
+
+    /**
+     * Fetches the number all answers of the specified experiment with a quality-value equal or above
+     * the given threshold
+     *
+     * @param expID     of the experiment
+     * @param threshold specifying good answers. A good answer has at least a quality-value of given threshold
+     * @return Map of workers and a number of matching answerRecords.
+     */
+    public Map<WorkerRecord, Integer> getNumOfGoodAnswersOfExperiment(int expID, int threshold){
+        Field<Integer> count = DSL.count(ANSWER.ID_ANSWER).as("count");
+        return create.select(WORKER.fields())
+                .select(count)
+                .from(WORKER)
+                .rightJoin(ANSWER).onKey()
+                .where(ANSWER.EXPERIMENT.eq(expID))
+                .and(ANSWER.QUALITY.greaterOrEqual(threshold))
+                .groupBy(WORKER.fields())
+                .fetchMap(WORKER, record -> record.getValue(count));
+    }
+
+
+    /**
+     * Fetches all ratings of the specified experiment with a quality-value equal or above
+     * the given threshold
+     *
+     * @param expID     of the experiment
+     * @param threshold specifying good rating. A good rating has at least a quality-value of given threshold
+     * @return Map of workers and a set of matching ratings.
+     */
+    public Map<WorkerRecord, List<RatingRecord>> getGoodRatingsOfExperiment(int expID, int threshold) {
+        return create.select(WORKER.fields())
+                .select(RATING.fields())
+                .from(WORKER)
+                .rightJoin(RATING).onKey()
+                .where(ANSWER.EXPERIMENT.eq(expID))
+                .and(ANSWER.QUALITY.greaterOrEqual(threshold))
+                .fetchGroups(WORKER, record -> record.into(RATING));
+    }
+
+    /**
+     * Fetches the number of all ratings of the specified experiment with a quality-value equal or above
+     * the given threshold
+     *
+     * @param expID     of the experiment
+     * @param threshold specifying good rating. A good rating has at least a quality-value of given threshold
+     * @return Map of workers and a number of matching ratings.
+     */
+    public Map<WorkerRecord, Integer> getNumOfGoodRatingsOfExperiment(int expID, int threshold){
+        Field<Integer> count = DSL.count(RATING.ID_RATING).as("count");
+        return create.select(WORKER.fields())
+                .select(count)
+                .from(WORKER)
+                .rightJoin(RATING).onKey()
+                .where(ANSWER.EXPERIMENT.eq(expID))
+                .and(ANSWER.QUALITY.greaterOrEqual(threshold))
+                .groupBy(WORKER.fields())
+                .fetchMap(WORKER, record -> record.getValue(count));
+    }
+
+
+
+    /**
+     * Returns all ratings of given answer, which have a quality rating above passed threshold
+     *
+     * @param answerRecord answer, whose good ratings (specified by given threshold) are returned
+     * @param threshold    of type int, which specifies good ratings
+     * @return list of all ratings of given answer with a quality rating equal or greater than given threshold
+     */
+    public Result<RatingRecord> getGoodRatingsOfAnswer(AnswerRecord answerRecord, int threshold) {
+        return null;
+    }
+
+
+    /**
+     * Sets quality ratings to a set of ratings
+     *
+     * @param map of ratings and matching qualities
+     */
+    public void setQualityToRatings(Map<RatingRecord, Integer> map) {
+
+    }
+
+    /**
+     * Sets quality rating to an answer
+     *
+     * @param answer  whose quality is to be set
+     * @param quality of the answer
+     */
+    public void setQualityToAnswer(AnswerRecord answer, int quality) {
+
+    }
+
 
     /**
      * inserts a new answer into the DB
@@ -79,6 +221,17 @@ public class AnswerRatingOperations extends AbstractOperations {
                 DSL.selectFrom(ANSWER)
                         .where(ANSWER.WORKER_ID.eq(workerID))
         );
+    }
+
+
+    /**
+     * Sets the quality-assured-bit for the given answerRecord
+     * This indicates, that the answers quality is unlikely to change
+     *
+     * @param answerRecord whose quality-assured-bit is set
+     */
+    public void setAnswerQualityAssured(AnswerRecord answerRecord) {
+        //TODO
     }
 
     /**

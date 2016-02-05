@@ -156,6 +156,28 @@ public class WorkerOperations extends AbstractOperations {
     }
 
     /**
+     * Returns all workers participating in the specified experiment.
+     * @param expId Id of the experiment
+     * @return a collection of all workers of the specified experiment
+     */
+    public Result<WorkerRecord> getWorkersOfExp(int expId){
+        Rating rating = RATING.as("rating");
+        Answer answer = ANSWER.as("answer");
+        return create.select(WORKER.fields())
+                .select(rating.ID_RATING)
+                .select(answer.ID_ANSWER)
+                .from(ANSWER)
+                .rightJoin(rating).on(
+                        WORKER.ID_WORKER.eq(rating.WORKER_ID)
+                                .and(rating.EXPERIMENT.eq(expId))
+                )
+                .rightJoin(answer).on(
+                        WORKER.ID_WORKER.eq(answer.WORKER_ID)
+                                .and(answer.EXPERIMENT.eq(expId))
+                )
+                .fetchInto(WORKER);
+    }
+    /**
      * Returns a single worker.
      *
      * @param id ID of the worker
