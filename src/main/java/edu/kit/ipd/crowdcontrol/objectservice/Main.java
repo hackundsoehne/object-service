@@ -42,8 +42,10 @@ public class Main {
 
         Config config = Yaml.loadType(Main.class.getResourceAsStream("/config.yml"), Config.class);
 
-        if (config.database.maintainInterval < 1)
+        if (config.database.maintainInterval == 0)
             config.database.maintainInterval = 24;
+        else if (config.database.maintainInterval < 0)
+            throw new ConfigException("negativ maintainInterval of database is not valid");
 
         SQLDialect dialect = SQLDialect.valueOf(config.database.dialect);
         DatabaseManager databaseManager;
