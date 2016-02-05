@@ -40,7 +40,7 @@ public class Main {
     public static void main(String[] args) throws IOException, ConfigException {
         LOGGER.trace("Entering application.");
 
-        Config config = Yaml.loadType(Main.class.getResourceAsStream("/config.yaml"), Config.class);
+        Config config = Yaml.loadType(Main.class.getResourceAsStream("/config.yml"), Config.class);
 
         if (config.database.maintainInterval < 1)
             config.database.maintainInterval = 24;
@@ -64,7 +64,7 @@ public class Main {
                     platformInstance = new DummyPlatform(platform.name);
                     break;
                 default:
-                    throw new ConfigException("Platform type "+platform.type+" not found");
+                    throw new ConfigException("Platform type \""+platform.type+"\" not found");
             }
             platforms.add(platformInstance);
         }
