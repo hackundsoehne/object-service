@@ -1,8 +1,12 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingOptionTemplateRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateConstraintRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TemplateTagRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 
 import java.util.Collections;
@@ -22,7 +26,7 @@ public class TemplateTransformer extends AbstractTransformer {
      * @return Template.
      */
     public static Template toProto(TemplateRecord record) {
-        return toProto(record, Collections.emptyList());
+        return toProto(record, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
     }
     /**
      * Converts a template record to its protobuf representation.
@@ -31,18 +35,25 @@ public class TemplateTransformer extends AbstractTransformer {
      * @param ratingOptions the ratingOptions
      * @return Template.
      */
-    public static Template toProto(TemplateRecord record, List<RatingOptionTemplateRecord> ratingOptions) {
+    public static Template toProto(TemplateRecord record, List<RatingOptionTemplateRecord> ratingOptions, List<TemplateTagRecord> tags, List<TemplateConstraintRecord> constraints) {
         AnswerType answerType = "IMAGE".equals(record.getAnswerType())
                 ? AnswerType.IMAGE
                 : AnswerType.TEXT;
 
         List<Template.RatingOption> options = ratingOptions.stream()
                 .map(option -> Template.RatingOption.newBuilder()
-                        .setTemplateRatingId(option.getIdRatingOptionsTemplate())
                         .setName(option.getName())
                         .setValue(option.getValue())
                         .build()
                 )
+                .collect(Collectors.toList());
+
+        List<Tag> tagList = tags.stream()
+                .map(tag -> Tag.newBuilder().setName(tag.getTag()).build())
+                .collect(Collectors.toList());
+
+        List<Constraint> constraintList = constraints.stream()
+                .map(constraint -> Constraint.newBuilder().setName(constraint.getConstraint()).build())
                 .collect(Collectors.toList());
 
         return Template.newBuilder()
@@ -51,19 +62,48 @@ public class TemplateTransformer extends AbstractTransformer {
                 .setContent(record.getTemplate())
                 .setAnswerType(answerType)
                 .addAllRatingOptions(options)
+                .addAllTags(tagList)
+                .addAllConstraints(constraintList)
                 .build();
     }
 
     public static RatingOptionTemplateRecord toRecord(Template.RatingOption ratingOption, int templateId) {
         RatingOptionTemplateRecord optionRecord = new RatingOptionTemplateRecord();
         optionRecord.setTemplate(templateId);
+
         return merge(optionRecord, ratingOption, (fieldNumber, record) -> {
             switch (fieldNumber) {
-                case Template.RatingOption.TEMPLATE_RATING_ID_FIELD_NUMBER: record.setIdRatingOptionsTemplate(ratingOption.getTemplateRatingId());
+                case Template.RatingOption.NAME_FIELD_NUMBER:
+                    record.setName(ratingOption.getName());
                     break;
-                case Template.RatingOption.NAME_FIELD_NUMBER: record.setName(ratingOption.getName());
+                case Template.RatingOption.VALUE_FIELD_NUMBER:
+                    record.setValue(ratingOption.getValue());
                     break;
-                case Template.RatingOption.VALUE_FIELD_NUMBER: record.setValue(ratingOption.getValue());
+            }
+        });
+    }
+
+    public static TemplateTagRecord toRecord(Tag tag, int templateId) {
+        TemplateTagRecord tagRecord = new TemplateTagRecord();
+        tagRecord.setTemplate(templateId);
+
+        return merge(tagRecord, tag, (fieldNumber, record) -> {
+            switch (fieldNumber) {
+                case Tag.NAME_FIELD_NUMBER:
+                    record.setTag(tag.getName());
+                    break;
+            }
+        });
+    }
+
+    public static TemplateConstraintRecord toRecord(Constraint constraint, int templateId) {
+        TemplateConstraintRecord constraintRecord = new TemplateConstraintRecord();
+        constraintRecord.setTemplate(templateId);
+
+        return merge(constraintRecord, constraint, (fieldNumber, record) -> {
+            switch (fieldNumber) {
+                case Constraint.NAME_FIELD_NUMBER:
+                    record.setConstraint(constraint.getName());
                     break;
             }
         });

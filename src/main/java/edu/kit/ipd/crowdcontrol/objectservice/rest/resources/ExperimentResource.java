@@ -65,11 +65,9 @@ public class ExperimentResource {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
+        // TODO: (low priority) Optimize fetchExperiment for multiple experiments
         return experimentOperations.getExperimentsFrom(from, asc, 20)
-                .map(experimentRecord -> ExperimentTransformer.toProto(
-                        experimentRecord,
-                        experimentOperations.getExperimentState(experimentRecord.getIdExperiment()))
-                )
+                .map(experimentRecord -> fetchExperiment(experimentRecord.getIdExperiment()))
                 .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
     }
 
@@ -96,8 +94,14 @@ public class ExperimentResource {
         List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);
         List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment, id);
 
-        tags.forEach(tagConstraintsOperations::insertTag);
-        constraints.forEach(tagConstraintsOperations::insertConstraint);
+        tags.stream()
+                .filter(tagRecord -> !tagRecord.getTag().isEmpty())
+                .forEach(tagConstraintsOperations::insertTag);
+
+        constraints.stream()
+                .filter(constraintRecord -> !constraintRecord.getConstraint().isEmpty())
+                .forEach(tagConstraintsOperations::insertConstraint);
+
         experiment.getPopulationsList().forEach(population -> {
             List<Integer> answerIDs = population.getCalibrationsList().stream()
                     .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
@@ -330,7 +334,8 @@ public class ExperimentResource {
 
         experiment.getAlgorithmQualityRating().getParametersList().forEach(param -> algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue()));
 
-        if (!Objects.equals(old.getTemplateId(), experimentRecord.getTemplate())) {
+        //TODO fix!
+        if (!Objects.equals(old.getTemplateId() , experimentRecord.getTemplate())) {
             experimentOperations.deleteRatingOptions(id);
         }
 
@@ -376,6 +381,11 @@ public class ExperimentResource {
         if (experiment.getState().equals(Experiment.State.PUBLISHED)
                 && experimentOperations.verifyExperimentForPublishing(id)) {
             throw new IllegalStateException("experiment lacks information needed for publishing");
+        }
+
+        //TODO publish
+        if (experiment.getState().equals(Experiment.State.PUBLISHED)) {
+            calibrationOperations.createExperimentsCalibration(id);
         }
 
         resulting = fetchExperiment(id);

@@ -6,6 +6,8 @@ import com.google.protobuf.util.JsonFormat;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotAcceptableException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -27,6 +29,7 @@ public class OutputTransformer implements Route {
     // Request and Response objects. We need access to the accept header and must change the type of
     // the response.
 
+    private static final Logger LOGGER = LogManager.getLogger(OutputTransformer.class);
     private static final JsonFormat.Printer PRINTER = JsonFormat.printer().includingDefaultValueFields();
     private static final String TYPE_JSON = "application/json";
     private static final String TYPE_PROTOBUF = "application/protobuf";
@@ -116,6 +119,8 @@ public class OutputTransformer implements Route {
      */
     public static String transform(Request request, Response response, Message message) {
         String bestMatch = MimeParse.bestMatch(SUPPORTED_TYPES, request.headers("accept"));
+
+        LOGGER.trace("Accept header matches '" + bestMatch + "' best.");
 
         try {
             switch (bestMatch) {

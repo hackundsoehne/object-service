@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerExc
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.WorkerList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
@@ -102,6 +103,8 @@ public class WorkerResource {
 
         worker = operations.insertWorker(worker, identity);
 
+        EventManager.WORKER_CREATE.emit(worker);
+
         response.status(201);
         response.header("Location", "/workers/" + worker.getId());
 
@@ -115,8 +118,13 @@ public class WorkerResource {
      * @return {@code null}.
      */
     public Worker delete(Request request, Response response) {
+        int id = getParamInt(request, "id");
+
         try {
-            operations.anonymizeWorker(getParamInt(request, "id"));
+            Optional<Worker> worker = operations.getWorkerProto(id);
+            worker.map(EventManager.WORKER_DELETE::emit);
+
+            operations.anonymizeWorker(id);
         } catch (IllegalArgumentException e) {
             throw new NotFoundException();
         }

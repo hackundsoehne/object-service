@@ -12,18 +12,16 @@ import org.jooq.Record1;
 import org.jooq.impl.DSL;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
 /**
  * responsible for the operations on the Experiment-Table
- * @author LeanderK
- * @version 1.0
+ * @author Leander K.
+ * @author Niklas Keller
  */
 public class ExperimentOperations extends AbstractOperations {
     public ExperimentOperations(DSLContext create) {
@@ -148,14 +146,15 @@ public class ExperimentOperations extends AbstractOperations {
                 || experimentRecord.getNeededAnswers() == null
                 || experimentRecord.getRatingsPerAnswer() == null
                 || experimentRecord.getAnwersPerWorker() == null
-                || experimentRecord.getRatingsPerAnswer() == null
+                || experimentRecord.getRatingsPerWorker() == null
                 || experimentRecord.getAlgorithmTaskChooser() == null
                 || experimentRecord.getAlgorithmQualityAnswer() == null
                 || experimentRecord.getAlgorithmQualityRating() == null
                 || experimentRecord.getBasePayment() == null
                 || experimentRecord.getBonusAnswer() == null
                 || experimentRecord.getBonusRating() == null
-                || experimentRecord.getWorkerQualityThreshold() == null) {
+                || experimentRecord.getWorkerQualityThreshold() == null
+                || experimentRecord.getPaymentQualityThreshold() == null) {
             return false;
         }
         int ratings = create.fetchCount(
@@ -230,28 +229,14 @@ public class ExperimentOperations extends AbstractOperations {
     public void storeRatingOptions(List<Experiment.RatingOption> ratingOptions, int experimentId) {
         Descriptors.Descriptor descriptor = Experiment.RatingOption.getDescriptor();
 
-        Predicate<Experiment.RatingOption> hasID = ratingOption ->
-                ratingOption.hasField(descriptor.findFieldByNumber(Experiment.RatingOption.EXPERIMENT_RATING_ID_FIELD_NUMBER));
-
-        Map<Integer, RatingOptionExperimentRecord> existing = ratingOptions.stream()
-                .filter(hasID)
-                .collect(Collectors.toMap(
-                        Experiment.RatingOption::getExperimentRatingId,
-                        option -> new RatingOptionExperimentRecord(option.getExperimentRatingId(), option.getName(), option.getValue(), experimentId)
-                ));
-
         List<RatingOptionExperimentRecord> toInsert = ratingOptions.stream()
-                .filter(ratingOption -> !hasID.test(ratingOption))
                 .map(option -> new RatingOptionExperimentRecord(null, option.getName(), option.getValue(), experimentId))
                 .collect(Collectors.toList());
 
         create.transaction(conf -> {
             DSL.using(conf).deleteFrom(RATING_OPTION_EXPERIMENT)
                     .where(RATING_OPTION_EXPERIMENT.EXPERIMENT.eq(experimentId))
-                    .and(RATING_OPTION_EXPERIMENT.ID_RATING_OPTION_EXPERIMENT.notIn(existing.keySet()))
                     .execute();
-
-            DSL.using(conf).batchUpdate(existing.values()).execute();
 
             DSL.using(conf).batchInsert(toInsert).execute();
         });
@@ -267,7 +252,7 @@ public class ExperimentOperations extends AbstractOperations {
             DSL.using(conf).deleteFrom(EXPERIMENTS_PLATFORMS)
                     .where(EXPERIMENTS_PLATFORMS.EXPERIMENT.eq(experimentId))
                     .and(EXPERIMENTS_PLATFORMS.PLATFORM.notIn(platforms))
-                    .returning();
+                    .execute();
 
             Set<String> existing = DSL.using(conf).select(EXPERIMENTS_PLATFORMS.PLATFORM)
                     .from(EXPERIMENTS_PLATFORMS)
