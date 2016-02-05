@@ -91,12 +91,16 @@ public class NotificationResource {
         int id = getParamInt(request, "id");
         Notification patch = request.attribute("input");
 
-        Notification oldNotification = operations.getNotification(id).orElseThrow(NotFoundException::new);
-        Notification newNotification = operations.updateNotification(id, patch);
+        try {
+            Notification oldNotification = operations.getNotification(id).orElseThrow(NotFoundException::new);
+            Notification newNotification = operations.updateNotification(id, patch);
 
-        EventManager.NOTIFICATION_UPDATE.emit(new ChangeEvent<>(oldNotification, newNotification));
+            EventManager.NOTIFICATION_UPDATE.emit(new ChangeEvent<>(oldNotification, newNotification));
 
-        return newNotification;
+            return newNotification;
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     /**

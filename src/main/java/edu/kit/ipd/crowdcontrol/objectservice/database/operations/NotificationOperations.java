@@ -198,6 +198,12 @@ public class NotificationOperations extends AbstractOperations {
                 .fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
                 .orElseThrow(() -> new NotFoundException("Notification does not exist!"));
 
+        notification.getEmailsList().forEach(email -> {
+            if (!EmailValidator.getInstance(false).isValid(email)) {
+                throw new IllegalArgumentException(String.format("Invalid email: %s", email));
+            }
+        });
+
         NotificationTransformer.mergeRecord(record, notification);
         record.update();
 
