@@ -9,6 +9,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,7 @@ public class PlatformManager {
             //we cannot find this platform in our instance mark it dead
             if (platform == null) {
                 //TODO record.setLockBit(true);
+                LogManager.getLogger("Crowdplatform").fatal("Mark platform "+record.getIdPlatform()+" as locked");
                 platformOps.updatePlatform(record);
             }
         }
