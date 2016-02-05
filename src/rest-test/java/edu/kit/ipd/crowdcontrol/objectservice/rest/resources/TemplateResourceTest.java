@@ -16,12 +16,12 @@ import static org.junit.Assert.*;
 
 public class TemplateResourceTest extends ResourceTest {
     @BeforeClass
-    public void setUp() throws IOException, ConfigException {
+    public static void setUp() throws IOException, ConfigException {
         Main.main(null);
     }
 
     @AfterClass
-    public void tearDown() {
+    public static void tearDown() {
         Spark.stop();
     }
 
