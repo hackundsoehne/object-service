@@ -38,7 +38,7 @@ public class TemplateResourceTest extends ResourceTest {
                 .addTags(Tag.newBuilder().setName("tag").build())
                 .build();
 
-        Template template = httpPut("/templates", put);
+        Template template = httpPut("/templates", put, Template.class);
 
         assertTrue(template.getId() > 0);
         assertEquals(template.toBuilder().setId(0).build(), put);
@@ -46,6 +46,12 @@ public class TemplateResourceTest extends ResourceTest {
         Template received = httpGet("/templates/" + template.getId(), Template.class);
         assertEquals(template, received);
 
+        list = httpGet("/templates", TemplateList.class);
+        assertSame(1, list.getItemsCount());
+
         assertNull(httpDelete("/templates/" + template.getId(), Template.class));
+
+        list = httpGet("/templates", TemplateList.class);
+        assertSame(0, list.getItemsCount());
     }
 }

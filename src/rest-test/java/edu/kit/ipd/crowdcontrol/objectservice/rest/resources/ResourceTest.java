@@ -21,22 +21,22 @@ abstract public class ResourceTest {
         return fromResponse(response, type);
     }
 
-    protected <T extends Message> T httpPut(String path, T input) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    protected <T extends Message> T httpPut(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         HttpResponse<InputStream> response = Unirest.put(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .body(input.toByteArray())
                 .asBinary();
 
-        return fromResponse(response, (Class<T>) input.getClass());
+        return fromResponse(response, type);
     }
 
-    protected <T extends Message> T httpPatch(String path, T input) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    protected <T extends Message> T httpPatch(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         HttpResponse<InputStream> response = Unirest.patch(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .body(input.toByteArray())
                 .asBinary();
 
-        return fromResponse(response, (Class<T>) input.getClass());
+        return fromResponse(response, type);
     }
 
     protected <T extends Message> T httpDelete(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
