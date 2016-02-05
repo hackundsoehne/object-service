@@ -54,20 +54,27 @@ public class PlatformManager {
         //create hashmap of platforms
         platforms = crowdPlatforms.stream()
                 .collect(Collectors.toMap(Platform::getID, Function.identity()));
-        //clear database
-        platformOps.deleteAllPlatforms();
+
         //update database
         platforms.forEach((s, platform) -> {
-            PlatformRecord rec = new PlatformRecord();
-            rec.setIdPlatform(platform.getID());
-            rec.setName(platform.getName());
-            rec.setNeedsEmail(false);
+            Optional<edu.kit.ipd.crowdcontrol.objectservice.proto.Platform> databasestate
+                    = platformOps.getPlatform(platform.getID());
 
-            rec.setNeedsEmail(isNeedemail(platform));
-            rec.setRenderCalibrations(platform.isCalibrationAllowed());
+            if (!databasestate.isPresent()) {
+                PlatformRecord rec = new PlatformRecord();
+                rec.setIdPlatform(platform.getID());
+                rec.setName(platform.getName());
+                rec.setNeedsEmail(false);
 
-            platformOps.createPlatform(rec);
+                rec.setNeedsEmail(isNeedemail(platform));
+                rec.setRenderCalibrations(platform.isCalibrationAllowed());
+
+                platformOps.createPlatform(rec);
+            }
         });
+
+        //FIXME we should check if there are
+        // platforms which are not active anymore, if they are we should lock them
     }
 
     private boolean isNeedemail(Platform platform) {

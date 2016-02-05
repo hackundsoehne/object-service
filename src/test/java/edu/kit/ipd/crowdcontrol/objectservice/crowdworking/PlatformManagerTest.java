@@ -54,7 +54,6 @@ public class PlatformManagerTest {
     }
     @Test
     public void dbinit(){
-        verify(platformOps).deleteAllPlatforms();
 
         platforms.forEach(platform -> {
             //check that every platform got init

@@ -63,11 +63,4 @@ public class PlatformOperations extends AbstractOperations {
         assertHasPrimaryKey(platformRecord);
         return create.executeInsert(platformRecord) == 1;
     }
-
-    /**
-     * Delete all platforms existing in the database.
-     */
-    public void deleteAllPlatforms() {
-        create.deleteFrom(Tables.PLATFORM).execute();
-    }
 }
