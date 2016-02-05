@@ -109,11 +109,19 @@ configurations {
 task restTest(type: Test) {
     testClassesDir = sourceSets.restTest.output.classesDir
     classpath = sourceSets.restTest.runtimeClasspath
+
+    testLogging {
+        events 'failed', 'skipped', 'passed'
+    }
 }
 
 task integrationTest(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath
+
+    testLogging {
+        events 'failed', 'skipped', 'passed'
+    }
 }
 
 tasks.withType(Test) {
