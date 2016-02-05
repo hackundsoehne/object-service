@@ -80,9 +80,13 @@ public class Main {
                     dialect);
 
             databaseManager.initDatabase();
-            boot(databaseManager, platforms,
+
+            boot(
+                    databaseManager, platforms,
                     config.database.readonly,
-                    config.database.maintainInterval);
+                    config.database.maintainInterval,
+                    config.deployment.origin
+            );
         } catch (NamingException | SQLException e) {
             System.err.println("Unable to establish database connection.");
             e.printStackTrace();
@@ -90,7 +94,7 @@ public class Main {
         }
     }
 
-    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval) throws SQLException {
+    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin) throws SQLException {
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnly.user, readOnly.password);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
@@ -120,7 +124,8 @@ public class Main {
                 new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations),
                 new AlgorithmResources(algorithmsOperations),
                 new AnswerRatingResource(experimentOperations, answerRatingOperations, workerOperations),
-                new WorkerCalibrationResource(workerCalibrationOperations)
+                new WorkerCalibrationResource(workerCalibrationOperations),
+                origin
         ).init();
     }
 }

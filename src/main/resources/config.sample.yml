@@ -13,6 +13,11 @@ database:
         user: sampleROUser
         password: sampleROPassword
 
+# Deployment of the object service / control ui
+deployment:
+    # Origin of the control ui
+    origin: http://localhost:4567/
+
 # the defined platforms to run
 platforms :
 # type to use

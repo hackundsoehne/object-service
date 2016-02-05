@@ -10,6 +10,12 @@ public class Config {
      * Databasepart of the config
      */
     public Database database;
+
+    /**
+     * Deployment configuration
+     */
+    public Deployment deployment;
+
     /**
      * all specified platforms in the config
      */
