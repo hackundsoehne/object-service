@@ -92,7 +92,7 @@ public class Main {
         TagConstraintsOperations tagConstraintsOperations = new TagConstraintsOperations(databaseManager.getContext());
         AlgorithmOperations algorithmsOperations = new AlgorithmOperations(databaseManager.getContext());
         WorkerCalibrationOperations workerCalibrationOperations = new WorkerCalibrationOperations(databaseManager.getContext());
-        AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext(), calibrationOperations, workerCalibrationOperations);
+        AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext(), calibrationOperations, workerCalibrationOperations, experimentOperations);
 
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();

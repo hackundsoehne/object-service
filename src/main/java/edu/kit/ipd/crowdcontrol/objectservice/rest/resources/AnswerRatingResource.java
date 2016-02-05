@@ -1,8 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Answer;
@@ -17,9 +18,7 @@ import spark.Response;
 import java.util.Collections;
 import java.util.Optional;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getParamInt;
-import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getQueryBool;
-import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getQueryInt;
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
 /**
  * Handles requests to answer- and rating-resources.
@@ -95,12 +94,17 @@ public class AnswerRatingResource {
         if (answer.getQuality() != 0)
             throw new BadRequestException("Quality cannot be set at creation");
 
-        AnswerRecord record = answerRatingOperations.insertNewAnswer(
-                AnswerRatingTransformer.toAnswerRecord(answer, experimentId)
-        );
+        AnswerRecord record = null;
+        try {
+            record = answerRatingOperations.insertNewAnswer(
+                    AnswerRatingTransformer.toAnswerRecord(answer, experimentId)
+            );
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         response.status(201);
-        response.header("Location","/experiment/"+experimentId+"/answers/"+answer.getId()+"");
+        response.header("Location","/experiments/" + experimentId + "/answers/" + answer.getId());
 
         answer = AnswerRatingTransformer.toAnswerProto(record, Collections.emptyList());
 
@@ -142,15 +146,18 @@ public class AnswerRatingResource {
             throw new IllegalArgumentException("Quality cannot be set when creating a Rating");
         }
 
-        RatingRecord r = answerRatingOperations.insertNewRating(
-                AnswerRatingTransformer.toRatingRecord(rating, answerId, experimentId)
-        );
+        Rating result;
+
+        try {
+            result = answerRatingOperations.insertNewRating(rating, answerId, experimentId);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         response.status(201);
+        response.header("Location", "/experiments/" + experimentId + "/answers/" + answerId);
 
-        rating = AnswerRatingTransformer.toRatingProto(r);
-
-        EventManager.RATINGS_CREATE.emit(rating);
+        EventManager.RATINGS_CREATE.emit(result);
 
         return rating;
     }

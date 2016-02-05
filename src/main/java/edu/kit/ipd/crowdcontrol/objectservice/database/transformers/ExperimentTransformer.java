@@ -59,6 +59,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                 .set(record.getTemplateData(), ((builder, s) -> builder.putAllPlaceholders(new Gson().fromJson(s, type))))
                 .set(toInteger(record.getWorkerQualityThreshold()), Experiment.Builder::setWorkerQualityThreshold)
                 .set(toInteger(record.getTemplate()), Experiment.Builder::setTemplateId)
+                .set(toInteger(record.getPaymentQualityThreshold()), Experiment.Builder::setPaymentQualityThreshold)
                 .getBuilder()
                 .build();
     }
@@ -104,7 +105,6 @@ public class ExperimentTransformer extends AbstractTransformer {
 
     private static Experiment.RatingOption transform(RatingOptionExperimentRecord record) {
         return Experiment.RatingOption.newBuilder()
-                .setExperimentRatingId(record.getIdRatingOptionExperiment())
                 .setName(record.getName())
                 .setValue(record.getValue())
                 .build();
@@ -190,6 +190,9 @@ public class ExperimentTransformer extends AbstractTransformer {
                 case Experiment.WORKER_QUALITY_THRESHOLD_FIELD_NUMBER:
                     record.setWorkerQualityThreshold(experiment.getWorkerQualityThreshold().getValue());
                     break;
+                case Experiment.PAYMENT_QUALITY_THRESHOLD_FIELD_NUMBER:
+                    record.setPaymentQualityThreshold(experiment.getPaymentQualityThreshold().getValue());
+                    break;
             }
         });
     }
@@ -203,20 +206,16 @@ public class ExperimentTransformer extends AbstractTransformer {
      */
     public static List<RatingOptionExperimentRecord> toRecord(Experiment experiment) {
         return experiment.getRatingOptionsList().stream()
-                .map(ratingOption ->
-                                merge(new RatingOptionExperimentRecord(), ratingOption, (field, record) -> {
-                                    switch (field) {
-                                        case Experiment.RatingOption.EXPERIMENT_RATING_ID_FIELD_NUMBER:
-                                            record.setIdRatingOptionExperiment(ratingOption.getExperimentRatingId());
-                                            break;
-                                        case Experiment.RatingOption.NAME_FIELD_NUMBER:
-                                            record.setName(ratingOption.getName());
-                                            break;
-                                        case Experiment.RatingOption.VALUE_FIELD_NUMBER:
-                                            record.setValue(ratingOption.getValue());
-                                            break;
-                                    }
-                                })
+                .map(ratingOption -> merge(new RatingOptionExperimentRecord(), ratingOption, (field, record) -> {
+                            switch (field) {
+                                case Experiment.RatingOption.NAME_FIELD_NUMBER:
+                                    record.setName(ratingOption.getName());
+                                    break;
+                                case Experiment.RatingOption.VALUE_FIELD_NUMBER:
+                                    record.setValue(ratingOption.getValue());
+                                    break;
+                            }
+                        })
                 )
                 .collect(Collectors.toList());
     }
