@@ -70,7 +70,7 @@ public class NotificationResource {
         try {
             notification = operations.insertNotification(notification);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Missing at least one required parameter.");
+            throw new BadRequestException(e.getMessage());
         }
 
         EventManager.NOTIFICATION_CREATE.emit(notification);

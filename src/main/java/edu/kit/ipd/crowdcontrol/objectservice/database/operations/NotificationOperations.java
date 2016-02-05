@@ -8,6 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Noti
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.NotificationTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -113,6 +114,12 @@ public class NotificationOperations extends AbstractOperations {
                 Notification.CHECK_PERIOD_FIELD_NUMBER,
                 Notification.SEND_ONCE_FIELD_NUMBER,
                 Notification.EMAILS_FIELD_NUMBER);
+
+        toStore.getEmailsList().forEach(email -> {
+            if (!EmailValidator.getInstance(false).isValid(email)) {
+                throw new IllegalArgumentException(String.format("Invalid email: %s", email));
+            }
+        });
 
         NotificationRecord record = NotificationTransformer.mergeRecord(create.newRecord(NOTIFICATION), toStore);
         record.store();

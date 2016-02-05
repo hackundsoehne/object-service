@@ -70,7 +70,7 @@ public class TemplateResource {
         try {
             template = operations.insertTemplate(template);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Missing at least one required parameter.");
+            throw new BadRequestException(e.getMessage());
         }
 
         EventManager.TEMPLATE_CREATE.emit(template);
