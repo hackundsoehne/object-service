@@ -13,7 +13,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rx.Observable;
-import rx.Observer;
 
 import java.util.stream.Collectors;
 
@@ -24,7 +23,8 @@ import java.util.stream.Collectors;
  * On experiment-end, the PaymentDispatcher collects the payments per worker via the PaymentCalculator
  * and uses the results of that calculation to dispatch the payments to the PlatformManager.
  */
-public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
+public class PaymentDispatcher  {
+
     private final Logger log = LogManager.getLogger(PaymentDispatcher.class);
     private final Observable<Event<ChangeEvent<Experiment>>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
     private final PlatformManager platformManager;
@@ -38,37 +38,14 @@ public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
      * @param operations AnswerRatingOperations-class of the database-package. Enables db-calls
      */
     public PaymentDispatcher(PlatformManager manager, AnswerRatingOperations operations, WorkerOperations workerOperations) {
-        observable.subscribe();
+        observable.subscribe(expChangeEvent -> {
+            if(expChangeEvent.getData().getOld().getState() != Experiment.State.STOPPED
+                    && expChangeEvent.getData().getNeww().getState() == Experiment.State.STOPPED){
+                dispatchPayment(expChangeEvent.getData().getNeww());
+            }
+        });
         this.platformManager = manager;
         this.paymentCalc = new PaymentCalculator(operations,workerOperations);
-    }
-
-
-    @Override
-    public void onCompleted() {
-        //NOP
-    }
-
-    @Override
-    public void onError(Throwable e) {
-        //NOP
-    }
-
-
-    /**
-     * The onNext-method is called if an experiment has changed and that change has been communicated
-     * via the EXPERIMENT_CHANGE-observable.
-     * The PaymentDispatcher checks if the state of the experiment has changed from STOPPING to STOPPED.
-     * In that case the payment is calculated (via PaymentCalculator) and dispatched to the PlatformManager.
-     *
-     * @param experimentChangeEvent representation of the changed experiment before and after the change
-     */
-    @Override
-    public void onNext(ChangeEvent<Experiment> experimentChangeEvent) {
-        if (experimentChangeEvent.getNeww().getState() == Experiment.State.STOPPED
-                && experimentChangeEvent.getOld().getState() == Experiment.State.CREATIVE_STOPPED) {
-            dispatchPayment(experimentChangeEvent.getNeww());
-        }
     }
 
 
