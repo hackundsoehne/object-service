@@ -63,7 +63,6 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
-        //TODO auto expand
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
                 experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dallers
