@@ -6,6 +6,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.jooq.AggregateFunction;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -40,6 +41,7 @@ public class WorkerOperations extends AbstractOperations {
     public WorkerRecord insertWorker(WorkerRecord workerRecord) {
         workerRecord.setIdWorker(null);
         workerRecord.setQuality(9);
+        assertNonMalformedEmail(workerRecord.getEmail());
 
         return create.transactionResult(conf -> {
             boolean existing = DSL.using(conf).fetchExists(
@@ -211,12 +213,32 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Worker insertWorker(Worker toStore, String identity) {
         assertHasField(toStore, Worker.PLATFORM_FIELD_NUMBER);
+        assertNonMalformedEmail(toStore.getEmail());
 
         WorkerRecord record = WorkerTransformer.mergeRecord(create.newRecord(WORKER), toStore);
         record.setIdentification(identity);
         record.store();
 
         return WorkerTransformer.toProto(record);
+    }
+
+    /**
+     * Updates a worker
+     *
+     * @param toUpdate the worker to update
+     * @param id the id of the worker
+     * @return the updated Worker
+     */
+    public Worker updateWorker(Worker toUpdate, int id) {
+        WorkerRecord workerRecord = WorkerTransformer.mergeRecord(create.newRecord(WORKER), toUpdate);
+        workerRecord.setIdWorker(id);
+        assertHasPrimaryKey(workerRecord);
+        assertNonMalformedEmail(toUpdate.getEmail());
+
+        return WorkerTransformer.toProto(create.update(WORKER)
+                .set(workerRecord)
+                .returning()
+                .fetchOne());
     }
 
     /**
@@ -242,5 +264,16 @@ public class WorkerOperations extends AbstractOperations {
                 )
                 .where(WORKER.PLATFORM.eq(platformName))
                 .fetchInto(WORKER);
+    }
+
+    /**
+     * validates that the email except the email is null or empty
+     * @param email the email to validate
+     * @throws IllegalArgumentException if the email is not valid
+     */
+    private void assertNonMalformedEmail(String email) throws IllegalArgumentException {
+        if(email != null && !email.isEmpty() && !EmailValidator.getInstance(false).isValid(email)) {
+            throw new IllegalArgumentException(String.format("email is not valid: %s", email));
+        }
     }
 }
