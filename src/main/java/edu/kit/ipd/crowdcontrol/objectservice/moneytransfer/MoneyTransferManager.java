@@ -115,10 +115,12 @@ public class MoneyTransferManager {
         List<GiftCodeRecord> giftCodes = workerBalanceOperations.getUnusedGiftCodes();
 
         for (WorkerRecord worker : workers) {
-            List<GiftCodeRecord> payedCodesForWorker = chooseGiftCodes(worker, giftCodes);
+            if (!worker.getEmail().equals("")) {
+                List<GiftCodeRecord> payedCodesForWorker = chooseGiftCodes(worker, giftCodes);
 
-            giftCodes = workerBalanceOperations.getUnusedGiftCodes();
-            payWorker(worker, payedCodesForWorker);
+                giftCodes = workerBalanceOperations.getUnusedGiftCodes();
+                payWorker(worker, payedCodesForWorker);
+            }
         }
         LOGGER.trace("Completed submission of giftcodes to workers.");
 
