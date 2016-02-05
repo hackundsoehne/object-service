@@ -1,0 +1,28 @@
+
+database:
+# the url where to find the database
+    url: jdbc:mysql://localhost:3306/crowdcontrol
+# dialekt to use for communication
+    dialect: MYSQL
+# the writing user
+    writing:
+        user: sampleUser
+        password: samplePassword
+# readonly user should really just be readonly
+    readonly:
+        user: sampleROUser
+        password: sampleROPassword
+
+# the defined platforms to run
+platforms :
+# type to use
+    - type: mturk/Pybossa/dummy
+# standard credentials
+      user: samplePlatformUser
+      password: samplePassword
+# name which is used to display
+      name: Sandbox
+# the url to give to the platform type
+      url: fancySandboxUrl
+    - type: dummy
+# dummy does not need any of the given fields

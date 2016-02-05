@@ -18,6 +18,17 @@ import java.util.concurrent.CompletableFuture;
 public class DummyPlatform implements Platform, Payment {
     public static final String ID = "dummy";
     private final static String NAME = "Dummy Platform";
+    private final String name;
+
+    /**
+     * Create a new dummy platform with the given name
+     * @param name the name is added as part of the id and to the name
+     */
+    public DummyPlatform(String name) {
+        this.name = name;
+    }
+
+
     /**
      * if the Platform has his own payment service the implementation can return not none.
      *
@@ -45,7 +56,7 @@ public class DummyPlatform implements Platform, Payment {
      */
     @Override
     public String getName() {
-        return NAME;
+        return NAME+" "+name;
     }
 
     /**
@@ -56,7 +67,7 @@ public class DummyPlatform implements Platform, Payment {
      */
     @Override
     public String getID() {
-        return ID;
+        return ID+name;
     }
 
     /**
