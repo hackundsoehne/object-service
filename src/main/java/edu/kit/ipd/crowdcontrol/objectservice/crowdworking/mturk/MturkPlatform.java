@@ -104,7 +104,7 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                 assignmentList = new GetAssignments(connection,id,i).get();
             }
 
-            i = 0;
+            i = 1;
             List<BonusPayment> bonusPayments = new GetBonusPayments(connection, id, 1).get();
             while (bonusPayments.size() > 0) {
                 for (BonusPayment bonusPayment : bonusPayments) {
