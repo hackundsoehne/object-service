@@ -2,13 +2,11 @@ package edu.kit.ipd.crowdcontrol.objectservice.payment;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Created by lucaskrauss at 28.01.2016
@@ -21,14 +19,15 @@ public class PaymentCalculator {
 
 
     private final  AnswerRatingOperations ops;
+    private final WorkerOperations workerOperations;
 
     /**
      * Constructor
      * @param ops AnswerRatingOperation which enable database-access
      */
-    public PaymentCalculator(AnswerRatingOperations ops) {
+    public PaymentCalculator(AnswerRatingOperations ops, WorkerOperations workerOperations) {
         this.ops = ops;
-
+        this.workerOperations = workerOperations;
     }
 
 
@@ -70,6 +69,13 @@ public class PaymentCalculator {
 
         //Now all workers participating in the experiment are present in the map and the base-payment can be added to their salary
         map.replaceAll((workerRecord, payment) -> payment + paymentBase);
+
+        //Add all workers of the experiment without valid answers or ratings
+        workerOperations.getWorkersOfExp(experiment.getId()).forEach((workerRecord -> {
+            if(!map.containsKey(workerRecord)){
+                map.put(workerRecord,-1);
+            }
+        }));
 
         return map;
     }

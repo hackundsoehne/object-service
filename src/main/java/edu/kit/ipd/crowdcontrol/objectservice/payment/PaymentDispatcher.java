@@ -4,11 +4,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rx.Observable;
@@ -36,10 +36,10 @@ public class PaymentDispatcher implements Observer<ChangeEvent<Experiment>> {
      * @param manager    PlatformManager being the target of the dispatching process
      * @param operations AnswerRatingOperations-class of the database-package. Enables db-calls
      */
-    public PaymentDispatcher(PlatformManager manager, AnswerRatingOperations operations) {
+    public PaymentDispatcher(PlatformManager manager, AnswerRatingOperations operations, WorkerOperations workerOperations) {
         observable.subscribe();
         this.platformManager = manager;
-        this.paymentCalc = new PaymentCalculator(operations);
+        this.paymentCalc = new PaymentCalculator(operations,workerOperations);
     }
 
 

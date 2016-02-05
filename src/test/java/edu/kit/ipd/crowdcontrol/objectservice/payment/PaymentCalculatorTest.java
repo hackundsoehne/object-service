@@ -2,15 +2,14 @@ package edu.kit.ipd.crowdcontrol.objectservice.payment;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import org.jooq.Result;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -23,9 +22,11 @@ import static org.mockito.Mockito.when;
 public class PaymentCalculatorTest {
 
     AnswerRatingOperations ops;
+    WorkerOperations workerOperations;
     Experiment exp;
     Map<WorkerRecord, Integer> workerAnswerMap;
     Map<WorkerRecord, Integer> workerRatingMap;
+    Result<WorkerRecord> workerRecordList ;
     PaymentCalculator calculator;
 
     @Before
@@ -34,15 +35,17 @@ public class PaymentCalculatorTest {
 
         workerAnswerMap = new HashMap<>();
         workerRatingMap = new HashMap<>();
-
+        workerRecordList = mock(Result.class);
+        when(workerRecordList.size()).thenReturn(0);
         exp = Experiment.newBuilder().setId(13).setPaymentAnswer(toProtoInt(10)).setPaymentRating(toProtoInt(8)).setPaymentBase(toProtoInt(5)).build();
 
-
+        workerOperations = mock(WorkerOperations.class);
+        when(workerOperations.getWorkersOfExp(exp.getId())).thenReturn(workerRecordList);
         ops = mock(AnswerRatingOperations.class);
         when(ops.getNumOfGoodAnswersOfExperiment(exp.getId(), 0)).thenReturn(workerAnswerMap);
         when(ops.getNumOfGoodRatingsOfExperiment(exp.getId(), 0)).thenReturn(workerRatingMap);
 
-        calculator = new PaymentCalculator(ops);
+        calculator = new PaymentCalculator(ops,workerOperations);
     }
 
     @After

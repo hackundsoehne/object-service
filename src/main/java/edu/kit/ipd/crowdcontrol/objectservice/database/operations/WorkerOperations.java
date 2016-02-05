@@ -153,6 +153,14 @@ public class WorkerOperations extends AbstractOperations {
     }
 
     /**
+     * Returns all workers participating in the specified experiment.
+     * @param expId Id of the experiment
+     * @return a collection of all workers of the specified experiment
+     */
+    public Result<WorkerRecord> getWorkersOfExp(int expId){
+        return null;
+    }
+    /**
      * Returns a single worker.
      *
      * @param id ID of the worker
