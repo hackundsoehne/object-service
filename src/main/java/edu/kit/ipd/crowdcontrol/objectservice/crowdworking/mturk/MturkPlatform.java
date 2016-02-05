@@ -60,7 +60,7 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
         //TODO auto expand
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
-                experiment.getPaymentBase().getValue()/100, //we are getting cents passed and have to pass dallers
+                experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dallers
                 60*60*2, //you have 2 hours to do the assignment
                 60*60*24*10, // the experiment is staying for 10 days - each day the lifetime is extended by 1 day
                 tags,
