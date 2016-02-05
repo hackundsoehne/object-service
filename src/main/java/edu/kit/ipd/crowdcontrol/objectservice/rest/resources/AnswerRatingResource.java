@@ -95,9 +95,14 @@ public class AnswerRatingResource {
         if (answer.getQuality() != 0)
             throw new BadRequestException("Quality cannot be set at creation");
 
-        AnswerRecord record = answerRatingOperations.insertNewAnswer(
-                AnswerRatingTransformer.toAnswerRecord(answer, experimentId)
-        );
+        AnswerRecord record = null;
+        try {
+            record = answerRatingOperations.insertNewAnswer(
+                    AnswerRatingTransformer.toAnswerRecord(answer, experimentId)
+            );
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         response.status(201);
         response.header("Location","/experiment/"+experimentId+"/answers/"+answer.getId()+"");
@@ -142,9 +147,14 @@ public class AnswerRatingResource {
             throw new IllegalArgumentException("Quality cannot be set when creating a Rating");
         }
 
-        RatingRecord r = answerRatingOperations.insertNewRating(
-                AnswerRatingTransformer.toRatingRecord(rating, answerId, experimentId)
-        );
+        RatingRecord r = null;
+        try {
+            r = answerRatingOperations.insertNewRating(
+                    AnswerRatingTransformer.toRatingRecord(rating, answerId, experimentId)
+            );
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         response.status(201);
 
