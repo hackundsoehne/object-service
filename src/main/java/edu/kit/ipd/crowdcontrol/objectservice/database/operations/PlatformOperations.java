@@ -8,6 +8,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Platform;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.PLATFORM;
@@ -62,5 +64,14 @@ public class PlatformOperations extends AbstractOperations {
     public boolean createPlatform(PlatformRecord platformRecord) throws IllegalArgumentException {
         assertHasPrimaryKey(platformRecord);
         return create.executeInsert(platformRecord) == 1;
+    }
+
+    public void updatePlatform(PlatformRecord rec) {
+        //TODO LEAAAAANDER
+    }
+
+    public List<PlatformRecord> getPlatforms() {
+        //TODO LEAAAAANDER
+        return Collections.emptyList();
     }
 }
