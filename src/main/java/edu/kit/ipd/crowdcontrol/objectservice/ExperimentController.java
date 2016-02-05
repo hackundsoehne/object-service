@@ -34,7 +34,7 @@ public class ExperimentController implements Observer<Event<Experiment>> {
     /**
      * Starts the experiment by publishing it on the participating platforms.
      * If an error occurs during the publishing, all already created tasks for this experiment will be undone
-     * @param experiment
+     * @param experiment to be started
      */
    private void startExperiment(Experiment experiment){
 
@@ -52,12 +52,14 @@ public class ExperimentController implements Observer<Event<Experiment>> {
             }
         }
 
+        //ChangeEvent mit State.INVALID ?
+
 
     }
 
     /**
      * Unpublishes an experiment from all platforms it is meant to be active on.
-     * This method is only called if the initilization of the experiment has failed on one
+     * This method is only called if the initialization of the experiment has failed on one
      * of its platforms.
      * @param experiment which is going to be unpublished
      */
@@ -74,7 +76,7 @@ public class ExperimentController implements Observer<Event<Experiment>> {
 
     /**
      * Unpublished the experiment from all its platform. Waits until the time for giving answers and/or ratings
-     * on the platforms (specified in the config-file) has run out. The experimen's state is set to STOPPED and a
+     * on the platforms (specified in the config-file) has run out. The experiment's state is set to STOPPED and a
      * matching event is emitted.
      * @param experiment which is to be ended.
      */
@@ -89,7 +91,7 @@ public class ExperimentController implements Observer<Event<Experiment>> {
         }
         //wait for crowdplatform time out
         try {
-            TimeUnit.HOURS.sleep(2);
+            TimeUnit.HOURS.sleep(2);  //TODO get time from config
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
