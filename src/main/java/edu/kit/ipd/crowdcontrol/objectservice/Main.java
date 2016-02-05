@@ -8,6 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
@@ -57,8 +58,9 @@ public class Main {
             Platform platformInstance;
             switch (platform.type) {
                 case "mturk":
-                    //TODO somone needs to implement mturk ... NOOOONE
-                    throw new IllegalArgumentException("Nonono we cannot do this now.");
+                    //FIXME remove the sandbox url - but I am to paranoid
+                    platformInstance = new MturkPlatform(platform.user, platform.password, "https://mechanicalturk.sandbox.amazonaws.com/");
+                    break;
                 case "pybossa":
                     //TODO someone needs to implement pybossa SIIIIMON
                     throw new IllegalArgumentException("Nonono we cannot do this now.");
