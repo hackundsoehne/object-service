@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
@@ -15,8 +17,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKER;
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKER_BALANCE;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
 /**
  * Responsible for the operations involving the worker-table.
@@ -197,13 +198,27 @@ public class WorkerOperations extends AbstractOperations {
     }
 
     /**
-     * Get Workers which gave at least one answer on a experiment, from the given platform
+     * Get Workers which gave at least one response on a experiment, from the given platform
      * @param experimentId experiment which was worked on
-     * @param platformname name of the platform of the worker
+     * @param platformName name of the platform of the worker
      * @return A list of workerrecords
      */
-    public List<WorkerRecord> getWorkerWithWork(int experimentId, String platformname) {
-        //TODO FIXME LEANDER AAAAAH!
-        return null;
+    public List<WorkerRecord> getWorkerWithWork(int experimentId, String platformName) {
+        Rating rating = RATING.as("rating");
+        Answer answer = ANSWER.as("answer");
+        return create.select(WORKER.fields())
+                .select(rating.ID_RATING)
+                .select(answer.ID_ANSWER)
+                .from(ANSWER)
+                .rightJoin(rating).on(
+                        WORKER.ID_WORKER.eq(rating.WORKER_ID)
+                                .and(rating.EXPERIMENT.eq(experimentId))
+                )
+                .rightJoin(answer).on(
+                        WORKER.ID_WORKER.eq(answer.WORKER_ID)
+                        .and(answer.EXPERIMENT.eq(experimentId))
+                )
+                .where(WORKER.PLATFORM.eq(platformName))
+                .fetchInto(WORKER);
     }
 }
