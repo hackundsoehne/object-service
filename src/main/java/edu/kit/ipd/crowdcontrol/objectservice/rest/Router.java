@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static spark.Spark.before;
 import static spark.Spark.exception;
+import static spark.Spark.options;
 
 /**
  * Application entry point. Defines the REST API.
@@ -37,6 +38,7 @@ public class Router implements SparkApplication {
     private final AlgorithmResources algorithmResources;
     private final AnswerRatingResource answerRatingResource;
     private final WorkerCalibrationResource workerCalibrationResource;
+    private final String origin;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
@@ -49,7 +51,8 @@ public class Router implements SparkApplication {
                   ExperimentResource experimentResource,
                   AlgorithmResources algorithmResources,
                   AnswerRatingResource answerRatingResource,
-                  WorkerCalibrationResource workerCalibrationResource) {
+                  WorkerCalibrationResource workerCalibrationResource,
+                  String origin) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
@@ -59,6 +62,7 @@ public class Router implements SparkApplication {
         this.algorithmResources = algorithmResources;
         this.answerRatingResource = answerRatingResource;
         this.workerCalibrationResource = workerCalibrationResource;
+        this.origin = origin;
     }
 
     @Override
@@ -104,7 +108,21 @@ public class Router implements SparkApplication {
             if (request.headers("accept") == null) {
                 throw new BadRequestException("Missing required 'accept' header.");
             }
+
+            response.header("access-control-allow-origin", origin);
+            response.header("access-control-allow-methods", "GET,PUT,POST,PATCH,DELETE,OPTIONS");
+            response.header("access-control-allow-credentials", "true");
+            response.header("access-control-allow-headers", "Authorization,Content-Type");
+            response.header("access-control-expose-headers", "Link,Location");
+            response.header("access-control-max-age", "86400");
         });
+
+        options("/*", ((request, response) -> {
+            response.status(204);
+            response.type("text/plain");
+
+            return "";
+        }));
 
         put("/templates", templateResource::put, Template.class);
         get("/templates", templateResource::all);
