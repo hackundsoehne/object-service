@@ -1,7 +1,11 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationReceiverEmailRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Transforms notification protocol buffers to database records.
@@ -16,7 +20,7 @@ public class NotificationTransformer extends AbstractTransformer {
      *
      * @return Notification.
      */
-    public static Notification toProto(NotificationRecord record) {
+    public static Notification toProto(NotificationRecord record, List<NotificationReceiverEmailRecord> emails) {
         return Notification.newBuilder()
                 .setId(record.getIdNotification())
                 .setName(record.getName())
@@ -24,6 +28,7 @@ public class NotificationTransformer extends AbstractTransformer {
                 .setQuery(record.getQuery())
                 .setCheckPeriod(record.getCheckperiod())
                 .setSendOnce(toBoolean(record.getSendOnce()))
+                .addAllEmails(emails.stream().map(NotificationReceiverEmailRecord::getEmail).collect(Collectors.toList()))
                 .build();
     }
 

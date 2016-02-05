@@ -7,11 +7,13 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.NotificationList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
@@ -37,7 +39,11 @@ public class NotificationResource {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
+        Supplier<RuntimeException> ex = () -> new InternalServerErrorException("Could not fetch a single notification in a list.");
+
+        // TODO: (low priority) Optimize for multiple templates
         return operations.getNotificationsFrom(from, asc, 20)
+                .map(notification -> (Notification) operations.getNotification(notification.getId()).orElseThrow(ex))
                 .constructPaginated(NotificationList.newBuilder(), NotificationList.Builder::addAllItems);
     }
 
