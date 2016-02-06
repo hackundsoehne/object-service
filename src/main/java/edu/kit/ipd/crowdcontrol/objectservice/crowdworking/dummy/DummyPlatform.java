@@ -56,7 +56,11 @@ public class DummyPlatform implements Platform, Payment {
      */
     @Override
     public String getName() {
-        return NAME+" "+name;
+        String appendix = "";
+        if (name != null) {
+            appendix = " " + name;
+        }
+        return NAME+appendix;
     }
 
     /**
