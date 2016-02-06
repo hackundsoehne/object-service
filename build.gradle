@@ -64,7 +64,8 @@ dependencies {
 
 test {
     testLogging {
-        showStandardStreams = true
+        showStandardStreams = false
+        exceptionFormat = 'full'
         events 'failed', 'skipped', 'passed'
     }
 }
@@ -119,7 +120,8 @@ task restTest(type: Test) {
     classpath = sourceSets.restTest.runtimeClasspath
 
     testLogging {
-        showStandardStreams = true
+        showStandardStreams = false
+        exceptionFormat = 'full'
         events 'failed', 'skipped', 'passed'
     }
 }
@@ -134,7 +136,8 @@ task integrationTest(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
 
     testLogging {
-        showStandardStreams = true
+        showStandardStreams = false
+        exceptionFormat = 'full'
         events 'failed', 'skipped', 'passed'
     }
 }
