@@ -29,7 +29,7 @@ public class TemplateResourceIntegrationTest {
         Template template = httpPut("/templates", put, Template.class);
 
         assertTrue(template.getId() > 0);
-        assertEquals(template.toBuilder().setId(0).build(), put);
+        assertEquals(put, template.toBuilder().setId(0).build());
 
         Template received = httpGet("/templates/" + template.getId(), Template.class);
         assertEquals(template, received);
