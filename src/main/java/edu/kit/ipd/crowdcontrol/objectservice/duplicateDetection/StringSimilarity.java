@@ -9,11 +9,26 @@ import java.util.Set;
 
 /**
  * Created by lucaskrauss at 02.02.2016
+ * @author lucaskrauss
  *
+ *
+ * Provides several methods to compare strings.
+ * The following functionallity is provided:
+ * - jaccard-coefficient
+ * - hamming-distance
+ * - simhashing
  *
  */
 public class StringSimilarity {
 
+
+
+    /**
+     * Computes the hamming-distance of the given strings
+     * @param string1 first string
+     * @param string2 second string
+     * @return hamming distance of the input strings
+     */
     public static int getHammingDistance(String string1, String string2) {
         Set<String> shingle1 = Shingle.getShingle(string1);
         Set<String> shingle2 = Shingle.getShingle(string2);
@@ -31,6 +46,14 @@ public class StringSimilarity {
 
     }
 
+    /**
+     * Computes the jaccard-coefficient of two stings.
+     * The given strings will be divided in sets of substrings which will be compared
+     * to get the jaccard-coefficient.
+     * @param stringA first string
+     * @param stringB second string
+     * @return jaccard-coefficient of the two input strings
+     */
     public static float getJaccardCoefficient(String stringA, String stringB){
         Set<String> shinglesA = Shingle.getShingle(stringA);
         Set<String> shinglesB = Shingle.getShingle(stringB);
@@ -40,7 +63,13 @@ public class StringSimilarity {
 
     }
 
-    public static double getSimilarityBySimhash(String string1, String string2) {
+    /**
+     * Computes the similarity of two strings via simhash
+     * @param string1 first string
+     * @param string2 second string
+     * @return the similarity of the two given strings
+     */
+    public static double getSimilarityFromString(String string1, String string2) {
         Set<String> shingle1 = Shingle.getShingle(string1);
         Set<String> shingle2 = Shingle.getShingle(string2);
 
@@ -55,8 +84,26 @@ public class StringSimilarity {
 
     }
 
+    /**
+     * Computes the similarity of two hashes via simhash
+     * @param hash1 first hash
+     * @param hash2 second hash
+     * @return the similarity of the two given hashes
+     */
+    public static double getSimilarityFromHash(long hash1, long hash2){
+        long xor = hash1 ^ hash2;
+        if(xor == 0){
+            return 1;
+        }
+        return 1.0 - (((double) Long.bitCount(xor) + 1) / (65 - Long.numberOfLeadingZeros(xor)));
+    }
 
-    private static long computeSimhashFromShingles(Set<String> shingles) {
+    /**
+     * Computes hashing of the given set of shingles
+     * @param shingles ngrams of the original input string
+     * @return hash of the shingle-set
+     */
+    public static long computeSimhashFromShingles(Set<String> shingles) {
         //hash vector
         int[] vector = new int[64];
 
