@@ -63,6 +63,11 @@ dependencies {
 //tests
 
 test {
+    jacoco {
+        // Must be above 0.7.2.201408210455 for lambda coverage
+        toolVersion = "0.7.5"
+    }
+
     testLogging {
         showStandardStreams = false
         exceptionFormat = 'full'
@@ -112,6 +117,8 @@ configurations {
 
 task restTest(type: Test) {
     jacoco {
+        // Must be above 0.7.2.201408210455 for lambda coverage
+        toolVersion = "0.7.5"
         destinationFile = file("$buildDir/jacoco/restTest.exec")
         classDumpFile = file("$buildDir/classes/restTest")
     }
@@ -128,6 +135,8 @@ task restTest(type: Test) {
 
 task integrationTest(type: Test) {
     jacoco {
+        // Must be above 0.7.2.201408210455 for lambda coverage
+        toolVersion = "0.7.5"
         destinationFile = file("$buildDir/jacoco/integrationTest.exec")
         classDumpFile = file("$buildDir/classes/integrationTest")
     }
