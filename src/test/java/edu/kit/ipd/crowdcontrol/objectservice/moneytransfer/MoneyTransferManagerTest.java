@@ -38,11 +38,11 @@ public class MoneyTransferManagerTest {
         handler = mock(MailHandler.class);
         payops = mock(WorkerBalanceOperations.class);
         workerops = mock(WorkerOperations.class);
-        mng = new MoneyTransferManager(handler, payops, workerops, null);
+        mng = new MoneyTransferManager(handler, payops, workerops, "pseipd@gmail.com");
     }
 
     @Test
-    public void testPayOff1Worker() throws Exception {
+    public void testPayOffWorkers() throws Exception {
         WorkerRecord worker0 = mock(WorkerRecord.class);
         WorkerRecord worker1 = mock(WorkerRecord.class);
         WorkerRecord worker2 = mock(WorkerRecord.class);
@@ -77,7 +77,6 @@ public class MoneyTransferManagerTest {
         code2.setCode("FOOBAR-BAZ");
         code3.setCode("FOO-BAR");
         code4.setCode("YXCV-BNM");
-
 
         code0.setAmount(30);
         code1.setAmount(25);
@@ -164,5 +163,48 @@ public class MoneyTransferManagerTest {
         verify(handler).sendMail("pseipd@gmail.com","Your payment for your Crowdworking", codesWorker1);
         verify(handler).sendMail("pse2016@web.de", "Your payment for your Crowdworking", codesWorker2);
         verify(handler).sendMail("pseipd@web.de", "Your payment for your Crowdworking", codesWorker3);
+    }
+
+    public void testNotEnoughGiftCodesInDB() throws Exception {
+        WorkerRecord worker0 = mock(WorkerRecord.class);
+        doReturn("pseipd@gmail.com").when(worker0).getEmail();
+        doReturn(0).when(worker0).getIdWorker();
+
+        doReturn(40).when(payops).getBalance(anyInt());
+
+        Result<WorkerRecord> workerList = mock(Result.class);
+        Iterator<WorkerRecord> it = mock(Iterator.class);
+        when(it.hasNext()).thenReturn(true).thenReturn(false);
+        when(it.next()).thenReturn(worker0);
+        when(workerList.iterator()).thenReturn(it);
+
+        doReturn(workerList).when(workerops).getWorkerWithCreditBalanceGreaterOrEqual(anyInt());
+
+        GiftCodeRecord code0 = new GiftCodeRecord();
+
+        code0.setCode("QWER-TZUI");
+
+        code0.setAmount(15);
+
+        code0.setIdGiftCode(0);
+
+        LinkedList<GiftCodeRecord> codeList = new LinkedList<>();
+        doReturn(codeList).when(payops).getUnusedGiftCodes();
+
+        codeList.addLast(code0);
+
+        Answer answer0 = invocation -> {
+            codeList.remove(code0);
+            return true;
+        };
+
+        doReturn(new Message[0]).when(handler).fetchUnseen(any());
+
+        doAnswer(answer0).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
+
+
+        StringBuilder message = MoneyTransferManager.loadMessage("src/main/resources/notificationMoneyTransferMessage.txt");
+        message = message.append("A worker has pending Payments in the amount of 25ct. Please add giftcodes, so the payment of the worker can be continued.").append(System.getProperty("line.separator"));
+        verify(handler).sendMail("pseipd@gmail.com", "Payment Notification", message.toString());
     }
 }
