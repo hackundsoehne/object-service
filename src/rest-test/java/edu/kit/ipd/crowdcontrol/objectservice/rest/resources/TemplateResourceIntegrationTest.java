@@ -1,13 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
-import edu.kit.ipd.crowdcontrol.objectservice.Main;
-import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigException;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import spark.Spark;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -15,16 +10,6 @@ import java.lang.reflect.InvocationTargetException;
 import static org.junit.Assert.*;
 
 public class TemplateResourceIntegrationTest extends ResourceIntegrationTest {
-    @BeforeClass
-    public static void setUp() throws IOException, ConfigException {
-        Main.main(null);
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        Spark.stop();
-    }
-
     @Test
     public void test() throws NoSuchMethodException, UnirestException, IllegalAccessException, IOException, InvocationTargetException {
         TemplateList list = httpGet("/templates", TemplateList.class);
