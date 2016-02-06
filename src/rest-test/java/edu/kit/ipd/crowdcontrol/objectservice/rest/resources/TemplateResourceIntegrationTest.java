@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.*;
 
-public class TemplateResourceTest extends ResourceTest {
+public class TemplateResourceIntegrationTest extends ResourceIntegrationTest {
     @BeforeClass
     public static void setUp() throws IOException, ConfigException {
         Main.main(null);

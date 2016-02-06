@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-abstract public class ResourceTest {
+public abstract class ResourceIntegrationTest {
     protected static final String ORIGIN = "http://localhost:4567";
 
     protected <T extends Message> T httpGet(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
