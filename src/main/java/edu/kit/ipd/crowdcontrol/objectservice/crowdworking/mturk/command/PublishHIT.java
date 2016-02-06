@@ -61,6 +61,7 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
                                     "  </HTMLContent>\n" +
                                     "  <FrameHeight>450</FrameHeight>\n" +
                                     "</HTMLQuestion>");
+                    //TODO dont forget this is not the workerui!!!!! add the workerui!!!!
                     values.put("Reward.Amount", reward);
                     values.put("Reward.CurrencyCode", "USD");
                     values.put("AssignmentDurationInSeconds", assignmentDurationInSeconds);
