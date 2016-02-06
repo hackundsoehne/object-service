@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
@@ -8,7 +7,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperatio
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.jooq.Result;
-import org.jooq.util.derby.sys.Sys;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.stubbing.Answer;
@@ -17,12 +15,16 @@ import javax.mail.Message;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
 /**
  * Tests the MoneyTransferManager
+ *
  * @author Felix Rittler
  */
 public class MoneyTransferManagerTest {
@@ -33,12 +35,12 @@ public class MoneyTransferManagerTest {
     WorkerOperations workerops;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
 
         handler = mock(MailHandler.class);
         payops = mock(WorkerBalanceOperations.class);
         workerops = mock(WorkerOperations.class);
-        mng = new MoneyTransferManager(handler, payops, workerops, "pseipd@gmail.com");
+        mng = new MoneyTransferManager(handler, payops, workerops, "pseipd@gmail.com", null, 7, 0);
     }
 
     @Test
@@ -134,7 +136,7 @@ public class MoneyTransferManagerTest {
 
         StringBuilder content = new StringBuilder();
         try {
-            FileReader file = new FileReader("src/main/resources/PaymentMessage.txt");
+            FileReader file = new FileReader("src/main/resources/moneytransfer/PaymentMessage.txt");
             BufferedReader reader = new BufferedReader(file);
 
             String messageLine;
@@ -160,7 +162,7 @@ public class MoneyTransferManagerTest {
 
         mng.submitGiftCodes();
 
-        verify(handler).sendMail("pseipd@gmail.com","Your payment for your Crowdworking", codesWorker1);
+        verify(handler).sendMail("pseipd@gmail.com", "Your payment for your Crowdworking", codesWorker1);
         verify(handler).sendMail("pse2016@web.de", "Your payment for your Crowdworking", codesWorker2);
         verify(handler).sendMail("pseipd@web.de", "Your payment for your Crowdworking", codesWorker3);
     }
@@ -205,7 +207,16 @@ public class MoneyTransferManagerTest {
 
         mng.submitGiftCodes();
 
-        StringBuilder message = MoneyTransferManager.loadMessage("src/main/resources/notificationMoneyTransferMessage.txt");
+        StringBuilder message = new StringBuilder();
+
+        FileReader file = new FileReader("src/main/resources/moneytransfer/notificationMessage.txt");
+        BufferedReader reader = new BufferedReader(file);
+        String messageLine;
+        while ((messageLine = reader.readLine()) != null) {
+            message.append(messageLine);
+            message.append(System.getProperty("line.separator"));
+        }
+
         message = message.append("A worker has pending Payments in the amount of 25ct. Please add giftcodes, so the payment of the worker can be continued.").append(System.getProperty("line.separator"));
         verify(handler).sendMail("pseipd@gmail.com", "Payment Notification", message.toString());
     }

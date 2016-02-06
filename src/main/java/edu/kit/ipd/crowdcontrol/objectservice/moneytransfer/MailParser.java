@@ -20,19 +20,19 @@ public class MailParser {
      * Extracts a giftcode out of a message.
      *
      * @param msg the message, to extract the code
-     * @return returns the giftcode
+     * @return returns the giftcode, or empty when the sender of the message is not Amazon
      * @throws MoneyTransferException gets thrown, if an error occurred during parsing
      */
-    protected static Optional<GiftCodeRecord> parseAmazonGiftCode(Message msg) throws MoneyTransferException {
+    protected static Optional<GiftCodeRecord> parseAmazonGiftCode(Message msg, String password) throws MoneyTransferException {
         //Extract Message
         String message;
         Optional<GiftCodeRecord> optional;
         try {
-            if (!msg.getFrom()[0].toString().toLowerCase().endsWith("amazon.de>")) {
-                return Optional.ofNullable(null);
+            if (!msg.getFrom()[0].toString().toLowerCase().endsWith("amazon.de>") && !msg.getFrom()[0].toString().toLowerCase().endsWith("amazon.de")) {
+                return Optional.empty();
             }
         } catch (MessagingException e) {
-            return Optional.ofNullable(null);
+            return Optional.empty();
         }
         try {
             Multipart parts = (Multipart) msg.getContent();
@@ -46,16 +46,15 @@ public class MailParser {
         //Parse Message
         String messageStr = message.replaceAll(" ", "");
 
-        StringBuilder password = MoneyTransferManager.loadMessage("src/main/resources/parsingPassword.txt");
         if (!messageStr.contains(password)) {
-            return Optional.ofNullable(null);
+            return Optional.empty();
         }
 
         String codePatternStr = "[0-9A-Z]+(-[0-9A-Z]+)+";
         Pattern codePattern = Pattern.compile(codePatternStr);
         Matcher codeMatcher = codePattern.matcher(messageStr);
 
-        String amountPatternStr = "[0-9]+[,|.][0-9][0-9][€]";
+        String amountPatternStr = "[0-9]+[,.][0-9][0-9][€]";
         Pattern amountPattern = Pattern.compile(amountPatternStr);
         Matcher amountMatcher = amountPattern.matcher(messageStr);
 
