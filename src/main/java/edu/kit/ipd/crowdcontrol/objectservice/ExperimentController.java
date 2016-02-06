@@ -10,7 +10,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rx.Observable;
-import rx.Observer;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -19,16 +18,21 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by lucaskrauss at 05.02.2016
  */
-public class ExperimentController implements Observer<Event<Experiment>> {
+public class ExperimentController {
 
     private final Logger log = LogManager.getLogger(ExperimentController.class);
-    private final Observable<Event<Experiment>> observable = EventManager.EXPERIMENT_CREATE.getObservable();
+    private final Observable<Event<ChangeEvent<Experiment>>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
     private final EventObservable<ChangeEvent<Experiment>> endExpObservable = EventManager.EXPERIMENT_CHANGE;
     private final PlatformManager platformManager;
 
     public ExperimentController(PlatformManager manager) {
         platformManager = manager;
-        observable.subscribe();
+        observable.subscribe(experimentEvent -> {
+            if (experimentEvent.getData().getOld().getState() != Experiment.State.PUBLISHED
+                    && experimentEvent.getData().getNeww().getState() == Experiment.State.PUBLISHED){
+                startExperiment(experimentEvent.getData().getNeww());
+            }
+        });
 
     }
 
@@ -40,6 +44,8 @@ public class ExperimentController implements Observer<Event<Experiment>> {
      * @param experiment to be started
      */
     private void startExperiment(Experiment experiment) {
+
+
         Queue<String> successfulPlatforms = new LinkedList<>();
         for (int i = 0; i < experiment.getPopulationsCount(); i++) {
             try {
@@ -55,7 +61,7 @@ public class ExperimentController implements Observer<Event<Experiment>> {
             }
         }
 
-        //ChangeEvent mit State.INVALID ?
+
 
 
     }
@@ -107,21 +113,9 @@ public class ExperimentController implements Observer<Event<Experiment>> {
         endExpObservable.emit(new ChangeEvent<Experiment>(experiment, newExperiment));
     }
 
-    @Override
-    public void onCompleted() {
-        //NOP
-    }
 
-    @Override
-    public void onError(Throwable e) {
-        //NOP
-    }
 
-    @Override
-    public void onNext(Event<Experiment> experimentEvent) {
-        startExperiment(experimentEvent.getData());
 
-    }
 
 
 }
