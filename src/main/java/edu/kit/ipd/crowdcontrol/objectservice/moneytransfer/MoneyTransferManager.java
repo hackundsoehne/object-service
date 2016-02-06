@@ -153,7 +153,9 @@ public class MoneyTransferManager {
                     mailHandler.markAsUnseen(message);
                     throw new MoneyTransferException(e.getMessage());
                 } catch (MessagingException f) {
-                    f.printStackTrace();
+                    throw new MoneyTransferException("The MailHandler couldnt mark mails as unseen." +
+                            "It seems, that there is either a problem with the server or with the properties file." + System.getProperty("line.separator") +
+                            e.getMessage());
                 }
             }
         }
