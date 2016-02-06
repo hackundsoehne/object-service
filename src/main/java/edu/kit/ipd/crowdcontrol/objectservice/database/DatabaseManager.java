@@ -101,11 +101,13 @@ public class DatabaseManager {
                 //TODO: need better idea, but meta() and systable are not working
                 String tables = initScript.substring(0, initScript.indexOf("DELIMITER $$"));
                 ScriptRunner scriptRunner = new ScriptRunner(ds.getConnection());
+                scriptRunner.setLogWriter(null);
                 scriptRunner.setDelimiter(";");
                 scriptRunner.runScript(new StringReader(tables));
                 String delimiter = "DELIMITER $$";
                 String trigger = initScript.substring(initScript.indexOf(delimiter) + delimiter.length(), initScript.lastIndexOf("DELIMITER ;"));
                 scriptRunner = new ScriptRunner(ds.getConnection());
+                scriptRunner.setLogWriter(null);
                 scriptRunner.setDelimiter("$$");
                 scriptRunner.runScript(new StringReader(trigger));
 

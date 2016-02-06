@@ -8,10 +8,7 @@ import org.jooq.Record1;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
@@ -358,6 +355,78 @@ public class AlgorithmOperations extends AbstractOperations {
                         .and(CHOSEN_RATING_QUALITY_PARAM.PARAM.eq(paramId))
                         .execute();
             }
+        });
+    }
+
+    /**
+     * stores the RatingQuality-Algorithm
+     * @param algorithm the algorithm-information
+     * @param params the parameters
+     */
+    public void storeRatingQualityAlgorithm(AlgorithmRatingQualityRecord algorithm, List<AlgorithmRatingQualityParamRecord> params) {
+        assertHasPrimaryKey(algorithm);
+        params.forEach(param -> assertHasField(param, ALGORITHM_RATING_QUALITY_PARAM.REGEX));
+        create.insertInto(ALGORITHM_RATING_QUALITY)
+                .set(algorithm)
+                .onDuplicateKeyUpdate()
+                .set(algorithm)
+                .execute();
+
+        List<String> regexes = params.stream()
+                .map(AlgorithmRatingQualityParamRecord::getRegex)
+                .collect(Collectors.toList());
+
+        create.transaction(conf -> {
+            DSL.using(conf).deleteFrom(ALGORITHM_RATING_QUALITY_PARAM)
+                    .where(ALGORITHM_RATING_QUALITY_PARAM.ALGORITHM.eq(algorithm.getIdAlgorithmRatingQuality()))
+                    .and(ALGORITHM_RATING_QUALITY_PARAM.REGEX.notIn(regexes))
+                    .execute();
+
+            Set<String> existingRegexes = DSL.using(conf).select(ALGORITHM_RATING_QUALITY_PARAM.REGEX)
+                    .where(ALGORITHM_RATING_QUALITY_PARAM.ALGORITHM.eq(algorithm.getIdAlgorithmRatingQuality()))
+                    .fetchSet(ALGORITHM_RATING_QUALITY_PARAM.REGEX);
+
+            List<AlgorithmRatingQualityParamRecord> toInsert = params.stream()
+                    .filter(record -> !existingRegexes.contains(record.getRegex()))
+                    .collect(Collectors.toList());
+
+            DSL.using(conf).batchInsert(toInsert).execute();
+        });
+    }
+
+    /**
+     * stores the AnswerQuality-Algortihm
+     * @param algorithm the algorithm-information
+     * @param params the parameters
+     */
+    public void storeAnswerQualityAlgorithm(AlgorithmAnswerQualityRecord algorithm, List<AlgorithmAnswerQualityParamRecord> params) {
+        assertHasPrimaryKey(algorithm);
+        params.forEach(param -> assertHasField(param, ALGORITHM_ANSWER_QUALITY_PARAM.REGEX));
+        create.insertInto(ALGORITHM_ANSWER_QUALITY)
+                .set(algorithm)
+                .onDuplicateKeyUpdate()
+                .set(algorithm)
+                .execute();
+
+        List<String> regexes = params.stream()
+                .map(AlgorithmAnswerQualityParamRecord::getRegex)
+                .collect(Collectors.toList());
+
+        create.transaction(conf -> {
+            DSL.using(conf).deleteFrom(ALGORITHM_ANSWER_QUALITY_PARAM)
+                    .where(ALGORITHM_ANSWER_QUALITY_PARAM.ALGORITHM.eq(algorithm.getIdAlgorithmAnswerQuality()))
+                    .and(ALGORITHM_ANSWER_QUALITY_PARAM.REGEX.notIn(regexes))
+                    .execute();
+
+            Set<String> existingRegexes = DSL.using(conf).select(ALGORITHM_ANSWER_QUALITY_PARAM.REGEX)
+                    .where(ALGORITHM_ANSWER_QUALITY_PARAM.ALGORITHM.eq(algorithm.getIdAlgorithmAnswerQuality()))
+                    .fetchSet(ALGORITHM_ANSWER_QUALITY_PARAM.REGEX);
+
+            List<AlgorithmAnswerQualityParamRecord> toInsert = params.stream()
+                    .filter(record -> !existingRegexes.contains(record.getRegex()))
+                    .collect(Collectors.toList());
+
+            DSL.using(conf).batchInsert(toInsert).execute();
         });
     }
 }

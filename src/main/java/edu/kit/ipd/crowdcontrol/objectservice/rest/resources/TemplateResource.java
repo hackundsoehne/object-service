@@ -7,11 +7,13 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Template;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.TemplateList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
@@ -37,7 +39,11 @@ public class TemplateResource {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
+        Supplier<RuntimeException> ex = () -> new InternalServerErrorException("Could not fetch a single template in a list.");
+
+        // TODO: (low priority) Optimize for multiple templates
         return operations.getTemplatesFrom(from, asc, 20)
+                .map(template -> (Template) operations.getTemplate(template.getId()).orElseThrow(ex))
                 .constructPaginated(TemplateList.newBuilder(), TemplateList.Builder::addAllItems);
     }
 
@@ -64,7 +70,7 @@ public class TemplateResource {
         try {
             template = operations.insertTemplate(template);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Missing at least one required parameter.");
+            throw new BadRequestException(e.getMessage());
         }
 
         EventManager.TEMPLATE_CREATE.emit(template);

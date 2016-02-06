@@ -21,8 +21,23 @@ public abstract class AbstractTransformer {
      *
      * @return Encoded integer.
      */
-    protected static edu.kit.ipd.crowdcontrol.objectservice.proto.Integer toInteger(int value) {
+    protected static edu.kit.ipd.crowdcontrol.objectservice.proto.Integer toInteger(Integer value) {
+        if (value == null) {
+            return null;
+        }
+
         return edu.kit.ipd.crowdcontrol.objectservice.proto.Integer.newBuilder().setValue(value).build();
+    }
+
+    /**
+     * Converts an integer to it's protocol buffer encapsulation.
+     *
+     * @param value integer value to convert
+     *
+     * @return Encoded integer.
+     */
+    protected static edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean toBoolean(boolean value) {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.newBuilder().setValue(value).build();
     }
 
     /**

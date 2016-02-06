@@ -9,17 +9,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * transforms the TaskChooser/AnswerQualityRatingQuality-Algorithms from the DB-records to the protobuf-definitions
- * @author LeanderK
- * @version 1.0
+ * Transforms the task chooser / answer quality / rating quality algorithms from the DB records to
+ * the protobuf-definitions.
+ *
+ * @author Leander K.
+ * @author Niklas Keller
  */
 public class AlgorithmsTransformer extends AbstractTransformer {
-
     /**
-     * transforms the record into a AlgorithmOption
-     * @param taskChooserRecord the taskChooserRecord
-     * @param parameters the parameters
-     * @return a list of AlgorithmOptions
+     * Transforms the record into an AlgorithmOption.
+     *
+     * @param taskChooserRecord the task chooser record
+     * @param parameters        the parameters
+     *
+     * @return A AlgorithmOption.
      */
     public static AlgorithmOption constructTaskChooser(AlgorithmTaskChooserRecord taskChooserRecord, List<AlgorithmTaskChooserParamRecord> parameters) {
         HashMap<AlgorithmTaskChooserParamRecord, String> params = new HashMap<>();
@@ -28,10 +31,12 @@ public class AlgorithmsTransformer extends AbstractTransformer {
     }
 
     /**
-     * transforms the record into a AlgorithmOption
-     * @param answerQualityRecord the answerQualityRecord
-     * @param parameters the parameters
-     * @return a list of AlgorithmOptions
+     * Transforms the record into an AlgorithmOption.
+     *
+     * @param answerQualityRecord the answer quality record
+     * @param parameters          the parameters
+     *
+     * @return A AlgorithmOption.
      */
     public static AlgorithmOption constructAnswerQuality(AlgorithmAnswerQualityRecord answerQualityRecord, List<AlgorithmAnswerQualityParamRecord> parameters) {
         HashMap<AlgorithmAnswerQualityParamRecord, String> params = new HashMap<>();
@@ -40,10 +45,12 @@ public class AlgorithmsTransformer extends AbstractTransformer {
     }
 
     /**
-     * transforms the record into a AlgorithmOption
-     * @param ratingQuality the ratingQualityRecord
-     * @param parameters the parameters
-     * @return a list of AlgorithmOptions
+     * Transforms the record into an AlgorithmOption.
+     *
+     * @param ratingQuality the rating quality record
+     * @param parameters    the parameters
+     *
+     * @return A AlgorithmOption.
      */
     public static AlgorithmOption constructRatingQuality(AlgorithmRatingQualityRecord ratingQuality, List<AlgorithmRatingQualityParamRecord> parameters) {
         HashMap<AlgorithmRatingQualityParamRecord, String> params = new HashMap<>();
@@ -52,13 +59,15 @@ public class AlgorithmsTransformer extends AbstractTransformer {
     }
 
     /**
-     * creates the protobuf-representation for the TaskChooser
-     * @param taskChooserRecord the TaskChooserRecord
+     * Creates the protobuf representation for the task chooser.
+     *
+     * @param taskChooserRecord the task chooser record
      * @param taskChooserParams the parameters, where the values may be the chosen values
-     * @return the resulting AlgorithmOption
+     *
+     * @return Resulting AlgorithmOption.
      */
     public static AlgorithmOption toTaskChooserProto(AlgorithmTaskChooserRecord taskChooserRecord,
-                                              Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams) {
+                                                     Map<AlgorithmTaskChooserParamRecord, String> taskChooserParams) {
         List<AlgorithmOption.AlgorithmParameter> parameters = taskChooserParams.entrySet().stream()
                 .filter(entry -> entry.getKey().getIdAlgorithmTaskChooserParam() != null)
                 .map(entry -> getParam(entry.getKey(), entry.getValue()))
@@ -71,13 +80,15 @@ public class AlgorithmsTransformer extends AbstractTransformer {
     }
 
     /**
-     * creates the protobuf-representation for the AnswerQuality-Algorithm
-     * @param answerQualityRecord the the answerQualityRecord
+     * Creates the protobuf representation for the answer quality algorithm.
+     *
+     * @param answerQualityRecord the the answer quality record
      * @param answerQualityParams the parameters, where the values may be the chosen values
-     * @return the resulting AlgorithmOption
+     *
+     * @return Resulting AlgorithmOption.
      */
     public static AlgorithmOption toAnswerQualityProto(AlgorithmAnswerQualityRecord answerQualityRecord,
-                                                Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams) {
+                                                       Map<AlgorithmAnswerQualityParamRecord, String> answerQualityParams) {
         List<AlgorithmOption.AlgorithmParameter> parameters = answerQualityParams.entrySet().stream()
                 .filter(entry -> entry.getKey().getIdAlgorithmAnswerQualityParam() != null)
                 .map(entry -> getParam(entry.getKey(), entry.getValue()))
@@ -90,13 +101,15 @@ public class AlgorithmsTransformer extends AbstractTransformer {
     }
 
     /**
-     * creates the protobuf-representation for the RatingQuality-Algorithm
-     * @param ratingQualityRecord the ratingQualityRecord
+     * Creates the protobuf representation for the rating quality algorithm.
+     *
+     * @param ratingQualityRecord the rating quality record
      * @param ratingQualityParams the parameters, where the values may be the chosen values
-     * @return the resulting AlgorithmOption
+     *
+     * @return Resulting AlgorithmOption.
      */
     public static AlgorithmOption toRatingQualityProto(AlgorithmRatingQualityRecord ratingQualityRecord,
-                                                Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
+                                                       Map<AlgorithmRatingQualityParamRecord, String> ratingQualityParams) {
         List<AlgorithmOption.AlgorithmParameter> parameters = ratingQualityParams.entrySet().stream()
                 .filter(entry -> entry.getKey().getIdAlgorithmRatingQualityParam() != null)
                 .map(entry -> getParam(entry.getKey(), entry.getValue()))

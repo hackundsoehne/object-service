@@ -2,7 +2,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.transformers;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationReceiverEmailRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 
 import java.util.List;
@@ -15,20 +14,21 @@ import java.util.stream.Collectors;
  */
 public class NotificationTransformer extends AbstractTransformer {
     /**
-     * Converts a notification notificationRecord to its protobuf representation.
+     * Converts a notification record to its protobuf representation.
      *
-     * @param notificationRecord notification notificationRecord
+     * @param record notification record
+     *
      * @return Notification.
      */
-    public static Notification toProto(NotificationRecord notificationRecord, List<NotificationReceiverEmailRecord> emailRecordList) {
+    public static Notification toProto(NotificationRecord record, List<NotificationReceiverEmailRecord> emails) {
         return Notification.newBuilder()
-                .setId(notificationRecord.getIdNotification())
-                .setName(notificationRecord.getName())
-                .setDescription(notificationRecord.getDescription())
-                .setQuery(notificationRecord.getQuery())
-                .setCheckPeriod(notificationRecord.getCheckperiod())
-                .setSendOnce(Boolean.newBuilder().setValue(notificationRecord.getSendOnce()).build())
-                .addAllEmails(emailRecordList.stream().map(NotificationReceiverEmailRecord::getEmail).collect(Collectors.toList()))
+                .setId(record.getIdNotification())
+                .setName(record.getName())
+                .setDescription(record.getDescription())
+                .setQuery(record.getQuery())
+                .setCheckPeriod(record.getCheckperiod())
+                .setSendOnce(toBoolean(record.getSendOnce()))
+                .addAllEmails(emails.stream().map(NotificationReceiverEmailRecord::getEmail).collect(Collectors.toList()))
                 .build();
     }
 
@@ -37,6 +37,7 @@ public class NotificationTransformer extends AbstractTransformer {
      *
      * @param target       record to merge into
      * @param notification message to merge from
+     *
      * @return Merged notification record.
      */
     public static NotificationRecord mergeRecord(NotificationRecord target, Notification notification) {
