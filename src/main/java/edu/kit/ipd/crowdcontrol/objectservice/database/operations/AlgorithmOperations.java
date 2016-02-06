@@ -385,6 +385,7 @@ public class AlgorithmOperations extends AbstractOperations {
                     .execute();
 
             Set<String> existingRegexes = DSL.using(conf).select(ALGORITHM_RATING_QUALITY_PARAM.REGEX)
+                    .from(ALGORITHM_RATING_QUALITY_PARAM)
                     .where(ALGORITHM_RATING_QUALITY_PARAM.ALGORITHM.eq(algorithm.getIdAlgorithmRatingQuality()))
                     .fetchSet(ALGORITHM_RATING_QUALITY_PARAM.REGEX);
 
@@ -421,6 +422,7 @@ public class AlgorithmOperations extends AbstractOperations {
                     .execute();
 
             Set<String> existingRegexes = DSL.using(conf).select(ALGORITHM_ANSWER_QUALITY_PARAM.REGEX)
+                    .from(ALGORITHM_ANSWER_QUALITY_PARAM)
                     .where(ALGORITHM_ANSWER_QUALITY_PARAM.ALGORITHM.eq(algorithm.getIdAlgorithmAnswerQuality()))
                     .fetchSet(ALGORITHM_ANSWER_QUALITY_PARAM.REGEX);
 
