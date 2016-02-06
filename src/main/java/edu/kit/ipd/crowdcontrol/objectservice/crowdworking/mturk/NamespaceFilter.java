@@ -6,7 +6,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 /**
- * Copyed from http://stackoverflow.com/questions/277502/jaxb-how-to-ignore-namespace-during-unmarshalling-xml-document
+ * Copied from http://stackoverflow.com/questions/277502/jaxb-how-to-ignore-namespace-during-unmarshalling-xml-document
  */
 public class NamespaceFilter extends XMLFilterImpl {
 
