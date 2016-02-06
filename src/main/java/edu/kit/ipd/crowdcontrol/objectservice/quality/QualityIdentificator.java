@@ -4,22 +4,22 @@ import edu.kit.ipd.crowdcontrol.objectservice.ExperimentController;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityByRatings;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityStrategy;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.RatingQualityByDistribution;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.RatingQualityStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rx.Observable;
-import rx.Observer;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by lucaskrauss
@@ -31,7 +31,7 @@ import java.util.Optional;
  * and thus can assure that only "good" ratings will be used on the identification of the experiment's
  * answers.
  */
-public class QualityIdentificator implements Observer<Rating> {
+public class QualityIdentificator{
 
 
     final static int MAXIMUM_QUALITY = 9;
@@ -42,6 +42,10 @@ public class QualityIdentificator implements Observer<Rating> {
     private final ExperimentController controller;
     private final AnswerRatingOperations answerOperations;
     private final ExperimentOperations experimentOperations;
+    private final AlgorithmOperations algorithmOperations;
+    private final Set<AnswerQualityStrategy> answerAlgorithms;
+    private final Set<RatingQualityStrategy> ratingAlgorithms;
+
     private AnswerQualityStrategy answerIdentifier;
     private RatingQualityStrategy ratingIdentifier;
 
@@ -51,49 +55,102 @@ public class QualityIdentificator implements Observer<Rating> {
      * <p>
      * Might be set to allow more flexibility and more good answers
      */
-    private int ratingQualityThreshold = 10;
+    private int ratingQualityThreshold = 5;
 
-   public QualityIdentificator(AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentController controller){
-       this.controller = controller;
-       this.answerOperations = answerRatingOperations;
+    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentController controller) {
+        this.controller = controller;
+        this.answerOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
-        ratingObservable.subscribe();
+        this.algorithmOperations = algorithmOperations;
+        this.answerAlgorithms = new HashSet<>();
+        this.ratingAlgorithms = new HashSet<>();
+
+        //
+        answerAlgorithms.add(new AnswerQualityByRatings());
+        ratingAlgorithms.add(new RatingQualityByDistribution());
+
+
+        ratingObservable.subscribe(rating -> this.onNext(rating.getData()));
 
     }
 
-
-
-    @Override
-    public void onCompleted() {
-        //NOP
-    }
-
-    @Override
-    public void onError(Throwable e) {
-        //NOP
-    }
-
-    @Override
-    public void onNext(Rating rating) {
-
+    /**
+     * This method is performed, if the RATINGS_CREATE-observable emits an event.
+     * All ratings and answers of the experiment will be rated. Furthermore the status of the experiment is checked and
+     * if the criteria are met, it will be shut-down
+     * @param rating which has been created an will be processed
+     */
+    private void onNext(Rating rating) {
 
         Optional<ExperimentRecord> exp = experimentOperations.getExperiment(rating.getExperimentId());
-        if(!exp.isPresent()){
-            throw new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID:"+rating.getExperimentId());
+        if (!exp.isPresent()) {
+            throw new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID:" + rating.getExperimentId());
         }
-       // ratingIdentifier = experimentOperations.get()  TODO get  exp. specific
-        //answerIdentifier = experimentOperations.get()
-        rateQualityOfRatings(exp.get());
+
+        try {
+            ratingIdentifier = getRatingQualityAlgorithm(exp.get().getAlgorithmQualityRating()).get();
+        } catch (NoSuchElementException e1) {
+            log.fatal("Error! Could not find %s-algorithm. Replacing with default RatingQualityByDistribution-algorithm.", exp.get().getAlgorithmQualityRating(), e1);
+            ratingIdentifier = new RatingQualityByDistribution();
+        }
+        try {
+            answerIdentifier = getAnswerQualityAlgorithm(exp.get().getAlgorithmQualityAnswer()).get();
+        } catch (NoSuchElementException e1) {
+            log.fatal("Error! Could not find %s-algorithm. Replacing with default AnswerQualityByRatings-algorithm.", exp.get().getAlgorithmQualityAnswer(), e1);
+            answerIdentifier = new AnswerQualityByRatings();
+        }
+        //TODO ratingQualityThreshold = algorithmOperations.getAnswerQualityParams(ratingIdentifier.getAlgorithmName(), exp.get().getIdExperiment());
+        //TODO push algos in db.
         rateQualityOfAnswers(exp.get());
+        rateQualityOfRatings(exp.get());
         checkExpStatus(exp.get());
 
 
     }
 
 
-    private void checkExpStatus(ExperimentRecord experiment){
-        if(experiment.getNeededAnswers() == answerOperations.getNumberOfFinalGoodAns(experiment.getIdExperiment())){
-            controller.endExperiment(ExperimentTransformer.toProto(experiment,experimentOperations.getExperimentState(experiment.getIdExperiment())));
+    /**
+     * Performs a look-up on all provided answerQualityAlgorithms
+     *
+     * @param name of the wanted algorithm
+     * @return An Optional-object containing the algorithm or null if the algorithm isn't present
+     */
+    private Optional<AnswerQualityStrategy> getAnswerQualityAlgorithm(String name) {
+
+        for (AnswerQualityStrategy algo : answerAlgorithms) {
+            if (algo.getAlgorithmName().equals(name)) {
+                return Optional.of(algo);
+            }
+        }
+        return Optional.empty();
+    }
+
+
+    /**
+     * Performs a look-up on all provided ratingQualityAlgorithms
+     *
+     * @param name of the wanted algorithm
+     * @return An Optional-object containing the algorithm or null if the algorithm isn't present
+     */
+    private Optional<RatingQualityStrategy> getRatingQualityAlgorithm(String name) {
+        for (RatingQualityStrategy algo : ratingAlgorithms) {
+            if (algo.getAlgorithmName().equals(name)) {
+                return Optional.of(algo);
+            }
+        }
+        return Optional.empty();
+    }
+
+
+    /**
+     * Checks if the criteria for ending the experiment are met. In that case the experiment will be shut down via
+     * the experiment controller
+     *
+     * @param experiment to be checked
+     */
+    private void checkExpStatus(ExperimentRecord experiment) {
+        if (experiment.getNeededAnswers() == answerOperations.getNumberOfFinalGoodAns(experiment.getIdExperiment())) {
+            controller.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
         }
 
     }
@@ -125,7 +182,6 @@ public class QualityIdentificator implements Observer<Rating> {
      * and it thus the answer's quality is unlikely to change. In that case the corresponding
      * quality-assured-bit is set in the database.
      *
-     *
      * @param experimentRecord the experiment whose answers are going to be rated
      */
     private void rateQualityOfAnswers(ExperimentRecord experimentRecord) {
@@ -134,7 +190,7 @@ public class QualityIdentificator implements Observer<Rating> {
 
         for (AnswerRecord answer : answers) {
             List<RatingRecord> records = answerOperations.getGoodRatingsOfAnswer(answer, ratingQualityThreshold);
-            if(records.size() > 0) {
+            if (records.size() > 0) {
                 answerOperations.setQualityToAnswer(answer, answerIdentifier.identifyAnswerQuality(answer, records, MAXIMUM_QUALITY, MINIMUM_QUALITY));
 
                 // Checks if quality_assured bit can be set.

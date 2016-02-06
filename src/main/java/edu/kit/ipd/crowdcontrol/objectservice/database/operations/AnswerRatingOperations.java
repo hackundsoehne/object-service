@@ -43,7 +43,7 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @return Returns the number of all good answers of the specified experiment
      */
     public int getNumberOfFinalGoodAns(int expID){
-        return 0;
+        return 0; //TODO
     }
 
     /**
