@@ -61,11 +61,11 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
     public void completed(HttpResponse<String> response) {
         JAXBContext context;
         try {
-            //FIXME we should append a version, but this leads to a bug ;)
-            final String bla = "http://requester.mturk.amazonaws.com/doc/2014-08-15";
+            //FIXME we should append a version, because amazon does not append there own standard namespace
+            final String version = "http://requester.mturk.amazonaws.com/doc/2014-08-15";
 
             NamespaceFilter filter =
-                    new NamespaceFilter(bla,true);
+                    new NamespaceFilter(version,true);
             XMLReader reader
                     = XMLReaderFactory.createXMLReader();
             filter.setParent(reader);
