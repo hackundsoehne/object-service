@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
  * @version 0.1
  */
 public class MturkPlatform implements Platform,Payment,WorkerIdentification {
+    public static final int THIRTY_DAYS = 60 * 60 * 24 * 30;
+    public static final int TWO_HOURS = 60 * 60 * 2;
     private final String name;
     private final MTurkConnection connection;
 
@@ -66,8 +68,8 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
                 experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dallers
-                60*60*2, //you have 2 hours to do the assignment
-                60*60*24*30, // the experiment is staying for 30 days
+                TWO_HOURS, //you have 2 hours to do the assignment
+                THIRTY_DAYS, // the experiment is staying for 30 days
                 tags,
                 experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
                 2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
