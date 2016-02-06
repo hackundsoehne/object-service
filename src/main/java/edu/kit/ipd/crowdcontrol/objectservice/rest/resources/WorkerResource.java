@@ -46,7 +46,7 @@ public class WorkerResource {
             Optional<WorkerRecord> optionalRecord = manager.getWorker(platform, request.queryMap().toMap());
             if (optionalRecord.isPresent()) {
                 worker = optionalRecord.get();
-            } else if (!manager.getNeedemail(platform) || (!request.queryParams("email").isEmpty())){
+            } else if (!manager.getNeedemail(platform) || (request.queryParams("email") != null && !request.queryParams("email").isEmpty())){
                 String identify = manager.identifyWorker(platform, request.queryMap().toMap());
                 WorkerRecord workerRecord = new WorkerRecord(null, identify, platform, null, null);
                 worker = operations.insertWorker(workerRecord);
