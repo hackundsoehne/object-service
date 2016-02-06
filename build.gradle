@@ -64,6 +64,8 @@ dependencies {
 
 test {
     testLogging {
+        showStandardStreams = false
+        exceptionFormat = 'full'
         events 'failed', 'skipped', 'passed'
     }
 }
@@ -118,6 +120,8 @@ task restTest(type: Test) {
     classpath = sourceSets.restTest.runtimeClasspath
 
     testLogging {
+        showStandardStreams = false
+        exceptionFormat = 'full'
         events 'failed', 'skipped', 'passed'
     }
 }
@@ -132,6 +136,8 @@ task integrationTest(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
 
     testLogging {
+        showStandardStreams = false
+        exceptionFormat = 'full'
         events 'failed', 'skipped', 'passed'
     }
 }
@@ -139,6 +145,10 @@ task integrationTest(type: Test) {
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
     finalizedBy jacocoTestReport
+}
+
+jacoco {
+    toolVersion = "0.7.5.201505241946"
 }
 
 jacocoTestReport {
