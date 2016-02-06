@@ -94,7 +94,8 @@ public class AnswerRatingResource {
         if (answer.getQuality() != 0)
             throw new BadRequestException("Quality cannot be set at creation");
 
-        AnswerRecord record = null;
+        AnswerRecord record;
+
         try {
             record = answerRatingOperations.insertNewAnswer(
                     AnswerRatingTransformer.toAnswerRecord(answer, experimentId)
@@ -124,8 +125,9 @@ public class AnswerRatingResource {
         int answerId = getParamInt(request, "aid");
         AnswerRecord record = getOrThrow(answerRatingOperations.getAnswer(answerId));
 
-        if (experimentId != record.getExperiment())
+        if (experimentId != record.getExperiment()) {
             throw new IllegalArgumentException("Answer not found for the given experiment");
+        }
 
         return AnswerRatingTransformer.toAnswerProto (record,
                 answerRatingOperations.getRatings(answerId));

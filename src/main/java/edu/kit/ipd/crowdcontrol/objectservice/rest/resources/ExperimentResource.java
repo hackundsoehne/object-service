@@ -112,6 +112,9 @@ public class ExperimentResource {
 
         Experiment exp = fetchExperiment(id);
 
+        response.status(201);
+        response.header("Location", "/experiments/" + id);
+
         EventManager.EXPERIMENT_CREATE.emit(exp);
 
         return exp;
