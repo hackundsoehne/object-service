@@ -13,10 +13,7 @@ import org.jooq.Result;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -118,8 +115,8 @@ public class MoneyTransferManager {
             if (!worker.getEmail().equals("")) {
                 List<GiftCodeRecord> payedCodesForWorker = chooseGiftCodes(worker, giftCodes);
 
-                giftCodes = workerBalanceOperations.getUnusedGiftCodes();
                 payWorker(worker, payedCodesForWorker);
+                giftCodes = workerBalanceOperations.getUnusedGiftCodes();
             }
         }
         LOGGER.trace("Completed submission of giftcodes to workers.");
@@ -147,9 +144,9 @@ public class MoneyTransferManager {
         //extract giftcodes and save them to the database
         for (Message message : messages) {
             try {
-                GiftCodeRecord rec = MailParser.parseAmazonGiftCode(message);
-                if (rec != null) {
-                    workerBalanceOperations.addGiftCode(rec.getCode(), rec.getAmount());
+                Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(message);
+                if (rec.isPresent()) {
+                    workerBalanceOperations.addGiftCode(rec.get().getCode(), rec.get().getAmount());
                 }
             } catch (MoneyTransferException e) {
                 try {

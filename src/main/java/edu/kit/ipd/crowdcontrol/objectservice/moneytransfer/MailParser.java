@@ -7,6 +7,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import java.io.*;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,15 +23,16 @@ public class MailParser {
      * @return returns the giftcode
      * @throws MoneyTransferException gets thrown, if an error occurred during parsing
      */
-    protected static GiftCodeRecord parseAmazonGiftCode(Message msg) throws MoneyTransferException {
+    protected static Optional<GiftCodeRecord> parseAmazonGiftCode(Message msg) throws MoneyTransferException {
         //Extract Message
         String message;
+        Optional<GiftCodeRecord> optional;
         try {
-            if (!msg.getFrom()[0].toString().toLowerCase().contains("amazon.de")) {
-                return null;
+            if (!msg.getFrom()[0].toString().toLowerCase().endsWith("amazon.de>")) {
+                return Optional.ofNullable(null);
             }
         } catch (MessagingException e) {
-            return null;
+            return Optional.ofNullable(null);
         }
         try {
             Multipart parts = (Multipart) msg.getContent();
@@ -46,7 +48,7 @@ public class MailParser {
 
         StringBuilder password = MoneyTransferManager.loadMessage("src/main/resources/parsingPassword.txt");
         if (!messageStr.contains(password)) {
-            return null;
+            return Optional.ofNullable(null);
         }
 
         String codePatternStr = "[0-9A-Z]+(-[0-9A-Z]+)+";
@@ -70,7 +72,7 @@ public class MailParser {
         rec.setAmount(Integer.parseInt(amountStr));
         rec.setCode(giftCode);
 
-        return rec;
+        return Optional.of(rec);
     }
 
     /**

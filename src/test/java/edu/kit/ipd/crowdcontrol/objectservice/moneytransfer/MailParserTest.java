@@ -11,6 +11,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.*;
+import java.util.Optional;
 import java.util.Properties;
 
 import static org.junit.Assert.assertTrue;
@@ -55,9 +56,9 @@ public class MailParserTest {
         }
 
         innerBody.setContent(content, "text/plain");
-        GiftCodeRecord rec = MailParser.parseAmazonGiftCode(mail);
-        assertTrue(rec.getAmount() == 15);
-        assertTrue(rec.getCode().equals("5X4F-H8359N-Q2JM"));
+        Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(mail);
+        assertTrue(rec.get().getAmount() == 15);
+        assertTrue(rec.get().getCode().equals("5X4F-H8359N-Q2JM"));
 
     }
 
