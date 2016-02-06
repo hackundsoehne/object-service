@@ -4,6 +4,7 @@ import com.amazonaws.mturk.requester.doc._2014_08_15.Assignment;
 import com.amazonaws.mturk.requester.doc._2014_08_15.HIT;
 import com.amazonaws.mturk.requester.doc._2014_08_15.HITStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,6 +31,21 @@ public class MTurkRestApiTest {
                 "https://mechanicalturk.sandbox.amazonaws.com/");
     }
 
+    @Test(expected = ExecutionException.class)
+    public void testReject() throws Exception {
+        new RejectAssignment(connection,"alpha","bla").get();
+    }
+
+    @Test(expected = ExecutionException.class)
+    public void testApprove() throws Exception {
+        new ApproveAssignment(connection,"alpha","bla").get();
+    }
+
+    @Test(expected = ExecutionException.class)
+    public void testGetBonusPayments() throws Exception {
+        new GetBonusPayments(connection,"bla",1).get();
+    }
+
     @Test
     public void testPublishHIT() throws Exception {
         String id = new PublishHIT(connection,"Title1", "Description2",
@@ -39,16 +55,6 @@ public class MTurkRestApiTest {
         assertNotEquals(id, null);
 
         HIT hit = new GetHIT(connection,id).get();
-
-        try {
-            new RejectAssignment(connection,"alpha","bla").get();
-            new ApproveAssignment(connection,"alpha","bla").get();
-            new GetBonusPayments(connection,id,1).get();
-        } catch (ExecutionException e) {
-            assertEquals(e.getCause().getCause().getMessage().replaceAll("\\d",""),
-                   "AWS.MechanicalTurk.AssignmentDoesNotExist : " +
-                            "Assignment ALPHA does not exist. ( s)\nAssignmentId = ALPHA");
-        }
 
         List<Assignment> assignments = new GetAssignments(connection, id, 1).join();
 
