@@ -152,8 +152,10 @@ public class NotificationOperations extends AbstractOperations {
      * @return {@code true} if deleted, {@code false} otherwise
      */
     public boolean deleteNotification(int id) {
-        return create.deleteFrom(NOTIFICATION_RECEIVER_EMAIL)
-                .where(NOTIFICATION_RECEIVER_EMAIL.NOTIFICATION.eq(id)).execute() == 1;
+        NotificationRecord record = create.newRecord(NOTIFICATION);
+        record.setIdNotification(id);
+
+        return create.executeDelete(record, NOTIFICATION.ID_NOTIFICATION.eq(id)) == 1;
     }
 
     /**

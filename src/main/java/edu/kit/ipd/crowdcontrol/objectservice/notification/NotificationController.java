@@ -5,7 +5,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -44,10 +43,7 @@ public class NotificationController {
     }
 
     private void loadNotificationsFromDatabase() {
-        List<edu.kit.ipd.crowdcontrol.objectservice.proto.Notification> notificationList = operations.getAllNotifications();
-        for (edu.kit.ipd.crowdcontrol.objectservice.proto.Notification notificationProto : notificationList) {
-            createNotification(Notification.fromProtobuf(notificationProto, policy));
-        }
+        operations.getAllNotifications().forEach(this::createNotification);
     }
 
     /**
