@@ -5,6 +5,8 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -56,6 +58,8 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
                 .queryString(con.getCallParameter(operation,responseGroup,version))
                 .queryString(supplier.get());
         request.asStringAsync(this);
+
+        LogManager.getLogger("MTurk Platform").log(Level.INFO, request.getUrl());
     }
     @Override
     public void completed(HttpResponse<String> response) {
