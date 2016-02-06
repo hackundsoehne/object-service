@@ -252,75 +252,62 @@ public class AnswerRatingOperations extends AbstractOperations {
      * inserts a new rating into the DB
      *
      * @param rating       the rating to insert
-     * @param answerId     the id of the answer which is rated
-     * @param experimentId the id of the experiment which the rating belongs to
      *
      * @return the resulting rating
      *
      * @throws IllegalArgumentException if the experiment the rating is referring to is not
      *                                  existing
      * @throws IllegalStateException    if the worker is not allowed to submit more ratings
-     * @
      */
-    public Rating insertNewRating(Rating rating, int answerId, int experimentId) throws IllegalArgumentException, IllegalStateException {
-        RatingRecord ratingRecord = AnswerRatingTransformer.toRatingRecord(rating, answerId, experimentId);
-        ratingRecord.setIdRating(null);
+    public Rating insertNewRating(Rating rating) throws IllegalArgumentException, IllegalStateException {
+        assertHasField(rating, Rating.RATING_FIELD_NUMBER, Rating.RATING_ID_FIELD_NUMBER);
 
-        ExperimentRecord experiment = experimentOperations.getExperiment(ratingRecord.getExperiment())
-                .orElseThrow(() -> new IllegalArgumentException("Illegal experiment-value in rating record."));
+        boolean isReserved = create.fetchExists(
+                DSL.selectFrom(RATING)
+                        .where(RATING.ID_RATING.eq(rating.getRatingId()))
+                        .and(RATING.WORKER_ID.eq(rating.getWorker()))
+        );
 
-        if (getRatingCount(ratingRecord.getWorkerId()) >= experiment.getRatingsPerWorker()) {
-            throw new IllegalStateException(
-                    String.format("Worker %d already submitted the maximum of allowed ratings", ratingRecord.getWorkerId())
-            );
+        if (!isReserved) {
+            throw new IllegalStateException(String.format("Rating %d is not reserved for worker %d", rating.getRatingId(), rating.getWorker()));
         }
 
-        RatingRecord result = doIfRunning(ratingRecord.getExperiment(), conf -> {
-            RatingRecord record = DSL.using(conf)
-                    .insertInto(RATING)
-                    .set(ratingRecord)
-                    .returning()
-                    .fetchOne();
+        String feedback = null;
 
-            List<RatingConstraintRecord> toInsert = rating.getViolatedConstraintsList().stream()
-                    .map(constraint -> {
-                        RatingConstraintRecord constraintRecord = new RatingConstraintRecord();
-                        constraintRecord.setRefRating(record.getIdRating());
-                        constraintRecord.setOffConstraint(constraint.getId());
-                        return constraintRecord;
-                    })
-                    .collect(Collectors.toList());
+        if (rating.hasField(rating.getDescriptorForType().findFieldByNumber(Rating.FEEDBACK_FIELD_NUMBER))) {
+            feedback = rating.getFeedback();
+        }
 
-            DSL.using(conf).batchInsert(toInsert).execute();
+        create.update(RATING)
+                .set(RATING.RATING_, rating.getRating())
+                .set(RATING.FEEDBACK, feedback)
+                .where(RATING.ID_RATING.eq(rating.getRatingId()))
+                .execute();
 
-            return record;
-        });
+        RatingRecord ratingRecord = create.fetchOne(RATING, RATING.ID_RATING.eq(rating.getRatingId()));
+
+        List<RatingConstraintRecord> toInsert = rating.getViolatedConstraintsList().stream()
+                .map(constraint -> {
+                    RatingConstraintRecord constraintRecord = new RatingConstraintRecord();
+                    constraintRecord.setRefRating(ratingRecord.getIdRating());
+                    constraintRecord.setOffConstraint(constraint.getId());
+                    return constraintRecord;
+                })
+                .collect(Collectors.toList());
+
+        create.batchInsert(toInsert).execute();
 
         addToExperimentCalibration(ratingRecord.getWorkerId(), ratingRecord.getExperiment());
 
         Result<RatingConstraintRecord> ratingConstraints = create.selectFrom(RATING_CONSTRAINT)
-                .where(RATING_CONSTRAINT.REF_RATING.eq(result.getIdRating()))
+                .where(RATING_CONSTRAINT.REF_RATING.eq(ratingRecord.getIdRating()))
                 .fetch();
 
         Result<ConstraintRecord> constraints = create.selectFrom(CONSTRAINT)
                 .where(CONSTRAINT.ID_CONSTRAINT.in(ratingConstraints.map(RatingConstraintRecord::getOffConstraint)))
                 .fetch();
 
-        return AnswerRatingTransformer.toRatingProto(result, constraints);
-    }
-
-    /**
-     * returns the number of ratings a worker has submitted
-     *
-     * @param workerId the workerId to check for
-     *
-     * @return the number of ratings
-     */
-    private int getRatingCount(int workerId) {
-        return create.fetchCount(
-                DSL.selectFrom(RATING)
-                        .where(RATING.WORKER_ID.eq(workerId))
-        );
+        return AnswerRatingTransformer.toRatingProto(ratingRecord, constraints);
     }
 
     /**
