@@ -22,7 +22,7 @@ public class Utils {
      * @param request request to handle the error in case
      * @throws RuntimeException for the case the request is invalid
      */
-    public static void handleRequest(Request request) throws RuntimeException {
+    public static void handleRequest(Request request) throws RequestException {
         if (request.getIsValid().equals("False")) {
             StringBuilder builder = new StringBuilder();
 
@@ -35,7 +35,7 @@ public class Utils {
                     builder.append(pair.getKey()+" = "+pair.getValue());
                 }
             }
-            throw new RuntimeException(builder.toString());
+            throw new RequestException(builder.toString());
         }
     }
     /**
