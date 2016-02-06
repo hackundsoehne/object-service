@@ -74,10 +74,10 @@ public class WorkerBalanceOperations extends AbstractOperations {
      * @return true if successful
      */
     public boolean addDebit(int workerID, int amount, int giftCode) {
-        if (amount > 0)
-            throw new IllegalArgumentException("amount: " + amount + " has do be negative or zero");
+        if (amount < 0)
+            throw new IllegalArgumentException("amount: " + amount + " has do be positive or zero");
         WorkerBalanceRecord workerBalanceRecord = create.newRecord(WORKER_BALANCE);
-        workerBalanceRecord.setTransactionValue(amount);
+        workerBalanceRecord.setTransactionValue((-1) * amount);
         workerBalanceRecord.setWorker(workerID);
         workerBalanceRecord.setGiftCode(giftCode);
         workerBalanceRecord.setType(WorkerBalanceType.debit);
