@@ -39,15 +39,15 @@ public class StringSimilarityTest {
     public void testGetHammingDistance() throws Exception {
 
 
-        System.out.println("A: "+ StringSimilarity.getSimilarityBySimhash(leander1,leander2));
-        System.out.println("B: "+StringSimilarity.getSimilarityBySimhash(leander2,leander3));
-        System.out.println("C: "+StringSimilarity.getSimilarityBySimhash(leander1,leander3));
+        System.out.println("A: "+ StringSimilarity.getSimilarityFromString(leander1,leander2));
+        System.out.println("B: "+StringSimilarity.getSimilarityFromString(leander2,leander3));
+        System.out.println("C: "+StringSimilarity.getSimilarityFromString(leander1,leander3));
         //test similar strings
-        assertTrue(StringSimilarity.getSimilarityBySimhash(simA,simB) > 0.8 );
+        assertTrue(StringSimilarity.getSimilarityFromString(simA,simB) > 0.8 );
         //test equal strings
-        assertEquals(StringSimilarity.getSimilarityBySimhash(simA,simA),1.0,0.00001);
+        assertEquals(StringSimilarity.getSimilarityFromString(simA,simA),1.0,0.00001);
         //test different strings
-        assertTrue(StringSimilarity.getSimilarityBySimhash(diffA,diffB) < 0.8);
+        assertTrue(StringSimilarity.getSimilarityFromString(diffA,diffB) < 0.8);
 
     }
 }
