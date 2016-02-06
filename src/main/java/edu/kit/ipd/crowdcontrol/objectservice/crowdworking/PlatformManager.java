@@ -9,6 +9,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Map;
@@ -54,20 +55,19 @@ public class PlatformManager {
         //create hashmap of platforms
         platforms = crowdPlatforms.stream()
                 .collect(Collectors.toMap(Platform::getID, Function.identity()));
-        //clear database
-        platformOps.deleteAllPlatforms();
+
         //update database
-        platforms.forEach((s, platform) -> {
-            PlatformRecord rec = new PlatformRecord();
-            rec.setIdPlatform(platform.getID());
-            rec.setName(platform.getName());
-            rec.setNeedsEmail(false);
+        List<PlatformRecord> records = platforms.values().stream()
+                .map(platform -> new PlatformRecord(
+                        platform.getID(),
+                        platform.getName(),
+                        platform.isCalibrationAllowed(),
+                        isNeedemail(platform),
+                        false
+                ))
+                .collect(Collectors.toList());
 
-            rec.setNeedsEmail(isNeedemail(platform));
-            rec.setRenderCalibrations(platform.isCalibrationAllowed());
-
-            platformOps.createPlatform(rec);
-        });
+        platformOps.storePlatforms(records);
     }
 
     private boolean isNeedemail(Platform platform) {
