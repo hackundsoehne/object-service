@@ -42,7 +42,6 @@ public class PlatformManagerTest {
         platformOps = mock(PlatformOperations.class);
         workerOps = mock(WorkerOperations.class);
 
-        when(platformOps.getPlatforms()).thenReturn(Collections.emptyList());
         when(platformOps.getPlatform("test1")).thenReturn(Optional.empty());
         when(platformOps.getPlatform("test2")).thenReturn(Optional.empty());
         when(platformOps.getPlatform("test3")).thenReturn(Optional.empty());
@@ -54,14 +53,7 @@ public class PlatformManagerTest {
                 platformOps,
                 workerOps);
     }
-    @Test
-    public void dbinit(){
 
-        platforms.forEach(platform -> {
-            //check that every platform got init
-            verify(platformOps).createPlatform(((PlatformTest)platform).toRecord());
-        });
-    }
     @Test
     public void publishTest() {
         platforms.forEach(platform -> {
