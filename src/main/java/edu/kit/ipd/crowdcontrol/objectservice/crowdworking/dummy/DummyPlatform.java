@@ -67,7 +67,11 @@ public class DummyPlatform implements Platform, Payment {
      */
     @Override
     public String getID() {
-        return ID+name.toLowerCase();
+        String appendix = "";
+        if (name != null) {
+            appendix = name.toLowerCase();
+        }
+        return ID+appendix;
     }
 
     /**
