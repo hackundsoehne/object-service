@@ -1,11 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality;
 
-import edu.kit.ipd.crowdcontrol.objectservice.ExperimentController;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
@@ -37,7 +35,7 @@ public class QualityIdentificator{
 
     private final Logger log = LogManager.getLogger(QualityIdentificator.class);
     private final Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
-    private final ExperimentController controller;
+   //TODO uncomment after exp.controller merge private final ExperimentController controller;
     private final AnswerRatingOperations answerOperations;
     private final ExperimentOperations experimentOperations;
     private final AlgorithmOperations algorithmOperations;
@@ -55,9 +53,9 @@ public class QualityIdentificator{
      */
     private int ratingQualityThreshold = 5;
 
-    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentController controller) {
+    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations) {
 
-        this.controller = controller;
+        //TODO uncomment after contoller merge this.controller = controller;
         this.answerOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.algorithmOperations = algorithmOperations;
@@ -169,7 +167,7 @@ public class QualityIdentificator{
      */
     private void checkExpStatus(ExperimentRecord experiment) {
         if (experiment.getNeededAnswers() == answerOperations.getNumberOfFinalGoodAns(experiment.getIdExperiment())) {
-            controller.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
+           //TODO uncomment after controller merge: controller.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
         }
 
     }
