@@ -12,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 import rx.Observable;
 import rx.Observer;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,7 +26,7 @@ public class ExperimentController implements Observer<Event<Experiment>> {
     private final EventObservable<ChangeEvent<Experiment>> endExpObservable = EventManager.EXPERIMENT_CHANGE;
     private final PlatformManager platformManager;
 
-    public ExperimentController(PlatformManager manager){
+    public ExperimentController(PlatformManager manager) {
         platformManager = manager;
         observable.subscribe();
 
@@ -34,21 +36,22 @@ public class ExperimentController implements Observer<Event<Experiment>> {
     /**
      * Starts the experiment by publishing it on the participating platforms.
      * If an error occurs during the publishing, all already created tasks for this experiment will be undone
+     *
      * @param experiment to be started
      */
-   private void startExperiment(Experiment experiment){
-
+    private void startExperiment(Experiment experiment) {
+        Queue<String> successfulPlatforms = new LinkedList<>();
         for (int i = 0; i < experiment.getPopulationsCount(); i++) {
             try {
-                platformManager.publishTask(experiment.getPopulations(i).getPlatformId(),experiment);
-
-            }catch ( TaskOperationException e1){
+                platformManager.publishTask(experiment.getPopulations(i).getPlatformId(), experiment);
+                successfulPlatforms.add(experiment.getPopulations(i).getPlatformId());
+            } catch (TaskOperationException e1) {
                 //could not create task
                 log.fatal(String.format("Error! Could not create experiment on platform %s!", experiment.getPopulations(i).getPlatformId()), e1);
-                unpublishExperiment(experiment);
-            }catch (IllegalStateException | IllegalArgumentException e2){
-                log.fatal("Error! Could not create experiment! "+e2.getMessage());
-                unpublishExperiment(experiment);
+                unpublishExperiment(experiment, successfulPlatforms);
+            } catch (IllegalStateException | IllegalArgumentException e2) {
+                log.fatal("Error! Could not create experiment! " + e2.getMessage());
+                unpublishExperiment(experiment, successfulPlatforms);
             }
         }
 
@@ -61,14 +64,17 @@ public class ExperimentController implements Observer<Event<Experiment>> {
      * Unpublishes an experiment from all platforms it is meant to be active on.
      * This method is only called if the initialization of the experiment has failed on one
      * of its platforms.
-     * @param experiment which is going to be unpublished
+     *
+     * @param experiment          which is going to be unpublished
+     * @param successfulPlatforms all platforms the experiment already was published on
      */
-    private void unpublishExperiment(Experiment experiment){
-        for (int i = 0; i < experiment.getPopulationsCount(); i++) {
+    private void unpublishExperiment(Experiment experiment, Queue<String> successfulPlatforms) {
+
+        while (!successfulPlatforms.isEmpty()) {
             try {
-                platformManager.unpublishTask(experiment.getPopulations(i).getPlatformId(),experiment);
-            }catch ( TaskOperationException e1){
-                //nothing to do here because experiment-publishing was aborted before this population was reached.
+                platformManager.unpublishTask(successfulPlatforms.remove(), experiment);
+            } catch (TaskOperationException e1) {
+                log.fatal("Error! Could not unpublish experiment from platform! " + e1.getMessage());
             }
         }
     }
@@ -78,18 +84,19 @@ public class ExperimentController implements Observer<Event<Experiment>> {
      * Unpublished the experiment from all its platform. Waits until the time for giving answers and/or ratings
      * on the platforms (specified in the config-file) has run out. The experiment's state is set to STOPPED and a
      * matching event is emitted.
+     *
      * @param experiment which is to be ended.
      */
-    public void endExperiment(Experiment experiment){
+    public void endExperiment(Experiment experiment) {
 
-        for (int i = 0; i < experiment.getPopulationsCount(); i++){
+        for (int i = 0; i < experiment.getPopulationsCount(); i++) {
             try {
-                platformManager.unpublishTask(experiment.getPopulations(i).getPlatformId(),experiment);
-            }catch (TaskOperationException e1){
-                log.fatal(String.format("Error! Cannot unpublish experiment from platform %s!",experiment.getPopulations(i).getPlatformId()),e1);
+                platformManager.unpublishTask(experiment.getPopulations(i).getPlatformId(), experiment);
+            } catch (TaskOperationException e1) {
+                log.fatal(String.format("Error! Cannot unpublish experiment from platform %s!", experiment.getPopulations(i).getPlatformId()), e1);
             }
         }
-        //wait for crowdplatform time out
+        //wait for crowd platform time out
         try {
             TimeUnit.HOURS.sleep(2);  //TODO get time from config
         } catch (InterruptedException e) {
@@ -97,7 +104,7 @@ public class ExperimentController implements Observer<Event<Experiment>> {
         }
         Experiment newExperiment = experiment.toBuilder().setState(Experiment.State.STOPPED).build();
         //notify all observers
-        endExpObservable.emit(new ChangeEvent<>(experiment,newExperiment));
+        endExpObservable.emit(new ChangeEvent<Experiment>(experiment, newExperiment));
     }
 
     @Override
