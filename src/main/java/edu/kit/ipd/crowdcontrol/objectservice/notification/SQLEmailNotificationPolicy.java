@@ -6,7 +6,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.jooq.Field;
 import org.jooq.Record;
-import org.jooq.Result;
 import org.jooq.impl.DSL;
 
 import java.util.Collections;
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The SQLEmailNotificationPolicy checks given queries in a SQL-Database and sends notifications via email.
@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>> {
-    private MailSender mailSender;
-    private NotificationOperations operations;
+    private final MailSender mailSender;
+    private final NotificationOperations operations;
 
 
     /**
@@ -37,25 +37,46 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
         this.operations = operations;
     }
 
-    private boolean resultHasIdAndTokenField(Result<Record> result) {
+    /**
+     * Checks if the record has the desired form of:
+     * <p>
+     * |id |token| <br>
+     * |int|string|
+     * </p>
+     *
+     * @param record the record to check
+     * @return true if the record has the desired form, else false
+     */
+    private boolean recordHasIdAndTokenField(Record record) {
         Field<Integer> idField = DSL.field("id", Integer.class);
         Field<String> tokenField = DSL.field("token", String.class);
 
-        return (result.get(0).field(idField) != null) && (result.get(0).field(tokenField) != null);
+        return (record.field(idField) != null) && (record.field(tokenField) != null);
     }
 
     @Override
     protected List<String> check(Notification notification) {
-        Result<Record> result = operations.runReadOnlySQL(notification.getQuery());
-        if (result.isNotEmpty()) {
-            if (resultHasIdAndTokenField(result)) {
-                // the result has the required columns, so we can bring it in a handier format
-                Map<Integer, NotificationTokenRecord> tokenRecords = result.stream()
-                        .map(record -> new NotificationTokenRecord(null, record.getValue("id", Integer.class),
-                                record.getValue("token", String.class), notification.getId())
-                        )
-                        .collect(Collectors.toMap(NotificationTokenRecord::getResultId, Function.identity()));
+        // peek on first record
+        Record firstRecord;
+        try (Stream<Record> recordStream = operations.runReadOnlySQL(notification.getQuery())) {
+            firstRecord = recordStream.findFirst().orElse(null);
+        }
+        if (firstRecord != null) {
+            if (recordHasIdAndTokenField(firstRecord)) {
+                // go on and fetch all. might be inefficient if there is only one record to fetch.
+                // but in the common case there are more than one. Most efficient would be to check only the first time
+                // a query is specified but that's too much work for now.
 
+                // the records have the required columns, so we can bring them in a handier format
+                Map<Integer, NotificationTokenRecord> tokenRecords;
+                try (Stream<Record> recordStream = operations.runReadOnlySQL(notification.getQuery())) {
+                    tokenRecords = recordStream.map(record -> new NotificationTokenRecord(
+                            null,
+                            record.getValue("id", Integer.class),
+                            record.getValue("token", String.class),
+                            notification.getId()))
+                            .collect(Collectors.toMap(NotificationTokenRecord::getResultId, Function.identity()));
+                }
                 List<String> newTokenList = operations.diffTokenRecords(tokenRecords, notification.getId()).stream()
                         .map(NotificationTokenRecord::getResultToken)
                         .collect(Collectors.toList());
@@ -89,11 +110,13 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
         }
 
         String subject = "[CrowdControl] " + notification.getName();
-        try {
-            for (String receiver : notification.getReceiverEmails())
-            mailSender.sendMail(receiver, subject, message.toString());
-        } catch (Exception e) {
-            throw new NotificationNotSentException("notification with id=" + notification.getId() + "could not be sent", e);
+        for (String receiver : notification.getReceiverEmails()) {
+            try {
+                mailSender.sendMail(receiver, subject, message.toString());
+            } catch (Exception e) {
+                throw new NotificationNotSentException(String.format("notification with id=%s could not be sent to %s",
+                        notification.getId(), receiver), e);
+            }
         }
     }
 

@@ -16,14 +16,14 @@ import java.util.List;
 public class Notification implements Runnable {
     private static final Logger LOGGER = LogManager.getLogger(Notification.class);
 
-    private int id;
-    private String name;
-    private String description;
-    private int checkPeriod;
-    private String query;
-    private boolean sendOnce = false;
-    private List<String> receiverEmails;
-    private NotificationPolicy policy;
+    private final int id;
+    private final String name;
+    private final String description;
+    private final int checkPeriod;
+    private final String query;
+    private final boolean sendOnce;
+    private final List<String> receiverEmails;
+    private final NotificationPolicy policy;
 
     /**
      * Creates a new instance of Notification.

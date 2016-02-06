@@ -205,7 +205,6 @@ public class NotificationOperations extends AbstractOperations {
      * Runs a sql-query in read-only mode
      *
      * @param sql the sql to execute in read-only mode
-     *
      * @return the results of the query as a stream
      */
     public Stream<Record> runReadOnlySQL(String sql) {
@@ -223,31 +222,33 @@ public class NotificationOperations extends AbstractOperations {
      * @return a list of newly added NotificationTokenRecords, that were not stored in database before
      */
     public List<NotificationTokenRecord> diffTokenRecords(Map<Integer, NotificationTokenRecord> newTokenRecords, int notificationId) {
-        List<Query> deletionQueries = new ArrayList<>();
+        if (newTokenRecords != null && !newTokenRecords.isEmpty()) {
+            List<Query> deletionQueries = new ArrayList<>();
 
-        try (Stream<NotificationTokenRecord> recordStream = create.selectFrom(NOTIFICATION_TOKEN)
-                .where(NOTIFICATION_TOKEN.NOTIFICATION.eq(notificationId))
-                .fetchLazy().stream()) {
-            recordStream.forEach(storedRecord -> {
-                int storedTokenId = storedRecord.getResultId();
-                if (newTokenRecords.containsValue(storedTokenId)) {
-                    // condition still holds true. keep token in db, but remove from new tokens
-                    newTokenRecords.remove(storedTokenId);
-                } else {
-                    // condition defined by query isn't true anymore, so we can delete the old token.
-                    deletionQueries.add(create.delete(NOTIFICATION_TOKEN)
-                            .where(NOTIFICATION_TOKEN.ID_NOTIFICATION_TOKEN.eq(storedRecord.getIdNotificationToken())));
-                }
-            });
-        }
+            try (Stream<NotificationTokenRecord> recordStream = create.selectFrom(NOTIFICATION_TOKEN)
+                    .where(NOTIFICATION_TOKEN.NOTIFICATION.eq(notificationId))
+                    .fetchLazy().stream()) {
+                recordStream.forEach(storedRecord -> {
+                    int storedTokenId = storedRecord.getResultId();
+                    if (newTokenRecords.containsValue(storedTokenId)) {
+                        // condition still holds true. keep token in db, but remove from new tokens
+                        newTokenRecords.remove(storedTokenId);
+                    } else {
+                        // condition defined by query isn't true anymore, so we can delete the old token.
+                        deletionQueries.add(create.delete(NOTIFICATION_TOKEN)
+                                .where(NOTIFICATION_TOKEN.ID_NOTIFICATION_TOKEN.eq(storedRecord.getIdNotificationToken())));
+                    }
+                });
+            }
 
-        create.batch(deletionQueries).execute();
+            create.batch(deletionQueries).execute();
 
-        // all remaining tokens in the map are new and have to be added to the database
-        if (!newTokenRecords.isEmpty()) {
-            ArrayList<NotificationTokenRecord> tokenRecordList = new ArrayList<>(newTokenRecords.values());
-            create.batchInsert(tokenRecordList).execute();
-            return tokenRecordList;
+            // all remaining tokens in the map are new and have to be added to the database
+            if (!newTokenRecords.isEmpty()) {
+                ArrayList<NotificationTokenRecord> tokenRecordList = new ArrayList<>(newTokenRecords.values());
+                create.batchInsert(tokenRecordList).execute();
+                return tokenRecordList;
+            }
         }
         return Collections.emptyList();
     }

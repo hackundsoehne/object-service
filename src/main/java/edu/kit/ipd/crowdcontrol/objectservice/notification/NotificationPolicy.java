@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 
 public abstract class NotificationPolicy<T extends Collection<?>> {
-    private NotificationOperations operations;
+    private final NotificationOperations operations;
 
     /**
      * Checks a notification's condition and sends the notification if the condition is met

@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.eq;
@@ -56,10 +57,9 @@ public class SQLEmailNotificationPolicyTest {
         // this could be any record from the db
         notification = new Notification(5, "Test Notification",
                 "Die Tests {{tokens}} wurden erfolgreich abgeschlossen!", 600, TESTQUERY, true, RECEIVER_EMAILS, policy);
-        record = new NotificationTokenRecord(1, 2, "three", 5);
-        resultNoIdAndToken = create.newResult();
-        resultNoIdAndToken.add(record);
+    }
 
+    private static Stream<Record> getResulWithIdAndToken() {
         Field<Integer> idField = DSL.field("id", Integer.class);
         Field<String> tokenField = DSL.field("token", String.class);
         resultWithIdAndToken = create.newResult();
@@ -73,8 +73,15 @@ public class SQLEmailNotificationPolicyTest {
             resultWithIdAndToken.add(idTokenRecord);
             tokenRecordMap.put(i, new NotificationTokenRecord(null, i, token, notification.getId()));
         }
+        return resultWithIdAndToken.stream();
     }
 
+    private static Stream<Record> getResultNoIdAndToken() {
+        record = new NotificationTokenRecord(1, 2, "three", 5);
+        resultNoIdAndToken = create.newResult();
+        resultNoIdAndToken.add(record);
+        return resultNoIdAndToken.stream();
+    }
     @Before
     public void setUpClear() throws Exception {
         Mockito.reset(mailSender);
@@ -83,7 +90,7 @@ public class SQLEmailNotificationPolicyTest {
 
     @Test
     public void testCheckNoIDAndTokenSuccess() throws Exception {
-        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(resultNoIdAndToken);
+        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(getResultNoIdAndToken());
         List<String> tokens = policy.check(notification);
         assertTrue(tokens != null && tokens.isEmpty());
     }
@@ -91,14 +98,14 @@ public class SQLEmailNotificationPolicyTest {
     @Test
     public void testCheckEmptyResult() throws Exception {
         Result<Record> emptyResult = create.newResult();
-        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(emptyResult);
+        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(emptyResult.stream());
         List<String> tokens = policy.check(notification);
         assertNull(tokens);
     }
 
     @Test
     public void testCheckWithIdAndToken2NewRecords() throws Exception {
-        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(resultWithIdAndToken);
+        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(getResulWithIdAndToken(), getResulWithIdAndToken());
         when(notificationOperations.diffTokenRecords(tokenRecordMap, notification.getId()))
                 //only return the first 2 records
                 .thenReturn(tokenRecordMap.values().stream().limit(2).collect(Collectors.toList()));
@@ -108,7 +115,7 @@ public class SQLEmailNotificationPolicyTest {
 
     @Test
     public void testCheckWithIdAndTokenNoNewRecords() throws Exception {
-        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(resultWithIdAndToken);
+        when(notificationOperations.runReadOnlySQL(TESTQUERY)).thenReturn(getResulWithIdAndToken(), getResulWithIdAndToken());
         when(notificationOperations.diffTokenRecords(tokenRecordMap, notification.getId()))
                 .thenReturn(Collections.emptyList());
         List<String> tokens = policy.check(notification);

@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 public class NotificationController {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private HashMap<Integer, ScheduledFuture<?>> handleMap;
-    private NotificationOperations operations;
-    private NotificationPolicy policy;
+    private final NotificationOperations operations;
+    private final NotificationPolicy policy;
 
     public NotificationController(NotificationOperations operations, NotificationPolicy policy) {
         this.operations = operations;
