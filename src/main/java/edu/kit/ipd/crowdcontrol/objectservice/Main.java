@@ -20,6 +20,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.SQLEmailNotificationPolicy;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.DuplicateChecker;
 import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
