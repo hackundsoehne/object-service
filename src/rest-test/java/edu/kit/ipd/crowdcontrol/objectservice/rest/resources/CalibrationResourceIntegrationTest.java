@@ -34,9 +34,9 @@ public class CalibrationResourceIntegrationTest extends ResourceIntegrationTest 
         Calibration put = Calibration.newBuilder()
                 .setName("Gender")
                 .setQuestion("What's your gender?")
-                .setAnswers(0, Calibration.Answer.newBuilder().setAnswer("answer1").build())
-                .setAnswers(1, Calibration.Answer.newBuilder().setAnswer("answer2").build())
-                .setAcceptedAnswers(0, Calibration.Answer.newBuilder().setAnswer("answer1").build())
+                .addAnswers(Calibration.Answer.newBuilder().setAnswer("answer1").build())
+                .addAnswers(Calibration.Answer.newBuilder().setAnswer("answer2").build())
+                .addAcceptedAnswers(Calibration.Answer.newBuilder().setAnswer("answer1").build())
                 .build();
 
         Calibration calibration = httpPut("/calibrations", put, Calibration.class);
