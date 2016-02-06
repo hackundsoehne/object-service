@@ -6,12 +6,13 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Plat
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.PlatformTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Platform;
 import org.jooq.DSLContext;
+import org.jooq.InsertSetStep;
+import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.PLATFORM;
@@ -77,12 +78,30 @@ public class PlatformOperations extends AbstractOperations {
     public void storePlatforms(List<PlatformRecord> toStore) {
         toStore.forEach(this::assertHasPrimaryKey);
         toStore.forEach(record -> assertHasField(record, PLATFORM.NAME, PLATFORM.NEEDS_EMAIL, PLATFORM.RENDER_CALIBRATIONS));
-        List<String> primaryKeys = toStore.stream().map(PlatformRecord::getIdPlatform).collect(Collectors.toList());
+        Map<String, PlatformRecord> records = toStore.stream().collect(Collectors.toMap(PlatformRecord::getIdPlatform, Function.identity()));
+
         create.transaction(conf -> {
-            DSL.using(conf).batchStore(toStore);
+            Set<String> existing = DSL.using(conf).select(PLATFORM.ID_PLATFORM)
+                    .from(PLATFORM)
+                    .where(PLATFORM.ID_PLATFORM.in(records.keySet()))
+                    .fetchSet(PLATFORM.ID_PLATFORM);
+
+            List<PlatformRecord> toUpdate = existing.stream()
+                    .map(records::get)
+                    .collect(Collectors.toList());
+
+            List<PlatformRecord> toInsert = records.keySet().stream()
+                    .filter(id -> !existing.contains(id))
+                    .map(records::get)
+                    .collect(Collectors.toList());
+
+            DSL.using(conf).batchUpdate(toUpdate).execute();
+
+            DSL.using(conf).batchInsert(toInsert).execute();
+
             DSL.using(conf).update(PLATFORM)
                     .set(PLATFORM.INACTIVE, true)
-                    .where(PLATFORM.ID_PLATFORM.notIn(primaryKeys))
+                    .where(PLATFORM.ID_PLATFORM.notIn(records.keySet()))
                     .execute();
         });
     }
