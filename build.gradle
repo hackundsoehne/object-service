@@ -189,6 +189,8 @@ jooq {
 }
 generateSampleJooqSchemaSource.enabled = false
 
+file("src/main/generated/").mkdirs()
+
 wsdl2java {
     generatedWsdlDir = file("src/main/generated/")  // target directory for generated source coude
     wsdlDir = file("src/main/generated/") // define to support incremental build
