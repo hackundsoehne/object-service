@@ -1,17 +1,15 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.PlatformTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Platform;
 import org.jooq.DSLContext;
-import org.jooq.InsertSetStep;
-import org.jooq.Result;
-import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
