@@ -100,3 +100,6 @@ gradle-app.setting
 gmailLogin.properties
 webLogin.properties
 mailHandlerTestProps.properties
+config.yaml
+mturk.properties
+generated

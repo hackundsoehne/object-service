@@ -21,6 +21,7 @@ public class PlatformTransformer extends AbstractTransformer {
                 .setId(record.getIdPlatform())
                 .setName(record.getName())
                 .setHasCalibrations(record.getRenderCalibrations())
+                .setIsInactive(record.getInactive())
                 .build();
     }
 }
