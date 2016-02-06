@@ -152,7 +152,7 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
             fileTree(dir: it,
-                    exclude: ['com/amazonaws/mturk/requester/doc/_2014_08_15/**'.
+                    exclude: ['com/amazonaws/mturk/requester/doc/_2014_08_15/**',
                               'edu/kit/ipd/crowdcontrol/objectservice/proto/**',
                               'edu/kit/ipd/crowdcontrol/objectservice/database/model/**'])
         })
