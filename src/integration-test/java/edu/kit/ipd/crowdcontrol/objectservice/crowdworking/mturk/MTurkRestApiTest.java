@@ -56,7 +56,7 @@ public class MTurkRestApiTest {
 
         assertEquals(hit.getTitle(), "Title1");
         assertEquals(hit.getDescription(), "Description2");
-        assertTrue(hit.getReward().getAmount().subtract(new BigDecimal(0.20)).doubleValue() < 0.0001);
+        assertEquals(new BigDecimal(0.20).doubleValue(), hit.getReward().getAmount().doubleValue(), 0.0001);
         assertEquals(hit.getAssignmentDurationInSeconds(), new Long(60));
         //FIXME check the lifetime
         assertEquals(hit.getKeywords(), "test,for,everything");
