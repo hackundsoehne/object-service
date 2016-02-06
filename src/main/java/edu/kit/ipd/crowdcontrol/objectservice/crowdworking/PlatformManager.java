@@ -57,36 +57,17 @@ public class PlatformManager {
                 .collect(Collectors.toMap(Platform::getID, Function.identity()));
 
         //update database
-        platforms.forEach((s, platform) -> {
-            //check if a platform is already in the database
+        List<PlatformRecord> records = platforms.values().stream()
+                .map(platform -> new PlatformRecord(
+                        platform.getID(),
+                        platform.getName(),
+                        platform.isCalibrationAllowed(),
+                        isNeedemail(platform),
+                        false
+                ))
+                .collect(Collectors.toList());
 
-            //create a record which would match this
-            PlatformRecord rec = new PlatformRecord(
-                    platform.getID(),
-                    platform.getName(),
-                    platform.isCalibrationAllowed(),
-                    isNeedemail(platform)
-                    //,TODO lock bit true
-                    );
-            //check if it present or not and create it or update it
-            if (!platformOps.getPlatform(platform.getID()).isPresent()) {
-                platformOps.createPlatform(rec);
-            } else {
-                platformOps.updatePlatform(rec);
-            }
-        });
-
-        // platforms which are not active anymore are getting dead locked
-        for (PlatformRecord record : platformOps.getPlatforms()) {
-            Platform platform = platforms.get(record.getIdPlatform());
-            //we cannot find this platform in our instance mark it dead
-            if (platform == null) {
-                //TODO record.setLockBit(true);
-                LogManager.getLogger("Crowdplatform").fatal("Mark platform "+record.getIdPlatform()+" as locked");
-                platformOps.updatePlatform(record);
-            }
-        }
-
+        platformOps.storePlatforms(records);
     }
 
     private boolean isNeedemail(Platform platform) {

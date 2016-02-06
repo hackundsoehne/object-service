@@ -7,10 +7,12 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.PlatformTran
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Platform;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.PLATFORM;
 
@@ -33,7 +35,7 @@ public class PlatformOperations extends AbstractOperations {
      * @param next   {@code true} for next, {@code false} for previous
      * @param limit  number of records
      *
-     * @return List of platforms.
+     * @return list of platforms.
      */
     public Range<Platform, String> getPlatformList(String cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(PLATFORM), PLATFORM.ID_PLATFORM, PLATFORM, cursor, next, limit, String::compareTo)
@@ -45,7 +47,7 @@ public class PlatformOperations extends AbstractOperations {
      *
      * @param id ID of the platform
      *
-     * @return The platform.
+     * @return the platform.
      */
     public Optional<Platform> getPlatform(String id) {
         return create.fetchOptional(PLATFORM, PLATFORM.ID_PLATFORM.eq(id))
@@ -55,7 +57,7 @@ public class PlatformOperations extends AbstractOperations {
     /**
      * Insert new platform into the database
      *
-     * @param platformRecord The platform to insert
+     * @param platformRecord the platform to insert
      *
      * @return true if inserted, false if existing
      *
@@ -67,19 +69,21 @@ public class PlatformOperations extends AbstractOperations {
     }
 
     /**
-     * Update the record of the given id with the new values
-     * @param rec A new Platformrecord
+     * Stores the passed PlatformRecords.
+     * <p>
+     * updates all the Records matching the primary key, and sets every other record in the database to inactive.
+     * @param toStore the records to store
      */
-    public void updatePlatform(PlatformRecord rec) {
-        //TODO LEAAAAANDER
-    }
-
-    /**
-     * Get a List of all Platforms
-     * @return List containing all platforms which are currently in the database
-     */
-    public List<PlatformRecord> getPlatforms() {
-        //TODO LEAAAAANDER
-        return Collections.emptyList();
+    public void storePlatforms(List<PlatformRecord> toStore) {
+        toStore.forEach(this::assertHasPrimaryKey);
+        toStore.forEach(record -> assertHasField(record, PLATFORM.NAME, PLATFORM.NEEDS_EMAIL, PLATFORM.RENDER_CALIBRATIONS));
+        List<String> primaryKeys = toStore.stream().map(PlatformRecord::getIdPlatform).collect(Collectors.toList());
+        create.transaction(conf -> {
+            DSL.using(conf).batchStore(toStore);
+            DSL.using(conf).update(PLATFORM)
+                    .set(PLATFORM.INACTIVE, true)
+                    .where(PLATFORM.ID_PLATFORM.notIn(primaryKeys))
+                    .execute();
+        });
     }
 }
