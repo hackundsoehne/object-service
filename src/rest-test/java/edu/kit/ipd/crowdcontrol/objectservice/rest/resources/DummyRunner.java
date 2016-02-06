@@ -11,7 +11,7 @@ import org.junit.runner.notification.RunNotifier;
 public class DummyRunner extends Runner {
     @Override
     public Description getDescription() {
-        return null;
+        return Description.EMPTY;
     }
 
     public void run(RunNotifier notifier) {
