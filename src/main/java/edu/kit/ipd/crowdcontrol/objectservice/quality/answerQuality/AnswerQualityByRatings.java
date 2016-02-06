@@ -1,8 +1,10 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AlgorithmAnswerQualityParamRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -17,6 +19,8 @@ public class AnswerQualityByRatings implements AnswerQualityStrategy {
     private final String algorithmName = "AnswerQualityByRatings";
     private final String algorithmDescription = "Identifies the quality of answers based on its ratings. " +
             "\nThe answer's quality is equal to the rounded average of all its ratings ";
+
+
 
     /**
      * Identifies the quality of an answer based on its ratings.
@@ -53,6 +57,11 @@ public class AnswerQualityByRatings implements AnswerQualityStrategy {
     @Override
     public String getAlgorithmDescription() {
         return algorithmDescription;
+    }
+
+    @Override
+    public List<AlgorithmAnswerQualityParamRecord> getParams() {
+        return new LinkedList<>();
     }
 
 

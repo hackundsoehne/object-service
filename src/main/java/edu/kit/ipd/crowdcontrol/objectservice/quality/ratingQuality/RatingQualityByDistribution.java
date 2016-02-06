@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AlgorithmRatingQualityParamRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 
 import java.util.*;
@@ -17,6 +18,13 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
     private final String algorithmDescription = "Identifies the quality of ratings depending on their distribution." +
             "\nRatings with the most-chosen value will be assigned the maximum-quality. Others have a quality depending on" +
             "the deviation of their value to the most chosen one";
+    static final  String REGEX = "[0-9]";
+    static final String DB_REGEX = "^"+ REGEX + "$";
+    private static final String PARAM_DESCRIPTION = "The algorithm's parameter specifies which ratings are considered \"good\"." +
+            "All ratings with a quality equal or greater than this parameter will be considered \"good\" " +
+            "Good ratings will be used to estimate the quality of answers. This parameter has to be a positive integer between 0 and 9. " ;
+
+
 
     /**
      * Identifies the quality of a list of ratings. The ratings' qualities depend on weather they meet the most chosen rating-value or not.
@@ -63,6 +71,11 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
     @Override
     public String getAlgorithmDescription() {
         return algorithmDescription;
+    }
+
+    @Override
+    public List<AlgorithmRatingQualityParamRecord> getParams() {
+        return Collections.singletonList(new AlgorithmRatingQualityParamRecord(null,PARAM_DESCRIPTION,DB_REGEX,algorithmName,"RatingQualityThreshold"));
     }
 
     /**

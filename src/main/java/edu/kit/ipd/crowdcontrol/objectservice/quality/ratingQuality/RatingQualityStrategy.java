@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AlgorithmRatingQualityParamRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 
 import java.util.List;
@@ -36,4 +37,10 @@ public interface RatingQualityStrategy {
      * @return a description of the algorithm
      */
     String getAlgorithmDescription();
+
+    /**
+     * Gets a list specifying the required parameters for the algorithm
+     * @return list of required parameters
+     */
+    List<AlgorithmRatingQualityParamRecord> getParams();
 }

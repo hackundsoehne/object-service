@@ -112,11 +112,12 @@ public class Main {
 
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
-        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations,experimentController);
+
 
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), null, tasksOperations, platformOperations,
                 workerOperations); // TODO set fallbackPayment
-
+        ExperimentController experimentController = new ExperimentController(platformManager);
+        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations,experimentController);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 
         new Router(

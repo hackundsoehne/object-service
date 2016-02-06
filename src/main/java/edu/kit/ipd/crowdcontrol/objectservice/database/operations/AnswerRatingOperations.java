@@ -1,23 +1,18 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
-import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -415,5 +410,15 @@ public class AnswerRatingOperations extends AbstractOperations {
 
             return AnswerRatingTransformer.toRatingProto(ratingRecord, constraints);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the number of all answers with the correct number of ratings specified in the experiment.
+     * The answers quality has to be equal or above the experiment's quality-threshold
+     * @param idExperiment id of the experiment
+     * @return number of answers with a final and good quality
+     */
+    public int getNumberOfFinalGoodAns(int idExperiment) {
+        return 0;
     }
 }

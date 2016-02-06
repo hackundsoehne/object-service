@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AlgorithmAnswerQualityParamRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 
@@ -33,4 +34,10 @@ public interface AnswerQualityStrategy {
      * @return a description of the algorithm
      */
     String getAlgorithmDescription();
+
+    /**
+     * Gets a list specifying the required parameters for the algorithm
+     * @return list of required parameters
+     */
+    List<AlgorithmAnswerQualityParamRecord> getParams();
 }

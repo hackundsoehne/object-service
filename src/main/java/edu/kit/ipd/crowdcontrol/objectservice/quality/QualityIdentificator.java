@@ -1,9 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality;
 
 import edu.kit.ipd.crowdcontrol.objectservice.ExperimentController;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
@@ -58,6 +56,7 @@ public class QualityIdentificator{
     private int ratingQualityThreshold = 5;
 
     public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentController controller) {
+
         this.controller = controller;
         this.answerOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
@@ -65,10 +64,20 @@ public class QualityIdentificator{
         this.answerAlgorithms = new HashSet<>();
         this.ratingAlgorithms = new HashSet<>();
 
+        // Reflection isn't used, that's why algorithms need to be added manually
+        //------------------------------------------------------
         //
+        //           ADD OTHER ALGORITHMS HERE
+        //
+        //------------------------------------------------------
         answerAlgorithms.add(new AnswerQualityByRatings());
         ratingAlgorithms.add(new RatingQualityByDistribution());
 
+
+
+        //Load algorithms in db
+        answerAlgorithms.forEach(algorithm -> algorithmOperations.storeAnswerQualityAlgorithm(new AlgorithmAnswerQualityRecord(algorithm.getAlgorithmName(),algorithm.getAlgorithmDescription()),algorithm.getParams()));
+        ratingAlgorithms.forEach(algorithm -> algorithmOperations.storeRatingQualityAlgorithm(new AlgorithmRatingQualityRecord(algorithm.getAlgorithmName(),algorithm.getAlgorithmDescription()),algorithm.getParams()));
 
         ratingObservable.subscribe(rating -> this.onNext(rating.getData()));
 
@@ -99,8 +108,18 @@ public class QualityIdentificator{
             log.fatal("Error! Could not find %s-algorithm. Replacing with default AnswerQualityByRatings-algorithm.", exp.get().getAlgorithmQualityAnswer(), e1);
             answerIdentifier = new AnswerQualityByRatings();
         }
-        //TODO ratingQualityThreshold = algorithmOperations.getAnswerQualityParams(ratingIdentifier.getAlgorithmName(), exp.get().getIdExperiment());
-        //TODO push algos in db.
+
+
+        algorithmOperations.getAnswerQualityParams(ratingIdentifier.getAlgorithmName(), exp.get().getIdExperiment()).entrySet().forEach(entry ->{
+            if(entry.getKey().field5().toString().equals("RatingQualityThreshold")){    //DOES THIS COMPARISON WORK ?
+                ratingQualityThreshold = Integer.valueOf(entry.getValue());
+                if(ratingQualityThreshold < 0 || ratingQualityThreshold > 9){
+                    log.fatal(String.format("Error! Received illegal argument for %s! Should: %s   Is: %s", entry.getKey().field4(),entry.getKey().field3(),entry.getValue()));
+                }
+            }
+        });
+
+
         rateQualityOfAnswers(exp.get());
         rateQualityOfRatings(exp.get());
         checkExpStatus(exp.get());
