@@ -8,10 +8,25 @@ after_success:
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+before_script:
+  - mysql -u "root" < src/main/resources/db.sql
+  - cp src/main/resources/config.travis.yml src/main/resources/config.yml
+
+env:
+  - TASK=check
+  - TASK=restTest
+
+script:
+  - ./gradlew $TASK
+
+services:
+  - mysql
 
 notifications:
   email: false

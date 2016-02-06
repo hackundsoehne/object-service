@@ -1,0 +1,37 @@
+database:
+    # the url where to find the database
+    url: jdbc:mysql://localhost:3306/crowdcontrol
+
+    # dialekt to use for communication
+    dialect: MYSQL
+
+    # the writing user
+    writing:
+        user: root
+        password:
+
+    # readonly user should really just be readonly
+    readonly:
+        user: root
+        password:
+
+# Deployment of the object service / control ui
+deployment:
+    # Origin of the control ui
+    # port has to match the url of the ui and no / at the end
+    origin: http://localhost:3000
+
+# the defined platforms to run
+platforms :
+    # type to use (mturk/pybossa/dummy)
+    - type: dummy
+
+      # standard credentials
+      user: samplePlatformUser
+      password: samplePassword
+
+      # name which is used to display
+      name: Sandbox
+
+      # the url to give to the platform type
+      url: http://example.com/

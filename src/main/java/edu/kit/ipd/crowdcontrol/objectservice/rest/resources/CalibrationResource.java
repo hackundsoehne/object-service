@@ -67,7 +67,7 @@ public class CalibrationResource {
         try {
             calibration = operations.insertCalibration(calibration);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Missing at least one required parameter.");
+            throw new BadRequestException(e.getMessage());
         }
 
         EventManager.CALIBRATION_CREATE.emit(calibration);
