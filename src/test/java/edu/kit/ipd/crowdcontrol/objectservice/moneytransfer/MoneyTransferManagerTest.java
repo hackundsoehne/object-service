@@ -165,6 +165,7 @@ public class MoneyTransferManagerTest {
         verify(handler).sendMail("pseipd@web.de", "Your payment for your Crowdworking", codesWorker3);
     }
 
+    @Test
     public void testNotEnoughGiftCodesInDB() throws Exception {
         WorkerRecord worker0 = mock(WorkerRecord.class);
         doReturn("pseipd@gmail.com").when(worker0).getEmail();
@@ -202,6 +203,7 @@ public class MoneyTransferManagerTest {
 
         doAnswer(answer0).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
 
+        mng.submitGiftCodes();
 
         StringBuilder message = MoneyTransferManager.loadMessage("src/main/resources/notificationMoneyTransferMessage.txt");
         message = message.append("A worker has pending Payments in the amount of 25ct. Please add giftcodes, so the payment of the worker can be continued.").append(System.getProperty("line.separator"));

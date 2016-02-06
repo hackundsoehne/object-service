@@ -182,7 +182,7 @@ public class MoneyTransferManager {
             }
         }
 
-        if (creditBalance >= payOffThreshold && creditBalance >= 15 && !payedCodes.isEmpty()) {
+        if (creditBalance >= payOffThreshold && creditBalance >= 15) {
             notificationText = notificationText.append("A worker has pending Payments in the amount of ").append(creditBalance).append("ct. Please add giftcodes, so the payment of the worker can be continued.").append(System.getProperty("line.separator"));
         }
         return payedCodes;
