@@ -8,9 +8,12 @@ import org.junit.Test;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.httpDelete;
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.httpGet;
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.httpPut;
 import static org.junit.Assert.*;
 
-public class CalibrationResourceIntegrationTest extends ResourceIntegrationTest {
+public class CalibrationResourceIntegrationTest {
     @Test
     public void test() throws NoSuchMethodException, UnirestException, IllegalAccessException, IOException, InvocationTargetException {
         CalibrationList list = httpGet("/calibrations", CalibrationList.class);

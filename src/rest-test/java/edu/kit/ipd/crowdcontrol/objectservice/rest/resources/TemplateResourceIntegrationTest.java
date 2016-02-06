@@ -7,9 +7,12 @@ import org.junit.Test;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.httpDelete;
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.httpGet;
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.httpPut;
 import static org.junit.Assert.*;
 
-public class TemplateResourceIntegrationTest extends ResourceIntegrationTest {
+public class TemplateResourceIntegrationTest {
     @Test
     public void test() throws NoSuchMethodException, UnirestException, IllegalAccessException, IOException, InvocationTargetException {
         TemplateList list = httpGet("/templates", TemplateList.class);

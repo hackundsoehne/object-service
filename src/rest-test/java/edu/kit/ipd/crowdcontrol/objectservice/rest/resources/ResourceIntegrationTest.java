@@ -35,7 +35,7 @@ public class ResourceIntegrationTest {
         Spark.stop();
     }
 
-    protected <T extends Message> T httpGet(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public static <T extends Message> T httpGet(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         HttpResponse<InputStream> response = Unirest.get(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .asBinary();
@@ -43,7 +43,7 @@ public class ResourceIntegrationTest {
         return fromResponse(response, type);
     }
 
-    protected <T extends Message> T httpPut(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public static <T extends Message> T httpPut(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         HttpResponse<InputStream> response = Unirest.put(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .header("content-type", "application/protobuf")
@@ -53,7 +53,7 @@ public class ResourceIntegrationTest {
         return fromResponse(response, type);
     }
 
-    protected <T extends Message> T httpPatch(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public static <T extends Message> T httpPatch(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         HttpResponse<InputStream> response = Unirest.patch(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .header("content-type", "application/protobuf")
@@ -63,7 +63,7 @@ public class ResourceIntegrationTest {
         return fromResponse(response, type);
     }
 
-    protected <T extends Message> T httpDelete(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public static <T extends Message> T httpDelete(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         HttpResponse<InputStream> response = Unirest.delete(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .asBinary();
@@ -71,7 +71,7 @@ public class ResourceIntegrationTest {
         return fromResponse(response, type);
     }
 
-    private <T extends Message> T fromResponse(HttpResponse<InputStream> response, Class<T> type) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    private static <T extends Message> T fromResponse(HttpResponse<InputStream> response, Class<T> type) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         if (response.getStatus() == 204) {
             return null;
         }
