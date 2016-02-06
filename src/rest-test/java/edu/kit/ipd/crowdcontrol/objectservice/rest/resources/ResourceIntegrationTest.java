@@ -48,7 +48,7 @@ public class ResourceIntegrationTest {
         Calibration calibration = httpPut("/calibrations", put, Calibration.class);
 
         assertTrue(calibration.getId() > 0);
-        assertEquals(put.toBuilder().setId(0).clearAcceptedAnswers().clearAnswers().build(), calibration.toBuilder().clearAnswers().build());
+        assertEquals(put.toBuilder().clearAcceptedAnswers().clearAnswers().build(), calibration.toBuilder().setId(0).clearAnswers().build());
 
         Calibration received = httpGet("/calibrations/" + calibration.getId(), Calibration.class);
         assertEquals(calibration, received);
