@@ -4,15 +4,15 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationList;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.httpDelete;
-import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.httpGet;
-import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.httpPut;
+import static edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ResourceIntegrationTest.*;
 import static org.junit.Assert.*;
 
+@RunWith ( DummyRunner.class )
 public class CalibrationResourceIntegrationTest {
     @Test
     public void test() throws NoSuchMethodException, UnirestException, IllegalAccessException, IOException, InvocationTargetException {
