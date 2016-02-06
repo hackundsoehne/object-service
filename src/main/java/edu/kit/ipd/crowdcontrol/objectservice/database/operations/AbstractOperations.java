@@ -22,7 +22,7 @@ public abstract class AbstractOperations {
     protected final DSLContext create;
 
     /**
-     * creates a new AbstractOperationq
+     * creates a new AbstractOperation
      * @param create the context to use to communicate with the database
      */
     protected AbstractOperations(DSLContext create) {
