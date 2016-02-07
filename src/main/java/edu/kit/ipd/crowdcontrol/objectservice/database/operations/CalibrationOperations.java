@@ -176,14 +176,15 @@ public class CalibrationOperations extends AbstractOperations {
      * create the internal Calibration used to connect worker to experiments.
      * @param experiment the experiment
      */
-    public void createExperimentsCalibration(Experiment experiment) {
-        String description = "Experiment " + experiment.getTitle()+" ("+experiment.getId()+") answered";
-        CalibrationRecord record = new CalibrationRecord(null, description, description, experiment.getId());
+    public void createExperimentsCalibration(int id, Experiment experiment) {
+
+        String description = "Experiment " + experiment.getTitle()+" ("+id+") answered";
+        CalibrationRecord record = new CalibrationRecord(null, description, description, id);
         CalibrationAnswerOptionRecord answer = new CalibrationAnswerOptionRecord(null, null, description);
         create.transactionResult(conf -> {
                     boolean exists = DSL.using(conf).fetchExists(
                             DSL.selectFrom(CALIBRATION)
-                                    .where(CALIBRATION.EXPERIMENT.eq(experiment.getId()))
+                                    .where(CALIBRATION.EXPERIMENT.eq(id))
                     );
                     if (!exists) {
                         return create.insertInto(CALIBRATION)
@@ -194,13 +195,13 @@ public class CalibrationOperations extends AbstractOperations {
                     return Optional.<CalibrationRecord>empty();
                 })
                 .map(CalibrationRecord::getIdCalibration)
-                .ifPresent(id -> create.transaction(conf -> {
+                .ifPresent(calibId -> create.transaction(conf -> {
                     boolean exists = DSL.using(conf).fetchExists(
                             DSL.selectFrom(CALIBRATION_ANSWER_OPTION)
                                     .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(id))
                     );
                     if (!exists) {
-                        answer.setCalibration(record.getIdCalibration());
+                        answer.setCalibration(calibId);
                         create.insertInto(CALIBRATION_ANSWER_OPTION)
                                 .set(answer)
                                 .execute();

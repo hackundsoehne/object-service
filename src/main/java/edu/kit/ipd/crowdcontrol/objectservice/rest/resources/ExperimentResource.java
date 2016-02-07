@@ -395,7 +395,7 @@ public class ExperimentResource {
 
         //create the calibration for this experiment
         if (experiment.getState().equals(Experiment.State.PUBLISHED)) {
-            calibrationOperations.createExperimentsCalibration(experiment);
+            calibrationOperations.createExperimentsCalibration(id, experiment);
         }
 
         resulting = fetchExperiment(id);
