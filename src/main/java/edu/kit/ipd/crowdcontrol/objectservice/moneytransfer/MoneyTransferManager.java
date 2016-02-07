@@ -190,18 +190,46 @@ public class MoneyTransferManager {
      * @return returns the list of the chosen giftcodes
      */
     private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
+
         LOGGER.trace("Started to choose the giftcodes worker " + worker.getIdWorker() + " will receive.");
 
-        List<GiftCodeRecord> payedCodes = new ArrayList<>();
         int creditBalanceAtStart = workerBalanceOperations.getBalance(worker.getIdWorker());
-        int creditBalance = creditBalanceAtStart;
-        for (GiftCodeRecord nextCode : giftCodes) {
-            if (creditBalance == 0) {
-                break;
+
+        int[] weights = new int[creditBalanceAtStart + 1];
+        boolean[][] decision = new boolean[giftCodes.size()][creditBalanceAtStart + 1];
+
+
+        for (int i = 0; i < giftCodes.size(); i++) {
+            int weight = giftCodes.get(i).getAmount();
+
+            for(int j = creditBalanceAtStart; j >= weight; j--) {
+
+                if (weights[j-weight] + weight > weights[j]) {
+                    weights[j] = weights[j - weight] + weight;
+                    decision[i][j] = true;
+                }
             }
-            if (nextCode.getAmount() <= creditBalance) {
-                payedCodes.add(nextCode);
-                creditBalance -= nextCode.getAmount();
+        }
+
+        int capacity = creditBalanceAtStart;
+        boolean[] x = new boolean[giftCodes.size()];
+
+        for (int i = giftCodes.size() - 1; i >= 0; i--) {
+            x[i] = decision[i][capacity];
+            if (x[i]) {
+                capacity = capacity - giftCodes.get(i).getAmount();
+            }
+        }
+
+        int creditBalance = creditBalanceAtStart;
+        List<GiftCodeRecord> payedCodes = new ArrayList<>();
+        Iterator<GiftCodeRecord> it = giftCodes.iterator();
+
+        for (int i = 0; i < x.length; i++) {
+            GiftCodeRecord rec = it.next();
+            if (x[i]) {
+                payedCodes.add(rec);
+                creditBalance -= rec.getAmount();
             }
         }
 

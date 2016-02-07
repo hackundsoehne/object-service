@@ -151,10 +151,11 @@ public class MoneyTransferManagerTest {
         map1.put("GiftCodes", "QWER-TZUI" + System.getProperty("line.separator"));
 
         Map<String, String> map2 = new HashMap<>();
-        map2.put("GiftCodes", "ASDF-GHJK" + System.getProperty("line.separator"));
+        map2.put("GiftCodes", "FOOBAR-BAZ" + System.getProperty("line.separator") + "FOO-BAR" + System.getProperty("line.separator"));
 
         Map<String, String> map3 = new HashMap<>();
-        map3.put("GiftCodes", "FOOBAR-BAZ" + System.getProperty("line.separator") + "FOO-BAR" + System.getProperty("line.separator"));
+        map3.put("GiftCodes", "ASDF-GHJK" + System.getProperty("line.separator"));
+
 
         String codesWorker1 = Template.apply(content.toString(), map1);
         String codesWorker2 = Template.apply(content.toString(), map2);
