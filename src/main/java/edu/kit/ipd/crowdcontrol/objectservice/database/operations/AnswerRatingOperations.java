@@ -330,11 +330,16 @@ public class AnswerRatingOperations extends AbstractOperations {
 
         Optional<CalibrationAnswer> result = doAdd.get();
 
-        if (!result.isPresent()) {
+        /*
+        FIXME Leander this is not really needed, we only call addToExperimentCalibration if the experiment is published
+        If the experiment got published we created the calibration for the experiment, so here is no reason to do this repair,
+        since its not possible the other way around. Opinion?
+         */
+        /*if (!result.isPresent()) {
             System.err.println(String.format("Database inconsistency! No calibration for experiment: %d present", experimentId));
             calibrationOperations.createExperimentsCalibration(experimentId);
             doAdd.get();
-        }
+        }*/
     }
 
     /**
