@@ -1,10 +1,14 @@
 package edu.kit.ipd.crowdcontrol.objectservice.payment;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import org.jooq.DSLContext;
 import org.jooq.Result;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,12 +35,13 @@ public class PaymentCalculatorTest {
 
     @Before
     public void setUp() throws Exception {
+        DSLContext create = DSL.using(SQLDialect.MYSQL);
 
 
         workerAnswerMap = new HashMap<>();
         workerRatingMap = new HashMap<>();
-        workerRecordList = mock(Result.class);
-        when(workerRecordList.size()).thenReturn(0);
+        workerRecordList = create.newResult(Tables.WORKER);
+
         exp = Experiment.newBuilder().setId(13).setPaymentAnswer(toProtoInt(10)).setPaymentRating(toProtoInt(8)).setPaymentBase(toProtoInt(5)).build();
 
         workerOperations = mock(WorkerOperations.class);
