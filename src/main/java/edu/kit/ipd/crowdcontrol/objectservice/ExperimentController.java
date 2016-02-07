@@ -49,7 +49,7 @@ public class ExperimentController {
         Queue<String> successfulPlatforms = new LinkedList<>();
         for (int i = 0; i < experiment.getPopulationsCount(); i++) {
             try {
-                platformManager.publishTask(experiment.getPopulations(i).getPlatformId(), experiment);
+                platformManager.publishTask(experiment.getPopulations(i).getPlatformId(), experiment).join();
                 successfulPlatforms.add(experiment.getPopulations(i).getPlatformId());
             } catch (TaskOperationException e1) {
                 //could not create task
@@ -57,6 +57,9 @@ public class ExperimentController {
                 unpublishExperiment(experiment, successfulPlatforms);
             } catch (IllegalStateException | IllegalArgumentException e2) {
                 log.fatal("Error! Could not create experiment! " + e2.getMessage());
+                unpublishExperiment(experiment, successfulPlatforms);
+            } catch (Exception e) {
+                e.printStackTrace();
                 unpublishExperiment(experiment, successfulPlatforms);
             }
         }
