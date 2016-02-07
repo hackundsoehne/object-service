@@ -1,10 +1,16 @@
 package edu.kit.ipd.crowdcontrol.objectservice.feedback;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.Range;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import org.jooq.Result;
 
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -18,42 +24,27 @@ import java.util.concurrent.TimeUnit;
 public class FeedbackSender {
 
     private MailHandler handler;
-    private WorkerOperations workerOps;
+    private AnswerRatingOperations answerOps;
+    private ExperimentOperations expOps;
 
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> schedule = null;
 
-    public FeedbackSender(MailHandler handler, WorkerOperations workerOps) {
+    public FeedbackSender(MailHandler handler, AnswerRatingOperations answerOps, ExperimentOperations expOps) {
         this.handler = handler;
-        this.workerOps = workerOps;
+        this.answerOps = answerOps;
+        this.expOps = expOps;
     }
 
-    /**
-     * Starts the MoneyTransferManager, so giftcodes become submitted to workers every 7 days.
-     */
-    public synchronized void start() {
-        if (schedule != null) {
-            throw new IllegalStateException("run() was called twice!");
+    public void sendFeedback(int expId) throws ExperimentNotFoundException {
+        Optional<ExperimentRecord> exp = expOps.getExperiment(expId);
+        int answerCount = 0;
+        if (exp.isPresent()) {
+            answerCount = exp.get().getNeededAnswers();
+        } else {
+            throw new ExperimentNotFoundException();
         }
-
-        schedule = scheduler.scheduleAtFixedRate(this::sendFeedback, 7, 7, TimeUnit.DAYS);
-
-    }
-
-    /**
-     * Shuts the MoneyTransferManager down.
-     */
-    public synchronized void shutdown() {
-        schedule.cancel(false);
-        scheduler.shutdown();
-        schedule = null;
-    }
-
-    public void sendFeedback() {
-        Result<WorkerRecord> workers = workerOps.getWorkerWithCreditBalanceGreaterOrEqual(0);
-        for (WorkerRecord worker : workers) {
-            String message = buildFeedbackMessage(worker);
-        }
+        Range<AnswerRecord, Integer> answers = answerOps.getAnswersFrom(expId, 0, true, answerCount);
     }
 
     private String buildFeedbackMessage(WorkerRecord worker) {
