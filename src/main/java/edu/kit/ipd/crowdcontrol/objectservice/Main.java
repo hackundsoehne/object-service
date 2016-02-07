@@ -120,6 +120,8 @@ public class Main {
         QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 
+        ExperimentController experimentController = new ExperimentController(platformManager);
+
         new Router(
                 new TemplateResource(templateOperations),
                 new NotificationResource(notificationRestOperations),
