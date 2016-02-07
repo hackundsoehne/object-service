@@ -13,6 +13,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.apache.logging.log4j.LogManager;
@@ -112,9 +113,11 @@ public class Main {
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
 
+
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), null, tasksOperations, platformOperations,
                 workerOperations); // TODO set fallbackPayment
-
+        ExperimentController experimentController =new ExperimentController(platformManager);
+        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations,experimentController);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 
         new Router(
