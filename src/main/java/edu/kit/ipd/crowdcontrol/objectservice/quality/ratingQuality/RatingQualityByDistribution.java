@@ -18,11 +18,7 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
     private final String algorithmDescription = "Identifies the quality of ratings depending on their distribution." +
             "\nRatings with the most-chosen value will be assigned the maximum-quality. Others have a quality depending on" +
             "the deviation of their value to the most chosen one";
-    static final  String REGEX = "[0-9]";
-    static final String DB_REGEX = "^"+ REGEX + "$";
-    private static final String PARAM_DESCRIPTION = "The algorithm's parameter specifies which ratings are considered \"good\"." +
-            "All ratings with a quality equal or greater than this parameter will be considered \"good\" " +
-            "Good ratings will be used to estimate the quality of answers. This parameter has to be a positive integer between 0 and 9. " ;
+
 
 
 
@@ -37,7 +33,7 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
      * @throws IllegalArgumentException
      */
     @Override
-    public Map<RatingRecord, Integer> identifyRatingQuality(List<RatingRecord> ratings, int maximumQuality, int minimumQuality) throws IllegalArgumentException {
+    public Map<RatingRecord, Integer> identifyRatingQuality(List<RatingRecord> ratings,Map<AlgorithmRatingQualityParamRecord,String> passedParameters, int maximumQuality, int minimumQuality) throws IllegalArgumentException {
 
         ratings.forEach((rating) -> {
             if (rating.getRating() < 0 || rating.getRating() > 9) {
@@ -74,9 +70,7 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
     }
 
     @Override
-    public List<AlgorithmRatingQualityParamRecord> getParams() {
-        return Collections.singletonList(new AlgorithmRatingQualityParamRecord(null,PARAM_DESCRIPTION,DB_REGEX,algorithmName,"RatingQualityThreshold"));
-    }
+    public List<AlgorithmRatingQualityParamRecord> getParams() { return new LinkedList<>();   }
 
     /**
      * Calculates optimal rating based on how much a rating-value has been chosen for an answer.

@@ -3,13 +3,9 @@ package edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by lucaskrauss at 25.01.2016
@@ -33,7 +29,7 @@ public class RatingQualityByDistributionTest {
     public void tearDown() throws Exception {
         ratings = null;
     }
-
+/*
    @Test (expected = IllegalArgumentException.class)
     public void throwExceptionInvalidRating(){
        ratings.add(new RatingRecord(-1,0,0,null,-1,"",0,-1));
@@ -95,5 +91,5 @@ public class RatingQualityByDistributionTest {
     public void throwExceptionMissingRatings(){
         identifier.identifyRatingQuality(ratings,maxQuality, minQuality);
 
-    }
+    }*/
 }
