@@ -26,7 +26,6 @@ public class MailParser {
     protected static Optional<GiftCodeRecord> parseAmazonGiftCode(Message msg, String password) throws MoneyTransferException {
         //Extract Message
         String message;
-        Optional<GiftCodeRecord> optional;
         try {
             if (!msg.getFrom()[0].toString().toLowerCase().endsWith("amazon.de>") && !msg.getFrom()[0].toString().toLowerCase().endsWith("amazon.de")) {
                 return Optional.empty();

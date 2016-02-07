@@ -225,9 +225,9 @@ public class MoneyTransferManager {
         List<GiftCodeRecord> payedCodes = new ArrayList<>();
         Iterator<GiftCodeRecord> it = giftCodes.iterator();
 
-        for (int i = 0; i < x.length; i++) {
+        for (boolean aX : x) {
             GiftCodeRecord rec = it.next();
-            if (x[i]) {
+            if (aX) {
                 payedCodes.add(rec);
                 creditBalance -= rec.getAmount();
             }
