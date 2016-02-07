@@ -173,7 +173,7 @@ public class PlatformManager {
     }
 
     /**
-     * Unpublish a given experiment from the given platform
+     * Unpublishes a given experiment from the given platform
      *
      * @param name The name of the platform
      * @param experiment The experiment to unpublish
