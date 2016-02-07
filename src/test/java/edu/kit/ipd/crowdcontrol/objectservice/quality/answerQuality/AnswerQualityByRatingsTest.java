@@ -62,13 +62,18 @@ public class AnswerQualityByRatingsTest {
 
     }
 
-
+    /**
+     * Testing behavior with illegal params.
+     */
     @Test (expected = IllegalArgumentException.class)
     public void throwExceptionIllegalRating(){
         ratings.add(new RatingRecord(0,0,0,null,-1,"",0,0));
         identifier.identifyAnswerQuality(answerRatingOperations,answer,params, maxQuality,minQuality);
     }
 
+    /**
+     * Testing if result of the operation is equal to its average
+     */
     @Test
     public void answerQualityIsAverageOfRatings(){
 
@@ -83,10 +88,13 @@ public class AnswerQualityByRatingsTest {
         assertEquals(answerQuality,4);
     }
 
+    /**
+     * Testing qualityIdentification with random ratings
+     */
     @Test
     public void testAnswerQualityRnd(){
         Random rand = new Random();
-        for (int i = 0; i < 10 ; i++) {
+        for (int i = 0; i < rand.nextInt(40) ; i++) {
             ratings.add(new RatingRecord(0,0,0,null, rand.nextInt(9),"",0,ratingThreshold+1));
         }
 
@@ -104,6 +112,9 @@ public class AnswerQualityByRatingsTest {
     }
 
 
+    /**
+     * Testing behavior with zero-only ratings
+     */
     @Test
     public void testZeroQualityRating(){
         ratings.add(new RatingRecord(0,0,0,null,0,"",0,ratingThreshold+1));
@@ -112,6 +123,9 @@ public class AnswerQualityByRatingsTest {
         assertEquals(0, (int)identifier.identifyAnswerQuality(answerRatingOperations,answer,params,maxQuality,minQuality).get(AnswerQualityStrategy.QUALITY));
     }
 
+    /**
+     * Testing behavior without ratings
+     */
     @Test
     public void testQualityWithoutRating(){
         assertEquals(ratings.size(),(int)identifier.identifyAnswerQuality(answerRatingOperations,answer,params,maxQuality, minQuality).get(AnswerQualityStrategy.NUM_OF_RATINGS) );

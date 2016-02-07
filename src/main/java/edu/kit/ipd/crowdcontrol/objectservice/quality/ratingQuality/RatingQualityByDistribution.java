@@ -47,6 +47,7 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
         Map<Integer, List<RatingRecord>> sortedMap = ratings.stream().collect(Collectors.groupingBy(RatingRecord::getRating));
         int optimalRating = getOptimalRating(sortedMap);
 
+
         for (Map.Entry<Integer, List<RatingRecord>> entry : sortedMap.entrySet()) {
             if (entry.getValue().size() > 0) {
                 for (RatingRecord ratingRecord : entry.getValue()) {
