@@ -393,8 +393,9 @@ public class ExperimentResource {
             throw new IllegalStateException("Experiment lacks information needed for publishing.");
         }
 
+        //create the calibration for this experiment
         if (experiment.getState().equals(Experiment.State.PUBLISHED)) {
-            calibrationOperations.createExperimentsCalibration(id);
+            calibrationOperations.createExperimentsCalibration(experiment);
         }
 
         resulting = fetchExperiment(id);
