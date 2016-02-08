@@ -53,19 +53,19 @@ public  final class Notification extends
             break;
           }
           case 18: {
-            java.lang.String s = input.readStringRequireUtf8();
+            String s = input.readStringRequireUtf8();
 
             name_ = s;
             break;
           }
           case 26: {
-            java.lang.String s = input.readStringRequireUtf8();
+            String s = input.readStringRequireUtf8();
 
             description_ = s;
             break;
           }
           case 34: {
-            java.lang.String s = input.readStringRequireUtf8();
+            String s = input.readStringRequireUtf8();
 
             query_ = s;
             break;
@@ -89,7 +89,7 @@ public  final class Notification extends
             break;
           }
           case 58: {
-            java.lang.String s = input.readStringRequireUtf8();
+            String s = input.readStringRequireUtf8();
             if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
               emails_ = new com.google.protobuf.LazyStringArrayList();
               mutable_bitField0_ |= 0x00000040;
@@ -950,7 +950,7 @@ public  final class Notification extends
      * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder getSendOnceBuilder() {
-
+      
       onChanged();
       return getSendOnceFieldBuilder().getBuilder();
     }
@@ -969,7 +969,7 @@ public  final class Notification extends
      * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean, edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder>
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean, edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder> 
         getSendOnceFieldBuilder() {
       if (sendOnceBuilder_ == null) {
         sendOnceBuilder_ = new com.google.protobuf.SingleFieldBuilder<

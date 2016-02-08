@@ -20,6 +20,8 @@ deployment:
     # Origin of the control ui
     # port has to match the url of the ui and no / at the end
     origin: http://localhost:3000
+    #the url to the workerService
+    workerService: https://worker.example.com
 
 # the defined platforms to run
 platforms :
