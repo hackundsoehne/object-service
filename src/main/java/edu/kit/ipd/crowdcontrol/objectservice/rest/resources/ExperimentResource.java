@@ -10,6 +10,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTr
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstraintTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
@@ -20,10 +21,14 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestExceptio
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import rx.*;
 import spark.Request;
 import spark.Response;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -43,6 +48,7 @@ public class ExperimentResource {
     private final AlgorithmOperations algorithmsOperations;
     private final TasksOperations tasksOperations;
     private final PlatformManager platformManager;
+    private static final Logger log = LogManager.getLogger("ExperimentResource");
 
     public ExperimentResource(ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
                               TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmsOperations,
@@ -53,11 +59,21 @@ public class ExperimentResource {
         this.algorithmsOperations = algorithmsOperations;
         this.tasksOperations = tasksOperations;
         this.platformManager = platformManager;
+
+        rx.Observable<Event<ChangeEvent<Experiment>>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
+        observable.subscribe(experimentEvent -> {
+            if (experimentEvent.getData().getOld().getState() != Experiment.State.PUBLISHED
+                    && experimentEvent.getData().getNeww().getState() == Experiment.State.PUBLISHED){
+                startExperiment(experimentEvent.getData().getNeww());
+            }
+        });
+
     }
 
     /**
      * get the value of a optional or end with a NotFoundException
-     * @param c The optional to unbox
+     *
+     * @param c   The optional to unbox
      * @param <U> The typ which should be in the optional
      * @return The type which was in the optional
      */
@@ -65,8 +81,62 @@ public class ExperimentResource {
         return c.orElseThrow(NotFoundException::new);
     }
 
+    private void startExperiment(Experiment experiment) {
+        List<Experiment.Population> successfulOps = new LinkedList<>();
+        for (Experiment.Population population :
+                experiment.getPopulationsList()) {
+            try {
+                platformManager.publishTask(population.getPlatformId(), experiment).join();
+                successfulOps.add(population);
+
+            } catch (TaskOperationException e) {
+                log.fatal(String.format("Error! Could not create experiment on platform %s!", population.getPlatformId()), e);
+            } catch (Exception e) {
+
+                log.fatal("Error! Could not create experiment! " + e.getMessage());
+            }
+        }
+
+        if (successfulOps.size() != experiment.getPopulationsList().size()) {
+            for (Experiment.Population population :
+                    successfulOps) {
+                try {
+                    platformManager.unpublishTask(population.getPlatformId(), experiment).join();
+                } catch (TaskOperationException e) {
+                    log.fatal("Fatal ERROR! Cannot unpublish!" + e.getMessage());
+                } catch (Exception e) {
+                    log.fatal("Fatal Error! Was not able to unpublish experiment" + e.getMessage());
+                }
+            }
+        }
+
+    }
+
+
+    public void endExperiment(Experiment experiment) {
+        for (Experiment.Population population :
+                experiment.getPopulationsList()) {
+            try {
+                platformManager.unpublishTask(population.getPlatformId(), experiment).join();
+            } catch (TaskOperationException e) {
+                log.fatal("Fatal ERROR! Cannot unpublish!" + e.getMessage());
+            } catch (Exception e) {
+                log.fatal("Fatal Error! Was not able to unpublish experiment" + e.getMessage());
+            }
+        }
+
+        try { //TODO Introduce a more elaborate solution - W. Churchill
+            TimeUnit.HOURS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        EventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experiment.toBuilder().setState(Experiment.State.STOPPED).build()));
+    }
+
     /**
      * List all experiments
+     *
      * @param request  Request provided by Spark.
      * @param response Response provided by Spark.
      * @return 20 experiments
@@ -78,11 +148,12 @@ public class ExperimentResource {
         // TODO: (low priority) Optimize fetchExperiment for multiple experiments
         return experimentOperations.getExperimentsFrom(from, asc, 20)
                 .map(experimentRecord -> fetchExperiment(experimentRecord.getIdExperiment()))
-                .constructPaginated(ExperimentList.newBuilder(),ExperimentList.Builder::addAllItems);
+                .constructPaginated(ExperimentList.newBuilder(), ExperimentList.Builder::addAllItems);
     }
 
     /**
      * Create a new experiment
+     *
      * @param request  Request provided by Spark.
      * @param response Response provided by Spark.
      * @return The new created experiment
@@ -113,11 +184,7 @@ public class ExperimentResource {
                 .forEach(tagConstraintsOperations::insertConstraint);
 
         experiment.getPopulationsList().forEach(population -> {
-            List<Integer> answerIDs = population.getCalibrationsList().stream()
-                    .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
-                    .map(Calibration.Answer::getId)
-                    .collect(Collectors.toList());
-            calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, id);
+            storePopulation(id, population);
         });
 
         experiment.getAlgorithmTaskChooser()
@@ -141,6 +208,14 @@ public class ExperimentResource {
         EventManager.EXPERIMENT_CREATE.emit(exp);
 
         return exp;
+    }
+
+    private void storePopulation(int experimentId, Experiment.Population population) {
+        List<Integer> answerIDs = population.getCalibrationsList().stream()
+                .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
+                .map(Calibration.Answer::getId)
+                .collect(Collectors.toList());
+        calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, experimentId);
     }
 
     private Experiment fetchExperiment(int id) {
@@ -177,6 +252,7 @@ public class ExperimentResource {
 
     /**
      * Returns a experiment which was specified by :id
+     *
      * @param request  Request provided by Spark.
      * @param response Response provided by Spark.
      * @return The experiment if it was found
@@ -190,6 +266,7 @@ public class ExperimentResource {
     /**
      * Will take the id of an experiment and return the platform tree with
      * all published platforms with the according calibrations
+     *
      * @param id the id of the experiment
      * @return returns a list of populations with a platform
      */
@@ -250,6 +327,7 @@ public class ExperimentResource {
 
     /**
      * Patch a experiment with the new :id
+     *
      * @param request  Request provided by Spark.
      * @param response Response provided by Spark.
      * @return The experiment with the new attributes
@@ -269,7 +347,7 @@ public class ExperimentResource {
             }
 
             resulting = updateExperimentState(id, experiment, old);
-        } else if (experiment.getState() == Experiment.State.DRAFT){
+        } else if (experiment.getState() == Experiment.State.DRAFT) {
             resulting = updateExperimentInfoDraftState(id, experiment, old, original);
         } else if (experiment.getState() == Experiment.State.PUBLISHED ||
                 experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
@@ -298,37 +376,39 @@ public class ExperimentResource {
 
         newPopulations.forEach(population -> {
             try {
-                platformManager.publishTask(population.getPlatformId(),experiment).join();
-                populations.add(population);
+                platformManager.publishTask(population.getPlatformId(), experiment).join();
+                storePopulation(id, population);
             } catch (TaskOperationException e) {
-              //TODO Logger  log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s",experiment.getTitle(),population.getPlatformId()),e);
+                log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s", experiment.getTitle(), population.getPlatformId()), e);
                 e.printStackTrace();
-            }catch (IllegalStateException | IllegalArgumentException e){
-                //TODO log.fatal("Error! Could not create experiment!"+e.getMessage());
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                log.fatal("Error! Could not create experiment!" + e.getMessage());
             }
         });
 
         List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream().filter(population -> !listContains.test(population)).collect(Collectors.toList());
 
-        missingPopulations.forEach(failedPopulation -> {
+        //FIXME this is something like negativ gapfiller, this is not implemented yet.
+        /*missingPopulations.forEach(failedPopulation -> {
             try {
-                platformManager.unpublishTask(failedPopulation.getPlatformId(),experiment).join();
-                populations.remove(failedPopulation);
+                //platformManager.unpublishTask(failedPopulation.getPlatformId(),experiment).join();
+                //TODO remove this population
             } catch (TaskOperationException e) {
               //TODO  log.fatal("Error! could not unpublish experiment from platform! "+ e.getMessage());
             }
 
-        });
+        });*/
 
         return fetchExperiment(id);
     }
 
     /**
      * updates the information about an experiment
-     * @param id the id of the experiment
+     *
+     * @param id         the id of the experiment
      * @param experiment the experiment with the new data
-     * @param old the old experiment in the protobuf-format
-     * @param oldRecord the old experiment as the database-record
+     * @param old        the old experiment in the protobuf-format
+     * @param oldRecord  the old experiment as the database-record
      * @return the resulting experiment
      */
     private Experiment updateExperimentInfoDraftState(int id, Experiment experiment, Experiment old, ExperimentRecord oldRecord) {
@@ -373,11 +453,7 @@ public class ExperimentResource {
 
         // Update calibration records from experiment
         experiment.getPopulationsList().forEach(population -> {
-            List<Integer> answerIDs = population.getCalibrationsList().stream()
-                    .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
-                    .map(Calibration.Answer::getId)
-                    .collect(Collectors.toList());
-            calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, id);
+            storePopulation(id, population);
         });
 
         if (!experiment.getPopulationsList().isEmpty()) {
@@ -418,9 +494,10 @@ public class ExperimentResource {
 
     /**
      * updates the state of an experiment
-     * @param id the primary key of the experiment
+     *
+     * @param id         the primary key of the experiment
      * @param experiment the experiment holding the new data
-     * @param old the old experiment
+     * @param old        the old experiment
      * @return the resulting experiment with the new data
      */
     private Experiment updateExperimentState(int id, Experiment experiment, Experiment old) {
@@ -429,8 +506,8 @@ public class ExperimentResource {
         //validate the only two possible changes
         if (!experiment.getState().equals(Experiment.State.PUBLISHED)
                 && !experiment.getState().equals(Experiment.State.CREATIVE_STOPPED))
-            throw new IllegalArgumentException("Only "+ Experiment.State.PUBLISHED.name()+
-                    " and " +Experiment.State.CREATIVE_STOPPED.name()+
+            throw new IllegalArgumentException("Only " + Experiment.State.PUBLISHED.name() +
+                    " and " + Experiment.State.CREATIVE_STOPPED.name() +
                     " is allowed as state change");
 
         //validate its draft -> published
@@ -473,6 +550,7 @@ public class ExperimentResource {
 
     /**
      * Delete a experiment which was specified :id
+     *
      * @param request  Request provided by Spark.
      * @param response Response provided by Spark.
      * @return null on success
