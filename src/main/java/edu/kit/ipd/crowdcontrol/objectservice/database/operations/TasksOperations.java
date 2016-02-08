@@ -67,7 +67,7 @@ public class TasksOperations extends AbstractOperations {
     public void deleteTask(TaskRecord result) {
         assertHasPrimaryKey(result);
         create.deleteFrom(TASK)
-                .where(TASK.ID_TASK.eq(result.getIdTask()));
+                .where(TASK.ID_TASK.eq(result.getIdTask())).execute();
     }
 
     public List<TaskRecord> getTasks(int id) {
