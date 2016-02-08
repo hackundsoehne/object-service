@@ -1,3 +1,0 @@
-[submodule "src/main/resources/worker-ui"]
-	path = src/main/resources/worker-ui
-	url = git@github.com:coolcrowd/worker-ui.git

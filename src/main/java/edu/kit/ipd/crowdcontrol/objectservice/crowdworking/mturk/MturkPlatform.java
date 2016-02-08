@@ -25,15 +25,16 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
     public static final int TWO_HOURS = 60 * 60 * 2;
     private final String name;
     private final MTurkConnection connection;
-
+    private final String workerServiceUrl;
     /**
      * A new mturk platform instance
      * @param user user to login
      * @param password password to use
      * @param url instance to connect to
      */
-    public MturkPlatform(String user, String password, String url, String name) {
+    public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl) {
         connection = new MTurkConnection(user, password, url);
+        this.workerServiceUrl = workerServiceUrl;
         this.name = name;
     }
 
@@ -74,7 +75,9 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                 experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
                 2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
                 "",
-                "initMturk('"+getID()+"', 'http://localhost:5678', "+experiment.getId()+");");
+                "initMturk('"+getID()+
+                        "', '"+workerServiceUrl+
+                        "', " +experiment.getId()+");");
     }
 
     @Override

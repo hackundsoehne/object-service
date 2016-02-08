@@ -65,18 +65,13 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
                                     "  <script type='text/javascript' src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script>\n" +
                                     "  <script type='text/javascript' src='https://code.jquery.com/jquery-2.0.0.js'></script>" +
                                     " </head>\n" +
-                                    " <body>\n" +
-                                    "<script type='text/javascript' src='"+""+"/bundle.js'></script>" +
+                                    " <body onload=\""+initCall+"\">\n" +
+                                    "<script type='text/javascript' src='https://worker.pse.kelunik.com/ui/bundle.js'></script>" +
                                     loadFiles(jsFiles).stream().map(s ->  "<script type='text/javascript'>"+s+"</script>").collect(Collectors.joining())+
-                                    "   <button onclick='sendFinish()'>Click me</button>" +
-                                    "  <script type='text/javascript'>"+
-                                    "  "+initCall+
-                                    " </script>\n" +
+                                    "   <button onclick='sendFinish()'>Submit</button>" +
                                     " </body>\n" +
                                     "</html>\n" +
                                     "]]>\n" +
-
-
                                     "  </HTMLContent>\n" +
                                     "  <FrameHeight>450</FrameHeight>\n" +
                                     "</HTMLQuestion>");
