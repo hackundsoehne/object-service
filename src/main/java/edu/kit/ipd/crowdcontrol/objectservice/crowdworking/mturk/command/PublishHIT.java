@@ -8,11 +8,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MTurkConnection;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkRestCommand;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.Utils;
-import sun.misc.IOUtils;
 
 import java.io.*;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
