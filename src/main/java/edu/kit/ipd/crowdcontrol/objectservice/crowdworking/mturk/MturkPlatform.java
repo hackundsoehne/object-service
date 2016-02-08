@@ -102,10 +102,9 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
         if (workerIdArray != null && workerIdArray.length > 0) {
             workerId = workerIdArray[0];
         } else {
-            //TODO
-            //throw new UnidentifiedWorkerException("mTurkWorkerId was not set!");
+            throw new UnidentifiedWorkerException("mTurkWorkerId was not set!");
         }
-        return "aaa";
+        return workerId;
     }
 
     @Override
