@@ -1,9 +1,12 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.jooq.AggregateFunction;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -12,10 +15,10 @@ import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKER;
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKER_BALANCE;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
 /**
  * Responsible for the operations involving the worker-table.
@@ -37,6 +40,8 @@ public class WorkerOperations extends AbstractOperations {
      */
     public WorkerRecord insertWorker(WorkerRecord workerRecord) {
         workerRecord.setIdWorker(null);
+        workerRecord.setQuality(9);
+        assertNonMalformedEmail(workerRecord.getEmail());
 
         return create.transactionResult(conf -> {
             boolean existing = DSL.using(conf).fetchExists(
@@ -99,12 +104,12 @@ public class WorkerOperations extends AbstractOperations {
                         .fetchOptional()
                         .orElseGet(() ->
                                 DSL.using(configuration).insertInto(Tables.WORKER)
-                                        .set(new WorkerRecord(null, "Anonymous Worker", toAnonymize.getPlatform(), null))
+                                        .set(new WorkerRecord(null, "Anonymous Worker", toAnonymize.getPlatform(), null, null))
                                         .returning()
                                         .fetchOne()));
         create.transaction(conf -> {
-            DSL.using(conf).deleteFrom(Tables.POPULATION_RESULT)
-                    .where(Tables.POPULATION_RESULT.WORKER.eq(toAnonymize.getIdWorker()))
+            DSL.using(conf).deleteFrom(Tables.CALIBRATION_RESULT)
+                    .where(Tables.CALIBRATION_RESULT.WORKER.eq(toAnonymize.getIdWorker()))
                     .execute();
 
             DSL.using(conf).update(Tables.ANSWER)
@@ -153,6 +158,28 @@ public class WorkerOperations extends AbstractOperations {
     }
 
     /**
+     * Returns all workers participating in the specified experiment.
+     * @param expId Id of the experiment
+     * @return a collection of all workers of the specified experiment
+     */
+    public Result<WorkerRecord> getWorkersOfExp(int expId){
+        Rating rating = RATING.as("rating");
+        Answer answer = ANSWER.as("answer");
+        return create.select(WORKER.fields())
+                .select(rating.ID_RATING)
+                .select(answer.ID_ANSWER)
+                .from(ANSWER)
+                .rightJoin(rating).on(
+                        WORKER.ID_WORKER.eq(rating.WORKER_ID)
+                                .and(rating.EXPERIMENT.eq(expId))
+                )
+                .rightJoin(answer).on(
+                        WORKER.ID_WORKER.eq(answer.WORKER_ID)
+                                .and(answer.EXPERIMENT.eq(expId))
+                )
+                .fetchInto(WORKER);
+    }
+    /**
      * Returns a single worker.
      *
      * @param id ID of the worker
@@ -160,7 +187,7 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Optional<Worker> getWorkerProto(int id) {
         return create.fetchOptional(WORKER, WORKER.ID_WORKER.eq(id))
-                .map(WorkerTransform::toProto);
+                .map(WorkerTransformer::toProto);
     }
 
     /**
@@ -172,8 +199,8 @@ public class WorkerOperations extends AbstractOperations {
      * @return List of workers
      */
     public Range<Worker, Integer> getWorkersFrom(int cursor, boolean next, int limit) {
-        return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, cursor, next, limit)
-                .map(WorkerTransform::toProto);
+        return getNextRange(create.selectFrom(WORKER), WORKER.ID_WORKER, WORKER, cursor, next, limit)
+                .map(WorkerTransformer::toProto);
     }
 
     /**
@@ -186,11 +213,67 @@ public class WorkerOperations extends AbstractOperations {
      */
     public Worker insertWorker(Worker toStore, String identity) {
         assertHasField(toStore, Worker.PLATFORM_FIELD_NUMBER);
+        assertNonMalformedEmail(toStore.getEmail());
 
-        WorkerRecord record = WorkerTransform.mergeRecord(create.newRecord(WORKER), toStore);
+        WorkerRecord record = WorkerTransformer.mergeRecord(create.newRecord(WORKER), toStore);
         record.setIdentification(identity);
         record.store();
 
-        return WorkerTransform.toProto(record);
+        return WorkerTransformer.toProto(record);
+    }
+
+    /**
+     * Updates a worker
+     *
+     * @param toUpdate the worker to update
+     * @param id the id of the worker
+     * @return the updated Worker
+     */
+    public Worker updateWorker(Worker toUpdate, int id) {
+        WorkerRecord workerRecord = WorkerTransformer.mergeRecord(create.newRecord(WORKER), toUpdate);
+        workerRecord.setIdWorker(id);
+        assertHasPrimaryKey(workerRecord);
+        assertNonMalformedEmail(toUpdate.getEmail());
+
+        return WorkerTransformer.toProto(create.update(WORKER)
+                .set(workerRecord)
+                .returning()
+                .fetchOne());
+    }
+
+    /**
+     * Get Workers which gave at least one response on a experiment, from the given platform
+     * @param experimentId experiment which was worked on
+     * @param platformName name of the platform of the worker
+     * @return A list of workerrecords
+     */
+    public List<WorkerRecord> getWorkerWithWork(int experimentId, String platformName) {
+        Rating rating = RATING.as("rating");
+        Answer answer = ANSWER.as("answer");
+        return create.select(WORKER.fields())
+                .select(rating.ID_RATING)
+                .select(answer.ID_ANSWER)
+                .from(ANSWER)
+                .rightJoin(rating).on(
+                        WORKER.ID_WORKER.eq(rating.WORKER_ID)
+                                .and(rating.EXPERIMENT.eq(experimentId))
+                )
+                .rightJoin(answer).on(
+                        WORKER.ID_WORKER.eq(answer.WORKER_ID)
+                        .and(answer.EXPERIMENT.eq(experimentId))
+                )
+                .where(WORKER.PLATFORM.eq(platformName))
+                .fetchInto(WORKER);
+    }
+
+    /**
+     * validates that the email except the email is null or empty
+     * @param email the email to validate
+     * @throws IllegalArgumentException if the email is not valid
+     */
+    private void assertNonMalformedEmail(String email) throws IllegalArgumentException {
+        if(email != null && !email.isEmpty() && !EmailValidator.getInstance(false).isValid(email)) {
+            throw new IllegalArgumentException(String.format("email is not valid: %s", email));
+        }
     }
 }

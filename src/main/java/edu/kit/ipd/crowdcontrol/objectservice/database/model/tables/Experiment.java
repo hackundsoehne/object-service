@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord> {
 
-	private static final long serialVersionUID = -106212941;
+	private static final long serialVersionUID = 1131854166;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Experiment</code>
@@ -32,9 +32,9 @@ public class Experiment extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol
 	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, java.lang.Integer> ID_EXPERIMENT = createField("id_experiment", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>crowdcontrol.Experiment.titel</code>.
+	 * The column <code>crowdcontrol.Experiment.title</code>.
 	 */
-	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, java.lang.String> TITEL = createField("titel", org.jooq.impl.SQLDataType.VARCHAR.length(191), this, "");
+	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, java.lang.String> TITLE = createField("title", org.jooq.impl.SQLDataType.VARCHAR.length(191), this, "");
 
 	/**
 	 * The column <code>crowdcontrol.Experiment.description</code>.
@@ -110,6 +110,11 @@ public class Experiment extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol
 	 * The column <code>crowdcontrol.Experiment.worker_quality_threshold</code>.
 	 */
 	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, java.lang.Integer> WORKER_QUALITY_THRESHOLD = createField("worker_quality_threshold", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>crowdcontrol.Experiment.payment_quality_threshold</code>.
+	 */
+	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord, java.lang.Integer> PAYMENT_QUALITY_THRESHOLD = createField("payment_quality_threshold", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>crowdcontrol.Experiment</code> table reference

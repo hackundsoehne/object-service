@@ -40,4 +40,76 @@ public interface TemplateOrBuilder extends
    * <code>optional .crowdcontrol.AnswerType answer_type = 4;</code>
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType getAnswerType();
+
+  /**
+   * <code>repeated .crowdcontrol.Template.RatingOption rating_options = 5;</code>
+   */
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Template.RatingOption> 
+      getRatingOptionsList();
+  /**
+   * <code>repeated .crowdcontrol.Template.RatingOption rating_options = 5;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Template.RatingOption getRatingOptions(int index);
+  /**
+   * <code>repeated .crowdcontrol.Template.RatingOption rating_options = 5;</code>
+   */
+  int getRatingOptionsCount();
+  /**
+   * <code>repeated .crowdcontrol.Template.RatingOption rating_options = 5;</code>
+   */
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Template.RatingOptionOrBuilder> 
+      getRatingOptionsOrBuilderList();
+  /**
+   * <code>repeated .crowdcontrol.Template.RatingOption rating_options = 5;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Template.RatingOptionOrBuilder getRatingOptionsOrBuilder(
+      int index);
+
+  /**
+   * <code>repeated .crowdcontrol.Constraint constraints = 6;</code>
+   */
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint> 
+      getConstraintsList();
+  /**
+   * <code>repeated .crowdcontrol.Constraint constraints = 6;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Constraint getConstraints(int index);
+  /**
+   * <code>repeated .crowdcontrol.Constraint constraints = 6;</code>
+   */
+  int getConstraintsCount();
+  /**
+   * <code>repeated .crowdcontrol.Constraint constraints = 6;</code>
+   */
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOrBuilder> 
+      getConstraintsOrBuilderList();
+  /**
+   * <code>repeated .crowdcontrol.Constraint constraints = 6;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.ConstraintOrBuilder getConstraintsOrBuilder(
+      int index);
+
+  /**
+   * <code>repeated .crowdcontrol.Tag tags = 7;</code>
+   */
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Tag> 
+      getTagsList();
+  /**
+   * <code>repeated .crowdcontrol.Tag tags = 7;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Tag getTags(int index);
+  /**
+   * <code>repeated .crowdcontrol.Tag tags = 7;</code>
+   */
+  int getTagsCount();
+  /**
+   * <code>repeated .crowdcontrol.Tag tags = 7;</code>
+   */
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.TagOrBuilder> 
+      getTagsOrBuilderList();
+  /**
+   * <code>repeated .crowdcontrol.Tag tags = 7;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.TagOrBuilder getTagsOrBuilder(
+      int index);
 }

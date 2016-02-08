@@ -11,16 +11,19 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlgorithmRatingQuality implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1135989795;
+	private static final long serialVersionUID = -1120912741;
 
 	private java.lang.String idAlgorithmRatingQuality;
+	private java.lang.String description;
 
 	public AlgorithmRatingQuality() {}
 
 	public AlgorithmRatingQuality(
-		java.lang.String idAlgorithmRatingQuality
+		java.lang.String idAlgorithmRatingQuality,
+		java.lang.String description
 	) {
 		this.idAlgorithmRatingQuality = idAlgorithmRatingQuality;
+		this.description = description;
 	}
 
 	public java.lang.String getIdAlgorithmRatingQuality() {
@@ -29,5 +32,13 @@ public class AlgorithmRatingQuality implements java.io.Serializable {
 
 	public void setIdAlgorithmRatingQuality(java.lang.String idAlgorithmRatingQuality) {
 		this.idAlgorithmRatingQuality = idAlgorithmRatingQuality;
+	}
+
+	public java.lang.String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(java.lang.String description) {
+		this.description = description;
 	}
 }

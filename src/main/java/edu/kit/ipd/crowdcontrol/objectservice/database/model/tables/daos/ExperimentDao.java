@@ -48,10 +48,10 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontro
 	}
 
 	/**
-	 * Fetch records that have <code>titel IN (values)</code>
+	 * Fetch records that have <code>title IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByTitel(java.lang.String... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.TITEL, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByTitle(java.lang.String... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.TITLE, values);
 	}
 
 	/**
@@ -157,5 +157,12 @@ public class ExperimentDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontro
 	 */
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByWorkerQualityThreshold(java.lang.Integer... values) {
 		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.WORKER_QUALITY_THRESHOLD, values);
+	}
+
+	/**
+	 * Fetch records that have <code>payment_quality_threshold IN (values)</code>
+	 */
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Experiment> fetchByPaymentQualityThreshold(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT.PAYMENT_QUALITY_THRESHOLD, values);
 	}
 }

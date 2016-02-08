@@ -17,6 +17,8 @@ public  final class Platform extends
   private Platform() {
     id_ = "";
     name_ = "";
+    hasCalibrations_ = false;
+    isInactive_ = false;
   }
 
   @java.lang.Override
@@ -53,6 +55,16 @@ public  final class Platform extends
             String s = input.readStringRequireUtf8();
 
             name_ = s;
+            break;
+          }
+          case 24: {
+
+            hasCalibrations_ = input.readBool();
+            break;
+          }
+          case 32: {
+
+            isInactive_ = input.readBool();
             break;
           }
         }
@@ -147,6 +159,24 @@ public  final class Platform extends
     }
   }
 
+  public static final int HAS_CALIBRATIONS_FIELD_NUMBER = 3;
+  private boolean hasCalibrations_;
+  /**
+   * <code>optional bool has_calibrations = 3;</code>
+   */
+  public boolean getHasCalibrations() {
+    return hasCalibrations_;
+  }
+
+  public static final int IS_INACTIVE_FIELD_NUMBER = 4;
+  private boolean isInactive_;
+  /**
+   * <code>optional bool is_inactive = 4;</code>
+   */
+  public boolean getIsInactive() {
+    return isInactive_;
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -165,6 +195,12 @@ public  final class Platform extends
     if (!getNameBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessage.writeString(output, 2, name_);
     }
+    if (hasCalibrations_ != false) {
+      output.writeBool(3, hasCalibrations_);
+    }
+    if (isInactive_ != false) {
+      output.writeBool(4, isInactive_);
+    }
   }
 
   public int getSerializedSize() {
@@ -177,6 +213,14 @@ public  final class Platform extends
     }
     if (!getNameBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(2, name_);
+    }
+    if (hasCalibrations_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(3, hasCalibrations_);
+    }
+    if (isInactive_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(4, isInactive_);
     }
     memoizedSize = size;
     return size;
@@ -293,6 +337,10 @@ public  final class Platform extends
 
       name_ = "";
 
+      hasCalibrations_ = false;
+
+      isInactive_ = false;
+
       return this;
     }
 
@@ -317,6 +365,8 @@ public  final class Platform extends
       edu.kit.ipd.crowdcontrol.objectservice.proto.Platform result = new edu.kit.ipd.crowdcontrol.objectservice.proto.Platform(this);
       result.id_ = id_;
       result.name_ = name_;
+      result.hasCalibrations_ = hasCalibrations_;
+      result.isInactive_ = isInactive_;
       onBuilt();
       return result;
     }
@@ -339,6 +389,12 @@ public  final class Platform extends
       if (!other.getName().isEmpty()) {
         name_ = other.name_;
         onChanged();
+      }
+      if (other.getHasCalibrations() != false) {
+        setHasCalibrations(other.getHasCalibrations());
+      }
+      if (other.getIsInactive() != false) {
+        setIsInactive(other.getIsInactive());
       }
       onChanged();
       return this;
@@ -500,6 +556,58 @@ public  final class Platform extends
   checkByteStringIsUtf8(value);
       
       name_ = value;
+      onChanged();
+      return this;
+    }
+
+    private boolean hasCalibrations_ ;
+    /**
+     * <code>optional bool has_calibrations = 3;</code>
+     */
+    public boolean getHasCalibrations() {
+      return hasCalibrations_;
+    }
+    /**
+     * <code>optional bool has_calibrations = 3;</code>
+     */
+    public Builder setHasCalibrations(boolean value) {
+      
+      hasCalibrations_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional bool has_calibrations = 3;</code>
+     */
+    public Builder clearHasCalibrations() {
+      
+      hasCalibrations_ = false;
+      onChanged();
+      return this;
+    }
+
+    private boolean isInactive_ ;
+    /**
+     * <code>optional bool is_inactive = 4;</code>
+     */
+    public boolean getIsInactive() {
+      return isInactive_;
+    }
+    /**
+     * <code>optional bool is_inactive = 4;</code>
+     */
+    public Builder setIsInactive(boolean value) {
+      
+      isInactive_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional bool is_inactive = 4;</code>
+     */
+    public Builder clearIsInactive() {
+      
+      isInactive_ = false;
       onChanged();
       return this;
     }

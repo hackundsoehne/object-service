@@ -2,11 +2,12 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest;
 
 import com.google.protobuf.Message;
 
+import java.util.Optional;
+
 /**
  * Represents a page containing the items and whether there's a next / previous page.
  *
- * @param <X>
- *         Type of the cursor.
+ * @param <X> type of the cursor
  *
  * @author Niklas Keller
  */
@@ -18,16 +19,11 @@ public class Paginated<X> {
     private final X right;
 
     /**
-     * @param message
-     *         Paginated message.
-     * @param left
-     *         Key of the most left element inside the page.
-     * @param right
-     *         Key of the most right element inside the page.
-     * @param hasPrevious
-     *         Whether there's a previous page.
-     * @param hasNext
-     *         Whether there's a next page.
+     * @param message     paginated message
+     * @param left        key of the most left element inside the page
+     * @param right       key of the most right element inside the page
+     * @param hasPrevious whether there's a previous page
+     * @param hasNext     whether there's a next page
      */
     public Paginated(Message message, X left, X right, boolean hasPrevious, boolean hasNext) {
         this.message = message;
@@ -49,8 +45,8 @@ public class Paginated<X> {
      *
      * @return Key, or empty if the list is empty.
      */
-    public X getLeft() {
-        return left;
+    public Optional<X> getLeft() {
+        return Optional.ofNullable(left);
     }
 
     /**
@@ -58,8 +54,8 @@ public class Paginated<X> {
      *
      * @return Key, or empty if the list is empty.
      */
-    public X getRight() {
-        return right;
+    public Optional<X> getRight() {
+        return Optional.ofNullable(right);
     }
 
     /**

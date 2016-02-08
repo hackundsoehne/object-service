@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
@@ -8,11 +9,12 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -52,26 +54,45 @@ public class PlatformManager {
 
         //create hashmap of platforms
         platforms = crowdPlatforms.stream()
-                .collect(Collectors.toMap(Platform::getName, Function.identity()));
-        //clear database
-        platformOps.deleteAllPlatforms();
+                .collect(Collectors.toMap(Platform::getID, Function.identity()));
+
         //update database
-        platforms.forEach((s, platform) -> {
-            PlatformRecord rec = new PlatformRecord();
-            rec.setName(platform.getName());
-            rec.setNeedsEmail(false);
+        List<PlatformRecord> records = platforms.values().stream()
+                .map(platform -> new PlatformRecord(
+                        platform.getID(),
+                        platform.getName(),
+                        platform.isCalibrationAllowed(),
+                        isNeedemail(platform),
+                        false
+                ))
+                .collect(Collectors.toList());
 
-            /* platform does not handle payment, email is needed for internal payment */
-            if (!platform.getPayment().isPresent())
-                rec.setNeedsEmail(true);
-            /* if platform cannot identify worker, we need to do that with a email adress */
-            if (!platform.getWorker().isPresent())
-                rec.setNeedsEmail(true);
+        platformOps.storePlatforms(records);
+    }
 
-            rec.setRenderCalibrations(platform.isCalibrationAllowed());
+    private boolean isNeedemail(Platform platform) {
+        boolean needemail = false;
 
-            platformOps.createPlatform(rec);
-        });
+        /* platform does not handle payment, email is needed for internal payment */
+        if (!platform.getPayment().isPresent())
+            needemail = true;
+
+        /* if platform cannot identify worker, we need to do that with a email adress */
+        if (!platform.getWorker().isPresent())
+            needemail = true;
+
+        return needemail;
+    }
+
+    /**
+     * Returns if the given Platform needs a email or not
+     * @param name name of the platform
+     * @return true if the platform needs an email, false if not
+     */
+    public boolean getNeedemail(String name) {
+        return isNeedemail(
+                getPlatform(name).orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+        );
     }
 
     /**
@@ -90,8 +111,7 @@ public class PlatformManager {
      * @return The interface used to identify a worker
      */
     public WorkerIdentification getWorker(String name) {
-        return getPlatform(name)
-                .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+        return getPlatformOrThrow(name)
                 .getWorker().orElse(fallbackWorker);
     }
 
@@ -103,14 +123,15 @@ public class PlatformManager {
      * @return The interface used for payment
      */
     public Payment getPlatformPayment(String name) {
-        return getPlatform(name)
-                .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+        return getPlatformOrThrow(name)
                 .getPayment().orElse(fallbackPayment);
     }
 
     /**
      * Publish the given experiment on the platform.
      * The method will update the database with the new public task
+     *
+     * If a exception is thrown NO TaskRecord is created, this means the Experiment will still be known as "unpublished"
      *
      * @param name The name of the platform
      * @param experiment The experiment to publish
@@ -127,24 +148,32 @@ public class PlatformManager {
         if (result == null)
             throw new TaskOperationException("Task could not be created");
 
-        return getPlatform(name)
-                .map(platform1 -> platform1.publishTask(experiment))
-                .orElseThrow(() -> new IllegalArgumentException("Platform not found!"))
+        return getPlatformOrThrow(name)
+                .publishTask(experiment)
                 .handle((s1, throwable) -> {
-                    if (s1 != null) {
+                    //if the creation was successful update the task
+                    if (s1 != null && throwable == null && !s1.isEmpty()) {
                         result.setPlatformData(s1);
-                    } else {
-                        result.setStatus(TaskStatus.stopped);
+                        if (!tasksOps.updateTask(result)) {
+                            throw new IllegalStateException("Updating record for published task failed");
+                        }
                     }
-                    if (!tasksOps.updateTask(result)) {
-                        throw new IllegalStateException("Updating record for published task failed");
+                    //if there is no useful key throw!
+                    if (s1 != null && s1.isEmpty()) {
+                        tasksOps.deleteTask(result);
+                        throw new IllegalStateException("Platform "+name+" does not provide any useful key");
+                    }
+                    //if not rethrow the exception and delete the task
+                    if (throwable != null) {
+                        tasksOps.deleteTask(result);
+                        throw new RuntimeException(throwable);
                     }
                     return true;
                 });
     }
 
     /**
-     * Unpublish a given experiment from the given platform
+     * Unpublishes a given experiment from the given platform
      *
      * @param name The name of the platform
      * @param experiment The experiment to unpublish
@@ -158,12 +187,16 @@ public class PlatformManager {
         if (record == null)
             return CompletableFuture.completedFuture(true);
 
-        return getPlatform(name).map(platform -> platform.unpublishTask(record.getPlatformData()))
-                .orElseThrow(() -> new IllegalArgumentException("Experiment not found!"))
+        return getPlatformOrThrow(name).unpublishTask(record.getPlatformData())
                 .thenApply(aBoolean -> {
                     record.setStatus(TaskStatus.finished);
                     return tasksOps.updateTask(record);
                 });
+    }
+
+    private Platform getPlatformOrThrow(String name) {
+        return getPlatform(name)
+                .orElseThrow(() -> new IllegalArgumentException("Platform \""+name+"\" not found"));
     }
 
     /**
@@ -178,9 +211,8 @@ public class PlatformManager {
         record = tasksOps.getTask(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment is not published"));
 
-        return getPlatform(name)
-                .map(platform -> platform.updateTask(record.getPlatformData(), experiment))
-                .orElseThrow(() -> new IllegalArgumentException("Platform not found"))
+        return getPlatformOrThrow(name)
+                .updateTask(record.getPlatformData(), experiment)
                 .thenApply(s -> {
                     record.setPlatformData(s);
                     return tasksOps.updateTask(record);
@@ -210,13 +242,32 @@ public class PlatformManager {
     }
 
     /**
-     * Pay a worker
-     * @param name The name of the platform
-     * @param worker Worker to pay
-     * @param amount The amount of money
-     * @return A completable future which returns the success of the call
+     * Pay all worker of a experiment
+     *
+     * The passed list of paymentJobs contains all worker which have submitted a answer.
+     * If the worker should not get payed because of bad ratings the amount should be smaller
+     * than the basepayment of the experiment.
+     *
+     * @param name name of the platform
+     * @param experiment experiment which is published
+     * @param paymentJobs tuples which are defining the amount to pay
+     * @return a future object which indicates if the payment was successful or not
+     * @throws IllegalWorkerSetException if this exception is thrown NO payment requests are given to the platform
+     *
      */
-    public CompletableFuture<Boolean> payWorker(String name, Worker worker, int amount) {
-        return getPlatformPayment(name).payWorker(worker, amount);
+    public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws TaskOperationException, IllegalWorkerSetException {
+        TaskRecord record = tasksOps.getTask(name, experiment.getId()).
+                orElseThrow(() -> new TaskOperationException("Experiment was never published"));
+        List<WorkerRecord> workerRecords = workerOps.getWorkerWithWork(experiment.getId(), name);
+
+        Set<String> given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toSet());
+        Set<String> should = workerRecords.stream().map(WorkerRecord::getIdentification).collect(Collectors.toSet());
+
+        if (!given.equals(should)) {
+            throw new IllegalWorkerSetException(
+                    "The list of payment Jobs need to have all workers which worked on this experiment on the given platform");
+        }
+
+        return getPlatformPayment(name).payExperiment(record.getPlatformData(), experiment,paymentJobs);
     }
 }

@@ -6,6 +6,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.InputTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.transformer.OutputTransformer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static spark.Spark.before;
 import static spark.Spark.exception;
+import static spark.Spark.options;
 
 /**
  * Application entry point. Defines the REST API.
@@ -24,27 +27,48 @@ import static spark.Spark.exception;
  * @author Niklas Keller
  */
 public class Router implements SparkApplication {
+    private static final Logger LOGGER = LogManager.getLogger(Router.class);
+
     private final TemplateResource templateResource;
     private final NotificationResource notificationResource;
     private final PlatformResource platformResource;
     private final WorkerResource workerResource;
-    private final PopulationResource populationResource;
+    private final CalibrationResource calibrationResource;
+    private final ExperimentResource experimentResource;
+    private final AlgorithmResources algorithmResources;
+    private final AnswerRatingResource answerRatingResource;
+    private final WorkerCalibrationResource workerCalibrationResource;
+    private final String origin;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
      */
-    public Router(TemplateResource templateResource, NotificationResource notificationResource,
-                  PlatformResource platformResource, WorkerResource workerResource,
-                  PopulationResource populationResource) {
+    public Router(TemplateResource templateResource,
+                  NotificationResource notificationResource,
+                  PlatformResource platformResource,
+                  WorkerResource workerResource,
+                  CalibrationResource calibrationResource,
+                  ExperimentResource experimentResource,
+                  AlgorithmResources algorithmResources,
+                  AnswerRatingResource answerRatingResource,
+                  WorkerCalibrationResource workerCalibrationResource,
+                  String origin) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
-        this.populationResource = populationResource;
+        this.calibrationResource = calibrationResource;
         this.workerResource = workerResource;
+        this.experimentResource = experimentResource;
+        this.algorithmResources = algorithmResources;
+        this.answerRatingResource = answerRatingResource;
+        this.workerCalibrationResource = workerCalibrationResource;
+        this.origin = origin;
     }
 
     @Override
     public void init() {
+        LOGGER.trace("Setting up routes for Spark.");
+
         exception(BadRequestException.class, (exception, request, response) -> {
             response.status(400);
             response.body(error(request, response, "badRequest", exception.getMessage()));
@@ -74,6 +98,8 @@ public class Router implements SparkApplication {
         });
 
         exception(InternalServerErrorException.class, (exception, request, response) -> {
+            LOGGER.error(exception);
+
             response.status(500);
             response.body(error(request, response, "internalServerError", exception.getMessage()));
         });
@@ -82,7 +108,21 @@ public class Router implements SparkApplication {
             if (request.headers("accept") == null) {
                 throw new BadRequestException("Missing required 'accept' header.");
             }
+
+            response.header("access-control-allow-origin", origin);
+            response.header("access-control-allow-methods", "GET,PUT,POST,PATCH,DELETE,OPTIONS");
+            response.header("access-control-allow-credentials", "true");
+            response.header("access-control-allow-headers", "Authorization,Content-Type");
+            response.header("access-control-expose-headers", "Link,Location");
+            response.header("access-control-max-age", "86400");
         });
+
+        options("/*", ((request, response) -> {
+            response.status(204);
+            response.type("text/plain");
+
+            return "";
+        }));
 
         put("/templates", templateResource::put, Template.class);
         get("/templates", templateResource::all);
@@ -99,16 +139,32 @@ public class Router implements SparkApplication {
         get("/platforms", platformResource::all);
         get("/platforms/:id", platformResource::get);
 
-        put("/populations", populationResource::put, Population.class);
-        get("/populations", populationResource::all);
-        get("/populations/:id", populationResource::get);
-        delete("/populations/:id", populationResource::delete);
+        put("/calibrations", calibrationResource::put, Calibration.class);
+        get("/calibrations", calibrationResource::all);
+        get("/calibrations/:id", calibrationResource::get);
+        delete("/calibrations/:id", calibrationResource::delete);
 
         get("/workers/:platform/identity", workerResource::identify);
         put("/workers", workerResource::put, Worker.class);
         get("/workers", workerResource::all);
         get("/workers/:id", workerResource::get);
+        patch("/workers/:id", workerResource::patch, Worker.class);
         delete("/workers/:id", workerResource::delete);
+        put("/workers/:id/calibrations", workerCalibrationResource::put, CalibrationAnswer.class);
+
+        get("/algorithms", algorithmResources::getAllAlgortihms);
+
+        put("/experiments", experimentResource::put, Experiment.class);
+        get("/experiments", experimentResource::all);
+        get("/experiments/:id", experimentResource::get);
+        patch("/experiments/:id", experimentResource::patch, Experiment.class);
+        delete("/experiments/:id", experimentResource::delete);
+        put("/experiments/:id/answers", answerRatingResource::putAnswer, Answer.class);
+        get("/experiments/:id/answers", answerRatingResource::getAnswers);
+        get("/experiments/:id/answers/:aid", answerRatingResource::getAnswer);
+        put("/experiments/:id/answers/:aid/rating", answerRatingResource::putRating, Rating.class);
+
+        LOGGER.trace("Finished setting up routes for Spark.");
     }
 
     /**

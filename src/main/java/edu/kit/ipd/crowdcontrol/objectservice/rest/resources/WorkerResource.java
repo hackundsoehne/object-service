@@ -2,8 +2,10 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transforms.WorkerTransform;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.WorkerList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
@@ -11,6 +13,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestExceptio
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
+
+import java.util.Objects;
+import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
@@ -29,26 +34,37 @@ public class WorkerResource {
     }
 
     /**
-     * @param request  request provided by Spark.
-     * @param response response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return Worker if found.
+     * @return Identified worker.
      */
     public Worker identify(Request request, Response response) {
         try {
-            return manager.getWorker(request.params("platform"), request.queryMap().toMap())
-                    .map(WorkerTransform::toProto)
-                    .orElseThrow(() -> new NotFoundException("Resource not found."));
+            WorkerRecord worker;
+            String platform = request.params("platform");
+            Optional<WorkerRecord> optionalRecord = manager.getWorker(platform, request.queryMap().toMap());
+            if (optionalRecord.isPresent()) {
+                worker = optionalRecord.get();
+            } else if (!manager.getNeedemail(platform) || (request.queryParams("email") != null && !request.queryParams("email").isEmpty())){
+                String identify = manager.identifyWorker(platform, request.queryMap().toMap());
+                WorkerRecord workerRecord = new WorkerRecord(null, identify, platform, null, null);
+                worker = operations.insertWorker(workerRecord);
+            } else {
+                throw new NotFoundException();
+            }
+
+            return WorkerTransformer.toProto(worker);
         } catch (UnidentifiedWorkerException e) {
-            throw new BadRequestException("Unidentified worker!");
+            throw new BadRequestException("Could not identify worker.");
         }
     }
 
     /**
-     * @param request  request provided by Spark.
-     * @param response response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return A list of all workers.
+     * @return List of workers.
      */
     public Paginated<Integer> all(Request request, Response response) {
         int from = getQueryInt(request, "from", 0);
@@ -62,16 +78,16 @@ public class WorkerResource {
      * @param request  request provided by Spark.
      * @param response response provided by Spark.
      *
-     * @return A single worker.
+     * @return Single worker.
      */
     public Worker get(Request request, Response response) {
         return operations.getWorkerProto(getParamInt(request, "id"))
-                .orElseThrow(() -> new NotFoundException("Resource not found."));
+                .orElseThrow(NotFoundException::new);
     }
 
     /**
-     * @param request  request provided by Spark.
-     * @param response response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
      * @return Created worker.
      */
@@ -82,10 +98,12 @@ public class WorkerResource {
         try {
             identity = manager.identifyWorker(request.params("platform"), request.queryMap().toMap());
         } catch (UnidentifiedWorkerException e) {
-            throw new BadRequestException("Unidentified worker!");
+            throw new BadRequestException("Could not identify worker.");
         }
 
         worker = operations.insertWorker(worker, identity);
+
+        EventManager.WORKER_CREATE.emit(worker);
 
         response.status(201);
         response.header("Location", "/workers/" + worker.getId());
@@ -94,16 +112,38 @@ public class WorkerResource {
     }
 
     /**
-     * @param request  request provided by Spark.
-     * @param response response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
+     *
+     * @return patched worker.
+     */
+    public Worker patch(Request request, Response response) {
+        Worker worker = request.attribute("input");
+        int id = getParamInt(request, "id");
+
+        worker = operations.updateWorker(worker, id);
+
+        EventManager.WORKER_CHANGE.emit(worker);
+
+        return worker;
+    }
+
+    /**
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
      * @return {@code null}.
      */
     public Worker delete(Request request, Response response) {
+        int id = getParamInt(request, "id");
+
         try {
-            operations.anonymizeWorker(getParamInt(request, "id"));
+            Optional<Worker> worker = operations.getWorkerProto(id);
+            worker.map(EventManager.WORKER_DELETE::emit);
+
+            operations.anonymizeWorker(id);
         } catch (IllegalArgumentException e) {
-            throw new NotFoundException("Resource not found.");
+            throw new NotFoundException();
         }
 
         return null;

@@ -1,16 +1,27 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.NotificationList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 
+/**
+ * Handles requests to notification resources.
+ *
+ * @author Niklas Keller
+ */
 public class NotificationResource {
     private NotificationOperations operations;
 
@@ -19,49 +30,50 @@ public class NotificationResource {
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return A list of all templates.
+     * @return List of notifications.
      */
     public Paginated<Integer> all(Request request, Response response) {
         int from = getQueryInt(request, "from", 0);
         boolean asc = getQueryBool(request, "asc", true);
 
+        Supplier<RuntimeException> ex = () -> new InternalServerErrorException("Could not fetch a single notification in a list.");
+
+        // TODO: (low priority) Optimize for multiple templates
         return operations.getNotificationsFrom(from, asc, 20)
+                .map(notification -> (Notification) operations.getNotification(notification.getId()).orElseThrow(ex))
                 .constructPaginated(NotificationList.newBuilder(), NotificationList.Builder::addAllItems);
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return A single template.
+     * @return Single notification.
      */
     public Notification get(Request request, Response response) {
         return operations.getNotification(getParamInt(request, "id"))
-                .orElseThrow(() -> new NotFoundException("Resource not found."));
+                .orElseThrow(NotFoundException::new);
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return The created template.
+     * @return Created notification.
      */
     public Notification put(Request request, Response response) {
         Notification notification = request.attribute("input");
+
         try {
             notification = operations.insertNotification(notification);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("All parameters must be set!");
+            throw new BadRequestException(e.getMessage());
         }
+
+        EventManager.NOTIFICATION_CREATE.emit(notification);
 
         response.status(201);
         response.header("Location", "/notifications/" + notification.getId());
@@ -70,31 +82,43 @@ public class NotificationResource {
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
-     * @return The modified template.
+     * @return Modified notification.
      */
     public Notification patch(Request request, Response response) {
-        Notification notification = request.attribute("input");
-        return operations.updateNotification(getParamInt(request, "id"), notification);
+        int id = getParamInt(request, "id");
+        Notification patch = request.attribute("input");
+
+        try {
+            Notification oldNotification = operations.getNotification(id).orElseThrow(NotFoundException::new);
+            Notification newNotification = operations.updateNotification(id, patch);
+
+            EventManager.NOTIFICATION_UPDATE.emit(new ChangeEvent<>(oldNotification, newNotification));
+
+            return newNotification;
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     /**
-     * @param request
-     *         Request provided by Spark.
-     * @param response
-     *         Response provided by Spark.
+     * @param request  request provided by Spark
+     * @param response response provided by Spark
      *
      * @return {@code null}.
      */
     public Notification delete(Request request, Response response) {
-        boolean existed = operations.deleteNotification(getParamInt(request, "id"));
+        int id = getParamInt(request, "id");
+
+        Optional<Notification> notification = operations.getNotification(id);
+        notification.map(EventManager.NOTIFICATION_DELETE::emit);
+
+        boolean existed = operations.deleteNotification(id);
 
         if (!existed) {
-            throw new NotFoundException("Template does not exist!");
+            throw new NotFoundException();
         }
 
         return null;

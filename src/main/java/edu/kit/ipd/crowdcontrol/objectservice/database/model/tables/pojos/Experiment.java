@@ -11,10 +11,10 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Experiment implements java.io.Serializable {
 
-	private static final long serialVersionUID = 584453501;
+	private static final long serialVersionUID = -44144379;
 
 	private java.lang.Integer idExperiment;
-	private java.lang.String  titel;
+	private java.lang.String  title;
 	private java.lang.String  description;
 	private java.lang.Integer neededAnswers;
 	private java.lang.Integer ratingsPerAnswer;
@@ -30,12 +30,13 @@ public class Experiment implements java.io.Serializable {
 	private java.lang.String  templateData;
 	private java.lang.Integer template;
 	private java.lang.Integer workerQualityThreshold;
+	private java.lang.Integer paymentQualityThreshold;
 
 	public Experiment() {}
 
 	public Experiment(
 		java.lang.Integer idExperiment,
-		java.lang.String  titel,
+		java.lang.String  title,
 		java.lang.String  description,
 		java.lang.Integer neededAnswers,
 		java.lang.Integer ratingsPerAnswer,
@@ -50,10 +51,11 @@ public class Experiment implements java.io.Serializable {
 		java.lang.Integer bonusRating,
 		java.lang.String  templateData,
 		java.lang.Integer template,
-		java.lang.Integer workerQualityThreshold
+		java.lang.Integer workerQualityThreshold,
+		java.lang.Integer paymentQualityThreshold
 	) {
 		this.idExperiment = idExperiment;
-		this.titel = titel;
+		this.title = title;
 		this.description = description;
 		this.neededAnswers = neededAnswers;
 		this.ratingsPerAnswer = ratingsPerAnswer;
@@ -69,6 +71,7 @@ public class Experiment implements java.io.Serializable {
 		this.templateData = templateData;
 		this.template = template;
 		this.workerQualityThreshold = workerQualityThreshold;
+		this.paymentQualityThreshold = paymentQualityThreshold;
 	}
 
 	public java.lang.Integer getIdExperiment() {
@@ -79,12 +82,12 @@ public class Experiment implements java.io.Serializable {
 		this.idExperiment = idExperiment;
 	}
 
-	public java.lang.String getTitel() {
-		return this.titel;
+	public java.lang.String getTitle() {
+		return this.title;
 	}
 
-	public void setTitel(java.lang.String titel) {
-		this.titel = titel;
+	public void setTitle(java.lang.String title) {
+		this.title = title;
 	}
 
 	public java.lang.String getDescription() {
@@ -205,5 +208,13 @@ public class Experiment implements java.io.Serializable {
 
 	public void setWorkerQualityThreshold(java.lang.Integer workerQualityThreshold) {
 		this.workerQualityThreshold = workerQualityThreshold;
+	}
+
+	public java.lang.Integer getPaymentQualityThreshold() {
+		return this.paymentQualityThreshold;
+	}
+
+	public void setPaymentQualityThreshold(java.lang.Integer paymentQualityThreshold) {
+		this.paymentQualityThreshold = paymentQualityThreshold;
 	}
 }

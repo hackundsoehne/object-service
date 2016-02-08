@@ -51,69 +51,134 @@ public interface ExperimentOrBuilder extends
   edu.kit.ipd.crowdcontrol.objectservice.proto.AnswerType getAnswerType();
 
   /**
-   * <code>optional string algorithm_task_chooser = 6;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
    */
-  java.lang.String getAlgorithmTaskChooser();
+  boolean hasAlgorithmTaskChooser();
   /**
-   * <code>optional string algorithm_task_chooser = 6;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
    */
-  com.google.protobuf.ByteString
-      getAlgorithmTaskChooserBytes();
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmTaskChooser();
+  /**
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_task_chooser = 6;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmTaskChooserOrBuilder();
 
   /**
-   * <code>optional string algorithm_quality_answer = 7;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
    */
-  java.lang.String getAlgorithmQualityAnswer();
+  boolean hasAlgorithmQualityAnswer();
   /**
-   * <code>optional string algorithm_quality_answer = 7;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
    */
-  com.google.protobuf.ByteString
-      getAlgorithmQualityAnswerBytes();
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmQualityAnswer();
+  /**
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_answer = 7;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmQualityAnswerOrBuilder();
 
   /**
-   * <code>optional string algorithm_quality_rating = 8;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
    */
-  java.lang.String getAlgorithmQualityRating();
+  boolean hasAlgorithmQualityRating();
   /**
-   * <code>optional string algorithm_quality_rating = 8;</code>
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
    */
-  com.google.protobuf.ByteString
-      getAlgorithmQualityRatingBytes();
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption getAlgorithmQualityRating();
+  /**
+   * <code>optional .crowdcontrol.AlgorithmOption algorithm_quality_rating = 8;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOptionOrBuilder getAlgorithmQualityRatingOrBuilder();
 
   /**
-   * <code>optional int32 answers_per_worker = 9;</code>
+   * <code>optional .crowdcontrol.Integer answers_per_worker = 9;</code>
    */
-  int getAnswersPerWorker();
+  boolean hasAnswersPerWorker();
+  /**
+   * <code>optional .crowdcontrol.Integer answers_per_worker = 9;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getAnswersPerWorker();
+  /**
+   * <code>optional .crowdcontrol.Integer answers_per_worker = 9;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getAnswersPerWorkerOrBuilder();
 
   /**
-   * <code>optional int32 ratings_per_worker = 10;</code>
+   * <code>optional .crowdcontrol.Integer ratings_per_worker = 10;</code>
    */
-  int getRatingsPerWorker();
+  boolean hasRatingsPerWorker();
+  /**
+   * <code>optional .crowdcontrol.Integer ratings_per_worker = 10;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getRatingsPerWorker();
+  /**
+   * <code>optional .crowdcontrol.Integer ratings_per_worker = 10;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getRatingsPerWorkerOrBuilder();
 
   /**
-   * <code>optional int32 ratings_per_answer = 11;</code>
+   * <code>optional .crowdcontrol.Integer ratings_per_answer = 11;</code>
    */
-  int getRatingsPerAnswer();
+  boolean hasRatingsPerAnswer();
+  /**
+   * <code>optional .crowdcontrol.Integer ratings_per_answer = 11;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getRatingsPerAnswer();
+  /**
+   * <code>optional .crowdcontrol.Integer ratings_per_answer = 11;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getRatingsPerAnswerOrBuilder();
 
   /**
-   * <code>optional int32 needed_answers = 12;</code>
+   * <code>optional .crowdcontrol.Integer needed_answers = 12;</code>
    */
-  int getNeededAnswers();
+  boolean hasNeededAnswers();
+  /**
+   * <code>optional .crowdcontrol.Integer needed_answers = 12;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getNeededAnswers();
+  /**
+   * <code>optional .crowdcontrol.Integer needed_answers = 12;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getNeededAnswersOrBuilder();
 
   /**
-   * <code>optional int32 payment_base = 13;</code>
+   * <code>optional .crowdcontrol.Integer payment_base = 13;</code>
    */
-  int getPaymentBase();
+  boolean hasPaymentBase();
+  /**
+   * <code>optional .crowdcontrol.Integer payment_base = 13;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getPaymentBase();
+  /**
+   * <code>optional .crowdcontrol.Integer payment_base = 13;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getPaymentBaseOrBuilder();
 
   /**
-   * <code>optional int32 payment_answer = 14;</code>
+   * <code>optional .crowdcontrol.Integer payment_answer = 14;</code>
    */
-  int getPaymentAnswer();
+  boolean hasPaymentAnswer();
+  /**
+   * <code>optional .crowdcontrol.Integer payment_answer = 14;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getPaymentAnswer();
+  /**
+   * <code>optional .crowdcontrol.Integer payment_answer = 14;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getPaymentAnswerOrBuilder();
 
   /**
-   * <code>optional int32 payment_rating = 15;</code>
+   * <code>optional .crowdcontrol.Integer payment_rating = 15;</code>
    */
-  int getPaymentRating();
+  boolean hasPaymentRating();
+  /**
+   * <code>optional .crowdcontrol.Integer payment_rating = 15;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getPaymentRating();
+  /**
+   * <code>optional .crowdcontrol.Integer payment_rating = 15;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getPaymentRatingOrBuilder();
 
   /**
    * <code>repeated .crowdcontrol.Constraint constraints = 16;</code>
@@ -164,27 +229,27 @@ public interface ExperimentOrBuilder extends
       int index);
 
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation> 
-      getPlatformPopulationsList();
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population> 
+      getPopulationsList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulation getPlatformPopulations(int index);
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population getPopulations(int index);
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  int getPlatformPopulationsCount();
+  int getPopulationsCount();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder> 
-      getPlatformPopulationsOrBuilderList();
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PopulationOrBuilder> 
+      getPopulationsOrBuilderList();
   /**
-   * <code>repeated .crowdcontrol.Experiment.PlatformPopulation platform_populations = 18;</code>
+   * <code>repeated .crowdcontrol.Experiment.Population populations = 18;</code>
    */
-  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PlatformPopulationOrBuilder getPlatformPopulationsOrBuilder(
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.PopulationOrBuilder getPopulationsOrBuilder(
       int index);
 
   /**
@@ -194,12 +259,65 @@ public interface ExperimentOrBuilder extends
   getPlaceholders();
 
   /**
-   * <code>optional int32 worker_quality_threshold = 20;</code>
+   * <code>optional .crowdcontrol.Integer payment_quality_threshold = 20;</code>
    */
-  int getWorkerQualityThreshold();
+  boolean hasPaymentQualityThreshold();
+  /**
+   * <code>optional .crowdcontrol.Integer payment_quality_threshold = 20;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getPaymentQualityThreshold();
+  /**
+   * <code>optional .crowdcontrol.Integer payment_quality_threshold = 20;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getPaymentQualityThresholdOrBuilder();
 
   /**
-   * <code>optional int32 template_id = 21;</code>
+   * <code>optional .crowdcontrol.Integer worker_quality_threshold = 21;</code>
    */
-  int getTemplateId();
+  boolean hasWorkerQualityThreshold();
+  /**
+   * <code>optional .crowdcontrol.Integer worker_quality_threshold = 21;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getWorkerQualityThreshold();
+  /**
+   * <code>optional .crowdcontrol.Integer worker_quality_threshold = 21;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getWorkerQualityThresholdOrBuilder();
+
+  /**
+   * <code>optional .crowdcontrol.Integer template_id = 22;</code>
+   */
+  boolean hasTemplateId();
+  /**
+   * <code>optional .crowdcontrol.Integer template_id = 22;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Integer getTemplateId();
+  /**
+   * <code>optional .crowdcontrol.Integer template_id = 22;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.IntegerOrBuilder getTemplateIdOrBuilder();
+
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
+   */
+  java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption> 
+      getRatingOptionsList();
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOption getRatingOptions(int index);
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
+   */
+  int getRatingOptionsCount();
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
+   */
+  java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder> 
+      getRatingOptionsOrBuilderList();
+  /**
+   * <code>repeated .crowdcontrol.Experiment.RatingOption rating_options = 23;</code>
+   */
+  edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.RatingOptionOrBuilder getRatingOptionsOrBuilder(
+      int index);
 }
