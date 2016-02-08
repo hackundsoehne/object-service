@@ -2,6 +2,8 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransformer;
@@ -295,15 +297,27 @@ public class ExperimentResource {
         List<Experiment.Population> newPopulations = experiment.getPopulationsList().stream().filter(listContains).collect(Collectors.toList());
 
         newPopulations.forEach(population -> {
-            //TODO try to start this population
-            //TODO add this to populations
+            try {
+                platformManager.publishTask(population.getPlatformId(),experiment).join();
+                populations.add(population);
+            } catch (TaskOperationException e) {
+              //TODO Logger  log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s",experiment.getTitle(),population.getPlatformId()),e);
+                e.printStackTrace();
+            }catch (IllegalStateException | IllegalArgumentException e){
+                //TODO log.fatal("Error! Could not create experiment!"+e.getMessage());
+            }
         });
 
         List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream().filter(population -> !listContains.test(population)).collect(Collectors.toList());
 
-        missingPopulations.forEach(population -> {
-            //TODO stop this platform!
-            //TODO delete this from populations
+        missingPopulations.forEach(failedPopulation -> {
+            try {
+                platformManager.unpublishTask(failedPopulation.getPlatformId(),experiment).join();
+                populations.remove(failedPopulation);
+            } catch (TaskOperationException e) {
+              //TODO  log.fatal("Error! could not unpublish experiment from platform! "+ e.getMessage());
+            }
+
         });
 
         return fetchExperiment(id);
