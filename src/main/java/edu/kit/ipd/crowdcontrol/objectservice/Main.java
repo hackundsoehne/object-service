@@ -100,10 +100,10 @@ public class Main {
                     config.database.readonly,
                     config.database.maintainInterval,
                     config.deployment.origin,
-                    config.moneyTransfer.notificationMailAddress,
-                    config.moneyTransfer.parsingPassword,
-                    config.moneyTransfer.scheduleInterval,
-                    config.moneyTransfer.payOffThreshold
+                    config.moneytransfer.notificationMailAddress,
+                    config.moneytransfer.parsingPassword,
+                    config.moneytransfer.scheduleInterval,
+                    config.moneytransfer.payOffThreshold
             );
         } catch (NamingException | SQLException e) {
             System.err.println("Unable to establish database connection.");
