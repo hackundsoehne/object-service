@@ -314,15 +314,16 @@ public class ExperimentResource {
 
         List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream().filter(population -> !listContains.test(population)).collect(Collectors.toList());
 
-        missingPopulations.forEach(failedPopulation -> {
+        //FIXME this is something like negativ gapfiller, this is not implemented yet.
+        /*missingPopulations.forEach(failedPopulation -> {
             try {
-                platformManager.unpublishTask(failedPopulation.getPlatformId(),experiment).join();
+                //platformManager.unpublishTask(failedPopulation.getPlatformId(),experiment).join();
                 //TODO remove this population
             } catch (TaskOperationException e) {
               //TODO  log.fatal("Error! could not unpublish experiment from platform! "+ e.getMessage());
             }
 
-        });
+        });*/
 
         return fetchExperiment(id);
     }
