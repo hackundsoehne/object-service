@@ -134,7 +134,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                     record.setAlgorithmTaskChooser(experiment.getAlgorithmTaskChooser().getName());
                     break;
                 case Experiment.ANSWER_TYPE_FIELD_NUMBER:
-                    //record.setAnswerType("NULL");
+                    record.setAnswerType(transform(experiment.getAnswerType()));
                     break;
                 case Experiment.ANSWERS_PER_WORKER_FIELD_NUMBER:
                     record.setAnwersPerWorker(experiment.getAnswersPerWorker().getValue());

@@ -84,7 +84,7 @@ public class Main {
                     platformInstance = new DummyPlatform(platform.name);
                     break;
                 default:
-                    throw new ConfigException("Platform type \""+platform.type+"\" not found");
+                    throw new ConfigException("Platform type \"" + platform.type + "\" not found");
             }
             platforms.add(platformInstance);
         }
@@ -142,7 +142,7 @@ public class Main {
 
         try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(mailPropertiesPath))) {
             properties.load(stream);
-        } catch(IOException e) {
+        } catch (IOException e) {
             LOGGER.warn(mailPropertiesPath + " not found, falling back to environment variables for Travis …");
 
             if (System.getenv("MAIL_USERNAME") == null) {
@@ -192,10 +192,10 @@ public class Main {
 
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, tasksOperations, platformOperations,
                 workerOperations);
+        ExperimentResource experimentResource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations, tasksOperations, platformManager);
 
-        ExperimentController experimentController =new ExperimentController(platformManager);
-        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations,experimentController);
-        PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
+        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations, answerRatingOperations, experimentOperations, experimentResource);
+        PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations, workerOperations);
 
         // TODO initialize mailHandler
 //        NotificationController notificationController = new NotificationController(notificationRestOperations,
@@ -208,8 +208,7 @@ public class Main {
                 new PlatformResource(platformOperations),
                 new WorkerResource(workerOperations, platformManager),
                 new CalibrationResource(calibrationOperations),
-                new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations),
-                new AlgorithmResources(algorithmsOperations),
+                experimentResource, new AlgorithmResources(algorithmsOperations),
                 new AnswerRatingResource(experimentOperations, answerRatingOperations, workerOperations),
                 new WorkerCalibrationResource(workerCalibrationOperations),
                 origin
