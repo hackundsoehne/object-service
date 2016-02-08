@@ -93,6 +93,19 @@ public abstract class AbstractOperations {
     }
 
     /**
+     * Throws an exception if one of the passed field is not set.
+     * @param record the record to check on
+     * @param fields the fields to check for
+     * @param <R> the type of the record
+     * @throws IllegalArgumentException thrown if one of the fields is not set
+     */
+    protected <R extends TableRecord<R>> void assertHasField(TableRecordImpl<R> record, Field<?>... fields) throws IllegalArgumentException {
+        if (Arrays.stream(fields).anyMatch(field -> record.getValue(field) == null))
+            throw new IllegalArgumentException("Record from Table: " + record.getTable().getName()
+                    + " needs PrimaryKey for this action");
+    }
+
+    /**
      * Throws an exception if the passed field is not set.
      * @param record the record to check on
      * @param field the field to check for

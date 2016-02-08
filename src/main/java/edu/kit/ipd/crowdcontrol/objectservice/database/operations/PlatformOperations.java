@@ -1,14 +1,17 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.PlatformTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Platform;
 import org.jooq.DSLContext;
-import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.PLATFORM;
 
@@ -31,7 +34,7 @@ public class PlatformOperations extends AbstractOperations {
      * @param next   {@code true} for next, {@code false} for previous
      * @param limit  number of records
      *
-     * @return List of platforms.
+     * @return list of platforms.
      */
     public Range<Platform, String> getPlatformList(String cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(PLATFORM), PLATFORM.ID_PLATFORM, PLATFORM, cursor, next, limit, String::compareTo)
@@ -43,7 +46,7 @@ public class PlatformOperations extends AbstractOperations {
      *
      * @param id ID of the platform
      *
-     * @return The platform.
+     * @return the platform.
      */
     public Optional<Platform> getPlatform(String id) {
         return create.fetchOptional(PLATFORM, PLATFORM.ID_PLATFORM.eq(id))
@@ -53,7 +56,7 @@ public class PlatformOperations extends AbstractOperations {
     /**
      * Insert new platform into the database
      *
-     * @param platformRecord The platform to insert
+     * @param platformRecord the platform to insert
      *
      * @return true if inserted, false if existing
      *
@@ -65,9 +68,39 @@ public class PlatformOperations extends AbstractOperations {
     }
 
     /**
-     * Delete all platforms existing in the database.
+     * Stores the passed PlatformRecords.
+     * <p>
+     * updates all the Records matching the primary key, and sets every other record in the database to inactive.
+     * @param toStore the records to store
      */
-    public void deleteAllPlatforms() {
-        create.deleteFrom(Tables.PLATFORM).execute();
+    public void storePlatforms(List<PlatformRecord> toStore) {
+        toStore.forEach(this::assertHasPrimaryKey);
+        toStore.forEach(record -> assertHasField(record, PLATFORM.NAME, PLATFORM.NEEDS_EMAIL, PLATFORM.RENDER_CALIBRATIONS));
+        Map<String, PlatformRecord> records = toStore.stream().collect(Collectors.toMap(PlatformRecord::getIdPlatform, Function.identity()));
+
+        create.transaction(conf -> {
+            Set<String> existing = DSL.using(conf).select(PLATFORM.ID_PLATFORM)
+                    .from(PLATFORM)
+                    .where(PLATFORM.ID_PLATFORM.in(records.keySet()))
+                    .fetchSet(PLATFORM.ID_PLATFORM);
+
+            List<PlatformRecord> toUpdate = existing.stream()
+                    .map(records::get)
+                    .collect(Collectors.toList());
+
+            List<PlatformRecord> toInsert = records.keySet().stream()
+                    .filter(id -> !existing.contains(id))
+                    .map(records::get)
+                    .collect(Collectors.toList());
+
+            DSL.using(conf).batchUpdate(toUpdate).execute();
+
+            DSL.using(conf).batchInsert(toInsert).execute();
+
+            DSL.using(conf).update(PLATFORM)
+                    .set(PLATFORM.INACTIVE, true)
+                    .where(PLATFORM.ID_PLATFORM.notIn(records.keySet()))
+                    .execute();
+        });
     }
 }
