@@ -20,4 +20,9 @@ public class Config {
      * all specified platforms in the config
      */
     public ConfigPlatform[] platforms;
+
+    /**
+     * moneytransfer configuration
+     */
+    public MoneyTransfer moneyTransfer;
 }

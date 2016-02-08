@@ -4,6 +4,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
 import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigException;
 import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.config.Credentials;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
@@ -12,7 +14,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.apache.logging.log4j.LogManager;
@@ -20,11 +25,18 @@ import org.apache.logging.log4j.Logger;
 import org.ho.yaml.Yaml;
 import org.jooq.SQLDialect;
 
+import javax.mail.Authenticator;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.naming.NamingException;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Niklas Keller
@@ -87,16 +99,24 @@ public class Main {
                     databaseManager, platforms,
                     config.database.readonly,
                     config.database.maintainInterval,
-                    config.deployment.origin
+                    config.deployment.origin,
+                    config.moneyTransfer.notificationMailAddress,
+                    config.moneyTransfer.parsingPassword,
+                    config.moneyTransfer.scheduleInterval,
+                    config.moneyTransfer.payOffThreshold
             );
         } catch (NamingException | SQLException e) {
             System.err.println("Unable to establish database connection.");
             e.printStackTrace();
             System.exit(-1);
+        } catch (IOException | MessagingException e) {
+            System.err.println("Unable to configure the mailhandler.");
+            e.printStackTrace();
+            System.exit(-1);
         }
     }
 
-    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin) throws SQLException {
+    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferMailAddress, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold) throws SQLException, IOException, MessagingException {
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnly.user, readOnly.password);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
@@ -108,12 +128,36 @@ public class Main {
         WorkerCalibrationOperations workerCalibrationOperations = new WorkerCalibrationOperations(databaseManager.getContext());
         AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext(), calibrationOperations, workerCalibrationOperations, experimentOperations);
         TasksOperations tasksOperations = new TasksOperations(databaseManager.getContext());
+        WorkerBalanceOperations workerBalanceOperations = new WorkerBalanceOperations(databaseManager.getContext());
 
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
 
-        PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), null, tasksOperations, platformOperations,
-                workerOperations); // TODO set fallbackPayment
+        Properties properties = new Properties();
+
+        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/integration-test/resources/gmailLogin.properties"));
+        properties.load(stream);
+        stream.close();
+        MailHandler mailHandler = new MailHandler(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
+            }
+        });
+
+        MoneyTransferManager mng = new MoneyTransferManager(mailHandler, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
+
+        Payment payment = (id, experiment, paymentJob) -> {
+            for (PaymentJob job : paymentJob) {
+                mng.addMoneyTransfer(job.getWorkerRecord().getIdWorker(), job.getAmount(), experiment.getId());
+            }
+            CompletableFuture<Boolean> future = new CompletableFuture<>();
+            future.complete(Boolean.TRUE);
+            return future;
+        };
+
+        PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, tasksOperations, platformOperations,
+                workerOperations);
 
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 

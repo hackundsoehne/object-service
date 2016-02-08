@@ -18,7 +18,7 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.WORKE
  * @version 1.0
  */
 public class WorkerBalanceOperations extends AbstractOperations {
-    protected WorkerBalanceOperations(DSLContext create) {
+    public WorkerBalanceOperations(DSLContext create) {
         super(create);
     }
 
