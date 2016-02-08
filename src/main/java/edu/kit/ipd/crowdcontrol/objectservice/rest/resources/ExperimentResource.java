@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransformer;
@@ -37,13 +39,18 @@ public class ExperimentResource {
     private final CalibrationOperations calibrationOperations;
     private final TagConstraintsOperations tagConstraintsOperations;
     private final AlgorithmOperations algorithmsOperations;
+    private final TasksOperations tasksOperations;
+    private final PlatformManager platformManager;
 
     public ExperimentResource(ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
-                              TagConstraintsOperations tagConstraintsOperations,  AlgorithmOperations algorithmsOperations) {
+                              TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmsOperations,
+                              TasksOperations tasksOperations, PlatformManager platformManager) {
         this.experimentOperations = experimentOperations;
         this.calibrationOperations = calibrationOperations;
         this.tagConstraintsOperations = tagConstraintsOperations;
         this.algorithmsOperations = algorithmsOperations;
+        this.tasksOperations = tasksOperations;
+        this.platformManager = platformManager;
     }
 
     /**
@@ -439,7 +446,11 @@ public class ExperimentResource {
 
         //check if we are not creative Stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
-            //TODO iterate thruw all the tasks and set them to stopping
+            //update db
+            tasksOperations.getTasks(experiment.getId()).forEach(taskRecord -> {
+                taskRecord.setStatus(TaskStatus.stopping);
+                tasksOperations.updateTask(taskRecord);
+            });
         }
 
         resulting = fetchExperiment(id);

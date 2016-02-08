@@ -126,7 +126,7 @@ public class Main {
                 new PlatformResource(platformOperations),
                 new WorkerResource(workerOperations, platformManager),
                 new CalibrationResource(calibrationOperations),
-                new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations),
+                new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations, tasksOperations, platformManager),
                 new AlgorithmResources(algorithmsOperations),
                 new AnswerRatingResource(experimentOperations, answerRatingOperations, workerOperations),
                 new WorkerCalibrationResource(workerCalibrationOperations),
