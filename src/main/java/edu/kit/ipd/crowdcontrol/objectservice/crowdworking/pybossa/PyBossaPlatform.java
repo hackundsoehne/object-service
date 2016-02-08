@@ -46,7 +46,7 @@ public class PyBossaPlatform implements Platform {
         this.calibsAllowed = calibsAllowed;
 
         taskUrl = apiUrl + "/task";
-        this.requests = new PyBossaRequests(taskUrl, this.projectID, apiKey);
+        this.requests = new PyBossaRequests(apiUrl, this.projectID, apiKey);
 
     }
 
