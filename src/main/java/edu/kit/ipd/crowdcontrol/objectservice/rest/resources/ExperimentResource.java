@@ -113,11 +113,7 @@ public class ExperimentResource {
                 .forEach(tagConstraintsOperations::insertConstraint);
 
         experiment.getPopulationsList().forEach(population -> {
-            List<Integer> answerIDs = population.getCalibrationsList().stream()
-                    .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
-                    .map(Calibration.Answer::getId)
-                    .collect(Collectors.toList());
-            calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, id);
+            storePopulation(id, population);
         });
 
         experiment.getAlgorithmTaskChooser()
@@ -141,6 +137,14 @@ public class ExperimentResource {
         EventManager.EXPERIMENT_CREATE.emit(exp);
 
         return exp;
+    }
+
+    private void storePopulation(int experimentId, Experiment.Population population) {
+        List<Integer> answerIDs = population.getCalibrationsList().stream()
+                .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
+                .map(Calibration.Answer::getId)
+                .collect(Collectors.toList());
+        calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, experimentId);
     }
 
     private Experiment fetchExperiment(int id) {
@@ -299,7 +303,7 @@ public class ExperimentResource {
         newPopulations.forEach(population -> {
             try {
                 platformManager.publishTask(population.getPlatformId(),experiment).join();
-                populations.add(population);
+                storePopulation(id, population);
             } catch (TaskOperationException e) {
               //TODO Logger  log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s",experiment.getTitle(),population.getPlatformId()),e);
                 e.printStackTrace();
@@ -313,7 +317,7 @@ public class ExperimentResource {
         missingPopulations.forEach(failedPopulation -> {
             try {
                 platformManager.unpublishTask(failedPopulation.getPlatformId(),experiment).join();
-                populations.remove(failedPopulation);
+                //TODO remove this population
             } catch (TaskOperationException e) {
               //TODO  log.fatal("Error! could not unpublish experiment from platform! "+ e.getMessage());
             }
@@ -373,11 +377,7 @@ public class ExperimentResource {
 
         // Update calibration records from experiment
         experiment.getPopulationsList().forEach(population -> {
-            List<Integer> answerIDs = population.getCalibrationsList().stream()
-                    .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
-                    .map(Calibration.Answer::getId)
-                    .collect(Collectors.toList());
-            calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, id);
+            storePopulation(id, population);
         });
 
         if (!experiment.getPopulationsList().isEmpty()) {
