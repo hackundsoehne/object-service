@@ -192,9 +192,7 @@ public class AnswerRatingOperations extends AbstractOperations {
      * inserts a new answer into the DB
      *
      * @param answerRecord the record to insert
-     *
      * @return the resulting record
-     *
      * @throws IllegalArgumentException if the experiment the answers is referring to is not
      *                                  existing
      * @throws IllegalStateException    if the worker is not allowed to submit more answers
@@ -249,17 +247,18 @@ public class AnswerRatingOperations extends AbstractOperations {
     }
 
     /**
-     * inserts a new rating into the DB
+     * updates the rating.
+     * <p>
+     * the usual workflow is that first a rating has to be reserved an therefore an empty rating gets inserted.
+     * Then the worker actually commits the rating and this method gets called to update it.
      *
-     * @param rating       the rating to insert
-     *
+     * @param rating       the rating to update
      * @return the resulting rating
-     *
      * @throws IllegalArgumentException if the experiment the rating is referring to is not
      *                                  existing
      * @throws IllegalStateException    if the worker is not allowed to submit more ratings
      */
-    public Rating insertNewRating(Rating rating) throws IllegalArgumentException, IllegalStateException {
+    public Rating updateRating(Rating rating) throws IllegalArgumentException, IllegalStateException {
         assertHasField(rating, Rating.RATING_FIELD_NUMBER, Rating.RATING_ID_FIELD_NUMBER);
 
         boolean isReserved = create.fetchExists(
