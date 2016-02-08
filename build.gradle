@@ -208,3 +208,13 @@ wsdl2java {
     wsdlsToGenerate = [['src/main/wsdl/mturk/AWSMechanicalTurkRequester.wsdl']]
     locale = Locale.ENGLISH
 }
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'edu.kit.ipd.crowdcontrol.objectservice.Main'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
