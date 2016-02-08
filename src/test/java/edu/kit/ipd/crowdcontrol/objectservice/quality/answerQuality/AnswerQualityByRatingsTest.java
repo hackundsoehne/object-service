@@ -94,7 +94,7 @@ public class AnswerQualityByRatingsTest {
     @Test
     public void testAnswerQualityRnd(){
         Random rand = new Random();
-        for (int i = 0; i < rand.nextInt(40) ; i++) {
+        for (int i = 0; i < rand.nextInt(40) + 1; i++) {
             ratings.add(new RatingRecord(0,0,0,null, rand.nextInt(9),"",0,ratingThreshold+1));
         }
 

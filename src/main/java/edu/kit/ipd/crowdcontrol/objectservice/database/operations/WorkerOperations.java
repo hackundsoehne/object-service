@@ -7,10 +7,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Work
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Worker;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.jooq.AggregateFunction;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Result;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
@@ -235,10 +232,15 @@ public class WorkerOperations extends AbstractOperations {
         assertHasPrimaryKey(workerRecord);
         assertNonMalformedEmail(toUpdate.getEmail());
 
-        return WorkerTransformer.toProto(create.update(WORKER)
+        boolean updated = create.update(WORKER)
                 .set(workerRecord)
-                .returning()
-                .fetchOne());
+                .where(WORKER.ID_WORKER.eq(id))
+                .execute() == 1;
+        if (!updated) {
+            throw new IllegalArgumentException(String.format("Worker %d is not existing", id));
+        }
+        return WorkerTransformer.toProto(getWorker(id)
+                .orElseThrow(() -> new IllegalStateException("Database inconsistent")));
     }
 
     /**
