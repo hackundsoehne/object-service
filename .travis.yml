@@ -1,32 +1,36 @@
 language: java
 
 jdk:
-  - oraclejdk8
+- oraclejdk8
 
 after_success:
-  - ./gradlew jacocoTestReport coveralls
+- "./gradlew jacocoTestReport coveralls"
 
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
 
 before_script:
-  - mysql -u "root" < src/main/resources/db.sql
-  - cp src/main/resources/config.travis.yml src/main/resources/config.yml
+- mysql -u "root" < src/main/resources/db.sql
+- cp src/main/resources/config.travis.yml src/main/resources/config.yml
 
 env:
+  matrix:
   - TASK=check
   - TASK=restTest
+  global:
+  - MAIL_USERNAME=pseipd@gmail.com
+  - secure: llNLbTj31AejKBItfHMdz24Y5Pz/wZKBK5ow5qxRJLvyVZCPS8V8ElxT4rz6unUtqrm2ZobdLH5b2VNBIroA+RneH1sV7e/CN7pZJd8CNNh6FNq5s5FWJmjLIcLnCEvGe+s2jg0DzsDyT4kbJtCxQ4aG/Lp0c/ypzU4a/BB00KcF0ulgp8kAiFyI1XBfFJ/+7cvKZHrV45UMNv+Xo5WVr6Hn2Swkoj7wsIQOzFp8R8ILjR/JpTb5muKetZIsSWVImXFTK3qEhKNF9fDh/VBgU3QodjR+FYIJBVKbiYh4M07lThHBjKg6gGDXgUYWkZaGGEsacPrDpdh/a1abpFk0sAH+1771ruo4i0PVnHaJ520WURKbC5h2zsz7aZFZmRUHYdGp3oS8Ko2yKmWwTRJCtzIy/k4rRpIFkfqVD4fOtJtg3CnBQZjUmgXGXy2/MEtaVs6A5Sv1TrrQZ9bjA4CDdWlDPD0ap5T19MW+77nfnqh5nThs3d0gw18WJAfVxSullpFZQuWL+erSxGM8KDSLYf28joHeMLXtp/s6uhB3IxJrYoV9/4dW6n8/G035keABV6LdpFIUsklwwF1HdUErb0MDrHrA2rYu8X56Qsk7l0yjj1LgaLpBw5ajYrG40ebxe+tFNNTGmNwG9aZGUMbxEG6aOU4DRvW/bpgTAZQX9WU=
 
 script:
-  - ./gradlew $TASK
+- "./gradlew $TASK"
 
 services:
-  - mysql
+- mysql
 
 notifications:
   email: false
