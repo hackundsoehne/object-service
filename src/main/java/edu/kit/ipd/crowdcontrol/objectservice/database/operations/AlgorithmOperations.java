@@ -214,10 +214,11 @@ public class AlgorithmOperations extends AbstractOperations {
     }
 
     /**
-     * returns the AnswerQuality-Algorithm parameters and the chosen value (or null if not yet chosen)
+     * returns a map of the required AnswerQuality-Algorithm parameters and the chosen values set by the operator (null if not set)
+     * For a published experiment all parameters are set and not null
      * @param answerQualityID the primary key of the chosen AnswerQuality
      * @param experimentID the primary key of the experiment
-     * @return a map where the values are the parameters and the keys the values
+     * @return a mapping of required parameters and their values set by the operator
      */
     public  Map<AlgorithmAnswerQualityParamRecord, String> getAnswerQualityParams(String answerQualityID, int experimentID) {
         return create.select(ALGORITHM_ANSWER_QUALITY_PARAM.fields())
@@ -231,10 +232,11 @@ public class AlgorithmOperations extends AbstractOperations {
     }
 
     /**
-     * returns the RatingQuality-Algorithm parameters and the chosen value (or null if not yet chosen)
+     * returns a map of the required RatingQuality-Algorithm parameters and values set by the operator (null if not set)
+     * For a published experiment all parameters are set and not null
      * @param ratingQualityID the primary key of the chosen RatingQuality
      * @param experimentID the primary key of the experiment
-     * @return a map where the values are the parameters and the keys the values
+     * @return a mapping of the required parameters and their values set by the operator
      */
     public Map<AlgorithmRatingQualityParamRecord, String> getRatingQualityParams(String ratingQualityID, int experimentID) {
         return create.select(ALGORITHM_RATING_QUALITY_PARAM.fields())
@@ -383,6 +385,7 @@ public class AlgorithmOperations extends AbstractOperations {
                     .execute();
 
             Set<String> existingRegexes = DSL.using(conf).select(ALGORITHM_RATING_QUALITY_PARAM.REGEX)
+                    .from(ALGORITHM_RATING_QUALITY_PARAM)
                     .where(ALGORITHM_RATING_QUALITY_PARAM.ALGORITHM.eq(algorithm.getIdAlgorithmRatingQuality()))
                     .fetchSet(ALGORITHM_RATING_QUALITY_PARAM.REGEX);
 
@@ -395,7 +398,7 @@ public class AlgorithmOperations extends AbstractOperations {
     }
 
     /**
-     * stores the AnswerQuality-Algortihm
+     * stores the AnswerQuality-Algorithm
      * @param algorithm the algorithm-information
      * @param params the parameters
      */
@@ -419,6 +422,7 @@ public class AlgorithmOperations extends AbstractOperations {
                     .execute();
 
             Set<String> existingRegexes = DSL.using(conf).select(ALGORITHM_ANSWER_QUALITY_PARAM.REGEX)
+                    .from(ALGORITHM_ANSWER_QUALITY_PARAM)
                     .where(ALGORITHM_ANSWER_QUALITY_PARAM.ALGORITHM.eq(algorithm.getIdAlgorithmAnswerQuality()))
                     .fetchSet(ALGORITHM_ANSWER_QUALITY_PARAM.REGEX);
 

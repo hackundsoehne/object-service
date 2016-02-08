@@ -151,7 +151,7 @@ public class AnswerRatingResource {
         Rating result;
 
         try {
-            result = answerRatingOperations.insertNewRating(rating, answerId, experimentId);
+            result = answerRatingOperations.insertNewRating(rating);
         } catch (IllegalArgumentException | IllegalStateException e) {
             throw new BadRequestException(e.getMessage());
         }

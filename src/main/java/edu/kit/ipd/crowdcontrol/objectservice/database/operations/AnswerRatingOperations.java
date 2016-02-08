@@ -5,10 +5,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRating
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
-import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.util.List;
@@ -50,6 +49,7 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .where(RATING.ANSWER_R.eq(answerRecord.getIdAnswer()))
                 .fetch();
     }
+
 
 
     /**
@@ -144,7 +144,6 @@ public class AnswerRatingOperations extends AbstractOperations {
     }
 
 
-
     /**
      * Returns all ratings of given answer, which have a quality rating above passed threshold
      *
@@ -153,7 +152,10 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @return list of all ratings of given answer with a quality rating equal or greater than given threshold
      */
     public Result<RatingRecord> getGoodRatingsOfAnswer(AnswerRecord answerRecord, int threshold) {
-        return null;
+        return create.selectFrom(RATING)
+                .where(RATING.ANSWER_R.eq(answerRecord.getIdAnswer()))
+                .and(RATING.QUALITY.greaterThan(0))
+                .fetch();
     }
 
 
@@ -163,7 +165,14 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @param map of ratings and matching qualities
      */
     public void setQualityToRatings(Map<RatingRecord, Integer> map) {
+        List<RatingRecord> toUpdate = map.entrySet().stream()
+                .map(entry -> {
+                    entry.getKey().setQuality(entry.getValue());
+                    return entry.getKey();
+                })
+                .collect(Collectors.toList());
 
+        create.batchUpdate(toUpdate).execute();
     }
 
     /**
@@ -173,7 +182,9 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @param quality of the answer
      */
     public void setQualityToAnswer(AnswerRecord answer, int quality) {
+        answer.setQuality(quality);
 
+        create.batchUpdate(answer).execute();
     }
 
 
@@ -224,6 +235,7 @@ public class AnswerRatingOperations extends AbstractOperations {
     }
 
 
+
     /**
      * Sets the quality-assured-bit for the given answerRecord
      * This indicates, that the answers quality is unlikely to change
@@ -231,82 +243,71 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @param answerRecord whose quality-assured-bit is set
      */
     public void setAnswerQualityAssured(AnswerRecord answerRecord) {
-        //TODO
+        answerRecord.setQualityAssured(true);
+
+        create.batchUpdate(answerRecord).execute();
     }
 
     /**
      * inserts a new rating into the DB
      *
      * @param rating       the rating to insert
-     * @param answerId     the id of the answer which is rated
-     * @param experimentId the id of the experiment which the rating belongs to
      *
      * @return the resulting rating
      *
      * @throws IllegalArgumentException if the experiment the rating is referring to is not
      *                                  existing
      * @throws IllegalStateException    if the worker is not allowed to submit more ratings
-     * @
      */
-    public Rating insertNewRating(Rating rating, int answerId, int experimentId) throws IllegalArgumentException, IllegalStateException {
-        RatingRecord ratingRecord = AnswerRatingTransformer.toRatingRecord(rating, answerId, experimentId);
-        ratingRecord.setIdRating(null);
+    public Rating insertNewRating(Rating rating) throws IllegalArgumentException, IllegalStateException {
+        assertHasField(rating, Rating.RATING_FIELD_NUMBER, Rating.RATING_ID_FIELD_NUMBER);
 
-        ExperimentRecord experiment = experimentOperations.getExperiment(ratingRecord.getExperiment())
-                .orElseThrow(() -> new IllegalArgumentException("Illegal experiment-value in rating record."));
+        boolean isReserved = create.fetchExists(
+                DSL.selectFrom(RATING)
+                        .where(RATING.ID_RATING.eq(rating.getRatingId()))
+                        .and(RATING.WORKER_ID.eq(rating.getWorker()))
+        );
 
-        if (getRatingCount(ratingRecord.getWorkerId()) >= experiment.getRatingsPerWorker()) {
-            throw new IllegalStateException(
-                    String.format("Worker %d already submitted the maximum of allowed ratings", ratingRecord.getWorkerId())
-            );
+        if (!isReserved) {
+            throw new IllegalStateException(String.format("Rating %d is not reserved for worker %d", rating.getRatingId(), rating.getWorker()));
         }
 
-        RatingRecord result = doIfRunning(ratingRecord.getExperiment(), conf -> {
-            RatingRecord record = DSL.using(conf)
-                    .insertInto(RATING)
-                    .set(ratingRecord)
-                    .returning()
-                    .fetchOne();
+        String feedback = null;
 
-            List<RatingConstraintRecord> toInsert = rating.getViolatedConstraintsList().stream()
-                    .map(constraint -> {
-                        RatingConstraintRecord constraintRecord = new RatingConstraintRecord();
-                        constraintRecord.setRefRating(record.getIdRating());
-                        constraintRecord.setOffConstraint(constraint.getId());
-                        return constraintRecord;
-                    })
-                    .collect(Collectors.toList());
+        if (rating.hasField(rating.getDescriptorForType().findFieldByNumber(Rating.FEEDBACK_FIELD_NUMBER))) {
+            feedback = rating.getFeedback();
+        }
 
-            DSL.using(conf).batchInsert(toInsert).execute();
+        create.update(RATING)
+                .set(RATING.RATING_, rating.getRating())
+                .set(RATING.FEEDBACK, feedback)
+                .where(RATING.ID_RATING.eq(rating.getRatingId()))
+                .execute();
 
-            return record;
-        });
+        RatingRecord ratingRecord = create.fetchOne(RATING, RATING.ID_RATING.eq(rating.getRatingId()));
+
+        List<RatingConstraintRecord> toInsert = rating.getViolatedConstraintsList().stream()
+                .map(constraint -> {
+                    RatingConstraintRecord constraintRecord = new RatingConstraintRecord();
+                    constraintRecord.setRefRating(ratingRecord.getIdRating());
+                    constraintRecord.setOffConstraint(constraint.getId());
+                    return constraintRecord;
+                })
+                .collect(Collectors.toList());
+
+        create.batchInsert(toInsert).execute();
 
         addToExperimentCalibration(ratingRecord.getWorkerId(), ratingRecord.getExperiment());
 
         Result<RatingConstraintRecord> ratingConstraints = create.selectFrom(RATING_CONSTRAINT)
-                .where(RATING_CONSTRAINT.REF_RATING.eq(result.getIdRating()))
+                .where(RATING_CONSTRAINT.REF_RATING.eq(ratingRecord.getIdRating()))
                 .fetch();
 
         Result<ConstraintRecord> constraints = create.selectFrom(CONSTRAINT)
                 .where(CONSTRAINT.ID_CONSTRAINT.in(ratingConstraints.map(RatingConstraintRecord::getOffConstraint)))
                 .fetch();
 
-        return AnswerRatingTransformer.toRatingProto(result, constraints);
-    }
-
-    /**
-     * returns the number of ratings a worker has submitted
-     *
-     * @param workerId the workerId to check for
-     *
-     * @return the number of ratings
-     */
-    private int getRatingCount(int workerId) {
-        return create.fetchCount(
-                DSL.selectFrom(RATING)
-                        .where(RATING.WORKER_ID.eq(workerId))
-        );
+        return AnswerRatingTransformer.toRatingProto(ratingRecord, constraints);
     }
 
     /**
@@ -329,11 +330,16 @@ public class AnswerRatingOperations extends AbstractOperations {
 
         Optional<CalibrationAnswer> result = doAdd.get();
 
-        if (!result.isPresent()) {
+        /*
+        FIXME Leander this is not really needed, we only call addToExperimentCalibration if the experiment is published
+        If the experiment got published we created the calibration for the experiment, so here is no reason to do this repair,
+        since its not possible the other way around. Opinion?
+         */
+        /*if (!result.isPresent()) {
             System.err.println(String.format("Database inconsistency! No calibration for experiment: %d present", experimentId));
             calibrationOperations.createExperimentsCalibration(experimentId);
             doAdd.get();
-        }
+        }*/
     }
 
     /**
@@ -396,5 +402,15 @@ public class AnswerRatingOperations extends AbstractOperations {
 
             return AnswerRatingTransformer.toRatingProto(ratingRecord, constraints);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the number of all answers with the correct number of ratings specified in the experiment.
+     * The answers quality has to be equal or above the experiment's quality-threshold
+     * @param idExperiment id of the experiment
+     * @return number of answers with a final and good quality
+     */
+    public int getNumberOfFinalGoodAns(int idExperiment) {
+        return 0;
     }
 }

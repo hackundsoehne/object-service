@@ -159,7 +159,7 @@ public class PlatformManager {
                         }
                     }
                     //if there is no useful key throw!
-                    if (s1 != null && s1.isEmpty()) {
+                    if (s1 == null || (s1.isEmpty())) {
                         tasksOps.deleteTask(result);
                         throw new IllegalStateException("Platform "+name+" does not provide any useful key");
                     }
@@ -173,7 +173,7 @@ public class PlatformManager {
     }
 
     /**
-     * Unpublish a given experiment from the given platform
+     * Unpublishes a given experiment from the given platform
      *
      * @param name The name of the platform
      * @param experiment The experiment to unpublish

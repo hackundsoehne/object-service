@@ -17,6 +17,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.apache.logging.log4j.LogManager;
@@ -158,7 +159,9 @@ public class Main {
 
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, tasksOperations, platformOperations,
                 workerOperations);
-
+                
+        ExperimentController experimentController =new ExperimentController(platformManager);
+        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations,experimentController);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 
         new Router(
