@@ -6,7 +6,7 @@ Type=simple
 WorkingDirectory=/git/crowdcontrol/object-service
 ExecStart=/git/crowdcontrol/object-service/gradlew run
 Restart=always
-RestartSec=1
+RestartSec=120
 TimeoutSec=1
 User=crowdcontrol
 
