@@ -13,3 +13,9 @@ deployment:
 
 platforms :
     - type: dummy
+
+moneytransfer:
+    payOffThreshold: 0
+    parsingPassword: test
+    notificationMailAddress: pseipd@gmail.com
+    scheduleInterval: 7

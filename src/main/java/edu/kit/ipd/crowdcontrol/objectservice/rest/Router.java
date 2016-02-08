@@ -69,6 +69,13 @@ public class Router implements SparkApplication {
     public void init() {
         LOGGER.trace("Setting up routes for Spark.");
 
+        exception(Exception.class, (exception, request, response) -> {
+            LOGGER.error(exception);
+
+            response.status(500);
+            response.body(error(request, response, "internalServerError", exception.getMessage()));
+        });
+
         exception(BadRequestException.class, (exception, request, response) -> {
             response.status(400);
             response.body(error(request, response, "badRequest", exception.getMessage()));
@@ -234,6 +241,12 @@ public class Router implements SparkApplication {
      * @return Encoded message.
      */
     private String error(Request request, Response response, String code, String detail) {
+        if (code == null) {
+            code = "";
+        }
+        if (detail == null) {
+            detail = "";
+        }
         ErrorResponse error = ErrorResponse.newBuilder().setCode(code).setDetail(detail).build();
         return OutputTransformer.transform(request, response, error);
     }

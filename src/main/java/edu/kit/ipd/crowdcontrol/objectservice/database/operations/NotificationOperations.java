@@ -5,35 +5,35 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationReceiverEmailRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationTokenRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.NotificationTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.jooq.DSLContext;
+import org.jooq.Query;
 import org.jooq.Record;
-import org.jooq.Result;
 import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.NOTIFICATION;
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.NOTIFICATION_RECEIVER_EMAIL;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
 /**
  * Contains all operations needed to interact with notifications in the database.
  *
  * @author Leander K.
  * @author Niklas Keller
+ * @author Simon Korz
  */
 public class NotificationOperations extends AbstractOperations {
     private final DSLContext readOnlyCreate;
 
     /**
-     * creates an new instance of NotificationOperation.
+     * Creates an new instance of NotificationOperation.
      *
      * @param manager  the manager used to obtain all relevant information about the DB
      * @param username the username belonging to a read-only account on the DB
@@ -61,9 +61,23 @@ public class NotificationOperations extends AbstractOperations {
      *
      * @return a list of notifications
      */
-    public List<NotificationRecord> getAllNotifications() {
-        return create.selectFrom(Tables.NOTIFICATION)
-                .fetch();
+    public List<Notification> getAllNotifications() {
+        return create.selectFrom(Tables.NOTIFICATION).fetch()
+                .map(notificationRecord -> NotificationTransformer.toProto(notificationRecord,
+                        fetchEmailsForNotification(notificationRecord)));
+    }
+
+
+    /**
+     * Returns a single notification.
+     *
+     * @param id the ID of the notification
+     * @return the notification of empty if not found
+     */
+    public Optional<Notification> getNotification(int id) {
+        return create.fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
+                .map(notificationRecord -> NotificationTransformer.toProto(notificationRecord,
+                        fetchEmailsForNotification(notificationRecord)));
     }
 
     /**
@@ -77,33 +91,30 @@ public class NotificationOperations extends AbstractOperations {
      */
     public Range<Notification, Integer> getNotificationsFrom(int cursor, boolean next, int limit) {
         return getNextRange(create.selectFrom(NOTIFICATION), NOTIFICATION.ID_NOTIFICATION, NOTIFICATION, cursor, next, limit)
-                .map(notification -> NotificationTransformer.toProto(notification, Collections.emptyList()));
+                .map(notificationRecord -> NotificationTransformer.toProto(notificationRecord,
+                        fetchEmailsForNotification(notificationRecord)));
     }
 
     /**
-     * inserts a notification into the database.
+     * Fetches all NotificationReceiverEmailRecords for the given NotificationRecord.
      *
-     * @param record the record to insert
-     *
-     * @return the resulting record (the primary key is guaranteed to be set)
+     * @param notificationRecord the NotificationRecord to fetch the emails for
+     * @return list of NotificationReceiverEmailRecords
      */
-    public NotificationRecord insertNotification(NotificationRecord record) {
-        return create.insertInto(Tables.NOTIFICATION)
-                .set(record)
-                .returning()
-                .fetchOne();
+    private List<NotificationReceiverEmailRecord> fetchEmailsForNotification(NotificationRecord notificationRecord) {
+        return create.selectFrom(NOTIFICATION_RECEIVER_EMAIL)
+                .where(NOTIFICATION_RECEIVER_EMAIL.NOTIFICATION.eq(notificationRecord.getIdNotification()))
+                .fetch();
     }
 
     /**
      * Creates a new notification.
      * <p>
-     * the passed notification must have the following fields set:<br> name, description, query,
-     * check_period and send_threshold
+     * The passed notification must have the following fields set:<br>
+     * name, description, query, check_period, emails and send_once
      *
      * @param toStore Notification to save
-     *
      * @return an instance of notification with ID assigned
-     *
      * @throws IllegalArgumentException if one of the specified fields is not set
      */
     public Notification insertNotification(Notification toStore) throws IllegalArgumentException {
@@ -121,21 +132,16 @@ public class NotificationOperations extends AbstractOperations {
             }
         });
 
-        NotificationRecord record = NotificationTransformer.mergeRecord(create.newRecord(NOTIFICATION), toStore);
-        record.store();
+        NotificationRecord notificationRecord = NotificationTransformer.mergeRecord(create.newRecord(NOTIFICATION), toStore);
+        notificationRecord.store();
 
-        List<NotificationReceiverEmailRecord> emails = toStore.getEmailsList().stream()
-                .map(mail -> {
-                    NotificationReceiverEmailRecord receiver = new NotificationReceiverEmailRecord();
-                    receiver.setNotification(record.getIdNotification());
-                    receiver.setEmail(mail);
-                    return receiver;
-                })
-                .collect(Collectors.toList());
+        toStore.getEmailsList().stream()
+                .map(s -> new NotificationReceiverEmailRecord(null, notificationRecord.getIdNotification(), s))
+                .collect(Collectors.collectingAndThen(Collectors.toList(), create::batchInsert))
+                .execute();
 
-        create.batchInsert(emails).execute();
-
-        return NotificationTransformer.toProto(record, emails);
+        // fetch emails instead of passing the previously created ones to get the NotificationReceiverEmailRecord id
+        return NotificationTransformer.toProto(notificationRecord, fetchEmailsForNotification(notificationRecord));
     }
 
     /**
@@ -153,48 +159,16 @@ public class NotificationOperations extends AbstractOperations {
     }
 
     /**
-     * Returns a single notification.
-     *
-     * @param id the ID of the notification
-     *
-     * @return the notification of empty if not found
-     */
-    public Optional<Notification> getNotification(int id) {
-        return create.fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
-                .map(notificationRecord -> {
-                    Result<NotificationReceiverEmailRecord> emails = create.selectFrom(NOTIFICATION_RECEIVER_EMAIL)
-                            .where(NOTIFICATION_RECEIVER_EMAIL.NOTIFICATION.eq(id))
-                            .fetch();
-
-                    return NotificationTransformer.toProto(notificationRecord, emails);
-                });
-    }
-
-    /**
-     * updates the notifications lastSend field
-     *
-     * @param notificationID the primary key of the notification
-     *
-     * @return {@code true} if updated, {@code false} if not found
-     */
-    public boolean updateLastSendForNotification(int notificationID) {
-        //TODO? wait for simon!
-        return true;//create.update(Tables.NOTIFICATION)
-        //.set(Tables.NOTIFICATION.LASTSENT, Timestamp.valueOf(LocalDateTime.now()))
-        //.where(Tables.NOTIFICATION.ID_NOTIFICATION.eq(notificationID))
-        //.execute() == 1;
-    }
-
-    /**
      * Updates a notification.
      *
      * @param id           ID of the notification
      * @param notification new notification contents
-     *
      * @return the updated notification
+     * @throws IllegalArgumentException if the Notification's email is invalid
+     * @throws NotFoundException        if the Notifications could not be found in the database
      */
     public Notification updateNotification(int id, Notification notification) {
-        NotificationRecord record = create
+        NotificationRecord notificationRecord = create
                 .fetchOptional(NOTIFICATION, NOTIFICATION.ID_NOTIFICATION.eq(id))
                 .orElseThrow(() -> new NotFoundException("Notification does not exist!"));
 
@@ -204,14 +178,14 @@ public class NotificationOperations extends AbstractOperations {
             }
         });
 
-        NotificationTransformer.mergeRecord(record, notification);
-        record.update();
+        NotificationTransformer.mergeRecord(notificationRecord, notification);
+        notificationRecord.update();
 
         if (!notification.getEmailsList().isEmpty()) {
             List<NotificationReceiverEmailRecord> toInsert = notification.getEmailsList().stream()
                     .map(mail -> {
                         NotificationReceiverEmailRecord receiver = new NotificationReceiverEmailRecord();
-                        receiver.setNotification(record.getIdNotification());
+                        receiver.setNotification(notificationRecord.getIdNotification());
                         receiver.setEmail(mail);
                         return receiver;
                     })
@@ -226,17 +200,58 @@ public class NotificationOperations extends AbstractOperations {
             });
         }
 
-        return this.getNotification(record.getIdNotification()).orElseThrow(NotFoundException::new);
+        return this.getNotification(notificationRecord.getIdNotification()).orElseThrow(NotFoundException::new);
     }
 
     /**
-     * runs a sql-query in read-only mode
+     * Runs a sql-query in read-only mode
      *
-     * @param sql the seq to execute in read-only mode
-     *
-     * @return the Result of the query
+     * @param sql the sql to execute in read-only mode
+     * @return the results of the query as a stream
      */
-    public Result<Record> runReadOnlySQL(String sql) {
-        return readOnlyCreate.fetch(sql);
+    public Stream<Record> runReadOnlySQL(String sql) {
+        return readOnlyCreate.fetchStream(sql);
+    }
+
+
+    /**
+     * This method will check if the passed NotificationTokenRecords are already stored in the database.
+     * It does so by comparing the resultId of each record for the specified notification.
+     * If there are new NotificationTokenRecords, they will be stored to database.
+     *
+     * @param newTokenRecords the new records from a current fetch query mapped to the NOTIFICATION_TOKEN.RESULT_ID
+     * @param notificationId  the id of the notification
+     * @return a list of newly added NotificationTokenRecords, that were not stored in database before
+     */
+    public List<NotificationTokenRecord> diffTokenRecords(Map<Integer, NotificationTokenRecord> newTokenRecords, int notificationId) {
+        if (newTokenRecords != null && !newTokenRecords.isEmpty()) {
+            List<Query> deletionQueries = new ArrayList<>();
+
+            try (Stream<NotificationTokenRecord> recordStream = create.selectFrom(NOTIFICATION_TOKEN)
+                    .where(NOTIFICATION_TOKEN.NOTIFICATION.eq(notificationId))
+                    .stream()) {
+                recordStream.forEach(storedRecord -> {
+                    int storedTokenId = storedRecord.getResultId();
+                    if (newTokenRecords.containsValue(storedTokenId)) {
+                        // condition still holds true. keep token in db, but remove from new tokens
+                        newTokenRecords.remove(storedTokenId);
+                    } else {
+                        // condition defined by query isn't true anymore, so we can delete the old token.
+                        deletionQueries.add(create.delete(NOTIFICATION_TOKEN)
+                                .where(NOTIFICATION_TOKEN.ID_NOTIFICATION_TOKEN.eq(storedRecord.getIdNotificationToken())));
+                    }
+                });
+            }
+
+            create.batch(deletionQueries).execute();
+
+            // all remaining tokens in the map are new and have to be added to the database
+            if (!newTokenRecords.isEmpty()) {
+                ArrayList<NotificationTokenRecord> tokenRecordList = new ArrayList<>(newTokenRecords.values());
+                create.batchInsert(tokenRecordList).execute();
+                return tokenRecordList;
+            }
+        }
+        return Collections.emptyList();
     }
 }
