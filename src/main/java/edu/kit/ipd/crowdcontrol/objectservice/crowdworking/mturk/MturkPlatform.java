@@ -73,7 +73,8 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
                 tags,
                 experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
                 2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
-                "");
+                "",
+                "initMturk('"+getID()+"', 'http://localhost:5678', "+experiment.getId()+");");
     }
 
     @Override
