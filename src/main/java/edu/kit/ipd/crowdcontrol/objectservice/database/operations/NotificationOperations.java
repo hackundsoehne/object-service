@@ -229,7 +229,7 @@ public class NotificationOperations extends AbstractOperations {
 
             try (Stream<NotificationTokenRecord> recordStream = create.selectFrom(NOTIFICATION_TOKEN)
                     .where(NOTIFICATION_TOKEN.NOTIFICATION.eq(notificationId))
-                    .fetchLazy().stream()) {
+                    .stream()) {
                 recordStream.forEach(storedRecord -> {
                     int storedTokenId = storedRecord.getResultId();
                     if (newTokenRecords.containsValue(storedTokenId)) {

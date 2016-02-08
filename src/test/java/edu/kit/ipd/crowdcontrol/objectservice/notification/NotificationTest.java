@@ -11,6 +11,6 @@ public class NotificationTest {
 
     @Before
     public void setUp() throws Exception {
-        // might test protobuf conversion
+        // TODO QS: test protobuf conversion
     }
 }
