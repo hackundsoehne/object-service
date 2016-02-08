@@ -468,7 +468,6 @@ public class ExperimentResource {
         }
 
         resulting = fetchExperiment(id);
-        resulting = resulting.toBuilder().setState(experiment.getState()).build();
         return resulting;
     }
 
