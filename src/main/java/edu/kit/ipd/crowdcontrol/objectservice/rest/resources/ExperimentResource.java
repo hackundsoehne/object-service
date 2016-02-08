@@ -1,16 +1,14 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstraintTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
-import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
@@ -23,7 +21,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import rx.*;
 import spark.Request;
 import spark.Response;
 
@@ -59,14 +56,6 @@ public class ExperimentResource {
         this.algorithmsOperations = algorithmsOperations;
         this.tasksOperations = tasksOperations;
         this.platformManager = platformManager;
-
-        rx.Observable<Event<ChangeEvent<Experiment>>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
-        observable.subscribe(experimentEvent -> {
-            if (experimentEvent.getData().getOld().getState() != Experiment.State.PUBLISHED
-                    && experimentEvent.getData().getNeww().getState() == Experiment.State.PUBLISHED){
-                startExperiment(experimentEvent.getData().getNeww());
-            }
-        });
 
     }
 
@@ -532,7 +521,7 @@ public class ExperimentResource {
 
         //we are here if the state has changed and changed from draft to published
         if (experiment.getState() == Experiment.State.PUBLISHED) {
-            //TODO start from populations
+            startExperiment(old);
         }
 
         //check if we are not creative Stopped
