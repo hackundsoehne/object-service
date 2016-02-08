@@ -21,6 +21,7 @@ import spark.Response;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
@@ -259,13 +260,46 @@ public class ExperimentResource {
             }
 
             resulting = updateExperimentState(id, experiment, old);
+        } else if (experiment.getState() == Experiment.State.DRAFT){
+            resulting = updateExperimentInfoDraftState(id, experiment, old, original);
+        } else if (experiment.getState() == Experiment.State.PUBLISHED ||
+                experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
+            resulting = updateExperimentGapStop(id, experiment, old, original);
         } else {
-            resulting = updateExperimentInfo(id, experiment, old, original);
+            throw new IllegalStateException("Patch not allowed in this state");
         }
 
         EventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(old, resulting));
 
         return resulting;
+    }
+
+    private Experiment updateExperimentGapStop(int id, Experiment experiment, Experiment old, ExperimentRecord original) {
+        List<Experiment.Population> populations = old.getPopulationsList();
+
+        Predicate<Experiment.Population> listContains = population -> {
+            for (Experiment.Population oldPopulation : populations) {
+                if (population.getPlatformId().equals(oldPopulation.getPlatformId()))
+                    return false;
+            }
+            return true;
+        };
+
+        List<Experiment.Population> newPopulations = experiment.getPopulationsList().stream().filter(listContains).collect(Collectors.toList());
+
+        newPopulations.forEach(population -> {
+            //TODO try to start this population
+            //TODO add this to populations
+        });
+
+        List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream().filter(population -> !listContains.test(population)).collect(Collectors.toList());
+
+        missingPopulations.forEach(population -> {
+            //TODO stop this platform!
+            //TODO delete this from populations
+        });
+
+        return fetchExperiment(id);
     }
 
     /**
@@ -276,7 +310,7 @@ public class ExperimentResource {
      * @param oldRecord the old experiment as the database-record
      * @return the resulting experiment
      */
-    private Experiment updateExperimentInfo(int id, Experiment experiment, Experiment old, ExperimentRecord oldRecord) {
+    private Experiment updateExperimentInfoDraftState(int id, Experiment experiment, Experiment old, ExperimentRecord oldRecord) {
         Experiment resulting;
 
         if (!old.getState().equals(Experiment.State.DRAFT)) {
@@ -396,6 +430,16 @@ public class ExperimentResource {
         //create the calibration for this experiment
         if (experiment.getState().equals(Experiment.State.PUBLISHED)) {
             calibrationOperations.createExperimentsCalibration(id, experiment);
+        }
+
+        //we are here if the state has changed and changed from draft to published
+        if (experiment.getState() == Experiment.State.PUBLISHED) {
+            //TODO start from populations
+        }
+
+        //check if we are not creative Stopped
+        if (experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
+            //TODO iterate thruw all the tasks and set them to stopping
         }
 
         resulting = fetchExperiment(id);
