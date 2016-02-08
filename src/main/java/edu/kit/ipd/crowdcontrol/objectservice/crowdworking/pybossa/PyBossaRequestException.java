@@ -1,26 +1,10 @@
-package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
+package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
 /**
- * PlatformConnectionException can be thrown when an error occurs that is related to the connection to a Platform.
- * It can be used as a wrapper for checked exceptions.
- *
  * @author Simon Korz
  * @version 1.0
  */
-public class PlatformConnectionException extends RuntimeException {
-
-    /**
-     * Constructs a new runtime exception with the specified detail message.
-     * The cause is not initialized, and may subsequently be initialized by a
-     * call to {@link #initCause}.
-     *
-     * @param message the detail message. The detail message is saved for
-     *                later retrieval by the {@link #getMessage()} method.
-     */
-    public PlatformConnectionException(String message) {
-        super(message);
-    }
-
+public class PyBossaRequestException extends RuntimeException {
     /**
      * Constructs a new runtime exception with the specified detail message and
      * cause.  <p>Note that the detail message associated with
@@ -35,8 +19,20 @@ public class PlatformConnectionException extends RuntimeException {
      *                unknown.)
      * @since 1.4
      */
-    public PlatformConnectionException(String message, Throwable cause) {
+    public PyBossaRequestException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    /**
+     * Constructs a new runtime exception with the specified detail message.
+     * The cause is not initialized, and may subsequently be initialized by a
+     * call to {@link #initCause}.
+     *
+     * @param message the detail message. The detail message is saved for
+     *                later retrieval by the {@link #getMessage()} method.
+     */
+    public PyBossaRequestException(String message) {
+        super(message);
     }
 
     /**
@@ -52,7 +48,7 @@ public class PlatformConnectionException extends RuntimeException {
      *              unknown.)
      * @since 1.4
      */
-    public PlatformConnectionException(Throwable cause) {
+    public PyBossaRequestException(Throwable cause) {
         super(cause);
     }
 }
