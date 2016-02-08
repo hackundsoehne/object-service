@@ -36,7 +36,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                 .setExperimentId(answerRecord.getExperiment())
                 .setContent(answerRecord.getAnswer())
                 .setId(answerRecord.getIdAnswer())
-                .setTime(answerRecord.getTimestamp().getNanos())
+                .setTime(answerRecord.getTimestamp().getTime())
                 .setWorker(answerRecord.getWorkerId())
                 .addAllRatings(ratings)
                 .build();

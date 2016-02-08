@@ -159,7 +159,7 @@ public class PlatformManager {
                         }
                     }
                     //if there is no useful key throw!
-                    if (s1 != null && s1.isEmpty()) {
+                    if (s1 == null || (s1.isEmpty())) {
                         tasksOps.deleteTask(result);
                         throw new IllegalStateException("Platform "+name+" does not provide any useful key");
                     }
