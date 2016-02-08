@@ -5,6 +5,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author Simon Korz
@@ -14,9 +15,11 @@ public class PyBossaRequests {
     private final String taskUrl;
     private final int projectId;
     private final String apiKey;
+    private final String apiUrl;
 
-    public PyBossaRequests(String taskUrl, int projectId, String apiKey) {
-        this.taskUrl = taskUrl;
+    public PyBossaRequests(String apiUrl, int projectId, String apiKey) {
+        this.apiUrl = apiUrl;
+        this.taskUrl = apiUrl + "/task";
         this.projectId = projectId;
         this.apiKey = apiKey;
     }
@@ -35,7 +38,7 @@ public class PyBossaRequests {
                     .queryString("project_id", projectId)
                     .asJson();
         } catch (UnirestException e) {
-            throw new RuntimeException(e);
+            throw new PyBossaRequestException(e);
         }
         JsonNode body = response.getBody();
         if (body.isArray()) {
@@ -43,6 +46,27 @@ public class PyBossaRequests {
         }
         return new JSONArray();
     }
+
+    public String postTask(JSONObject task) {
+        HttpResponse<JsonNode> response;
+        try {
+            response = Unirest.post(taskUrl)
+                    .header("Content-Type", "application/json")
+                    .queryString("api_key", apiKey)
+                    .body(task)
+                    .asJson();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+
+        if (response.getStatus() == 200) {
+            return String.valueOf(response.getBody().getObject().getInt("id"));
+        } else {
+            throw new PyBossaRequestException(response.getBody().getObject()
+                    .optString("exception_msg", "Publishing task failed"));
+        }
+    }
+
 
     /**
      * Deletes a task from the platform
@@ -63,5 +87,45 @@ public class PyBossaRequests {
         }
         // if response status is 204 the task was successfully deleted
         return response.getStatus() == 204;
+    }
+
+    private void deleteAllTaskRunsForTask(String task) {
+        HttpResponse<JsonNode> response;
+        try {
+            response = Unirest.get(apiUrl + "/taskrun")
+                    .queryString("api_key", apiKey)
+                    .queryString("task_id", task)
+
+                    .asJson();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        JSONArray taskRuns = response.getBody().getArray();
+
+        for (int i = 0; i < taskRuns.length() - 1; i++) {
+            try {
+                Unirest.delete(apiUrl + "/taskrun/{id}")
+                        .queryString("api_key", apiKey)
+                        .routeParam("id", Integer.toString(taskRuns.getJSONObject(i).getInt("id")))
+                        .asJson();
+            } catch (UnirestException e) {
+                throw new PyBossaRequestException(e);
+            }
+        }
+    }
+
+    public void deleteTaskRun(String taskRunId) {
+        HttpResponse<JsonNode> response;
+        try {
+            response = Unirest.delete(apiUrl + "/taskrun/{id}")
+                    .queryString("api_key", apiKey)
+                    .routeParam("id", taskRunId)
+                    .asJson();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        if (response.getStatus() != 204) {
+            throw new PyBossaRequestException(String.format("Taskrun with id %s could not be deleted", taskRunId));
+        }
     }
 }

@@ -103,7 +103,7 @@ public class PyBossaPlatform implements Platform {
                 }
             }
             // delete task run anyway
-            deleteTaskRun(Integer.toString(taskRuns.getJSONObject(0).getInt("id")));
+            requests.deleteTaskRun(Integer.toString(taskRuns.getJSONObject(0).getInt("id")));
         } else {
             throw new UnidentifiedWorkerException();
         }
@@ -127,40 +127,16 @@ public class PyBossaPlatform implements Platform {
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
-        return CompletableFuture.supplyAsync(() -> {
-            JsonNode jsonTask = new JsonNode("");
-
-            jsonTask.getObject()
-                    .put("project_id", projectID)
-                    .put("info", new JSONObject()
-                            .put("url", workerServiceUrl)
-                            .put("expID", experiment.getId())
-                            .put("platformName", name)
-                            .put("idTasks", new JSONArray(idTasks))
-                    )
-                    .put("priority_0", 1)
-                    .put("n_answers", experiment.getNeededAnswers().getValue());
-
-            HttpResponse<JsonNode> response;
-            try {
-                response = Unirest.post(taskUrl)
-                        .header("Content-Type", "application/json")
-                        .queryString("api_key", apiKey)
-                        .body(jsonTask)
-                        .asJson();
-            } catch (UnirestException e) {
-                throw new PyBossaRequestException(e);
-            }
-
-            String taskId = null;
-            if (response.getStatus() == 200) {
-                taskId = String.valueOf(response.getBody().getObject().getInt("id"));
-            } else {
-                throw new PyBossaRequestException(response.getBody().getObject()
-                        .optString("exception_msg", "Publishing task failed"));
-            }
-            return taskId;
-        });
+        return CompletableFuture.supplyAsync(() -> requests.postTask(new JSONObject()
+                .put("project_id", projectID)
+                .put("info", new JSONObject()
+                        .put("url", workerServiceUrl)
+                        .put("expID", experiment.getId())
+                        .put("platformName", name)
+                        .put("idTasks", new JSONArray(idTasks))
+                )
+                .put("priority_0", 1)
+                .put("n_answers", experiment.getNeededAnswers().getValue())));
     }
 
     @Override
@@ -211,36 +187,16 @@ public class PyBossaPlatform implements Platform {
      * @return true if idTasks are present in the current project, else false
      */
     private boolean getIdTasks() {
-        // request existing tasks for project
-        HttpResponse<JsonNode> response;
-        try {
-            response = Unirest.get(taskUrl)
-                    .queryString("api_key", apiKey)
-                    .queryString("project_id", Integer.toString(projectID))
-                    .asJson();
-        } catch (UnirestException e) {
-            throw new PyBossaRequestException(e);
-        }
-
-        // check for existent idTasks
-        if (response.getStatus() == 200) {
-            if (response.getBody().getArray().length() == 0) {
-                return false;
+        JSONArray allTasks = requests.getAllTasks();
+        // idTasks have to be the first two objects
+        for (int i = 0; i < IDTASK_COUNT; i++) {
+            JSONObject task = allTasks.optJSONObject(i);
+            if (task != null && task.isNull("info")) {
+                idTasks[i] = task.getInt("id");
             } else {
-                // idTasks have to be the first two objects
-                for (int i = 0; i < IDTASK_COUNT; i++) {
-                    JSONObject task = response.getBody().getArray().optJSONObject(i);
-                    if (task != null && task.isNull("info")) {
-                        idTasks[i] = task.getInt("id");
-                    } else {
-                        throw new PyBossaRequestException("Could not initialize tasks for platform "
-                                + this.getName() + ": Invalid idTasks.");
-                    }
-                }
+                throw new PyBossaRequestException("Could not initialize tasks for platform "
+                        + this.getName() + ": Invalid idTasks.");
             }
-        } else {
-            throw new PyBossaRequestException(response.getBody().getObject()
-                    .optString("exception_msg", "getIdTasks failed"));
         }
         return true;
     }
@@ -249,69 +205,12 @@ public class PyBossaPlatform implements Platform {
      * Creates 2 new idTasks with empty info object and assigns the IDs to the idTasks
      */
     private void createIdTasks() {
-        JsonNode jsonTask = new JsonNode(null);
-        jsonTask.getObject()
+        JSONObject jsonTask = new JSONObject()
                 .put("project_id", projectID)
                 .put("priority_0", 0);
 
-        HttpResponse<JsonNode> response;
         for (int i = 0; i < IDTASK_COUNT; i++) {
-            try {
-                response = Unirest.post(taskUrl)
-                        .header("Content-Type", "application/json")
-                        .queryString("api_key", apiKey)
-                        .body(jsonTask)
-                        .asJson();
-            } catch (UnirestException e) {
-                throw new PyBossaRequestException("Could not connect to " + getID(), e);
-            }
-
-            if (response.getStatus() == 200) {
-                idTasks[i] = response.getBody().getObject().getInt("id");
-            } else {
-                throw new RuntimeException(response.getBody().getObject()
-                        .optString("exception_msg", "createIdTasks failed"));
-            }
-        }
-    }
-
-    private void deleteTaskRun(String taskRunId) {
-        HttpResponse<JsonNode> response;
-        try {
-            response = Unirest.delete(apiUrl + "/taskrun/{id}")
-                    .queryString("api_key", apiKey)
-                    .routeParam("id", taskRunId)
-                    .asJson();
-        } catch (UnirestException e) {
-            throw new PyBossaRequestException(String.format("Connection failed for platform %s.", getID()), e);
-        }
-        if (response.getStatus() != 204) {
-            throw new PyBossaRequestException(String.format("Taskrun with id %s could not be deleted", taskRunId));
-        }
-    }
-
-    private void deleteAllTaskRunsForTask(String task) {
-        HttpResponse<JsonNode> response;
-        try {
-            response = Unirest.get(apiUrl + "/taskrun")
-                    .queryString("api_key", apiKey)
-                    .queryString("task_id", task)
-
-                    .asJson();
-        } catch (UnirestException e) {
-            throw new PyBossaRequestException(String.format("Connection failed for platform %s.", getID()), e);
-        }
-        JSONArray taskRuns = response.getBody().getArray();
-
-        for (int i = 0; i < taskRuns.length() - 1; i++) {
-            try {
-                Unirest.delete(apiUrl + "/taskrun/{id}")
-                        .queryString("api_key", apiKey)
-                        .routeParam("id", Integer.toString(taskRuns.getJSONObject(i).getInt("id")))
-                        .asJson();
-            } catch (UnirestException e) {
-                throw new PyBossaRequestException(e);
-            }
+            requests.postTask(jsonTask);
         }
     }
 }
