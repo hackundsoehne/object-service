@@ -138,10 +138,39 @@ public class Main {
         maintainer.start();
 
         Properties properties = new Properties();
+        String mailPropertiesPath = "src/main/resources/mailConfig.properties";
 
-        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/integration-test/resources/gmailLogin.properties"));
-        properties.load(stream);
-        stream.close();
+        try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(mailPropertiesPath))) {
+            properties.load(stream);
+        } catch(IOException e) {
+            LOGGER.warn(mailPropertiesPath + " not found, falling back to environment variables for Travis …");
+
+            if (System.getenv("MAIL_USERNAME") == null) {
+                LOGGER.error("MAIL_USERNAME not set …");
+                System.exit(-2);
+            }
+
+            if (System.getenv("MAIL_PASSWORD") == null) {
+                LOGGER.error("MAIL_PASSWORD not set …");
+                System.exit(-2);
+            }
+
+            properties.setProperty("username", System.getenv("MAIL_USERNAME"));
+            properties.setProperty("password", System.getenv("MAIL_PASSWORD"));
+            properties.setProperty("sender", System.getenv("MAIL_USERNAME"));
+            properties.setProperty("mail.smtp.host", "smtp.gmail.com");
+            properties.setProperty("mail.smtp.auth", "true");
+            properties.setProperty("mail.smtp.starttls.enable", "true");
+            properties.setProperty("mail.smtp.tls", "true");
+            properties.setProperty("mail.smtp.ssl.checkserveridentity", "true");
+            properties.setProperty("mail.store.protocol", "imap");
+            properties.setProperty("mail.imap.host", "imap.gmail.com");
+            properties.setProperty("mail.imap.port", "993");
+            properties.setProperty("mail.imap.ssl", "true");
+            properties.setProperty("mail.imap.ssl.enable", "true");
+            properties.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        }
+
         MailHandler mailHandler = new MailHandler(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -163,7 +192,7 @@ public class Main {
 
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, tasksOperations, platformOperations,
                 workerOperations);
-                
+
         ExperimentController experimentController =new ExperimentController(platformManager);
         QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations,experimentController);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
