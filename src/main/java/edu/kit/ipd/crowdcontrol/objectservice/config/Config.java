@@ -24,5 +24,5 @@ public class Config {
     /**
      * moneytransfer configuration
      */
-    public MoneyTransfer moneyTransfer;
+    public MoneyTransfer moneytransfer;
 }
