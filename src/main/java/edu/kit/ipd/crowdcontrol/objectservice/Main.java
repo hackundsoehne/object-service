@@ -64,7 +64,7 @@ public class Main {
                             platform.password,
                             "https://mechanicalturk.sandbox.amazonaws.com/",
                             platform.name,
-                            "https://worker.pse.kelunik.com/");
+                            config.deployment.workerService);
                     break;
                 case "pybossa":
                     //TODO someone needs to implement pybossa SIIIIMON
