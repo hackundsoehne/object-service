@@ -1,9 +1,11 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality;
 
+import edu.kit.ipd.crowdcontrol.objectservice.ExperimentController;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
@@ -27,7 +29,7 @@ import java.util.*;
  * and thus can assure that only "good" ratings will be used on the identification of the experiment's
  * answers.
  */
-public class QualityIdentificator{
+public class QualityIdentificator {
 
 
     final static int MAXIMUM_QUALITY = 9;
@@ -35,7 +37,7 @@ public class QualityIdentificator{
 
     private final Logger log = LogManager.getLogger(QualityIdentificator.class);
     private final Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
-   //TODO uncomment after exp.controller merge private final ExperimentController controller;
+    private final ExperimentController controller;
     private final AnswerRatingOperations answerOperations;
     private final ExperimentOperations experimentOperations;
     private final AlgorithmOperations algorithmOperations;
@@ -51,11 +53,10 @@ public class QualityIdentificator{
      * <p>
      * Might be set to allow more flexibility and more good answers
      */
-    private int ratingQualityThreshold = 5;
 
-    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations) {
+    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentController controller) {
 
-        //TODO uncomment after contoller merge this.controller = controller;
+        this.controller = controller;
         this.answerOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.algorithmOperations = algorithmOperations;
@@ -72,10 +73,9 @@ public class QualityIdentificator{
         ratingAlgorithms.add(new RatingQualityByDistribution());
 
 
-
         //Load algorithms in db
-        answerAlgorithms.forEach(algorithm -> algorithmOperations.storeAnswerQualityAlgorithm(new AlgorithmAnswerQualityRecord(algorithm.getAlgorithmName(),algorithm.getAlgorithmDescription()),algorithm.getParams()));
-        ratingAlgorithms.forEach(algorithm -> algorithmOperations.storeRatingQualityAlgorithm(new AlgorithmRatingQualityRecord(algorithm.getAlgorithmName(),algorithm.getAlgorithmDescription()),algorithm.getParams()));
+        answerAlgorithms.forEach(algorithm -> algorithmOperations.storeAnswerQualityAlgorithm(new AlgorithmAnswerQualityRecord(algorithm.getAlgorithmName(), algorithm.getAlgorithmDescription()), algorithm.getParams()));
+        ratingAlgorithms.forEach(algorithm -> algorithmOperations.storeRatingQualityAlgorithm(new AlgorithmRatingQualityRecord(algorithm.getAlgorithmName(), algorithm.getAlgorithmDescription()), algorithm.getParams()));
 
         ratingObservable.subscribe(rating -> this.onNext(rating.getData()));
 
@@ -85,42 +85,30 @@ public class QualityIdentificator{
      * This method is performed, if the RATINGS_CREATE-observable emits an event.
      * All ratings and answers of the experiment will be rated. Furthermore the status of the experiment is checked and
      * if the criteria are met, it will be shut-down
+     *
      * @param rating which has been created an will be processed
      */
     private void onNext(Rating rating) {
 
-        Optional<ExperimentRecord> exp = experimentOperations.getExperiment(rating.getExperimentId());
-        if (!exp.isPresent()) {
-            throw new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID:" + rating.getExperimentId());
-        }
-
-        try {
-            ratingIdentifier = getRatingQualityAlgorithm(exp.get().getAlgorithmQualityRating()).get();
-        } catch (NoSuchElementException e1) {
-            log.fatal("Error! Could not find %s-algorithm. Replacing with default RatingQualityByDistribution-algorithm.", exp.get().getAlgorithmQualityRating(), e1);
-            ratingIdentifier = new RatingQualityByDistribution();
-        }
-        try {
-            answerIdentifier = getAnswerQualityAlgorithm(exp.get().getAlgorithmQualityAnswer()).get();
-        } catch (NoSuchElementException e1) {
-            log.fatal("Error! Could not find %s-algorithm. Replacing with default AnswerQualityByRatings-algorithm.", exp.get().getAlgorithmQualityAnswer(), e1);
-            answerIdentifier = new AnswerQualityByRatings();
-        }
+        ExperimentRecord exp = experimentOperations.getExperiment(rating.getExperimentId()).orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID:" + rating.getExperimentId()));
 
 
-        algorithmOperations.getAnswerQualityParams(ratingIdentifier.getAlgorithmName(), exp.get().getIdExperiment()).entrySet().forEach(entry ->{
-            if(entry.getKey().field5().toString().equals("RatingQualityThreshold")){    //DOES THIS COMPARISON WORK ?
-                ratingQualityThreshold = Integer.valueOf(entry.getValue());
-                if(ratingQualityThreshold < 0 || ratingQualityThreshold > 9){
-                    log.fatal(String.format("Error! Received illegal argument for %s! Should: %s   Is: %s", entry.getKey().field4(),entry.getKey().field3(),entry.getValue()));
+        ratingIdentifier = getRatingQualityAlgorithm(exp.getAlgorithmQualityRating()).orElseGet(() -> {
+                    log.fatal("Error! Could not find " + exp.getAlgorithmQualityRating() + "-algorithm. Replacing with default RatingQualityByDistribution-algorithm.");
+                    return new RatingQualityByDistribution();
                 }
-            }
+        );
+
+
+        answerIdentifier = getAnswerQualityAlgorithm(exp.getAlgorithmQualityAnswer()).orElseGet(() -> {
+            log.fatal("Error! Could not find " + exp.getAlgorithmQualityAnswer() + "-algorithm. Replacing with default AnswerQualityByRatings-algorithm.");
+            return new AnswerQualityByRatings();
         });
 
+        rateQualityOfRatings(exp, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        rateQualityOfAnswers(exp, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
 
-        rateQualityOfAnswers(exp.get());
-        rateQualityOfRatings(exp.get());
-        checkExpStatus(exp.get());
+        checkExpStatus(exp);
 
 
     }
@@ -167,7 +155,7 @@ public class QualityIdentificator{
      */
     private void checkExpStatus(ExperimentRecord experiment) {
         if (experiment.getNeededAnswers() == answerOperations.getNumberOfFinalGoodAns(experiment.getIdExperiment())) {
-           //TODO uncomment after controller merge: controller.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
+            controller.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
         }
 
     }
@@ -179,13 +167,13 @@ public class QualityIdentificator{
      *
      * @param experimentRecord whose ratings' qualities are going to be estimated
      */
-    private void rateQualityOfRatings(ExperimentRecord experimentRecord) {
+    private void rateQualityOfRatings(ExperimentRecord experimentRecord, Map<AlgorithmRatingQualityParamRecord, String> params) {
 
         List<AnswerRecord> answers = answerOperations.getAnswersOfExperiment(experimentRecord.getIdExperiment());
 
         for (AnswerRecord answer : answers) {
             List<RatingRecord> records = answerOperations.getRatingsOfAnswer(answer);
-            Map<RatingRecord, Integer> map = ratingIdentifier.identifyRatingQuality(records, MAXIMUM_QUALITY, MINIMUM_QUALITY);
+            Map<RatingRecord, Integer> map = ratingIdentifier.identifyRatingQuality(records, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
             answerOperations.setQualityToRatings(map);
         }
 
@@ -201,21 +189,20 @@ public class QualityIdentificator{
      *
      * @param experimentRecord the experiment whose answers are going to be rated
      */
-    private void rateQualityOfAnswers(ExperimentRecord experimentRecord) {
+    private void rateQualityOfAnswers(ExperimentRecord experimentRecord, Map<AlgorithmAnswerQualityParamRecord, String> params) {
 
         List<AnswerRecord> answers = answerOperations.getAnswersOfExperiment(experimentRecord.getIdExperiment());
-
+        Map<String, Integer> result;
         for (AnswerRecord answer : answers) {
-            List<RatingRecord> records = answerOperations.getGoodRatingsOfAnswer(answer, ratingQualityThreshold);
-            if (records.size() > 0) {
-                answerOperations.setQualityToAnswer(answer, answerIdentifier.identifyAnswerQuality(answer, records, MAXIMUM_QUALITY, MINIMUM_QUALITY));
+            result = answerIdentifier.identifyAnswerQuality(answerOperations, answer, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
+            answerOperations.setQualityToAnswer(answer, result.get(AnswerQualityStrategy.QUALITY));
 
-                // Checks if quality_assured bit can be set.
-                if ((((double) records.size() / (double) experimentRecord.getRatingsPerAnswer()) >= 0.8)) {
-                    answerOperations.setAnswerQualityAssured(answer);
-                }
+            // Checks if quality_assured bit can be set.
+            if ((((double) result.get(AnswerQualityStrategy.NUM_OF_RATINGS) / (double) experimentRecord.getRatingsPerAnswer()) >= 0.8)) {
+                answerOperations.setAnswerQualityAssured(answer);
             }
         }
     }
-
 }
+
+

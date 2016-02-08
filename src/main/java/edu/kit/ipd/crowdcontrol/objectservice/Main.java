@@ -116,8 +116,8 @@ public class Main {
 
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), null, tasksOperations, platformOperations,
                 workerOperations); // TODO set fallbackPayment
-
-        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations);
+        ExperimentController experimentController =new ExperimentController(platformManager);
+        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations,experimentController);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 
         ExperimentController experimentController = new ExperimentController(platformManager);
