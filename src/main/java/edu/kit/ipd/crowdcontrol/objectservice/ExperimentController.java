@@ -44,8 +44,6 @@ public class ExperimentController {
      * @param experiment to be started
      */
     private void startExperiment(Experiment experiment) {
-
-
         Queue<String> successfulPlatforms = new LinkedList<>();
         for (int i = 0; i < experiment.getPopulationsCount(); i++) {
             try {
