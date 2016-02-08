@@ -7,6 +7,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Cali
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.CalibrationTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
@@ -173,16 +174,17 @@ public class CalibrationOperations extends AbstractOperations {
 
     /**
      * create the internal Calibration used to connect worker to experiments.
-     * @param experimentId the experiment
+     * @param experiment the experiment
      */
-    public void createExperimentsCalibration(int experimentId) {
-        String description = "experiment: " + experimentId;
-        CalibrationRecord record = new CalibrationRecord(null, description, description, experimentId);
+    public void createExperimentsCalibration(int id, Experiment experiment) {
+
+        String description = "Experiment " + experiment.getTitle()+" ("+id+") answered";
+        CalibrationRecord record = new CalibrationRecord(null, description, description, id);
         CalibrationAnswerOptionRecord answer = new CalibrationAnswerOptionRecord(null, null, description);
         create.transactionResult(conf -> {
                     boolean exists = DSL.using(conf).fetchExists(
                             DSL.selectFrom(CALIBRATION)
-                                    .where(CALIBRATION.EXPERIMENT.eq(experimentId))
+                                    .where(CALIBRATION.EXPERIMENT.eq(id))
                     );
                     if (!exists) {
                         return create.insertInto(CALIBRATION)
@@ -193,12 +195,13 @@ public class CalibrationOperations extends AbstractOperations {
                     return Optional.<CalibrationRecord>empty();
                 })
                 .map(CalibrationRecord::getIdCalibration)
-                .ifPresent(id -> create.transaction(conf -> {
+                .ifPresent(calibId -> create.transaction(conf -> {
                     boolean exists = DSL.using(conf).fetchExists(
                             DSL.selectFrom(CALIBRATION_ANSWER_OPTION)
                                     .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(id))
                     );
                     if (!exists) {
+                        answer.setCalibration(calibId);
                         create.insertInto(CALIBRATION_ANSWER_OPTION)
                                 .set(answer)
                                 .execute();

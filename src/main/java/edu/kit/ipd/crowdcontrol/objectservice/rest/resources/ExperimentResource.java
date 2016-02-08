@@ -110,6 +110,19 @@ public class ExperimentResource {
             calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, id);
         });
 
+        experiment.getAlgorithmTaskChooser()
+                .getParametersList().forEach(param ->
+                algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue())
+        );
+
+        experiment.getAlgorithmQualityAnswer()
+                .getParametersList().forEach(param ->
+                algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue())
+        );
+        experiment.getAlgorithmQualityRating()
+                .getParametersList().forEach(param ->
+                algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue())
+        );
         Experiment exp = fetchExperiment(id);
 
         response.status(201);
@@ -380,8 +393,9 @@ public class ExperimentResource {
             throw new IllegalStateException("Experiment lacks information needed for publishing.");
         }
 
+        //create the calibration for this experiment
         if (experiment.getState().equals(Experiment.State.PUBLISHED)) {
-            calibrationOperations.createExperimentsCalibration(id);
+            calibrationOperations.createExperimentsCalibration(id, experiment);
         }
 
         resulting = fetchExperiment(id);
