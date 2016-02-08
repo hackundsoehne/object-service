@@ -124,6 +124,11 @@ public class Main {
         QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations,experimentController);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 
+        // TODO initialize mailHandler
+//        NotificationController notificationController = new NotificationController(notificationRestOperations,
+//                new SQLEmailNotificationPolicy(mailHandler, notificationRestOperations));
+//        notificationController.init();
+
         new Router(
                 new TemplateResource(templateOperations),
                 new NotificationResource(notificationRestOperations),

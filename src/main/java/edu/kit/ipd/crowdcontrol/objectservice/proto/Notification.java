@@ -950,7 +950,7 @@ public  final class Notification extends
      * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder getSendOnceBuilder() {
-      
+
       onChanged();
       return getSendOnceFieldBuilder().getBuilder();
     }
@@ -969,7 +969,7 @@ public  final class Notification extends
      * <code>optional .crowdcontrol.Boolean send_once = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
-        edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean, edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder> 
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean, edu.kit.ipd.crowdcontrol.objectservice.proto.Boolean.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.BooleanOrBuilder>
         getSendOnceFieldBuilder() {
       if (sendOnceBuilder_ == null) {
         sendOnceBuilder_ = new com.google.protobuf.SingleFieldBuilder<
