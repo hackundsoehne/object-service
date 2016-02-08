@@ -5,9 +5,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment;
 /**
  * Gets thrown, if a
  */
-public class ExperimentNotFoundException extends Exception {
+public class FeedbackException extends Exception {
 
-    public ExperimentNotFoundException() {
-        super("The given experiment is not existent.");
+    public FeedbackException(String message) {
+        super(message);
     }
 }
