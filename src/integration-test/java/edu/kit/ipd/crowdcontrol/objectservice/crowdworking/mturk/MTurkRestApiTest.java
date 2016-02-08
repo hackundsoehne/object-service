@@ -3,12 +3,17 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 import com.amazonaws.mturk.requester.doc._2014_08_15.Assignment;
 import com.amazonaws.mturk.requester.doc._2014_08_15.HIT;
 import com.amazonaws.mturk.requester.doc._2014_08_15.HITStatus;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Properties;
@@ -50,7 +55,7 @@ public class MTurkRestApiTest {
     public void testPublishHIT() throws Exception {
         String id = new PublishHIT(connection,"Title1", "Description2",
                 0.20,60,2000,"test,for,everything",
-                2,2000000,"data").get();
+                2,2000000,"data","").get();
 
         assertNotEquals(id, null);
 
