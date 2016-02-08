@@ -1,0 +1,2 @@
+Dear administrator,
+it seems, that a critical error during payment occured:
