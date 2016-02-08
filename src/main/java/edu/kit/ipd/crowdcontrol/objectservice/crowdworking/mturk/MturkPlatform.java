@@ -34,7 +34,11 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
      */
     public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl) {
         connection = new MTurkConnection(user, password, url);
-        this.workerServiceUrl = workerServiceUrl;
+        if (workerServiceUrl.charAt(workerServiceUrl.length()-1) == '/') {
+            this.workerServiceUrl = workerServiceUrl;
+        } else {
+            this.workerServiceUrl = workerServiceUrl+"/";
+        }
         this.name = name;
     }
 
