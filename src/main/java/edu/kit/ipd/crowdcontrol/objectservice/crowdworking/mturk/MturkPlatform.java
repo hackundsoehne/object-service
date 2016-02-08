@@ -92,8 +92,15 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
 
     @Override
     public String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException {
-        //TODO implement this if there is a workerui
-        return null;
+        String[] workerIdArray = param.get("mTurkWorkerId");
+        String workerId;
+
+        if (workerIdArray != null && workerIdArray.length > 0) {
+            workerId = workerIdArray[0];
+        } else {
+            throw new UnidentifiedWorkerException("mTurkWorkerId was not set!");
+        }
+        return workerId;
     }
 
     @Override

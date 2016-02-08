@@ -24,7 +24,9 @@ function initMturk(platformName, workerServiceUrl, experiment) {
     CreativeCrowd.init(properties = {
         workerServiceURL: workerServiceUrl,
         platform: platformName,
-        workerId: turkGetParam("workerId", -1),
+        osParams: {
+                mTurkWorkerId: turkGetParam("workerId", -1),
+        },
         experiment: experiment,
         preview: preview
     });
