@@ -20,6 +20,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestExceptio
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.Request;
 import spark.Response;
 
@@ -43,6 +45,7 @@ public class ExperimentResource {
     private final AlgorithmOperations algorithmsOperations;
     private final TasksOperations tasksOperations;
     private final PlatformManager platformManager;
+    private static final Logger log = LogManager.getLogger("ExperimentResource");
 
     public ExperimentResource(ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
                               TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmsOperations,
@@ -305,10 +308,10 @@ public class ExperimentResource {
                 platformManager.publishTask(population.getPlatformId(),experiment).join();
                 storePopulation(id, population);
             } catch (TaskOperationException e) {
-              //TODO Logger  log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s",experiment.getTitle(),population.getPlatformId()),e);
+                log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s",experiment.getTitle(),population.getPlatformId()),e);
                 e.printStackTrace();
             }catch (IllegalStateException | IllegalArgumentException e){
-                //TODO log.fatal("Error! Could not create experiment!"+e.getMessage());
+                log.fatal("Error! Could not create experiment!"+e.getMessage());
             }
         });
 
