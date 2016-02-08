@@ -11,6 +11,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
@@ -78,8 +79,12 @@ public class Main {
                             config.deployment.workerService);
                     break;
                 case "pybossa":
-                    //TODO someone needs to implement pybossa SIIIIMON
-                    throw new IllegalArgumentException("Nonono we cannot do this now.");
+                    platformInstance = new PyBossaPlatform(config.deployment.workerService,
+                            platform.apiKey,
+                            platform.url,
+                            platform.name,
+                            platform.projectId,
+                            platform.calibrationsAllowed);
                 case "dummy":
                     platformInstance = new DummyPlatform(platform.name);
                     break;

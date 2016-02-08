@@ -45,7 +45,7 @@ public class PyBossaPlatformTest {
     public static void setUp() throws Exception {
         deleteAllTasks(TASK_URL, API_KEY, PROJECT_ID);
         pybossa = new PyBossaPlatform(WORKER_SERVICE_URL, API_KEY,
-                API_URL, NAME, PROJECT_ID, true);
+                API_URL, NAME, String.valueOf(PROJECT_ID), true);
         pybossa.init();
     }
 

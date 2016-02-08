@@ -37,16 +37,16 @@ public class PyBossaPlatform implements Platform {
     private PyBossaRequests requests;
 
 
-    public PyBossaPlatform(String workerServiceUrl, String apiKey, String apiUrl, String name, int projectID, Boolean calibsAllowed) {
+    public PyBossaPlatform(String workerServiceUrl, String apiKey, String apiUrl, String name, String projectID, Boolean calibsAllowed) {
         this.workerServiceUrl = workerServiceUrl;
         this.apiKey = apiKey;
         this.apiUrl = apiUrl;
         this.name = name;
-        this.projectID = projectID;
+        this.projectID = java.lang.Integer.parseInt(projectID);
         this.calibsAllowed = calibsAllowed;
 
         taskUrl = apiUrl + "/task";
-        this.requests = new PyBossaRequests(taskUrl, projectID, apiKey);
+        this.requests = new PyBossaRequests(taskUrl, this.projectID, apiKey);
 
     }
 

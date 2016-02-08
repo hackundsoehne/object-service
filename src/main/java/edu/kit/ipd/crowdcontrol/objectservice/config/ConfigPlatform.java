@@ -24,4 +24,16 @@ public class ConfigPlatform {
      * how exactly the platform is named in the db
      */
     public String name;
+    /**
+     * the api key to access the platform
+     */
+    public String apiKey;
+    /**
+     * the projectId (in pybossa all tasks are published under a project)
+     */
+    public String projectId;
+    /**
+     * if the platform supports calibrations
+     */
+    public boolean calibrationsAllowed;
 }
