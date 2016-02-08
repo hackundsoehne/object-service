@@ -249,7 +249,7 @@ public class AnswerRatingOperations extends AbstractOperations {
     /**
      * updates the rating.
      * <p>
-     * the usual workflow is that first a rating has to be reserved an therefore an empty rating exists in the db.
+     * the usual workflow is that first a rating has to be reserved an therefore an empty rating gets inserted.
      * Then the worker actually commits the rating and this method gets called to update it.
      *
      * @param rating       the rating to update
