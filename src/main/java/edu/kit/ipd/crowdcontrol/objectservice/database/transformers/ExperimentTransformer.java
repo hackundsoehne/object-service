@@ -99,7 +99,7 @@ public class ExperimentTransformer extends AbstractTransformer {
     }
 
     private static String transform(AnswerType answerType) {
-        if (answerType == AnswerType.INVALID) return null;
+        if (answerType == AnswerType.INVALID || answerType == AnswerType.TEXT) return null;
         return answerType.name();
     }
 
