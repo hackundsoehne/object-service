@@ -5,10 +5,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRating
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
-import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.util.List;
@@ -50,6 +49,7 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .where(RATING.ANSWER_R.eq(answerRecord.getIdAnswer()))
                 .fetch();
     }
+
 
 
     /**
@@ -144,7 +144,6 @@ public class AnswerRatingOperations extends AbstractOperations {
     }
 
 
-
     /**
      * Returns all ratings of given answer, which have a quality rating above passed threshold
      *
@@ -153,7 +152,10 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @return list of all ratings of given answer with a quality rating equal or greater than given threshold
      */
     public Result<RatingRecord> getGoodRatingsOfAnswer(AnswerRecord answerRecord, int threshold) {
-        return null;
+        return create.selectFrom(RATING)
+                .where(RATING.ANSWER_R.eq(answerRecord.getIdAnswer()))
+                .and(RATING.QUALITY.greaterThan(0))
+                .fetch();
     }
 
 
@@ -163,7 +165,14 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @param map of ratings and matching qualities
      */
     public void setQualityToRatings(Map<RatingRecord, Integer> map) {
+        List<RatingRecord> toUpdate = map.entrySet().stream()
+                .map(entry -> {
+                    entry.getKey().setQuality(entry.getValue());
+                    return entry.getKey();
+                })
+                .collect(Collectors.toList());
 
+        create.batchUpdate(toUpdate).execute();
     }
 
     /**
@@ -173,7 +182,9 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @param quality of the answer
      */
     public void setQualityToAnswer(AnswerRecord answer, int quality) {
+        answer.setQuality(quality);
 
+        create.batchUpdate(answer).execute();
     }
 
 
@@ -224,6 +235,7 @@ public class AnswerRatingOperations extends AbstractOperations {
     }
 
 
+
     /**
      * Sets the quality-assured-bit for the given answerRecord
      * This indicates, that the answers quality is unlikely to change
@@ -231,7 +243,9 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @param answerRecord whose quality-assured-bit is set
      */
     public void setAnswerQualityAssured(AnswerRecord answerRecord) {
-        //TODO
+        answerRecord.setQualityAssured(true);
+
+        create.batchUpdate(answerRecord).execute();
     }
 
     /**
@@ -396,5 +410,15 @@ public class AnswerRatingOperations extends AbstractOperations {
 
             return AnswerRatingTransformer.toRatingProto(ratingRecord, constraints);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the number of all answers with the correct number of ratings specified in the experiment.
+     * The answers quality has to be equal or above the experiment's quality-threshold
+     * @param idExperiment id of the experiment
+     * @return number of answers with a final and good quality
+     */
+    public int getNumberOfFinalGoodAns(int idExperiment) {
+        return 0;
     }
 }

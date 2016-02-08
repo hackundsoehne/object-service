@@ -8,10 +8,12 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
+import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.apache.logging.log4j.LogManager;
@@ -57,8 +59,9 @@ public class Main {
             Platform platformInstance;
             switch (platform.type) {
                 case "mturk":
-                    //TODO somone needs to implement mturk ... NOOOONE
-                    throw new IllegalArgumentException("Nonono we cannot do this now.");
+                    //FIXME remove the sandbox url - but I am to paranoid
+                    platformInstance = new MturkPlatform(platform.user, platform.password, "https://mechanicalturk.sandbox.amazonaws.com/", platform.name);
+                    break;
                 case "pybossa":
                     //TODO someone needs to implement pybossa SIIIIMON
                     throw new IllegalArgumentException("Nonono we cannot do this now.");
@@ -110,9 +113,11 @@ public class Main {
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
 
+
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), null, tasksOperations, platformOperations,
                 workerOperations); // TODO set fallbackPayment
-
+        ExperimentController experimentController =new ExperimentController(platformManager);
+        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations,answerRatingOperations,experimentOperations,experimentController);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations,workerOperations);
 
         new Router(
