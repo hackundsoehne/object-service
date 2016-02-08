@@ -461,7 +461,7 @@ public class ExperimentResource {
         //check if we are not creative Stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
             //update db
-            tasksOperations.getTasks(experiment.getId()).forEach(taskRecord -> {
+            tasksOperations.getTasks(id).forEach(taskRecord -> {
                 taskRecord.setStatus(TaskStatus.stopping);
                 tasksOperations.updateTask(taskRecord);
             });
