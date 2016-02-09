@@ -36,7 +36,8 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                 .setExperimentId(answerRecord.getExperiment())
                 .setContent(answerRecord.getAnswer())
                 .setId(answerRecord.getIdAnswer())
-                .setTime(answerRecord.getTimestamp().getTime())
+                //divide by 1000 because java uses milliseconds and proto expects seconds
+                .setTime(answerRecord.getTimestamp().getTime() / 1000L)
                 .setWorker(answerRecord.getWorkerId())
                 .addAllRatings(ratings)
                 .build();
