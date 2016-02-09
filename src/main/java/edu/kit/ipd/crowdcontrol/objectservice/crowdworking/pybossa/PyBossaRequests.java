@@ -47,20 +47,22 @@ public class PyBossaRequests {
         return new JSONArray();
     }
 
-    public String postTask(JSONObject task) {
+    public int postTask(JSONObject task) {
+        JsonNode jsonNode = new JsonNode(task.toString());
+
         HttpResponse<JsonNode> response;
         try {
             response = Unirest.post(taskUrl)
                     .header("Content-Type", "application/json")
                     .queryString("api_key", apiKey)
-                    .body(task)
+                    .body(jsonNode)
                     .asJson();
         } catch (UnirestException e) {
             throw new PyBossaRequestException(e);
         }
 
         if (response.getStatus() == 200) {
-            return String.valueOf(response.getBody().getObject().getInt("id"));
+            return response.getBody().getObject().getInt("id");
         } else {
             throw new PyBossaRequestException(response.getBody().getObject()
                     .optString("exception_msg", "Publishing task failed"));
@@ -87,6 +89,16 @@ public class PyBossaRequests {
         }
         // if response status is 204 the task was successfully deleted
         return response.getStatus() == 204;
+    }
+
+    /**
+     * Deletes a task from the platform
+     *
+     * @param id the task to delete
+     * @return true if successful, else false
+     */
+    public boolean deleteTask(int id) {
+        return deleteTask(String.valueOf(id));
     }
 
     private void deleteAllTaskRunsForTask(String task) {

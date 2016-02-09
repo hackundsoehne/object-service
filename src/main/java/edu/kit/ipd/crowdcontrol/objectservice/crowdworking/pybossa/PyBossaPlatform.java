@@ -127,16 +127,16 @@ public class PyBossaPlatform implements Platform {
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
-        return CompletableFuture.supplyAsync(() -> requests.postTask(new JSONObject()
+        return CompletableFuture.supplyAsync(() -> String.valueOf(requests.postTask(new JSONObject()
                 .put("project_id", projectID)
                 .put("info", new JSONObject()
                         .put("url", workerServiceUrl)
                         .put("expID", experiment.getId())
                         .put("platformName", name)
-                        .put("idTasks", new JSONArray(idTasks))
-                )
+                        .put("idTasks", new JSONArray(idTasks)))
                 .put("priority_0", 1)
-                .put("n_answers", experiment.getNeededAnswers().getValue())));
+                .put("n_answers", experiment.getNeededAnswers().getValue())))
+        );
     }
 
     @Override
@@ -189,10 +189,16 @@ public class PyBossaPlatform implements Platform {
     private boolean getIdTasks() {
         JSONArray allTasks = requests.getAllTasks();
         // idTasks have to be the first two objects
+        if (allTasks.length() <= IDTASK_COUNT) {
+            return false;
+        }
         for (int i = 0; i < IDTASK_COUNT; i++) {
             JSONObject task = allTasks.optJSONObject(i);
-            if (task != null && task.isNull("info")) {
-                idTasks[i] = task.getInt("id");
+            if (task != null) {
+                JSONObject info = task.optJSONObject("info");
+                if (info.optString("type", "none").equals("idTask")) {
+                    idTasks[i] = task.getInt("id");
+                }
             } else {
                 throw new PyBossaRequestException("Could not initialize tasks for platform "
                         + this.getName() + ": Invalid idTasks.");
@@ -207,10 +213,12 @@ public class PyBossaPlatform implements Platform {
     private void createIdTasks() {
         JSONObject jsonTask = new JSONObject()
                 .put("project_id", projectID)
-                .put("priority_0", 0);
+                .put("priority_0", 0)
+                .put("info", new JSONObject()
+                        .put("type", "idTask"));
 
         for (int i = 0; i < IDTASK_COUNT; i++) {
-            requests.postTask(jsonTask);
+            idTasks[i] = requests.postTask(jsonTask);
         }
     }
 }
