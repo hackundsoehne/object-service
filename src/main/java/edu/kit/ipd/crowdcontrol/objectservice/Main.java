@@ -17,6 +17,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
+import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
+import edu.kit.ipd.crowdcontrol.objectservice.notification.SQLEmailNotificationPolicy;
 import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
@@ -186,6 +188,11 @@ public class Main {
         MoneyTransferManager mng = new MoneyTransferManager(mailHandler, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
         mng.start();
 
+        // notifications might as well use another sendMail instance
+        NotificationController notificationController = new NotificationController(notificationRestOperations,
+                new SQLEmailNotificationPolicy(mailHandler, notificationRestOperations));
+        notificationController.init();
+
         Payment payment = (id, experiment, paymentJob) -> {
             for (PaymentJob job : paymentJob) {
                 mng.addMoneyTransfer(job.getWorkerRecord().getIdWorker(), job.getAmount(), experiment.getId());
@@ -201,11 +208,6 @@ public class Main {
 
         QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations, answerRatingOperations, experimentOperations, experimentResource);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations, workerOperations);
-
-        // TODO initialize mailHandler
-//        NotificationController notificationController = new NotificationController(notificationRestOperations,
-//                new SQLEmailNotificationPolicy(mailHandler, notificationRestOperations));
-//        notificationController.init();
 
         new Router(
                 new TemplateResource(templateOperations),
