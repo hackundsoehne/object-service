@@ -336,10 +336,10 @@ public class ExperimentResource {
             }
 
             resulting = updateExperimentState(id, experiment, old);
-        } else if (experiment.getState() == Experiment.State.DRAFT) {
+        } else if (old.getState() == Experiment.State.DRAFT) {
             resulting = updateExperimentInfoDraftState(id, experiment, old, original);
-        } else if (experiment.getState() == Experiment.State.PUBLISHED ||
-                experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
+        } else if (old.getState() == Experiment.State.PUBLISHED ||
+                old.getState() == Experiment.State.CREATIVE_STOPPED) {
             resulting = updateExperimentGapStop(id, experiment, old, original);
         } else {
             throw new IllegalStateException("Patch not allowed in this state");
