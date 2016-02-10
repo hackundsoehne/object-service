@@ -172,6 +172,8 @@ public class ExperimentResource {
                 .filter(constraintRecord -> !constraintRecord.getConstraint().isEmpty())
                 .forEach(tagConstraintsOperations::insertConstraint);
 
+        experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
+
         experiment.getPopulationsList().forEach(population -> {
             storePopulation(id, population);
         });
