@@ -7,6 +7,13 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperatio
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
+
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jooq.Result;
@@ -152,6 +159,8 @@ public class MoneyTransferManager {
     private void fetchNewGiftCodes() throws MoneyTransferException {
         LOGGER.trace("Started fetching new giftcodes.");
 
+        Float eurUsdRate = getEurUsdExchangeRate();
+
         Message[] messages;
 
         //fetch new mails
@@ -168,7 +177,7 @@ public class MoneyTransferManager {
             try {
                 Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(message, parsingPassword);
                 if (rec.isPresent()) {
-                    workerBalanceOperations.addGiftCode(rec.get().getCode(), rec.get().getAmount());
+                    workerBalanceOperations.addGiftCode(rec.get().getCode(), (int) (rec.get().getAmount() * eurUsdRate));
                     giftCodesCount++;
                 }
             } catch (MoneyTransferException e) {
@@ -200,7 +209,6 @@ public class MoneyTransferManager {
 
         int[] weights = new int[creditBalanceAtStart + 1];
         boolean[][] decision = new boolean[giftCodes.size()][creditBalanceAtStart + 1];
-
 
         for (int i = 0; i < giftCodes.size(); i++) {
             int weight = giftCodes.get(i).getAmount();
@@ -364,5 +372,26 @@ public class MoneyTransferManager {
         }
 
         return content.toString();
+    }
+
+    protected static float getEurUsdExchangeRate() throws MoneyTransferException {
+        LOGGER.trace("Started fetching currency exchange rates.");
+
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        HttpGet httpGet = new HttpGet("http://quote.yahoo.com/d/quotes.csv?s=EURUSD=X&f=l1&e=.csv");
+        ResponseHandler<String> responseHandler = new BasicResponseHandler();
+
+        String responseBody;
+        try {
+            responseBody = httpclient.execute(httpGet, responseHandler);
+            httpclient.close();
+        } catch (IOException e) {
+            LOGGER.error("Fetching currency exchange rates failed.");
+            throw new MoneyTransferException(e.getMessage());
+        }
+
+        LOGGER.trace("Completed fetching currency exchange rates.");
+
+        return Float.parseFloat(responseBody);
     }
 }
