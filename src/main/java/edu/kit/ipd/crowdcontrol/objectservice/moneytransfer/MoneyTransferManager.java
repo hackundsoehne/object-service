@@ -16,6 +16,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.plugins.convert.TypeConverters;
 import org.jooq.Result;
 
 import javax.mail.Message;
@@ -159,7 +160,7 @@ public class MoneyTransferManager {
     private void fetchNewGiftCodes() throws MoneyTransferException {
         LOGGER.trace("Started fetching new giftcodes.");
 
-        Float eurUsdRate = getEurUsdExchangeRate();
+        double eurUsdRate = getEurUsdExchangeRate();
 
         Message[] messages;
 
@@ -374,8 +375,8 @@ public class MoneyTransferManager {
         return content.toString();
     }
 
-    protected static float getEurUsdExchangeRate() throws MoneyTransferException {
-        LOGGER.trace("Started fetching currency exchange rates.");
+    protected static double getEurUsdExchangeRate() throws MoneyTransferException {
+        LOGGER.trace("Started fetching currency exchange rates from EUR to USD.");
 
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet("http://quote.yahoo.com/d/quotes.csv?s=EURUSD=X&f=l1&e=.csv");
@@ -390,8 +391,18 @@ public class MoneyTransferManager {
             throw new MoneyTransferException(e.getMessage());
         }
 
+        double rate = Double.parseDouble(responseBody);
+
+        if (rate > 2) {
+            rate = 2;
+            LOGGER.error("Warning: Exchange rate is above 2. The exchange rate got capped to 2.");
+        } else if (rate < 0.5) {
+            rate = 0.5;
+            LOGGER.error("Warning: Exchange rate is below 0.5. The exchange rate got capped to 0.5.");
+        }
+
         LOGGER.trace("Completed fetching currency exchange rates.");
 
-        return Float.parseFloat(responseBody);
+        return rate;
     }
 }
