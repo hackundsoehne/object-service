@@ -2,21 +2,24 @@ package edu.kit.ipd.crowdcontrol.objectservice.feedback;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
+
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
+
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.jooq.Result;
 
 import javax.mail.MessagingException;
+
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * Sends feedback to workers according to their answers.
@@ -30,6 +33,7 @@ public class FeedbackSender {
     private ExperimentOperations expOps;
     private WorkerOperations workerOps;
 
+    private static final Logger LOGGER = LogManager.getLogger(FeedbackSender.class);
 
     public FeedbackSender(MailHandler handler, AnswerRatingOperations answerOps, ExperimentOperations expOps, WorkerOperations workerOps) {
         this.handler = handler;
@@ -39,6 +43,9 @@ public class FeedbackSender {
     }
 
     public void sendFeedback(int expId) throws FeedbackException {
+
+        LOGGER.trace("Started sending feedback to workers.");
+
         String feedbackMessage = loadMessage("src/main/resources/feedbackMessage.txt");
         String feedbackAnswer = loadMessage("src/main/resources/feedbackAnswer.txt");
         String feedbackRating = loadMessage("src/main/resources/feedbackRating.txt");
@@ -53,21 +60,13 @@ public class FeedbackSender {
         map.put("answers", answerMessage.toString());
         map.put("experimentName", expOps.getExperiment(expId).get().getTitle());
 
+        int workerCount = 0;
         int prevWorkerId = -1;
         for (AnswerRecord answer : answers) {
             if (prevWorkerId != answer.getWorkerId() && prevWorkerId != -1) {
+                workerCount++;
                 String workerMessage = Template.apply(feedbackMessage, map);
-                if (workerOps.getWorker(prevWorkerId).isPresent()) {
-                    try {
-                        handler.sendMail(workerOps.getWorker(prevWorkerId).get().getEmail(), "Feedback to your work", workerMessage);
-                    } catch (MessagingException e) {
-                        throw new FeedbackException("The mailHandler cannot send mails. It seems, that there is a problem with the mailserver or the properties file.");
-                    } catch (UnsupportedEncodingException e) {
-                        throw new FeedbackException("The mailHandler cannot send mails to a worker, because the mail address of the worker is invalid.");
-                    }
-                } else {
-                    throw new FeedbackException("The worker, who gave a answer cannot be found in the database.");
-                }
+                sendFeedback(prevWorkerId, workerMessage);
                 answerMessage = new StringBuilder();
             }
             List<RatingRecord> ratings = answerOps.getRatingsOfAnswer(answer);
@@ -91,8 +90,29 @@ public class FeedbackSender {
 
             prevWorkerId = answer.getWorkerId();
         }
+        if (!answers.isEmpty()) {
+            workerCount++;
+            String workerMessage = Template.apply(feedbackMessage, map);
+            sendFeedback(prevWorkerId, workerMessage);
+        }
 
+        LOGGER.trace("Completed sending feedback to " + workerCount + "workers");
+    }
 
+    private void sendFeedback(int workerID, String workerMessage) throws FeedbackException {
+        if (workerOps.getWorker(workerID).isPresent()) {
+            try {
+                if (!workerOps.getWorker(workerID).get().getEmail().equals("")) {
+                    handler.sendMail(workerOps.getWorker(workerID).get().getEmail(), "Feedback to your work", workerMessage);
+                }
+            } catch (MessagingException e) {
+                LOGGER.error("Sending of feedback failed, because the mailhandler cannot send the mails.");
+                throw new FeedbackException("The mailHandler cannot send mails. It seems, that there is a problem with the mailserver or the properties file.");
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.error("Sending of feedback to worker " + workerID + " failed, because the mail address of this worker is invalid.");            }
+        } else {
+            LOGGER.error("Sending of feedback to worker " + workerID + " failed, because the worker cannot get found in the database.");
+        }
     }
 
     private static String loadMessage(String path) throws FeedbackException {
@@ -107,8 +127,10 @@ public class FeedbackSender {
                 content.append(System.getProperty("line.separator"));
             }
         } catch (FileNotFoundException e) {
+            LOGGER.error("Sending of feedback failed, because the message sources cannot be found.");
             throw new FeedbackException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.");
         } catch (IOException e) {
+            LOGGER.error("Sending of feedback failed, because the message sources are invalid.");
             throw new FeedbackException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
         }
         return content.toString();
