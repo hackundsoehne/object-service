@@ -1,15 +1,16 @@
 package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.io.*;
 
 /**
- * Created by lucas on 10.02.16.
+ * Created by lucaskrauss on 10.02.16.
+ * @author lucaskrauss
+ *
+ * Calculates the similarity of two images.
+ * For that each image is seperated in 25 sections and for each of them its color-signature is calculated.
+ * The corresponding sections of the pictures are copared after that. Their similarity is based on the deviation of
+ * the colorsignature of each section and thus based on location and color
  */
 public class ImageSimilarity {
 
@@ -39,13 +40,13 @@ public class ImageSimilarity {
                 double red = Math.pow(signatureImage1[i][j].getRed() - signatureImage2[i][j].getRed(), 2);
                 double green = Math.pow(signatureImage1[i][j].getGreen() - signatureImage2[i][j].getGreen(), 2);
                 double blue = Math.pow(signatureImage1[i][j].getBlue() - signatureImage2[i][j].getBlue(), 2);
-                System.out.println(signatureImage1[i][j].getBlue()+" "+signatureImage2[i][j].getBlue());
                 distance += Math.sqrt(red + green + blue);
             }
         }
 
+
         //Normalize distance
-        return distance;
+        return 1-(distance/MAX_DISTANCE);
     }
 
     /**
@@ -59,49 +60,40 @@ public class ImageSimilarity {
     private Color[][] getImageSignature(BufferedImage image) {
         if (!(image.getHeight() == BASE_SIZE) && !(image.getWidth() == BASE_SIZE)) {
             image = rescale(image);
-
         }
-
         Color[][] imgSignature = new Color[5][5];
-        ColorModel colorModel = image.getColorModel();
-
         for (int imgX = 0; imgX < imgSignature.length; imgX++) {
             for (int imgY = 0; imgY < imgSignature.length; imgY++) {
-                imgSignature[imgX][imgY] = getAvg(colorModel, imgX, imgY);
+                imgSignature[imgX][imgY] = getAvg(image, imgX, imgY);
             }
         }
-
         return imgSignature;
-        //TODO check return value, seems to be always the same
+
     }
 
     /**
      * Calculates average color-signature of specified image-section
      *
-     * @param colorModel of the image
+     * @param image image to be processed
      * @param imgX x-coordinate of the beginning of the image-section
      * @param imgY y-coordinate of the beginning of the image-section
      * @return average color-signature of the image section
      */
-    private  Color getAvg(ColorModel colorModel, int imgX, int imgY) {
+    private  Color getAvg(BufferedImage image, int imgX, int imgY) {
         int[] colorBuffer = new int[3];
         for (int x = imgX * SAMPLE_SIZE; x < (imgX + 1) * SAMPLE_SIZE; x++) {
             for (int y = imgY * SAMPLE_SIZE; y < (imgY + 1) * SAMPLE_SIZE; y++) {
                 //get color-values for pixel (x,y)
-                colorBuffer[0] += colorModel.getRed(x + y);
-                colorBuffer[1] += colorModel.getGreen(x + y);
-                colorBuffer[2] += colorModel.getBlue(x + y);
-
+                Color c = new Color(image.getRGB(x,y));
+                colorBuffer[0] += c.getRed();
+                colorBuffer[1] += c.getGreen();
+                colorBuffer[2] += c.getBlue();
             }
         }
-
-
-
         colorBuffer[0] /= SAMPLE_SIZE*SAMPLE_SIZE;
         colorBuffer[1] /= SAMPLE_SIZE*SAMPLE_SIZE;
         colorBuffer[2] /= SAMPLE_SIZE*SAMPLE_SIZE;
 
-        System.out.println(colorBuffer[0]+" "+colorBuffer[1]+" "+colorBuffer[2]);
         return new Color(colorBuffer[0], colorBuffer[1], colorBuffer[2]);
     }
 
