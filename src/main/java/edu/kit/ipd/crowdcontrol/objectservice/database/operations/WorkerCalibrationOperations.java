@@ -25,7 +25,7 @@ public class WorkerCalibrationOperations extends AbstractOperations {
      * @param workerId ID of the worker
      * @param answerOption the chosen answerOption
      * @return Inserted calibration answer
-     * @throws IllegalArgumentException if the
+     * @throws IllegalArgumentException if the worker has already chosen an answer
      */
     public CalibrationAnswer insertAnswer(int workerId, int answerOption) throws IllegalArgumentException {
         Select<Record1<Integer>> possibleAnswers = DSL

@@ -91,11 +91,11 @@ public class RatingQualityByDistributionTest {
 
 
     }
-
+   
     @Test
     public void testRndRatings(){
         Random rand = new Random();
-        for (int i = 0; i < rand.nextInt(50); i++) {
+        for (int i = 0; i < rand.nextInt(50)+1; i++) {
             ratings.add( new RatingRecord(1,0,0,null,rand.nextInt(9),"",0,0));
 
         }

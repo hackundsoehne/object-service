@@ -172,6 +172,8 @@ public class ExperimentResource {
                 .filter(constraintRecord -> !constraintRecord.getConstraint().isEmpty())
                 .forEach(tagConstraintsOperations::insertConstraint);
 
+        experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
+
         experiment.getPopulationsList().forEach(population -> {
             storePopulation(id, population);
         });
@@ -336,10 +338,10 @@ public class ExperimentResource {
             }
 
             resulting = updateExperimentState(id, experiment, old);
-        } else if (experiment.getState() == Experiment.State.DRAFT) {
+        } else if (old.getState() == Experiment.State.DRAFT) {
             resulting = updateExperimentInfoDraftState(id, experiment, old, original);
-        } else if (experiment.getState() == Experiment.State.PUBLISHED ||
-                experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
+        } else if (old.getState() == Experiment.State.PUBLISHED ||
+                old.getState() == Experiment.State.CREATIVE_STOPPED) {
             resulting = updateExperimentGapStop(id, experiment, old, original);
         } else {
             throw new IllegalStateException("Patch not allowed in this state");
@@ -365,7 +367,7 @@ public class ExperimentResource {
 
         newPopulations.forEach(population -> {
             try {
-                platformManager.publishTask(population.getPlatformId(), experiment).join();
+                platformManager.publishTask(population.getPlatformId(), old).join();
                 storePopulation(id, population);
             } catch (TaskOperationException e) {
                 log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s", experiment.getTitle(), population.getPlatformId()), e);

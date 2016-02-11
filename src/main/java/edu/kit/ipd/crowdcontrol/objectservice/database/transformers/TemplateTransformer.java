@@ -36,9 +36,9 @@ public class TemplateTransformer extends AbstractTransformer {
      * @return Template.
      */
     public static Template toProto(TemplateRecord record, List<RatingOptionTemplateRecord> ratingOptions, List<TemplateTagRecord> tags, List<TemplateConstraintRecord> constraints) {
-        AnswerType answerType = "IMAGE".equals(record.getAnswerType())
-                ? AnswerType.IMAGE
-                : AnswerType.TEXT;
+        AnswerType answerType = record.getAnswerType() == null
+                ? AnswerType.TEXT
+                : AnswerType.IMAGE;
 
         List<Template.RatingOption> options = ratingOptions.stream()
                 .map(option -> Template.RatingOption.newBuilder()
@@ -125,9 +125,12 @@ public class TemplateTransformer extends AbstractTransformer {
                 case Template.CONTENT_FIELD_NUMBER: record.setTemplate(template.getContent());
                     break;
                 case Template.ANSWER_TYPE_FIELD_NUMBER:
-                    if ("IMAGE".equals(template.getAnswerType().name())) {
-                        record.setAnswerType(template.getAnswerType().name());
+                    if (template.getAnswerType() == AnswerType.IMAGE) {
+                        record.setAnswerType("image/*");
+                    } else {
+                        record.setAnswerType(null);
                     }
+
                     break;
             }
         });
