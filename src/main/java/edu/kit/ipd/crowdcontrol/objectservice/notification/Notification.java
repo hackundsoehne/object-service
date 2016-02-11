@@ -97,7 +97,7 @@ public class Notification implements Runnable {
         try {
             policy.invoke(this);
         } catch (RuntimeException e) {
-            LOGGER.error("An Exception occurred while checking or sending a notification.", e);
+            LOGGER.error("An exception occurred while checking or sending a notification.", e);
         }
     }
 

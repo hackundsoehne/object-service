@@ -75,9 +75,9 @@ public class MoneyTransferManager {
                 try {
                     sendCriticalNotification(e.toString());
                 } catch (MoneyTransferException f) {
-                    LOGGER.error(f);
+                    LOGGER.error("", f);
                 }
-                LOGGER.error(e);
+                LOGGER.error("", e);
             }
         };
 
@@ -272,8 +272,7 @@ public class MoneyTransferManager {
         } catch (MessagingException e) {
             throw new MoneyTransferException(MAIL_FAILURE_MESSAGE);
         } catch (UnsupportedEncodingException e) {
-            LOGGER.error(e);
-            LOGGER.error("Sending of " + giftCodes.size() + " giftcodes to worker" + worker.getIdWorker() + " failed.");
+            LOGGER.error("Sending of " + giftCodes.size() + " gift codes to worker" + worker.getIdWorker() + " failed.", e);
         }
     }
 
@@ -302,7 +301,7 @@ public class MoneyTransferManager {
         } catch (MessagingException e) {
             throw new MoneyTransferException(MAIL_FAILURE_MESSAGE);
         } catch (UnsupportedEncodingException e) {
-            LOGGER.error(e);
+            LOGGER.error("", e);
         }
     }
 
@@ -322,6 +321,7 @@ public class MoneyTransferManager {
         }
 
         mail = mail.append(message);
+
         try {
             if (notificationText.length() != 0) {
                 LOGGER.trace("Started sending a notification about errors with submission of giftcodes.");
@@ -329,7 +329,7 @@ public class MoneyTransferManager {
                 LOGGER.trace("Completed sending a notification about errors with submission of giftcodes.");
             }
         } catch (MessagingException | UnsupportedEncodingException e) {
-            LOGGER.error(e);
+            LOGGER.error("", e);
         }
     }
 
