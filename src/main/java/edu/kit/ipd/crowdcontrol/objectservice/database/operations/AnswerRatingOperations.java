@@ -2,7 +2,9 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransformer;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -323,22 +325,25 @@ public class AnswerRatingOperations extends AbstractOperations {
     private void addToExperimentCalibration(int workerID, int experimentId) {
         Supplier<Optional<CalibrationAnswer>> doAdd = () -> calibrationOperations
                 .getCalibrationForExperiment(experimentId)
-                .map(answerOption -> workerCalibrationOperations
-                                .insertAnswer(workerID, answerOption.getIdCalibrationAnswerOption())
-                );
+                .map(answerOption -> {
+                    try {
+                        return workerCalibrationOperations
+                                        .insertAnswer(workerID, answerOption.getIdCalibrationAnswerOption());
+                    } catch (IllegalArgumentException ignored) {
+                        //is ok, the worker was already added
+                        return CalibrationAnswer.getDefaultInstance();
+                    }
+                });
 
         Optional<CalibrationAnswer> result = doAdd.get();
-
-        /*
-        FIXME Leander this is not really needed, we only call addToExperimentCalibration if the experiment is published
-        If the experiment got published we created the calibration for the experiment, so here is no reason to do this repair,
-        since its not possible the other way around. Opinion?
-         */
-        /*if (!result.isPresent()) {
+        if (!result.isPresent()) {
             System.err.println(String.format("Database inconsistency! No calibration for experiment: %d present", experimentId));
-            calibrationOperations.createExperimentsCalibration(experimentId);
+            Experiment experiment = experimentOperations.getExperiment(experimentId)
+                    .map(record -> ExperimentTransformer.toProto(record, experimentOperations.getExperimentState(experimentId)))
+                    .orElseThrow(() -> new IllegalArgumentException(String.format("Experiment %d is not existing", experimentId)));
+            calibrationOperations.createExperimentsCalibration(experimentId, experiment);
             doAdd.get();
-        }*/
+        }
     }
 
     /**
