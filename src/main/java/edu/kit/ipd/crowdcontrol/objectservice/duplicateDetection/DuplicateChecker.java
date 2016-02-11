@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 
+import java.awt.image.BufferedImage;
 import java.util.*;
 
 /**
@@ -33,7 +34,11 @@ public class DuplicateChecker {
         List<AnswerRecord> answerRecords = answerRatingOperations.getAnswersOfExperiment(expID);
         if(answerRecords.size() > 1){
             //get duplicates
-            Set<AnswerRecord> duplicates = getStringDuplicates(answerRecords);
+
+
+            //TODO seperate string-answers from picture answers
+            Set<AnswerRecord> duplicates = getStringDuplicates(answerRecords); //String-duplicates
+            duplicates.addAll(getImageDuplicates(answerRecords));              //Image-duplicates
             //set quality
             duplicates.forEach(answerRecord -> {
                 answerRatingOperations.setQualityToAnswer(answerRecord,0);
@@ -62,5 +67,23 @@ public class DuplicateChecker {
 
         return duplicates;
 
+    }
+
+    private Set<AnswerRecord> getImageDuplicates(List<AnswerRecord> answerRecords){
+        Set<AnswerRecord> duplicates = new HashSet<>();
+
+        //TODO fetch images
+        Map<BufferedImage,AnswerRecord> imageMap = new HashMap<>();
+
+        imageMap.forEach((imageA,answerRecordA) ->{
+            imageMap.forEach((imageB,answerRecordB)->{
+                if(answerRecordA != answerRecordB){
+                    if(ImageSimilarity.identifyImageSimilarity(imageA,imageB) > .9){
+                      duplicates.add( answerRecordA.getTimestamp().compareTo(answerRecordB.getTimestamp()) < 0 ? answerRecordB : answerRecordA);
+                    }
+                }
+            });
+        });
+        return duplicates;
     }
 }
