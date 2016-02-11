@@ -80,6 +80,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
         Function<ConstraintRecord, Constraint> mapper = (constraintRecord) -> Constraint.newBuilder().setId(constraintRecord.getIdConstraint()).setName(constraintRecord.getConstraint()).build();
 
         return builder(Rating.newBuilder())
+                .set(ratingRecord.getExperiment(), Rating.Builder::setExperimentId)
                 .set(ratingRecord.getRating(), Rating.Builder::setRating)
                 .set(ratingRecord.getFeedback(), Rating.Builder::setFeedback)
                 .getBuilder()
