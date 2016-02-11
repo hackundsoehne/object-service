@@ -28,7 +28,7 @@ public class ImageSimilarity {
      * @param image2
      * @return
      */
-    public double identifyImageSimilarity(BufferedImage image1, BufferedImage image2) {
+    public static double identifyImageSimilarity(BufferedImage image1, BufferedImage image2) {
 
         Color[][] signatureImage1 = getImageSignature(image1);
         Color[][] signatureImage2 = getImageSignature(image2);
@@ -57,7 +57,7 @@ public class ImageSimilarity {
      * @return a two dimensional Color-array. Each entry Color[x][y] contains the color-value of the image-section
      * (x,y) to (x+1,y+1). The locality of the image-section is preserved.
      */
-    private Color[][] getImageSignature(BufferedImage image) {
+    private static Color[][] getImageSignature(BufferedImage image) {
         if (!(image.getHeight() == BASE_SIZE) && !(image.getWidth() == BASE_SIZE)) {
             image = rescale(image);
         }
@@ -79,7 +79,7 @@ public class ImageSimilarity {
      * @param imgY y-coordinate of the beginning of the image-section
      * @return average color-signature of the image section
      */
-    private  Color getAvg(BufferedImage image, int imgX, int imgY) {
+    private static Color getAvg(BufferedImage image, int imgX, int imgY) {
         int[] colorBuffer = new int[3];
         for (int x = imgX * SAMPLE_SIZE; x < (imgX + 1) * SAMPLE_SIZE; x++) {
             for (int y = imgY * SAMPLE_SIZE; y < (imgY + 1) * SAMPLE_SIZE; y++) {
@@ -103,7 +103,7 @@ public class ImageSimilarity {
      * @param oldImage
      * @return
      */
-    private BufferedImage rescale(BufferedImage oldImage) {
+    private static BufferedImage rescale(BufferedImage oldImage) {
 
         BufferedImage newImage = new BufferedImage(BASE_SIZE, BASE_SIZE, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = newImage.createGraphics();
