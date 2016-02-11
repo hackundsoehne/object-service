@@ -45,7 +45,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                 .set(record.getTitle(), Experiment.Builder::setTitle)
                 .set(record.getDescription(), Experiment.Builder::setDescription)
                 .set(state, Experiment.Builder::setState)
-                .set(record.getAnswerType(), (builder, x) -> builder.setAnswerType(AnswerType.valueOf(x)))
+                .set(record.getAnswerType(), (builder, x) -> builder.setAnswerType(x == null ? AnswerType.TEXT : AnswerType.IMAGE))
                 .set(record.getAlgorithmTaskChooser(), (builder, x) -> builder.setAlgorithmTaskChooser(algo.apply(x)))
                 .set(record.getAlgorithmQualityAnswer(), (builder, x) -> builder.setAlgorithmQualityAnswer(algo.apply(x)))
                 .set(record.getAlgorithmQualityRating(), (builder, x) -> builder.setAlgorithmQualityRating(algo.apply(x)))
@@ -99,8 +99,12 @@ public class ExperimentTransformer extends AbstractTransformer {
     }
 
     private static String transform(AnswerType answerType) {
-        if (answerType == AnswerType.INVALID || answerType == AnswerType.TEXT) return null;
-        return answerType.name();
+        switch (answerType) {
+            case IMAGE:
+                return "image/*";
+            default:
+                return null;
+        }
     }
 
     private static Experiment.RatingOption transform(RatingOptionExperimentRecord record) {
