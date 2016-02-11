@@ -23,8 +23,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.ho.yaml.Yaml;
 import org.jooq.SQLDialect;
 
@@ -51,6 +53,14 @@ public class Main {
         // Disable jOOQ's self-advertising
         // http://stackoverflow.com/a/28283538/2373138
         System.setProperty("org.jooq.no-logo", "true");
+
+        Configurator.setLevel("com.zaxxer.hikari", Level.WARN);
+        Configurator.setLevel("org.eclipse.jetty", Level.WARN);
+        Configurator.setLevel("org.jooq.impl.DefaultBinding", Level.WARN);
+        Configurator.setLevel("org.jooq.impl.DefaultConnectionProvider", Level.WARN);
+        Configurator.setLevel("org.jooq.tools.StopWatch", Level.WARN);
+        Configurator.setLevel("spark.webserver.MatcherFilter", Level.WARN);
+        Configurator.setLevel("spark.Request", Level.WARN);
     }
 
     public static void main(String[] args) throws IOException, ConfigException {
