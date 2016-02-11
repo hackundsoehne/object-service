@@ -79,12 +79,15 @@ public class Main {
                             config.deployment.workerService);
                     break;
                 case "pybossa":
-                    platformInstance = new PyBossaPlatform(config.deployment.workerService,
+                    PyBossaPlatform pyBossa = new PyBossaPlatform(config.deployment.workerService,
                             platform.apiKey,
                             platform.url,
                             platform.name,
                             platform.projectId,
                             platform.calibrationsAllowed);
+                    pyBossa.init();
+                    platformInstance = pyBossa;
+                    break;
                 case "dummy":
                     platformInstance = new DummyPlatform(platform.name);
                     break;
