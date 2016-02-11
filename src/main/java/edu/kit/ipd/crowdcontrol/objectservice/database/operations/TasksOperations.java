@@ -5,7 +5,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Task
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
@@ -65,6 +67,12 @@ public class TasksOperations extends AbstractOperations {
     public void deleteTask(TaskRecord result) {
         assertHasPrimaryKey(result);
         create.deleteFrom(TASK)
-                .where(TASK.ID_TASK.eq(result.getIdTask()));
+                .where(TASK.ID_TASK.eq(result.getIdTask())).execute();
+    }
+
+    public List<TaskRecord> getTasks(int id) {
+        return create.selectFrom(TASK)
+                .where(TASK.EXPERIMENT.eq(id))
+                .fetch().stream().collect(Collectors.toList());
     }
 }

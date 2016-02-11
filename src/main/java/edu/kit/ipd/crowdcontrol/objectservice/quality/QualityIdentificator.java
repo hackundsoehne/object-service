@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality;
 
-import edu.kit.ipd.crowdcontrol.objectservice.ExperimentController;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
@@ -13,6 +12,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualit
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityStrategy;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.RatingQualityByDistribution;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.RatingQualityStrategy;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ExperimentResource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rx.Observable;
@@ -37,7 +37,7 @@ public class QualityIdentificator {
 
     private final Logger log = LogManager.getLogger(QualityIdentificator.class);
     private final Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
-    private final ExperimentController controller;
+    private final ExperimentResource experimentResource;
     private final AnswerRatingOperations answerOperations;
     private final ExperimentOperations experimentOperations;
     private final AlgorithmOperations algorithmOperations;
@@ -54,9 +54,9 @@ public class QualityIdentificator {
      * Might be set to allow more flexibility and more good answers
      */
 
-    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentController controller) {
+    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentResource experimentResource) {
 
-        this.controller = controller;
+        this.experimentResource = experimentResource;
         this.answerOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.algorithmOperations = algorithmOperations;
@@ -155,7 +155,7 @@ public class QualityIdentificator {
      */
     private void checkExpStatus(ExperimentRecord experiment) {
         if (experiment.getNeededAnswers() == answerOperations.getNumberOfFinalGoodAns(experiment.getIdExperiment())) {
-            controller.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
+            experimentResource.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
         }
 
     }

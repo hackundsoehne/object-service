@@ -1,9 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.CalibrationOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TagConstraintsOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import org.junit.Before;
@@ -32,6 +30,8 @@ public class ExperimentResourceTest {
     private CalibrationOperations calibrationOperations;
     private TagConstraintsOperations tagConstraintsOperations;
     private AlgorithmOperations algorithmOperations;
+    private TasksOperations tasksOperations;
+    private PlatformManager platformManager;
 
     @Before
     public void setUp() {
@@ -42,8 +42,10 @@ public class ExperimentResourceTest {
         calibrationOperations = mock(CalibrationOperations.class);
         tagConstraintsOperations = mock(TagConstraintsOperations.class);
         algorithmOperations = mock(AlgorithmOperations.class);
+        tasksOperations = mock(TasksOperations.class);
+        platformManager = mock(PlatformManager.class);
 
-        resource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations);
+        resource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations, tasksOperations,  platformManager);
     }
 
     /**

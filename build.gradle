@@ -60,6 +60,10 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+compileJava {
+    options.encoding = "UTF-8"
+}
+
 //tests
 
 test {
@@ -207,4 +211,14 @@ wsdl2java {
     wsdlDir = file("src/main/generated/") // define to support incremental build
     wsdlsToGenerate = [['src/main/wsdl/mturk/AWSMechanicalTurkRequester.wsdl']]
     locale = Locale.ENGLISH
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'edu.kit.ipd.crowdcontrol.objectservice.Main'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
