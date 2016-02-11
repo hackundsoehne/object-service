@@ -30,7 +30,7 @@ public class PyBossaPlatformTest {
     private static final String NAME = "pybossa";
     private static final int PROJECT_ID = 1;
 
-    private static PyBossaRequests requests = new PyBossaRequests(TASK_URL, PROJECT_ID, API_KEY);
+    private static PyBossaRequests requests = new PyBossaRequests(API_URL, PROJECT_ID, API_KEY);
 
     private Experiment experiment = Experiment.newBuilder()
             .setId(1)
@@ -81,7 +81,7 @@ public class PyBossaPlatformTest {
     public void testUnpublishTask() throws Exception {
         // get first available task
         JSONArray tasks = requests.getAllTasks();
-        String taskId = String.valueOf(tasks.optJSONObject(0));
+        String taskId = String.valueOf(tasks.optJSONObject(0).getInt("id"));
         CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(taskId);
         assertTrue(booleanCompletableFuture.get());
     }
