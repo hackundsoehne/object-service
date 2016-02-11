@@ -91,7 +91,12 @@ public class PyBossaPlatform implements Platform {
                         .put("expID", experiment.getId())
                         .put("platformName", name)
                         .put("idTasks", new JSONArray(idTasks))
-                        .put("type", "experiment"))
+                        .put("type", "experiment")
+                        .put("paymentBase", experiment.getPaymentBase())
+                        .put("paymentRating", experiment.getPaymentRating())
+                        .put("paymentAnswer", experiment.getPaymentAnswer())
+                        //pybossa doesn't support tags
+                )
                 .put("priority_0", 1)
                 .put("n_answers", experiment.getNeededAnswers().getValue())))
         );
