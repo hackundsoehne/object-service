@@ -103,13 +103,11 @@ public class AnswerRatingTransformer extends AbstractTransformer {
     public static RatingRecord toRatingRecord(Rating rating, int answerId, int experimentId) {
         RatingRecord ratingRecord = new RatingRecord();
         ratingRecord.setAnswerR(answerId);
+        ratingRecord.setExperiment(experimentId);
         ratingRecord.setTimestamp(Timestamp.from(Instant.now()));
 
         return merge(ratingRecord, rating, (field, record) -> {
             switch (field) {
-                case Rating.EXPERIMENT_ID_FIELD_NUMBER:
-                    record.setExperiment(experimentId);
-                    break;
                 case Rating.RATING_FIELD_NUMBER:
                     record.setRating(rating.getRating());
                     break;
