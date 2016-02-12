@@ -87,7 +87,7 @@ public class PyBossaPlatform implements Platform {
                 .put("info", new JSONObject()
                         .put("url", workerServiceUrl)
                         .put("expID", experiment.getId())
-                        .put("platformName", name)
+                                .put("platform", getID())
                         .put("idTasks", new JSONArray(idTasks))
                         .put("type", "experiment")
                         .put("paymentBase", experiment.getPaymentBase())
@@ -113,7 +113,7 @@ public class PyBossaPlatform implements Platform {
                     .put("info", new JSONObject()
                             .put("url", workerServiceUrl)
                             .put("expID", experiment.getId())
-                            .put("platformName", name)
+                            .put("platform", getID())
                             .put("idTasks", new JSONArray(idTasks))
                     )
                     .put("n_answers", experiment.getNeededAnswers()));
