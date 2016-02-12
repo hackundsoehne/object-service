@@ -42,7 +42,7 @@ public class ExperimentTransformer extends AbstractTransformer {
 
         // TODO: LEANDER: Execute build on null might not be safe, don't change it for now but fake null instead.
         if (record.getAnswerType() == null) {
-            record.setAnswerType("null");
+            record.setAnswerType("");
         }
 
         return builder(Experiment.newBuilder())
@@ -50,7 +50,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                 .set(record.getTitle(), Experiment.Builder::setTitle)
                 .set(record.getDescription(), Experiment.Builder::setDescription)
                 .set(state, Experiment.Builder::setState)
-                .set(record.getAnswerType(), (builder, x) -> builder.setAnswerType(x.equals("null") ? AnswerType.TEXT : AnswerType.IMAGE))
+                .set(record.getAnswerType(), (builder, x) -> builder.setAnswerType(x.equals("") ? AnswerType.TEXT : AnswerType.IMAGE))
                 .set(record.getAlgorithmTaskChooser(), (builder, x) -> builder.setAlgorithmTaskChooser(algo.apply(x)))
                 .set(record.getAlgorithmQualityAnswer(), (builder, x) -> builder.setAlgorithmQualityAnswer(algo.apply(x)))
                 .set(record.getAlgorithmQualityRating(), (builder, x) -> builder.setAlgorithmQualityRating(algo.apply(x)))
