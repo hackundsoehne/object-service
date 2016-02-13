@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
+import com.google.common.primitives.Ints;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
@@ -8,7 +9,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -50,7 +50,6 @@ public class PyBossaPlatform implements Platform {
         this.calibsAllowed = calibsAllowed;
 
         this.requests = new PyBossaRequests(apiUrl, this.projectID, apiKey);
-
     }
 
     /**
@@ -142,23 +141,33 @@ public class PyBossaPlatform implements Platform {
         String givenIdTask = param.getOrDefault("idTask", emptyDefault)[0];
         String givenCode = param.getOrDefault("code", emptyDefault)[0];
 
+        String errorMessage = "";
         if (!givenWorkerId.isEmpty() && !givenCode.isEmpty() && !givenIdTask.isEmpty()) {
             // check if valid idTask
-            if (Arrays.asList(idTasks).contains(givenIdTask)) {
+            if (Ints.contains(idTasks, java.lang.Integer.parseInt(givenIdTask))) {
                 // check if givenCode matches saved random
                 JSONArray taskRuns = requests.getTaskRuns(givenIdTask, givenWorkerId);
                 // if all given values are valid there should only be one task run returned
-                if (taskRuns.length() == 1) {
+                if (taskRuns.length() > 0) {
+                    // delete task run anyway, so the idTask can be used again
+                    requests.deleteTaskRun(taskRuns.getJSONObject(0).getInt("id"));
                     String savedCode = taskRuns.getJSONObject(0).getJSONObject("info").optString("code", "");
                     if (savedCode.equals(givenCode)) {
                         return givenWorkerId;
+                    } else {
+                        errorMessage = String.format("The identification code passed by worker %s, " +
+                                "doesn't equal the code stored in the taskRun.", givenWorkerId);
                     }
+                } else {
+                    errorMessage = String.format("There was no taskRun found for idTask %s and worker %s.",
+                            givenIdTask, givenWorkerId);
                 }
-                // delete task run anyway
-                requests.deleteTaskRun(taskRuns.getJSONObject(0).getInt("id"));
             }
+        } else {
+            errorMessage = "Invalid parameters passed to PyBossaPlatform. Expected: " +
+                    "workerId={id}&idTask={idTaskId}&code={theCode}";
         }
-        throw new UnidentifiedWorkerException();
+        throw new UnidentifiedWorkerException(errorMessage);
     }
 
     /**

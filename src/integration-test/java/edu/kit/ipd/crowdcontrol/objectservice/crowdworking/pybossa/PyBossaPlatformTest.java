@@ -22,17 +22,14 @@ import static org.junit.Assert.assertTrue;
  */
 @Ignore
 public class PyBossaPlatformTest {
-    static PyBossaPlatform pybossa;
-    private static final String WORKER_SERVICE_URL = "http://pse.kelunik.com";
+    private static final String WORKER_SERVICE_URL = "http://localhost:8080";
     private static final String API_KEY = "8ec92fa1-1bd1-42ad-8524-3d2bab4588b1";
     private static final String API_URL = "http://localhost:5000/api";
     private static final String TASK_URL = API_URL + "/task";
     private static final String NAME = "pybossa";
     private static final int PROJECT_ID = 1;
 
-    private static PyBossaRequests requests = new PyBossaRequests(API_URL, PROJECT_ID, API_KEY);
-
-    private Experiment experiment = Experiment.newBuilder()
+    private static Experiment experiment = Experiment.newBuilder()
             .setId(1)
             .setTitle("Test Experiment")
             .setDescription("Test description")
@@ -40,6 +37,9 @@ public class PyBossaPlatformTest {
             .setNeededAnswers(Integer.newBuilder().setValue(5).build())
             .setRatingsPerAnswer(Integer.newBuilder().setValue(5).build())
             .build();
+
+    private static PyBossaRequests requests = new PyBossaRequests(API_URL, PROJECT_ID, API_KEY);
+    private static PyBossaPlatform pybossa;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -49,15 +49,7 @@ public class PyBossaPlatformTest {
         pybossa.init();
     }
 
-    @Test
-    public void testInitIdTasks() throws Exception {
 
-    }
-
-    @Test
-    public void testGetWorker() throws Exception {
-
-    }
 
     @Test
     public void testPublishTask() throws Exception {
