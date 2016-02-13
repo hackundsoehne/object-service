@@ -367,7 +367,7 @@ public class ExperimentResource {
 
         newPopulations.forEach(population -> {
             try {
-                platformManager.publishTask(population.getPlatformId(), experiment).join();
+                platformManager.publishTask(population.getPlatformId(), old).join();
                 storePopulation(id, population);
             } catch (TaskOperationException e) {
                 log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s", experiment.getTitle(), population.getPlatformId()), e);
