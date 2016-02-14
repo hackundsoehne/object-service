@@ -9,6 +9,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -30,6 +33,7 @@ public class PyBossaPlatform implements Platform {
     private final Boolean calibsAllowed;
     private int[] idTasks = new int[IDTASK_COUNT];
     private PyBossaRequests requests;
+    private MessageDigest messageDigest;
 
     /**
      * The implementation of the pybossa platform.
@@ -50,6 +54,13 @@ public class PyBossaPlatform implements Platform {
         this.calibsAllowed = calibsAllowed;
 
         this.requests = new PyBossaRequests(apiUrl, this.projectID, apiKey);
+
+        try {
+            this.messageDigest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            // it's unlikely that this exception will ever occur since the algorithm is fixed.
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -145,14 +156,16 @@ public class PyBossaPlatform implements Platform {
         if (!givenWorkerId.isEmpty() && !givenCode.isEmpty() && !givenIdTask.isEmpty()) {
             // check if valid idTask
             if (Ints.contains(idTasks, java.lang.Integer.parseInt(givenIdTask))) {
-                // check if givenCode matches saved random
                 JSONArray taskRuns = requests.getTaskRuns(givenIdTask, givenWorkerId);
                 // if all given values are valid there should only be one task run returned
-                if (taskRuns.length() > 0) {
+                if (taskRuns.length() == 1) {
                     // delete task run anyway, so the idTask can be used again
                     requests.deleteTaskRun(taskRuns.getJSONObject(0).getInt("id"));
                     String savedCode = taskRuns.getJSONObject(0).getJSONObject("info").optString("code", "");
-                    if (savedCode.equals(givenCode)) {
+                    // the saved code is the sha256 representation of the given code in base64url encoding
+                    // this hashes the givenCode in sha256 and compares it to the decoded savedCode
+                    if (MessageDigest.isEqual(Base64.getUrlDecoder().decode(savedCode),
+                            messageDigest.digest(givenCode.getBytes()))) {
                         return givenWorkerId;
                     } else {
                         errorMessage = String.format("The identification code passed by worker %s, " +

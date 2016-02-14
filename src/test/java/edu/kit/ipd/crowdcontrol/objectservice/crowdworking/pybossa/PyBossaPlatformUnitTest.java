@@ -14,6 +14,8 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.security.MessageDigest;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -40,6 +42,8 @@ public class PyBossaPlatformUnitTest {
             .setRatingsPerAnswer(Integer.newBuilder().setValue(5).build())
             .build();
 
+    private static MessageDigest messageDigest;
+
     private static String idTask = "2";
     private static final String WORKER_ID = "37";
     @Rule
@@ -52,6 +56,8 @@ public class PyBossaPlatformUnitTest {
 
     @Before
     public void setUp() throws Exception {
+        messageDigest = MessageDigest.getInstance("SHA-256");
+
         MockitoAnnotations.initMocks(this);
         when(requests.getAllTasks()).thenReturn(getAllTasksDummy(3, 2));
         pybossa.init();
@@ -62,11 +68,12 @@ public class PyBossaPlatformUnitTest {
         Optional<WorkerIdentification> workerIdentification = pybossa.getWorker();
 
         String code = "super code";
+        String hashedEncodedCode = Base64.getUrlEncoder().encodeToString(messageDigest.digest(code.getBytes()));
         JSONArray taskRun = new JSONArray().put(new JSONObject()
                 .put("id", 2)
                 .put("user_id", WORKER_ID)
                 .put("info", new JSONObject()
-                        .put("code", code)));
+                        .put("code", hashedEncodedCode)));
         when(requests.getTaskRuns(idTask, WORKER_ID)).thenReturn(taskRun);
         HashMap<String, String[]> params = new HashMap<>();
         params.put("idTask", new String[]{idTask});
