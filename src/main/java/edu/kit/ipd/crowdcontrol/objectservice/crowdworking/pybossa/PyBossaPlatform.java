@@ -137,10 +137,10 @@ public class PyBossaPlatform implements Platform {
     }
 
     /**
-     * IdentifyWorker takes the passed params and looks for a specified workerid, an idTask id and a code.
+     * IdentifyWorker takes the passed params and looks for a specified workerId, an idTask id and a code.
      * It then checks if there is one idTask that has been submitted by the worker before.
-     * It compares the code saved in the taskRun, with the one passed in the params.
-     * If the codes are equal, the workers identity is verified for this particular request.
+     * It hashes the passed code from the params and compares it to the previously hashed code saved in the taskRun.
+     * If the hashes are equal, the workers identity is verified for this particular request.
      *
      * @param param the params passed from the worker ui
      * @return the worker's id
