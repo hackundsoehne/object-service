@@ -72,7 +72,7 @@ public class PlatformManagerTest {
             record2.setPlatformData(42 + "");
 
             when(tasksOps.createTask(record)).thenReturn(record.copy());
-            when(tasksOps.updateTask(record2)).thenReturn(true);
+            when(tasksOps.updateExperimentsPlatform(record2)).thenReturn(true);
 
             try {
                 manager.publishTask(platform.getID(), experiment).join();
@@ -81,7 +81,7 @@ public class PlatformManagerTest {
             }
 
             verify(tasksOps).createTask(record);
-            verify(tasksOps).updateTask(record2);
+            verify(tasksOps).updateExperimentsPlatform(record2);
         });
     }
 
@@ -94,13 +94,13 @@ public class PlatformManagerTest {
             record.setStatus(TaskStatus.running);
             record.setPlatformData(42 + "");
 
-            when(tasksOps.getTask(platform.getID(), experiment.getId())).thenReturn(Optional.of(record));
+            when(tasksOps.getExperimentsPlatform(platform.getID(), experiment.getId())).thenReturn(Optional.of(record));
             try {
                 manager.updateTask(platform.getID(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
-            verify(tasksOps).updateTask(record);
+            verify(tasksOps).updateExperimentsPlatform(record);
         });
     }
     @Test
@@ -112,14 +112,14 @@ public class PlatformManagerTest {
             record.setStatus(TaskStatus.running);
             record.setPlatformData(42+"");
 
-            when(tasksOps.getTask(platform.getID(),experiment.getId())).thenReturn(Optional.of(record));
+            when(tasksOps.getExperimentsPlatform(platform.getID(),experiment.getId())).thenReturn(Optional.of(record));
             try {
                 manager.unpublishTask(platform.getID(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
             record.setStatus(TaskStatus.finished);
-                    verify(tasksOps).updateTask(record);
+                    verify(tasksOps).updateExperimentsPlatform(record);
         });
     }
 

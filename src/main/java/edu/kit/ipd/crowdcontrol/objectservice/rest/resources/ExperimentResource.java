@@ -529,9 +529,9 @@ public class ExperimentResource {
         //check if we are not creative Stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
             //update db
-            experimentsPlatformOperations.getTasks(id).forEach(taskRecord -> {
+            experimentsPlatformOperations.getExperimentPlatforms(id).forEach(taskRecord -> {
                 taskRecord.setStatus(TaskStatus.stopping);
-                experimentsPlatformOperations.updateTask(taskRecord);
+                experimentsPlatformOperations.updateExperimentsPlatform(taskRecord);
             });
         }
 

@@ -152,7 +152,7 @@ public class PlatformManager {
                     //if the creation was successful update the task
                     if (s1 != null && throwable == null && !s1.isEmpty()) {
                         result.setPlatformData(s1);
-                        if (!tasksOps.updateTask(result)) {
+                        if (!tasksOps.updateExperimentsPlatform(result)) {
                             throw new IllegalStateException("Updating record for published task failed");
                         }
                     }
@@ -180,7 +180,7 @@ public class PlatformManager {
     public CompletableFuture<Boolean> unpublishTask(String name, Experiment experiment) throws TaskOperationException {
         TaskRecord record;
 
-        record = tasksOps.getTask(name, experiment.getId()).orElse(null);
+        record = tasksOps.getExperimentsPlatform(name, experiment.getId()).orElse(null);
 
         if (record == null)
             return CompletableFuture.completedFuture(true);
@@ -188,7 +188,7 @@ public class PlatformManager {
         return getPlatformOrThrow(name).unpublishTask(record.getPlatformData())
                 .thenApply(aBoolean -> {
                     record.setStatus(TaskStatus.finished);
-                    return tasksOps.updateTask(record);
+                    return tasksOps.updateExperimentsPlatform(record);
                 });
     }
 
@@ -206,14 +206,14 @@ public class PlatformManager {
     public CompletableFuture<Boolean> updateTask(String name, Experiment experiment) throws TaskOperationException {
         TaskRecord record;
 
-        record = tasksOps.getTask(name, experiment.getId()).
+        record = tasksOps.getExperimentsPlatform(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment is not published"));
 
         return getPlatformOrThrow(name)
                 .updateTask(record.getPlatformData(), experiment)
                 .thenApply(s -> {
                     record.setPlatformData(s);
-                    return tasksOps.updateTask(record);
+                    return tasksOps.updateExperimentsPlatform(record);
                 });
     }
 
@@ -254,7 +254,7 @@ public class PlatformManager {
      *
      */
     public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws TaskOperationException, IllegalWorkerSetException {
-        TaskRecord record = tasksOps.getTask(name, experiment.getId()).
+        TaskRecord record = tasksOps.getExperimentsPlatform(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment was never published"));
         List<WorkerRecord> workerRecords = workerOps.getWorkerWithWork(experiment.getId(), name);
 
