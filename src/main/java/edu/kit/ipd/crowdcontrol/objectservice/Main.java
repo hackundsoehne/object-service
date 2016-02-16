@@ -158,7 +158,7 @@ public class Main {
         AlgorithmOperations algorithmsOperations = new AlgorithmOperations(databaseManager.getContext());
         WorkerCalibrationOperations workerCalibrationOperations = new WorkerCalibrationOperations(databaseManager.getContext());
         AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext(), calibrationOperations, workerCalibrationOperations, experimentOperations);
-        TasksOperations tasksOperations = new TasksOperations(databaseManager.getContext());
+        ExperimentsPlatformOperations experimentsPlatformOperations = new ExperimentsPlatformOperations(databaseManager.getContext());
         WorkerBalanceOperations workerBalanceOperations = new WorkerBalanceOperations(databaseManager.getContext());
 
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
@@ -222,9 +222,9 @@ public class Main {
             return future;
         };
 
-        PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, tasksOperations, platformOperations,
+        PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, experimentsPlatformOperations, platformOperations,
                 workerOperations);
-        ExperimentResource experimentResource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations, tasksOperations, platformManager);
+        ExperimentResource experimentResource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations, experimentsPlatformOperations, platformManager);
 
         QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations, answerRatingOperations, experimentOperations, experimentResource);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations, workerOperations);

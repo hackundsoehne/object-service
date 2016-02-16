@@ -1,15 +1,13 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +25,7 @@ public class PlatformManager {
     private final Map<String, Platform> platforms;
     private final WorkerIdentification fallbackWorker;
     private final Payment fallbackPayment;
-    private TasksOperations tasksOps;
+    private ExperimentsPlatformOperations tasksOps;
     private WorkerOperations workerOps;
 
     /**
@@ -45,7 +43,7 @@ public class PlatformManager {
      * @param workerOps Used for the worker operations on the database
      */
     public PlatformManager(List<Platform> crowdPlatforms, WorkerIdentification fallbackWorker,
-                           Payment fallbackPayment, TasksOperations tasksOps,
+                           Payment fallbackPayment, ExperimentsPlatformOperations tasksOps,
                            PlatformOperations platformOps, WorkerOperations workerOps) {
         this.tasksOps = tasksOps;
         this.fallbackWorker = fallbackWorker;

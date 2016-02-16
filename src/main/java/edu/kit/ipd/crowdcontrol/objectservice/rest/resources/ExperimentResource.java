@@ -43,18 +43,18 @@ public class ExperimentResource {
     private final CalibrationOperations calibrationOperations;
     private final TagConstraintsOperations tagConstraintsOperations;
     private final AlgorithmOperations algorithmsOperations;
-    private final TasksOperations tasksOperations;
+    private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final PlatformManager platformManager;
     private static final Logger log = LogManager.getLogger("ExperimentResource");
 
     public ExperimentResource(ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
                               TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmsOperations,
-                              TasksOperations tasksOperations, PlatformManager platformManager) {
+                              ExperimentsPlatformOperations experimentsPlatformOperations, PlatformManager platformManager) {
         this.experimentOperations = experimentOperations;
         this.calibrationOperations = calibrationOperations;
         this.tagConstraintsOperations = tagConstraintsOperations;
         this.algorithmsOperations = algorithmsOperations;
-        this.tasksOperations = tasksOperations;
+        this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.platformManager = platformManager;
 
     }
@@ -529,9 +529,9 @@ public class ExperimentResource {
         //check if we are not creative Stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
             //update db
-            tasksOperations.getTasks(id).forEach(taskRecord -> {
+            experimentsPlatformOperations.getTasks(id).forEach(taskRecord -> {
                 taskRecord.setStatus(TaskStatus.stopping);
-                tasksOperations.updateTask(taskRecord);
+                experimentsPlatformOperations.updateTask(taskRecord);
             });
         }
 

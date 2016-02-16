@@ -4,7 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TasksOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.junit.Before;
@@ -25,7 +25,7 @@ public class PlatformManagerTest {
     private Experiment experiment = Experiment.newBuilder()
             .setId(42)
             .build();
-    private TasksOperations tasksOps;
+    private ExperimentsPlatformOperations tasksOps;
     private PlatformOperations platformOps;
     private WorkerOperations workerOps;
 
@@ -38,7 +38,7 @@ public class PlatformManagerTest {
     }
     @Before
     public void prepare() {
-        tasksOps = mock(TasksOperations.class);
+        tasksOps = mock(ExperimentsPlatformOperations.class);
         platformOps = mock(PlatformOperations.class);
         workerOps = mock(WorkerOperations.class);
 

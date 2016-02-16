@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
  * @author LeanderK
  * @version 1.0
  */
-public class TasksOperations extends AbstractOperations {
-    public TasksOperations(DSLContext create) {
+public class ExperimentsPlatformOperations extends AbstractOperations {
+    public ExperimentsPlatformOperations(DSLContext create) {
         super(create);
     }
 
