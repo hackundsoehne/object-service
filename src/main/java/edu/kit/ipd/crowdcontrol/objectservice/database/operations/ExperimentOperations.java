@@ -1,10 +1,10 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import com.google.protobuf.Descriptors;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformsRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingOptionExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
@@ -12,6 +12,7 @@ import org.jooq.Record1;
 import org.jooq.impl.DSL;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -84,17 +85,20 @@ public class ExperimentOperations extends AbstractOperations {
      * @return the state
      */
     public Experiment.State getExperimentState(int id) {
-        Set<TaskStatus> taskStatuses = create.select(TASK.STATUS)
-                .from(TASK)
-                .where(TASK.EXPERIMENT.eq(id))
-                .fetchSet(TASK.STATUS);
-        if (taskStatuses.isEmpty()) {
+        Set<ExperimentsPlatformStatusPlatformStatus> statuses = create.select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS)
+                .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
+                        DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                                .from(EXPERIMENTS_PLATFORM)
+                                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(id))
+                ))
+                .fetchSet(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS);
+        if (statuses.isEmpty()) {
             return Experiment.State.DRAFT;
-        } else if (taskStatuses.contains(TaskStatus.running)) {
+        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)) {
             return Experiment.State.PUBLISHED;
-        } else if (taskStatuses.contains(TaskStatus.stopping)) {
+        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.stopping)) {
             return Experiment.State.CREATIVE_STOPPED;
-        } else if (taskStatuses.contains(TaskStatus.stopped)) {
+        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.stopped)) {
             return Experiment.State.STOPPED;
         } else {
             return Experiment.State.STOPPED; //TODO: finished
@@ -104,12 +108,16 @@ public class ExperimentOperations extends AbstractOperations {
     /**
      * returns all calibrations of a experiment
      * @param id the primary key of the experiment
-     * @return a list of ExperimentsCalibrationRecords
+     * @return a map where the keys are the
      */
-    public List<ExperimentsCalibrationRecord> getCalibrations(int id) {
-        return create.selectFrom(EXPERIMENTS_CALIBRATION)
-                .where(EXPERIMENTS_CALIBRATION.REFERNCED_EXPERIMENT.eq(id))
-                .fetch();
+    public Map<ExperimentsPlatformRecord, List<ExperimentsCalibrationRecord>> getCalibrations(int id) {
+        return create.select(EXPERIMENTS_PLATFORM.fields())
+                .select(EXPERIMENTS_CALIBRATION.fields())
+                .from(EXPERIMENTS_PLATFORM)
+                .join(EXPERIMENTS_CALIBRATION).onKey()
+                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(id))
+                .groupBy(EXPERIMENTS_PLATFORM.fields())
+                .fetchGroups(EXPERIMENTS_PLATFORM, record -> record.into(EXPERIMENTS_CALIBRATION));
     }
 
     /**
@@ -249,20 +257,20 @@ public class ExperimentOperations extends AbstractOperations {
      */
     public void storeExperimentsPlatforms(List<String> platforms, int experimentId) {
         create.transaction(conf -> {
-            DSL.using(conf).deleteFrom(EXPERIMENTS_PLATFORMS)
-                    .where(EXPERIMENTS_PLATFORMS.EXPERIMENT.eq(experimentId))
-                    .and(EXPERIMENTS_PLATFORMS.PLATFORM.notIn(platforms))
+            DSL.using(conf).deleteFrom(EXPERIMENTS_PLATFORM)
+                    .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
+                    .and(EXPERIMENTS_PLATFORM.PLATFORM.notIn(platforms))
                     .execute();
 
-            Set<String> existing = DSL.using(conf).select(EXPERIMENTS_PLATFORMS.PLATFORM)
-                    .from(EXPERIMENTS_PLATFORMS)
-                    .where(EXPERIMENTS_PLATFORMS.EXPERIMENT.eq(experimentId))
+            Set<String> existing = DSL.using(conf).select(EXPERIMENTS_PLATFORM.PLATFORM)
+                    .from(EXPERIMENTS_PLATFORM)
+                    .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
                     .fetch()
-                    .intoSet(EXPERIMENTS_PLATFORMS.PLATFORM);
+                    .intoSet(EXPERIMENTS_PLATFORM.PLATFORM);
 
-            List<ExperimentsPlatformsRecord> toInsert = platforms.stream()
+            List<ExperimentsPlatformRecord> toInsert = platforms.stream()
                     .filter(platform -> !existing.contains(platform))
-                    .map(platform -> new ExperimentsPlatformsRecord(null, experimentId, platform))
+                    .map(platform -> new ExperimentsPlatformRecord(null, experimentId, platform, null))
                     .collect(Collectors.toList());
 
             DSL.using(conf).batchInsert(toInsert).execute();
@@ -275,9 +283,9 @@ public class ExperimentOperations extends AbstractOperations {
      * @return a list of platforms
      */
     public List<String> getActivePlatforms(int experimentId) {
-        return create.select(EXPERIMENTS_PLATFORMS.PLATFORM)
-                .from(EXPERIMENTS_PLATFORMS)
-                .where(EXPERIMENTS_PLATFORMS.EXPERIMENT.eq(experimentId))
+        return create.select(EXPERIMENTS_PLATFORM.PLATFORM)
+                .from(EXPERIMENTS_PLATFORM)
+                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
                 .fetch()
                 .map(Record1::value1);
     }
