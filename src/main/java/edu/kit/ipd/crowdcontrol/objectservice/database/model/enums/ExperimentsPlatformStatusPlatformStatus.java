@@ -13,6 +13,8 @@ public enum ExperimentsPlatformStatusPlatformStatus implements org.jooq.EnumType
 
 	draft("draft"),
 
+	failedPublishing("failedPublishing"),
+
 	running("running"),
 
 	finished("finished"),
