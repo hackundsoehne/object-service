@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Crowdcontrol extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1369164313;
+	private static final long serialVersionUID = 546944901;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol</code>
@@ -48,9 +48,12 @@ public class Crowdcontrol extends org.jooq.impl.SchemaImpl {
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ChosenRatingQualityParam.CHOSEN_RATING_QUALITY_PARAM,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ChosenTaskChooserParam.CHOSEN_TASK_CHOOSER_PARAM,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Constraint.CONSTRAINT,
+			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.DatabaseVersion.DATABASE_VERSION,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment.EXPERIMENT,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsCalibration.EXPERIMENTS_CALIBRATION,
-			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatforms.EXPERIMENTS_PLATFORMS,
+			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatform.EXPERIMENTS_PLATFORM,
+			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformMode.EXPERIMENTS_PLATFORM_MODE,
+			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus.EXPERIMENTS_PLATFORM_STATUS,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.GiftCode.GIFT_CODE,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Notification.NOTIFICATION,
 			edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.NotificationReceiverEmail.NOTIFICATION_RECEIVER_EMAIL,

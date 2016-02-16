@@ -48,10 +48,10 @@ public class TaskDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.obje
 	}
 
 	/**
-	 * Fetch records that have <code>experiment IN (values)</code>
+	 * Fetch records that have <code>experiment_platform IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByExperiment(java.lang.Integer... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.EXPERIMENT, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByExperimentPlatform(java.lang.Integer... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.EXPERIMENT_PLATFORM, values);
 	}
 
 	/**
@@ -59,20 +59,6 @@ public class TaskDao extends org.jooq.impl.DAOImpl<edu.kit.ipd.crowdcontrol.obje
 	 */
 	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByPlatformData(java.lang.String... values) {
 		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.PLATFORM_DATA, values);
-	}
-
-	/**
-	 * Fetch records that have <code>crowd_platform IN (values)</code>
-	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByCrowdPlatform(java.lang.String... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.CROWD_PLATFORM, values);
-	}
-
-	/**
-	 * Fetch records that have <code>status IN (values)</code>
-	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.Task> fetchByStatus(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK.STATUS, values);
 	}
 
 	/**

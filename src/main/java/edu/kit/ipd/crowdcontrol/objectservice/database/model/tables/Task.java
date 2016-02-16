@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Task extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord> {
 
-	private static final long serialVersionUID = -1216148347;
+	private static final long serialVersionUID = 1417144024;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Task</code>
@@ -32,24 +32,14 @@ public class Task extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objec
 	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord, java.lang.Integer> ID_TASK = createField("id_task", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>crowdcontrol.Task.experiment</code>.
+	 * The column <code>crowdcontrol.Task.experiment_platform</code>.
 	 */
-	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord, java.lang.Integer> EXPERIMENT = createField("experiment", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord, java.lang.Integer> EXPERIMENT_PLATFORM = createField("experiment_platform", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>crowdcontrol.Task.platform_data</code>.
 	 */
 	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord, java.lang.String> PLATFORM_DATA = createField("platform_data", org.jooq.impl.SQLDataType.CLOB.length(16777215), this, "");
-
-	/**
-	 * The column <code>crowdcontrol.Task.crowd_platform</code>.
-	 */
-	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord, java.lang.String> CROWD_PLATFORM = createField("crowd_platform", org.jooq.impl.SQLDataType.VARCHAR.length(191).nullable(false), this, "");
-
-	/**
-	 * The column <code>crowdcontrol.Task.status</code>.
-	 */
-	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord, edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus> STATUS = createField("status", org.jooq.util.mysql.MySQLDataType.VARCHAR.asEnumDataType(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus.class), this, "");
 
 	/**
 	 * The column <code>crowdcontrol.Task.stopgap</code>.
@@ -107,7 +97,7 @@ public class Task extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objec
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord, ?>>asList(edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDEXPERIMENTHIT, edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.RUNNINGONPLATTFORM);
+		return java.util.Arrays.<org.jooq.ForeignKey<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord, ?>>asList(edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.TASK_PLATFORM);
 	}
 
 	/**

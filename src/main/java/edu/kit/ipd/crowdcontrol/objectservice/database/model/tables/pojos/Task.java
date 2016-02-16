@@ -11,30 +11,24 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Task implements java.io.Serializable {
 
-	private static final long serialVersionUID = -1196102915;
+	private static final long serialVersionUID = 622268417;
 
 	private java.lang.Integer                                                       idTask;
-	private java.lang.Integer                                                       experiment;
+	private java.lang.Integer                                                       experimentPlatform;
 	private java.lang.String                                                        platformData;
-	private java.lang.String                                                        crowdPlatform;
-	private edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus  status;
 	private edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStopgap stopgap;
 
 	public Task() {}
 
 	public Task(
 		java.lang.Integer                                                       idTask,
-		java.lang.Integer                                                       experiment,
+		java.lang.Integer                                                       experimentPlatform,
 		java.lang.String                                                        platformData,
-		java.lang.String                                                        crowdPlatform,
-		edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus  status,
 		edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStopgap stopgap
 	) {
 		this.idTask = idTask;
-		this.experiment = experiment;
+		this.experimentPlatform = experimentPlatform;
 		this.platformData = platformData;
-		this.crowdPlatform = crowdPlatform;
-		this.status = status;
 		this.stopgap = stopgap;
 	}
 
@@ -46,12 +40,12 @@ public class Task implements java.io.Serializable {
 		this.idTask = idTask;
 	}
 
-	public java.lang.Integer getExperiment() {
-		return this.experiment;
+	public java.lang.Integer getExperimentPlatform() {
+		return this.experimentPlatform;
 	}
 
-	public void setExperiment(java.lang.Integer experiment) {
-		this.experiment = experiment;
+	public void setExperimentPlatform(java.lang.Integer experimentPlatform) {
+		this.experimentPlatform = experimentPlatform;
 	}
 
 	public java.lang.String getPlatformData() {
@@ -60,22 +54,6 @@ public class Task implements java.io.Serializable {
 
 	public void setPlatformData(java.lang.String platformData) {
 		this.platformData = platformData;
-	}
-
-	public java.lang.String getCrowdPlatform() {
-		return this.crowdPlatform;
-	}
-
-	public void setCrowdPlatform(java.lang.String crowdPlatform) {
-		this.crowdPlatform = crowdPlatform;
-	}
-
-	public edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus getStatus() {
-		return this.status;
-	}
-
-	public void setStatus(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus status) {
-		this.status = status;
 	}
 
 	public edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStopgap getStopgap() {
