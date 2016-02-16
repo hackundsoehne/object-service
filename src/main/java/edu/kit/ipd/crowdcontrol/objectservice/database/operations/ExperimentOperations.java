@@ -59,7 +59,7 @@ public class ExperimentOperations extends AbstractOperations {
      * @throws IllegalStateException if the experiment is running
      */
     public boolean updateExperiment(ExperimentRecord experimentRecord) throws IllegalStateException {
-        return doIfNotRunning(experimentRecord.getIdExperiment(), trans ->
+        return doIfDraft(experimentRecord.getIdExperiment(), trans ->
                 DSL.using(trans).executeUpdate(experimentRecord) == 1);
     }
 

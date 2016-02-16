@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -8,8 +7,6 @@ import org.jooq.impl.DSL;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
 /**
  * Responsible for the operations involving the creation of tasks.
@@ -28,7 +25,7 @@ public class TasksOperations extends AbstractOperations {
      */
     public TaskRecord createTask(TaskRecord taskRecord) {
         taskRecord.setIdTask(null);
-        return doIfNotRunning(taskRecord.getExperiment(), trans ->
+        return doIfDraft(taskRecord.getExperiment(), trans ->
                 DSL.using(trans)
                         .insertInto(TASK)
                         .set(taskRecord)
