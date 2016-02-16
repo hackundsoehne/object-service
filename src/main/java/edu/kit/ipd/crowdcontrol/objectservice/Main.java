@@ -37,6 +37,7 @@ import javax.naming.NamingException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +67,13 @@ public class Main {
     public static void main(String[] args) throws IOException, ConfigException {
         LOGGER.trace("Entering application.");
 
-        Config config = Yaml.loadType(Main.class.getResourceAsStream("/config.yml"), Config.class);
+        InputStream configStream;
+        if (System.getProperty("objectservice.config") != null) {
+            configStream = new FileInputStream(System.getProperty("objectservice.config"));
+        } else {
+            configStream = Main.class.getResourceAsStream("/config.yml");
+        }
+        Config config = Yaml.loadType(configStream, Config.class);
 
         if (config.database.maintainInterval == 0)
             config.database.maintainInterval = 24;

@@ -27,3 +27,5 @@ git clone https://github.com/coolcrowd/object-service && cd object-service
 # Run it.
 ./gradlew run
 ```
+
+One can pass `-Dobjectservice.config=configLocation` to specify the config-location.
