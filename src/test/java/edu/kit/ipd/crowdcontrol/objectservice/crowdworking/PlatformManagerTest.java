@@ -1,8 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
 
@@ -25,7 +26,7 @@ public class PlatformManagerTest {
     private Experiment experiment = Experiment.newBuilder()
             .setId(42)
             .build();
-    private ExperimentsPlatformOperations tasksOps;
+    private ExperimentsPlatformOperations experimentsPlatformOperations;
     private PlatformOperations platformOps;
     private WorkerOperations workerOps;
 
@@ -38,7 +39,7 @@ public class PlatformManagerTest {
     }
     @Before
     public void prepare() {
-        tasksOps = mock(ExperimentsPlatformOperations.class);
+        experimentsPlatformOperations = mock(ExperimentsPlatformOperations.class);
         platformOps = mock(PlatformOperations.class);
         workerOps = mock(WorkerOperations.class);
 
@@ -49,77 +50,73 @@ public class PlatformManagerTest {
         manager = new PlatformManager(platforms,
                 param -> "42",
                 (id, experiment1, paymentJob) -> CompletableFuture.completedFuture(true),
-                tasksOps,
+                experimentsPlatformOperations,
                 platformOps,
                 workerOps);
     }
 
     @Test
     public void publishTest() {
-        platforms.forEach(platform -> {
-            TaskRecord record = new TaskRecord();
-            TaskRecord record2 = new TaskRecord();
-
+        platforms.forEach(platform ->  {
+            ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
             record.setExperiment(42);
-            record2.setExperiment(42);
+            record.setIdexperimentsPlatforms(platform.hashCode());
+            record.setPlatform(platform.getID());
+            record.setPlatformData(42 + "");
 
-            record.setStatus(TaskStatus.running);
-            record2.setStatus(TaskStatus.running);
+            when(experimentsPlatformOperations.getExperimentsPlatform(record.getPlatform(), experiment.getId()))
+                    .thenReturn(Optional.of(record));
 
-            record.setCrowdPlatform(platform.getID());
-            record2.setCrowdPlatform(platform.getID());
-
-            record2.setPlatformData(42 + "");
-
-            when(tasksOps.createTask(record)).thenReturn(record.copy());
-            when(tasksOps.updateExperimentsPlatform(record2)).thenReturn(true);
+            when(experimentsPlatformOperations.updateExperimentsPlatform(record))
+                    .thenReturn(true);
 
             try {
-                manager.publishTask(platform.getID(), experiment).join();
+                manager.publishTask(record.getPlatform(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
 
-            verify(tasksOps).createTask(record);
-            verify(tasksOps).updateExperimentsPlatform(record2);
+            verify(experimentsPlatformOperations).setPlatformStatus(record.getIdexperimentsPlatforms(),
+                    ExperimentsPlatformStatusPlatformStatus.running);
         });
     }
 
     @Test
     public void updateTest() {
         platforms.forEach(platform -> {
-            TaskRecord record = new TaskRecord();
+            ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
             record.setExperiment(42);
-            record.setCrowdPlatform(platform.getName());
-            record.setStatus(TaskStatus.running);
+            record.setPlatform(platform.getName());
+            record.setIdexperimentsPlatforms(platform.hashCode());
             record.setPlatformData(42 + "");
 
-            when(tasksOps.getExperimentsPlatform(platform.getID(), experiment.getId())).thenReturn(Optional.of(record));
+            when(experimentsPlatformOperations.getExperimentsPlatform(platform.getID(), experiment.getId())).thenReturn(Optional.of(record));
             try {
                 manager.updateTask(platform.getID(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
-            verify(tasksOps).updateExperimentsPlatform(record);
+            verify(experimentsPlatformOperations).updateExperimentsPlatform(record);
         });
     }
     @Test
     public void unpublishTask() {
         platforms.forEach(platform -> {
-            TaskRecord record = new TaskRecord();
+            ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
             record.setExperiment(42);
-            record.setCrowdPlatform(platform.getID());
-            record.setStatus(TaskStatus.running);
+            record.setPlatform(platform.getID());
+            record.setIdexperimentsPlatforms(platform.hashCode());
             record.setPlatformData(42+"");
 
-            when(tasksOps.getExperimentsPlatform(platform.getID(),experiment.getId())).thenReturn(Optional.of(record));
+            when(experimentsPlatformOperations.getExperimentsPlatform(platform.getID(),experiment.getId())).thenReturn(Optional.of(record));
             try {
                 manager.unpublishTask(platform.getID(), experiment).join();
             } catch (TaskOperationException e) {
                 e.printStackTrace();
             }
-            record.setStatus(TaskStatus.finished);
-                    verify(tasksOps).updateExperimentsPlatform(record);
+            //record.setStatus(TaskStatus.finished);
+            verify(experimentsPlatformOperations).setPlatformStatus(record.getIdexperimentsPlatforms(),
+                    ExperimentsPlatformStatusPlatformStatus.finished);
         });
     }
 

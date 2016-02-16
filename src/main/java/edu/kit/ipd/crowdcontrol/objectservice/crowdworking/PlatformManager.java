@@ -1,8 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TaskRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ public class PlatformManager {
     private final Map<String, Platform> platforms;
     private final WorkerIdentification fallbackWorker;
     private final Payment fallbackPayment;
-    private ExperimentsPlatformOperations tasksOps;
+    private ExperimentsPlatformOperations experimentsPlatformOps;
     private WorkerOperations workerOps;
 
     /**
@@ -38,14 +39,14 @@ public class PlatformManager {
      *                       for this case need_email on the platform is set and the email which got entered by the worker
      *                       should be set as some param
      * @param fallbackPayment handler which is called if a platform does not support payment
-     * @param tasksOps Used for the task operations on the database
+     * @param experimentsPlatformOps Used for the experimentsPlatform operations on the database
      * @param platformOps Used for the platform operations on the database
      * @param workerOps Used for the worker operations on the database
      */
     public PlatformManager(List<Platform> crowdPlatforms, WorkerIdentification fallbackWorker,
-                           Payment fallbackPayment, ExperimentsPlatformOperations tasksOps,
+                           Payment fallbackPayment, ExperimentsPlatformOperations experimentsPlatformOps,
                            PlatformOperations platformOps, WorkerOperations workerOps) {
-        this.tasksOps = tasksOps;
+        this.experimentsPlatformOps = experimentsPlatformOps;
         this.fallbackWorker = fallbackWorker;
         this.fallbackPayment = fallbackPayment;
         this.workerOps = workerOps;
@@ -136,38 +137,39 @@ public class PlatformManager {
      * @return None if the platform does not exist
      */
     public CompletableFuture<Boolean> publishTask(String name, Experiment experiment) throws TaskOperationException {
+        ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
+                orElseThrow(() -> new IllegalStateException("Platform is not activated for experiment " + experiment));
 
-        TaskRecord record = new TaskRecord();
-        record.setExperiment(experiment.getId());
-        record.setStatus(TaskStatus.running);
-        record.setCrowdPlatform(name);
+        BiFunction<String, Throwable, Boolean> handlePublishResult = (s1, throwable) -> {
+            //if the creation was successful update the task
+            if (s1 != null && throwable == null && !s1.isEmpty()) {
+                experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                        ExperimentsPlatformStatusPlatformStatus.running);
+                record.setPlatformData(s1);
+                if (!experimentsPlatformOps.updateExperimentsPlatform(record)) {
+                    throw new IllegalStateException("Updating record for published experimentsPlatform failed");
+                }
+            }
+            //if there is no useful key throw!
+            if (s1 == null || (s1.isEmpty())) {
+                //TODO: marcel: but it is published?
+                experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                        ExperimentsPlatformStatusPlatformStatus.running);
+                throw new IllegalStateException("Platform " + name + " does not provide any useful key");
+            }
+            //if not rethrow the exception and delete the task
+            if (throwable != null) {
+                experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                        ExperimentsPlatformStatusPlatformStatus.failedPublishing);
 
-        TaskRecord result = tasksOps.createTask(record);
-        if (result == null)
-            throw new TaskOperationException("Task could not be created");
+                throw new RuntimeException(throwable);
+            }
+            return true;
+        };
 
         return getPlatformOrThrow(name)
                 .publishTask(experiment)
-                .handle((s1, throwable) -> {
-                    //if the creation was successful update the task
-                    if (s1 != null && throwable == null && !s1.isEmpty()) {
-                        result.setPlatformData(s1);
-                        if (!tasksOps.updateExperimentsPlatform(result)) {
-                            throw new IllegalStateException("Updating record for published task failed");
-                        }
-                    }
-                    //if there is no useful key throw!
-                    if (s1 == null || (s1.isEmpty())) {
-                        tasksOps.deleteTask(result);
-                        throw new IllegalStateException("Platform "+name+" does not provide any useful key");
-                    }
-                    //if not rethrow the exception and delete the task
-                    if (throwable != null) {
-                        tasksOps.deleteTask(result);
-                        throw new RuntimeException(throwable);
-                    }
-                    return true;
-                });
+                .handle(handlePublishResult);
     }
 
     /**
@@ -178,17 +180,18 @@ public class PlatformManager {
      * @return None if the platform was not found, false if the unpublish failed and true if everything went fine
      */
     public CompletableFuture<Boolean> unpublishTask(String name, Experiment experiment) throws TaskOperationException {
-        TaskRecord record;
-
-        record = tasksOps.getExperimentsPlatform(name, experiment.getId()).orElse(null);
+        ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId())
+                .orElse(null);
 
         if (record == null)
             return CompletableFuture.completedFuture(true);
 
         return getPlatformOrThrow(name).unpublishTask(record.getPlatformData())
                 .thenApply(aBoolean -> {
-                    record.setStatus(TaskStatus.finished);
-                    return tasksOps.updateExperimentsPlatform(record);
+                    //TODO: marcel why do you ignore the return type of unpublishTask?
+                    experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                            ExperimentsPlatformStatusPlatformStatus.finished);
+                    return true;
                 });
     }
 
@@ -204,16 +207,14 @@ public class PlatformManager {
      * @return None if the platform was not found, false if the update failed and true if everything went fine.
      */
     public CompletableFuture<Boolean> updateTask(String name, Experiment experiment) throws TaskOperationException {
-        TaskRecord record;
-
-        record = tasksOps.getExperimentsPlatform(name, experiment.getId()).
+        ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
                 orElseThrow(() -> new TaskOperationException("Experiment is not published"));
 
         return getPlatformOrThrow(name)
                 .updateTask(record.getPlatformData(), experiment)
                 .thenApply(s -> {
                     record.setPlatformData(s);
-                    return tasksOps.updateExperimentsPlatform(record);
+                    return experimentsPlatformOps.updateExperimentsPlatform(record);
                 });
     }
 
@@ -254,8 +255,8 @@ public class PlatformManager {
      *
      */
     public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws TaskOperationException, IllegalWorkerSetException {
-        TaskRecord record = tasksOps.getExperimentsPlatform(name, experiment.getId()).
-                orElseThrow(() -> new TaskOperationException("Experiment was never published"));
+        ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
+                orElseThrow(() -> new TaskOperationException("Platform is not activated for experiment "+experiment));
         List<WorkerRecord> workerRecords = workerOps.getWorkerWithWork(experiment.getId(), name);
 
         Set<String> given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toSet());

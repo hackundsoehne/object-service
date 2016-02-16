@@ -92,6 +92,7 @@ public class ExperimentOperations extends AbstractOperations {
                                 .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(id))
                 ))
                 .fetchSet(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS);
+        //TODO: what to do if one of the platforms failed?
         if (statuses.isEmpty()) {
             return Experiment.State.DRAFT;
         } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)) {
