@@ -2,8 +2,10 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import com.google.common.collect.Sets;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeStopgap;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -91,6 +93,17 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      */
     public void setPlatformMode(int experimentsPlatform, ExperimentsPlatformModeStopgap mode) {
         ExperimentsPlatformModeRecord toInsert = new ExperimentsPlatformModeRecord(null, experimentsPlatform, mode, null);
+
+        create.executeInsert(toInsert);
+    }
+
+    /**
+     * sets the mode for the passed status
+     * @param experimentsPlatform the primary key of the ExperimentsPlatform
+     * @param status the status to set to
+     */
+    public void setPlatformStatus(int experimentsPlatform, ExperimentsPlatformStatusPlatformStatus status) {
+        ExperimentsPlatformStatusRecord toInsert = new ExperimentsPlatformStatusRecord(null, status, null, experimentsPlatform);
 
         create.executeInsert(toInsert);
     }
