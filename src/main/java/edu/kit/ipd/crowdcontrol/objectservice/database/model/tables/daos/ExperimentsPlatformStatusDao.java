@@ -48,10 +48,10 @@ public class ExperimentsPlatformStatusDao extends org.jooq.impl.DAOImpl<edu.kit.
 	}
 
 	/**
-	 * Fetch records that have <code>status IN (values)</code>
+	 * Fetch records that have <code>platform_status IN (values)</code>
 	 */
-	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.ExperimentsPlatformStatus> fetchByStatus(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusStatus... values) {
-		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus.EXPERIMENTS_PLATFORM_STATUS.STATUS, values);
+	public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos.ExperimentsPlatformStatus> fetchByPlatformStatus(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus... values) {
+		return fetch(edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, values);
 	}
 
 	/**

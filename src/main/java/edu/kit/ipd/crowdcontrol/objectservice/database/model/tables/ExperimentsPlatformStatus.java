@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentsPlatformStatus extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord> {
 
-	private static final long serialVersionUID = -791306196;
+	private static final long serialVersionUID = 2012582038;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Experiments_Platform_Status</code>
@@ -32,9 +32,9 @@ public class ExperimentsPlatformStatus extends org.jooq.impl.TableImpl<edu.kit.i
 	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord, java.lang.Integer> IDEXPERIMENTS_PLATFORM_STATUS = createField("idExperiments_Platform_Status", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>crowdcontrol.Experiments_Platform_Status.status</code>.
+	 * The column <code>crowdcontrol.Experiments_Platform_Status.platform_status</code>.
 	 */
-	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord, edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusStatus> STATUS = createField("status", org.jooq.util.mysql.MySQLDataType.VARCHAR.asEnumDataType(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusStatus.class), this, "");
+	public final org.jooq.TableField<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord, edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus> PLATFORM_STATUS = createField("platform_status", org.jooq.util.mysql.MySQLDataType.VARCHAR.asEnumDataType(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus.class), this, "");
 
 	/**
 	 * The column <code>crowdcontrol.Experiments_Platform_Status.timestamp</code>.

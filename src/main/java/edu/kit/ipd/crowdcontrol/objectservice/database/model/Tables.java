@@ -164,11 +164,6 @@ public class Tables {
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Tag TAG = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Tag.TAG;
 
 	/**
-	 * The table crowdcontrol.Task
-	 */
-	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task TASK = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Task.TASK;
-
-	/**
 	 * The table crowdcontrol.Template
 	 */
 	public static final edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Template TEMPLATE = edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Template.TEMPLATE;

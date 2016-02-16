@@ -11,23 +11,23 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentsPlatformStatus implements java.io.Serializable {
 
-	private static final long serialVersionUID = 228351067;
+	private static final long serialVersionUID = -1595589573;
 
-	private java.lang.Integer                                                                           idexperimentsPlatformStatus;
-	private edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusStatus status;
-	private java.sql.Timestamp                                                                          timestamp;
-	private java.lang.Integer                                                                           platform;
+	private java.lang.Integer                                                                                   idexperimentsPlatformStatus;
+	private edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus platformStatus;
+	private java.sql.Timestamp                                                                                  timestamp;
+	private java.lang.Integer                                                                                   platform;
 
 	public ExperimentsPlatformStatus() {}
 
 	public ExperimentsPlatformStatus(
-		java.lang.Integer                                                                           idexperimentsPlatformStatus,
-		edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusStatus status,
-		java.sql.Timestamp                                                                          timestamp,
-		java.lang.Integer                                                                           platform
+		java.lang.Integer                                                                                   idexperimentsPlatformStatus,
+		edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus platformStatus,
+		java.sql.Timestamp                                                                                  timestamp,
+		java.lang.Integer                                                                                   platform
 	) {
 		this.idexperimentsPlatformStatus = idexperimentsPlatformStatus;
-		this.status = status;
+		this.platformStatus = platformStatus;
 		this.timestamp = timestamp;
 		this.platform = platform;
 	}
@@ -40,12 +40,12 @@ public class ExperimentsPlatformStatus implements java.io.Serializable {
 		this.idexperimentsPlatformStatus = idexperimentsPlatformStatus;
 	}
 
-	public edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusStatus getStatus() {
-		return this.status;
+	public edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus getPlatformStatus() {
+		return this.platformStatus;
 	}
 
-	public void setStatus(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusStatus status) {
-		this.status = status;
+	public void setPlatformStatus(edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus platformStatus) {
+		this.platformStatus = platformStatus;
 	}
 
 	public java.sql.Timestamp getTimestamp() {

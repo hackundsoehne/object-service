@@ -11,22 +11,25 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.pojos;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentsPlatform implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1775597627;
+	private static final long serialVersionUID = 1985584595;
 
 	private java.lang.Integer idexperimentsPlatforms;
 	private java.lang.Integer experiment;
 	private java.lang.String  platform;
+	private java.lang.String  platformData;
 
 	public ExperimentsPlatform() {}
 
 	public ExperimentsPlatform(
 		java.lang.Integer idexperimentsPlatforms,
 		java.lang.Integer experiment,
-		java.lang.String  platform
+		java.lang.String  platform,
+		java.lang.String  platformData
 	) {
 		this.idexperimentsPlatforms = idexperimentsPlatforms;
 		this.experiment = experiment;
 		this.platform = platform;
+		this.platformData = platformData;
 	}
 
 	public java.lang.Integer getIdexperimentsPlatforms() {
@@ -51,5 +54,13 @@ public class ExperimentsPlatform implements java.io.Serializable {
 
 	public void setPlatform(java.lang.String platform) {
 		this.platform = platform;
+	}
+
+	public java.lang.String getPlatformData() {
+		return this.platformData;
+	}
+
+	public void setPlatformData(java.lang.String platformData) {
+		this.platformData = platformData;
 	}
 }
