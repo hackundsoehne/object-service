@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransformer;
@@ -296,12 +296,11 @@ public class ExperimentResource {
         };
 
 
-        Map<String, List<Calibration.Builder>> populations = experimentOperations.getCalibrations(id).stream()
-                .collect(Collectors.groupingBy(
-                        ExperimentsCalibrationRecord::getReferencedPlatform,
-                        Collectors.mapping(toCalibration, Collectors.toList())
-                        )
-                );
+        Map<String, List<Calibration.Builder>> populations = experimentOperations.getCalibrations(id).entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().getPlatform(),
+                        entry -> entry.getValue().stream().map(toCalibration).collect(Collectors.toList())
+                ));
 
         experimentOperations.getActivePlatforms(id)
                 .forEach(platform -> {
@@ -529,9 +528,9 @@ public class ExperimentResource {
         //check if we are not creative Stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
             //update db
-            experimentsPlatformOperations.getExperimentPlatforms(id).forEach(taskRecord -> {
-                taskRecord.setStatus(TaskStatus.stopping);
-                experimentsPlatformOperations.updateExperimentsPlatform(taskRecord);
+            experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {
+                experimentsPlatformOperations.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                        ExperimentsPlatformStatusPlatformStatus.stopping);
             });
         }
 
