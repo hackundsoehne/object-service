@@ -141,7 +141,7 @@ public class PlatformManager {
                 orElseThrow(() -> new IllegalStateException("Platform is not activated for experiment " + experiment));
 
         BiFunction<String, Throwable, Boolean> handlePublishResult = (s1, throwable) -> {
-            //if the creation was successful update the task
+            //if the creation was successful update the db
             if (s1 != null && throwable == null && !s1.isEmpty()) {
                 experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
                         ExperimentsPlatformStatusPlatformStatus.running);
@@ -157,7 +157,7 @@ public class PlatformManager {
                         ExperimentsPlatformStatusPlatformStatus.running);
                 throw new IllegalStateException("Platform " + name + " does not provide any useful key");
             }
-            //if not rethrow the exception and delete the task
+            //if not rethrow the exception and update the db
             if (throwable != null) {
                 experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
                         ExperimentsPlatformStatusPlatformStatus.failedPublishing);
