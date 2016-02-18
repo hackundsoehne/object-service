@@ -208,7 +208,7 @@ file("src/main/generated/").mkdirs()
 
 wsdl2java {
     generatedWsdlDir = file("src/main/generated/")  // target directory for generated source coude
-    wsdlDir = file("src/main/wsdl/") // define to support incremental build
+    wsdlDir = file("src/main/wsdl/mturk/") // define to support incremental build
     wsdlsToGenerate = [['src/main/wsdl/mturk/AWSMechanicalTurkRequester.wsdl']]
     locale = Locale.ENGLISH
 }
