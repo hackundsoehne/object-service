@@ -4,8 +4,6 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.search.FlagTerm;
-import java.io.Closeable;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
@@ -35,7 +33,6 @@ public class MailHandler implements MailFetcher, MailSender {
         props.remove("sender");
         this.props = props;
         this.auth = auth;
-
     }
 
     @Override
@@ -84,14 +81,12 @@ public class MailHandler implements MailFetcher, MailSender {
 
         MimeMessage msg = new MimeMessage(session);
         msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientMail, recipientMail));
-        msg.setFrom(new InternetAddress(sender, sender));
+        msg.setFrom(new InternetAddress(sender, "CrowdControl"));
+        msg.setContent(message, "text/html; charset=utf-8");
         msg.setSubject(subject);
         msg.setText(message);
-        msg.saveChanges();
-        msg.setContent(message, "text/html; charset=utf-8");
 
         Transport.send(msg);
-
     }
 
     @Override
