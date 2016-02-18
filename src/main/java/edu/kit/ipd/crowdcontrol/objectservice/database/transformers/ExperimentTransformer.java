@@ -152,7 +152,7 @@ public class ExperimentTransformer extends AbstractTransformer {
                     // has to be done manual with Constraints Transformer
                     break;
                 case Experiment.DESCRIPTION_FIELD_NUMBER:
-                    record.setDescription(experiment.getDescription());
+                    record.setDescriptionRaw(experiment.getDescription());
                     break;
                 case Experiment.NEEDED_ANSWERS_FIELD_NUMBER:
                     record.setNeededAnswers(experiment.getNeededAnswers().getValue());
