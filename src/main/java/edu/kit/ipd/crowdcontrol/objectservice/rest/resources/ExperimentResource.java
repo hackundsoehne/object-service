@@ -26,6 +26,8 @@ import spark.Response;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -176,9 +178,7 @@ public class ExperimentResource {
 
         experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
 
-        experiment.getPopulationsList().forEach(population -> {
-            storePopulation(id, population);
-        });
+        storePopulation(id, experiment.getPopulationsList());
 
         experiment.getAlgorithmTaskChooser()
                 .getParametersList().forEach(param ->
@@ -203,12 +203,30 @@ public class ExperimentResource {
         return exp;
     }
 
-    private void storePopulation(int experimentId, Experiment.Population population) {
-        List<Integer> answerIDs = population.getCalibrationsList().stream()
-                .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
-                .map(Calibration.Answer::getId)
+    private void storePopulation(int experimentId, List<Experiment.Population> populations) {
+        if (populations.isEmpty())
+            return;
+
+        List<Experiment.Population> toStore = populations.stream()
+                .filter(population -> !population.getPlatformId().isEmpty())
                 .collect(Collectors.toList());
-        calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, experimentId);
+
+        List<String> platformsToStore = toStore.stream()
+                .map(Experiment.Population::getPlatformId)
+                .collect(Collectors.toList());
+        experimentOperations.storeExperimentsPlatforms(platformsToStore, experimentId);
+
+        BiConsumer<String, List<Calibration>> storeCalibrations = (platform, calibrations) -> {
+            List<Integer> answerIDs = calibrations.stream()
+                    .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
+                    .map(Calibration.Answer::getId)
+                    .collect(Collectors.toList());
+
+            calibrationOperations.storeExperimentCalibrations(platform, answerIDs, experimentId);
+        };
+
+        toStore.forEach(population ->
+                storeCalibrations.accept(population.getPlatformId(), population.getCalibrationsList()));
     }
 
     private Experiment fetchExperiment(int id) {
@@ -369,7 +387,8 @@ public class ExperimentResource {
         newPopulations.forEach(population -> {
             try {
                 platformManager.publishTask(population.getPlatformId(), old).join();
-                storePopulation(id, population);
+                //TODO marcel: update?
+                //storePopulation(id, population);
             } catch (TaskOperationException e) {
                 log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s", experiment.getTitle(), population.getPlatformId()), e);
                 e.printStackTrace();
@@ -445,17 +464,7 @@ public class ExperimentResource {
                     .forEach(tagConstraintsOperations::insertConstraint);
         }
 
-        // Update calibration records from experiment
-        experiment.getPopulationsList().forEach(population -> {
-            storePopulation(id, population);
-        });
-
-        if (!experiment.getPopulationsList().isEmpty()) {
-            List<String> platforms = experiment.getPopulationsList().stream()
-                    .map(Experiment.Population::getPlatformId)
-                    .collect(Collectors.toList());
-            experimentOperations.storeExperimentsPlatforms(platforms, id);
-        }
+        storePopulation(id, experiment.getPopulationsList());
 
         if (!Objects.equals(old.getAlgorithmTaskChooser().getName(), experimentRecord.getAlgorithmTaskChooser())) {
             algorithmsOperations.deleteChosenTaskChooserParams(id);
