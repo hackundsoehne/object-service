@@ -153,11 +153,13 @@ public class ExperimentResource {
         ExperimentRecord record = ExperimentTransformer.mergeProto(new ExperimentRecord(), experiment);
 
         Map<String, String> placeholders = experiment.getPlaceholders();
-        String description = experiment.getDescription();
+        String rawDescription = experiment.getDescription();
 
-        if (!Template.parse(description).keySet().equals(placeholders.keySet())) {
+        if (!Template.parse(rawDescription).keySet().equals(placeholders.keySet())) {
             throw new BadRequestException("Description and placeholder keys must match.");
         }
+
+        record.setDescription(Template.apply(rawDescription, placeholders));
 
         int id = experimentOperations.insertNewExperiment(record);
 
@@ -415,13 +417,15 @@ public class ExperimentResource {
                 ? experiment.getPlaceholders()
                 : old.getPlaceholders();
 
-        String description = experiment.getDescription().equals("")
+        String descriptionRaw = experiment.getDescription().equals("")
                 ? old.getDescription()
                 : experiment.getDescription();
 
-        if (!Template.parse(description).keySet().equals(placeholders.keySet())) {
+        if (!Template.parse(descriptionRaw).keySet().equals(placeholders.keySet())) {
             throw new BadRequestException("Description and placeholder keys must match.");
         }
+
+        experimentRecord.setDescription(Template.apply(descriptionRaw, placeholders));
 
         //update tags if they were updated
         List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);
