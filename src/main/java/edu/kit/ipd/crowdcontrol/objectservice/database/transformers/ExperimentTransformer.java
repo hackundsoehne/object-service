@@ -48,7 +48,7 @@ public class ExperimentTransformer extends AbstractTransformer {
         return builder(Experiment.newBuilder())
                 .set(record.getIdExperiment(), Experiment.Builder::setId)
                 .set(record.getTitle(), Experiment.Builder::setTitle)
-                .set(record.getDescription(), Experiment.Builder::setDescription)
+                .set(record.getDescriptionRaw(), Experiment.Builder::setDescription)
                 .set(state, Experiment.Builder::setState)
                 .set(record.getAnswerType(), (builder, x) -> builder.setAnswerType(x.equals("") ? AnswerType.TEXT : AnswerType.IMAGE))
                 .set(record.getAlgorithmTaskChooser(), (builder, x) -> builder.setAlgorithmTaskChooser(algo.apply(x)))
