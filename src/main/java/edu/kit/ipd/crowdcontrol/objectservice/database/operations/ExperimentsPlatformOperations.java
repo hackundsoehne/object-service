@@ -27,7 +27,41 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
     }
 
     /**
-     * stores the ExperimentsPlatforms in the db and deletes the one not existing.
+     * Inserts the passed platform into the database with the status draft
+     * @param platform the name of the platform
+     * @param experimentId the primary key of the experiment
+     * @throws IllegalArgumentException if the platform is already existing
+     */
+    public void insertPlatform(String platform, int experimentId, ExperimentsPlatformModeStopgap mode) throws IllegalArgumentException {
+        ExperimentsPlatformRecord record = new ExperimentsPlatformRecord(null, experimentId, platform, null);
+        ExperimentsPlatformRecord inserted = create.transactionResult(conf -> {
+            boolean exists = DSL.using(conf).fetchExists(
+                    DSL.selectFrom(EXPERIMENTS_PLATFORM)
+                            .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
+                            .and(EXPERIMENTS_PLATFORM.PLATFORM.eq(platform))
+            );
+            if (!exists) {
+                return Optional.of(create.insertInto(EXPERIMENTS_PLATFORM)
+                        .set(record)
+                        .returning()
+                        .fetchOne());
+            } else {
+                return Optional.<ExperimentsPlatformRecord>empty();
+            }
+        }).orElseThrow(() -> new IllegalArgumentException(String.format(
+                "Platform %s is already existing for experiment %d.",
+                platform,
+                experimentId
+        )));
+
+        setPlatformStatus(inserted.getIdexperimentsPlatforms(), ExperimentsPlatformStatusPlatformStatus.draft);
+
+        setPlatformMode(inserted.getIdexperimentsPlatforms(), mode);
+    }
+
+    /**
+     * Stores the ExperimentsPlatforms in the db and deletes the one not existing.
+     * All newly inserts Platforms will be inserted with the status draft.
      * @param platforms the names of the platforms
      * @param experimentId the primary key of the experiment
      */
@@ -60,6 +94,22 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
         List<String> platformsInserted = inserted.stream()
                 .map(ExperimentsPlatformRecord::getPlatform)
                 .collect(Collectors.toList());
+
+        Result<ExperimentsPlatformRecord> inTheDatabase = create.selectFrom(EXPERIMENTS_PLATFORM)
+                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
+                .and(EXPERIMENTS_PLATFORM.PLATFORM.in(platformsInserted))
+                .fetch();
+
+        List<ExperimentsPlatformStatusRecord> statusesToInsert = inTheDatabase.stream()
+                .map(record -> new ExperimentsPlatformStatusRecord(
+                        null,
+                        ExperimentsPlatformStatusPlatformStatus.draft,
+                        null,
+                        record.getIdexperimentsPlatforms()
+                ))
+                .collect(Collectors.toList());
+
+        create.batchInsert(statusesToInsert).execute();
     }
 
     /**
