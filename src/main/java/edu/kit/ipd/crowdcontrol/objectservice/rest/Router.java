@@ -70,7 +70,7 @@ public class Router implements SparkApplication {
         LOGGER.trace("Setting up routes for Spark.");
 
         exception(Exception.class, (exception, request, response) -> {
-            LOGGER.error(exception);
+            LOGGER.error("an unknown exception occurred", exception);
 
             response.status(500);
             response.body(error(request, response, "internalServerError", exception.getMessage()));
@@ -105,7 +105,7 @@ public class Router implements SparkApplication {
         });
 
         exception(InternalServerErrorException.class, (exception, request, response) -> {
-            LOGGER.error(exception);
+            LOGGER.error("an internal server error occurred", exception);
 
             response.status(500);
             response.body(error(request, response, "internalServerError", exception.getMessage()));
