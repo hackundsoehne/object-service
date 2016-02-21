@@ -1,7 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeStopgap;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
@@ -25,9 +27,9 @@ import spark.Request;
 import spark.Response;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -178,7 +180,7 @@ public class ExperimentResource {
 
         experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
 
-        storePopulation(id, experiment.getPopulationsList());
+        storePopulations(id, experiment.getPopulationsList());
 
         experiment.getAlgorithmTaskChooser()
                 .getParametersList().forEach(param ->
@@ -203,7 +205,7 @@ public class ExperimentResource {
         return exp;
     }
 
-    private void storePopulation(int experimentId, List<Experiment.Population> populations) {
+    private void storePopulations(int experimentId, List<Experiment.Population> populations) {
         if (populations.isEmpty())
             return;
 
@@ -227,6 +229,17 @@ public class ExperimentResource {
 
         toStore.forEach(population ->
                 storeCalibrations.accept(population.getPlatformId(), population.getCalibrationsList()));
+    }
+
+    private void insertPopulation(int experimentID, Experiment.Population population, ExperimentsPlatformModeStopgap mode) {
+        experimentsPlatformOperations.insertPlatform(population.getPlatformId(), experimentID, mode);
+
+        List<Integer> answerIDs = population.getCalibrationsList().stream()
+                .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
+                .map(Calibration.Answer::getId)
+                .collect(Collectors.toList());
+
+        calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, experimentID);
     }
 
     private Experiment fetchExperiment(int id) {
@@ -361,7 +374,7 @@ public class ExperimentResource {
             resulting = updateExperimentInfoDraftState(id, experiment, old, original);
         } else if (old.getState() == Experiment.State.PUBLISHED ||
                 old.getState() == Experiment.State.CREATIVE_STOPPED) {
-            resulting = updateExperimentGapStop(id, experiment, old, original);
+            resulting = updateExperimentStopgap(id, experiment, old, original);
         } else {
             throw new IllegalStateException("Patch not allowed in this state");
         }
@@ -371,33 +384,35 @@ public class ExperimentResource {
         return resulting;
     }
 
-    private Experiment updateExperimentGapStop(int id, Experiment experiment, Experiment old, ExperimentRecord original) {
-        List<Experiment.Population> populations = old.getPopulationsList();
+    private Experiment updateExperimentStopgap(int id, Experiment experiment, Experiment old, ExperimentRecord original) {
+        Set<String> existing = old.getPopulationsList().stream()
+                .map(Experiment.Population::getPlatformId)
+                .collect(Collectors.toSet());
 
-        Predicate<Experiment.Population> listContains = population -> {
-            for (Experiment.Population oldPopulation : populations) {
-                if (population.getPlatformId().equals(oldPopulation.getPlatformId()))
-                    return false;
-            }
-            return true;
-        };
+        List<Experiment.Population> newPopulations = experiment.getPopulationsList().stream()
+                .filter(population -> !existing.contains(population.getPlatformId()))
+                .collect(Collectors.toList());
 
-        List<Experiment.Population> newPopulations = experiment.getPopulationsList().stream().filter(listContains).collect(Collectors.toList());
+        newPopulations.stream()
+                .map(population -> {
+                    try {
+                        insertPopulation(id, population, ExperimentsPlatformModeStopgap.disabled);
+                        return platformManager.publishTask(population.getPlatformId(), old);
+                    } catch (TaskOperationException e) {
+                        log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s", experiment.getTitle(), population.getPlatformId()), e);
+                        e.printStackTrace();
+                    } catch (IllegalStateException | IllegalArgumentException e) {
+                        log.fatal("Error! Could not create experiment!" + e.getMessage());
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                //TODO what about return type Boolean?
+                .forEach(CompletableFuture::join);
 
-        newPopulations.forEach(population -> {
-            try {
-                platformManager.publishTask(population.getPlatformId(), old).join();
-                //TODO marcel: update?
-                //storePopulation(id, population);
-            } catch (TaskOperationException e) {
-                log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s", experiment.getTitle(), population.getPlatformId()), e);
-                e.printStackTrace();
-            } catch (IllegalStateException | IllegalArgumentException e) {
-                log.fatal("Error! Could not create experiment!" + e.getMessage());
-            }
-        });
-
-        List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream().filter(population -> !listContains.test(population)).collect(Collectors.toList());
+        List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream()
+                .filter(existing::contains)
+                .collect(Collectors.toList());
 
         //FIXME this is something like negativ gapfiller, this is not implemented yet.
         /*missingPopulations.forEach(failedPopulation -> {
@@ -464,7 +479,7 @@ public class ExperimentResource {
                     .forEach(tagConstraintsOperations::insertConstraint);
         }
 
-        storePopulation(id, experiment.getPopulationsList());
+        storePopulations(id, experiment.getPopulationsList());
 
         if (!Objects.equals(old.getAlgorithmTaskChooser().getName(), experimentRecord.getAlgorithmTaskChooser())) {
             algorithmsOperations.deleteChosenTaskChooserParams(id);
