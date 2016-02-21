@@ -136,6 +136,7 @@ public class PlatformManager {
      * @param experiment The experiment to publish
      * @return None if the platform does not exist
      */
+    //TODO improve doc: what is none? Completable with null (bad api) what does true/false mean? or does it return null?
     public CompletableFuture<Boolean> publishTask(String name, Experiment experiment) throws TaskOperationException {
         ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
                 orElseThrow(() -> new IllegalStateException("Platform is not activated for experiment " + experiment));
