@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeStopgap;
