@@ -72,6 +72,7 @@ public class Main {
 
         InputStream configStream;
         if (System.getProperty("objectservice.config") != null) {
+            LOGGER.debug("loading configuration from location: {}", System.getProperty("objectservice.config"));
             configStream = new FileInputStream(System.getProperty("objectservice.config"));
         } else {
             configStream = Main.class.getResourceAsStream("/config.yml");
