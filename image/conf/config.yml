@@ -15,6 +15,11 @@ database:
         user: root
         password: root
 
+# basic configurations for the mail-module
+mail :
+    # disabled = true will ignore the mail configuration and print to the command-line
+    disabled : true
+
 # Deployment of the object service / control ui
 deployment:
     # Origin of the control ui
