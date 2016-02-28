@@ -7,7 +7,7 @@ services:
     depends_on:
      - db
     links:
-     - db
+     - db:db
   db:
     image: mysql:latest
     environment:
@@ -15,3 +15,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: 123456
       MYSQL_ROOT_PASSWORD: root
+    command:
+        - --character-set-server=utf8mb4
+    ports:
+         - "3306:3306"
