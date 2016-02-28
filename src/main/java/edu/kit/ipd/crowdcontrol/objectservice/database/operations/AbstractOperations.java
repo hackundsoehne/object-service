@@ -39,7 +39,7 @@ public abstract class AbstractOperations {
      */
     protected <R> R doIfDraft(int experimentID, Function<Configuration, R> function) throws IllegalStateException {
         return create.transactionResult(trans -> {
-            boolean draft = DSL.using(trans).fetchExists(
+            boolean notDraft = DSL.using(trans).fetchExists(
                     DSL.selectFrom(Tables.EXPERIMENTS_PLATFORM_STATUS)
                             .where(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
                                     DSL.select(Tables.EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
@@ -49,7 +49,7 @@ public abstract class AbstractOperations {
                             .and(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
                                     .notEqual(ExperimentsPlatformStatusPlatformStatus.draft))
             );
-            if (!draft) {
+            if (!notDraft) {
                 return function.apply(trans);
             } else {
                 throw new IllegalStateException("Experiment is not in draft: " + experimentID);
