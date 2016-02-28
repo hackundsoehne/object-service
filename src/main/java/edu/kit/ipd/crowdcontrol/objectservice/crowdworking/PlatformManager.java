@@ -147,7 +147,10 @@ public class PlatformManager {
                 experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
                         ExperimentsPlatformStatusPlatformStatus.running);
                 record.setPlatformData(s1);
+                experimentsPlatformOps.updateExperimentsPlatform(record);
                 if (!experimentsPlatformOps.updateExperimentsPlatform(record)) {
+                    getPlatformOrThrow(name).unpublishTask(record.getPlatformData())
+                            .join();
                     throw new IllegalStateException("Updating record for published experimentsPlatform failed");
                 }
             }
