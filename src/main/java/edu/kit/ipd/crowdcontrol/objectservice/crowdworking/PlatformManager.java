@@ -233,12 +233,12 @@ public class PlatformManager {
     /**
      * Get a worker if he exists
      * @param name Name of the platform
-     * @param params Params passed by the platform
+     * @param identification The previously obtained identification of the worker
      * @return A worker if one is found
      * @throws UnidentifiedWorkerException if the platform does not identify a worker
      */
-    public Optional<WorkerRecord> getWorker(String name, Map<String ,String[]> params) throws UnidentifiedWorkerException {
-        return getWorker(name).getWorker(workerOps,name,params);
+    public Optional<WorkerRecord> getWorker(String name, String identification) throws UnidentifiedWorkerException {
+        return getWorker(name).getWorker(identification, workerOps, name);
     }
 
     /**

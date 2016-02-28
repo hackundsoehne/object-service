@@ -43,12 +43,12 @@ public class WorkerResource {
         try {
             WorkerRecord worker;
             String platform = request.params("platform");
-            Optional<WorkerRecord> optionalRecord = manager.getWorker(platform, request.queryMap().toMap());
+            String identification = manager.identifyWorker(platform, request.queryMap().toMap());
+            Optional<WorkerRecord> optionalRecord = manager.getWorker(platform, identification);
             if (optionalRecord.isPresent()) {
                 worker = optionalRecord.get();
             } else if (!manager.getNeedemail(platform) || (request.queryParams("email") != null && !request.queryParams("email").isEmpty())){
-                String identify = manager.identifyWorker(platform, request.queryMap().toMap());
-                WorkerRecord workerRecord = new WorkerRecord(null, identify, platform, null, null);
+                WorkerRecord workerRecord = new WorkerRecord(null, identification, platform, null, null);
                 worker = operations.insertWorker(workerRecord);
             } else {
                 throw new NotFoundException();
