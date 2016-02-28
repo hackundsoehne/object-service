@@ -1,6 +1,6 @@
 database:
     # the url where to find the database
-    url: jdbc:mysql://localhost:8888/crowdcontrol
+    url: jdbc:mysql://db:3306/crowdcontrol
 
     # dialekt to use for communication
     dialect: MYSQL
@@ -33,3 +33,9 @@ platforms :
 
       # name which is used to display
       name: dummy
+
+moneytransfer:
+    payOffThreshold: 0
+    parsingPassword: test
+    notificationMailAddress: pseipd@gmail.com
+    scheduleInterval: 7

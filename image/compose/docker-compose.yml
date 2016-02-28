@@ -1,0 +1,17 @@
+version: '2'
+services:
+  objectservice:
+    image: coolcrowd/object-service:latest
+    ports:
+     - "4567:4567"
+    depends_on:
+     - db
+    links:
+     - db
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: crowdcontrol
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: root
