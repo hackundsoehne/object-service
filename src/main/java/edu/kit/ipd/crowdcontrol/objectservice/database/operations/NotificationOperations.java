@@ -232,7 +232,7 @@ public class NotificationOperations extends AbstractOperations {
                     .stream()) {
                 recordStream.forEach(storedRecord -> {
                     int storedTokenId = storedRecord.getResultId();
-                    if (newTokenRecords.containsValue(storedTokenId)) {
+                    if (newTokenRecords.containsKey(storedTokenId)) {
                         // condition still holds true. keep token in db, but remove from new tokens
                         newTokenRecords.remove(storedTokenId);
                     } else {

@@ -112,6 +112,8 @@ public class Router implements SparkApplication {
         });
 
         before((request, response) -> {
+            LOGGER.debug("Dispatching request " + request.requestMethod() + " " + request.uri());
+
             if (request.headers("accept") == null) {
                 throw new BadRequestException("Missing required 'accept' header.");
             }
@@ -121,7 +123,7 @@ public class Router implements SparkApplication {
             response.header("access-control-allow-credentials", "true");
             response.header("access-control-allow-headers", "Authorization,Content-Type");
             response.header("access-control-expose-headers", "Link,Location");
-            response.header("access-control-max-age", "86400");
+            response.header("access-control-max-age", "600"); // see http://stackoverflow.com/a/23549398/2373138
         });
 
         options("/*", ((request, response) -> {
