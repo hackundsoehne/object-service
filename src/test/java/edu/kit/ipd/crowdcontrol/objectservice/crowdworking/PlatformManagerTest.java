@@ -48,7 +48,7 @@ public class PlatformManagerTest {
         when(platformOps.getPlatform("test3")).thenReturn(Optional.empty());
 
         manager = new PlatformManager(platforms,
-                param -> "42",
+                (stringMap, platform) -> WorkerIdentification.findByIdentification(platform, "42"),
                 (id, experiment1, paymentJob) -> CompletableFuture.completedFuture(true),
                 experimentsPlatformOperations,
                 platformOps,
@@ -120,7 +120,7 @@ public class PlatformManagerTest {
         });
     }
 
-    static class PlatformTest implements Platform, Payment, WorkerIdentification {
+    static class PlatformTest implements Platform, Payment {
         private boolean needEmail;
         private boolean handlePayment;
         private boolean handleWorker;
@@ -155,13 +155,12 @@ public class PlatformManagerTest {
             else
                 return Optional.of(this);
         }
-
         @Override
-        public Optional<WorkerIdentification> getWorker() {
+        public Optional<WorkerIdentification> getWorker(Map<String, String[]> params) throws UnidentifiedWorkerException {
             if (!handleWorker)
                 return Optional.empty();
             else
-                return Optional.of(this);
+                return Optional.of(WorkerIdentification.findByIdentification(getID(), "50"));
         }
 
         @Override
@@ -192,11 +191,6 @@ public class PlatformManagerTest {
         @Override
         public Boolean isCalibrationAllowed() {
             return renderCalib;
-        }
-
-        @Override
-        public String identifyWorker(Map<String, String[]> param) {
-            return "50";
         }
 
         @Override
