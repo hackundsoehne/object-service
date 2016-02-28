@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 public class PlatformManager {
     private static final Logger LOGGER = LogManager.getRootLogger();
     private final Map<String, Platform> platforms;
-    private final WorkerIdentification fallbackWorker;
+    private final BiFunction<Map<String, String[]>, String, WorkerIdentification> fallbackWorker;
     private final Payment fallbackPayment;
     private ExperimentsPlatformOperations experimentsPlatformOps;
     private WorkerOperations workerOps;
@@ -40,14 +41,14 @@ public class PlatformManager {
      *                       will be used to setup the list of platforms in the database
      * @param fallbackWorker handler which is called if a platform does not support identifying a worker
      *                       for this case need_email on the platform is set and the email which got entered by the worker
-     *                       should be set as some param
+     *                       should be set as some param. The function takes the passed parameter and the name of the platform.
      * @param fallbackPayment handler which is called if a platform does not support payment
      * @param experimentsPlatformOps Used for the experimentsPlatform operations on the database
      * @param platformOps Used for the platform operations on the database
      * @param workerOps Used for the worker operations on the database
      */
-    public PlatformManager(List<Platform> crowdPlatforms, WorkerIdentification fallbackWorker,
-                           Payment fallbackPayment, ExperimentsPlatformOperations experimentsPlatformOps,
+    public PlatformManager(List<Platform> crowdPlatforms, BiFunction<Map<String, String[]>, String, WorkerIdentification> fallbackWork,
+                           Payment fallbackPayment, TasksOperations tasksOps,
                            PlatformOperations platformOps, WorkerOperations workerOps) {
         this.experimentsPlatformOps = experimentsPlatformOps;
         this.fallbackWorker = fallbackWorker;
@@ -80,7 +81,7 @@ public class PlatformManager {
             needemail = true;
 
         /* if platform cannot identify worker, we need to do that with a email adress */
-        if (!platform.getWorker().isPresent())
+        if (!platform.getWorker(null).isPresent())
             needemail = true;
 
         return needemail;
@@ -104,17 +105,6 @@ public class PlatformManager {
      */
     public Optional<Platform> getPlatform(String name) {
         return Optional.ofNullable(platforms.get(name));
-    }
-
-    /**
-     * Will return the Worker interface which should be used to identify workers for the given platform
-     *
-     * @param name The name of the platform
-     * @return The interface used to identify a worker
-     */
-    public WorkerIdentification getWorker(String name) {
-        return getPlatformOrThrow(name)
-                .getWorker().orElse(fallbackWorker);
     }
 
     /**
@@ -235,21 +225,12 @@ public class PlatformManager {
      * @param name The name of the platform
      * @param params Params passed by the platform
      * @return A String if the platform exists
-     * @throws UnidentifiedWorkerException if the user can not be found by the platform code
+     * @throws UnidentifiedWorkerException if passed invalid params
      */
-    public String identifyWorker(String name, Map<String, String[]> params) throws UnidentifiedWorkerException {
-        return getWorker(name).identifyWorker(params);
-    }
-
-    /**
-     * Get a worker if he exists
-     * @param name Name of the platform
-     * @param params Params passed by the platform
-     * @return A worker if one is found
-     * @throws UnidentifiedWorkerException if the platform does not identify a worker
-     */
-    public Optional<WorkerRecord> getWorker(String name, Map<String ,String[]> params) throws UnidentifiedWorkerException {
-        return getWorker(name).getWorker(workerOps,name,params);
+    public WorkerIdentification identifyWorker(String name, Map<String, String[]> params) throws UnidentifiedWorkerException {
+        return getPlatformOrThrow(name)
+                .getWorker(params)
+                .orElse(fallbackWorker.apply(params, name));
     }
 
     /**

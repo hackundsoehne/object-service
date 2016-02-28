@@ -67,6 +67,18 @@ public class PyBossaPlatform implements Platform {
         return Optional.empty();
     }
 
+    /**
+     * if the Platform has his own worker identification the interface can be returned here
+     *
+     * @param params The parameters which were sent by a platform
+     * @return the value to indicate if it supports worker identification or not.
+     * @throws UnidentifiedWorkerException if passed invalid params
+     */
+    @Override
+    public Optional<WorkerIdentification> getWorker(Map<String, String[]> params) throws UnidentifiedWorkerException {
+        return Optional.of(WorkerIdentification.findByIdentification(getID(), identifyWorker(params)));
+    }
+
     @Override
     public String getName() {
         return "Pybossa " + name;
@@ -118,11 +130,6 @@ public class PyBossaPlatform implements Platform {
         });
     }
 
-    @Override
-    public Optional<WorkerIdentification> getWorker() {
-        return Optional.of(this::identifyWorker);
-    }
-
     /**
      * IdentifyWorker takes the passed params and looks for a specified workerid, an idTask id and a code.
      * It then checks if there is one idTask that has been submitted by the worker before.
@@ -134,6 +141,9 @@ public class PyBossaPlatform implements Platform {
      * @throws UnidentifiedWorkerException if the worker cannot be identified
      */
     private String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException {
+        if (param == null) {
+            return "";
+        }
         String givenWorkerId = param.get("id")[0];
         String givenIdTask = param.get("idTask")[0];
         String givenCode = param.get("code")[0];

@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -16,10 +17,13 @@ public interface Platform {
     Optional<Payment> getPayment();
 
     /**
-     * if the Platform has his own worker identification the interface can be returned here
+     * if the Platform has his own worker identification the interface can be returned here.
+     * if passed null it should return something if getWorker is supported.
+     * @param params The parameters which were sent by a platform
      * @return the value to indicate if it supports worker identification or not.
+     * @throws UnidentifiedWorkerException if passed invalid params
      */
-    Optional<WorkerIdentification> getWorker();
+    Optional<WorkerIdentification> getWorker(Map<String, String[]> params) throws UnidentifiedWorkerException;
 
     /**
      * Get the name of this platform

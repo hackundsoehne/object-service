@@ -5,33 +5,38 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentification;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * The fallback-worker uses the email-address to identify workers.
  * @author LeanderK
  * @version 1.0
  */
-public class FallbackWorker implements WorkerIdentification {
+public class FallbackWorker implements BiFunction<Map<String, String[]>, String, WorkerIdentification> {
+
     /**
-     * Parse a worker id out of the params
+     * Applies this function to the given argument.
      *
-     * @param param The parameters which were sent by a platform
-     * @return The id of the worker if one can be found
+     * @param params The parameters which were sent by a platform
+     * @param platform the name of the platform
+     * @return the function result
      */
     @Override
-    public String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException {
+    public WorkerIdentification apply(Map<String, String[]> params, String platform) {
+        //if the worker does not provide an email-address return not an email
+        // (this can not be found in our database, since our identification is an email.
+        // The worker then gets asked for an email).
+        String data = "_!";
         //if the worker provides an email-address return it
-        if (param.containsKey("email")) {
-            String email = param.get("email")[0];
+        if (params.containsKey("email")) {
+            String email = params.get("email")[0];
             if (!email.isEmpty() && !EmailValidator.getInstance(false).isValid(email)) {
                 throw new UnidentifiedWorkerException(String.format("invalid email: %s!", email));
             }
-            return email;
-            //if the worker does not provide an email-address return not an email
-            // (this can not be found in our database, since our identification is an email.
-            // The worker then gets asked for an email).
-        } else {
-            return "_!";
+            data = email;
         }
+        return WorkerIdentification.findByIdentification(platform, data);
     }
 }
