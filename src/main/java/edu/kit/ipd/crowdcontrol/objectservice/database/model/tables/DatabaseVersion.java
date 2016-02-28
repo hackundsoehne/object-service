@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DatabaseVersion extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.DatabaseVersionRecord> {
 
-	private static final long serialVersionUID = -1938650129;
+	private static final long serialVersionUID = -1746649120;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Database_Version</code>
@@ -61,6 +61,14 @@ public class DatabaseVersion extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdco
 
 	private DatabaseVersion(java.lang.String alias, org.jooq.Table<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.DatabaseVersionRecord> aliased, org.jooq.Field<?>[] parameters) {
 		super(alias, edu.kit.ipd.crowdcontrol.objectservice.database.model.Crowdcontrol.CROWDCONTROL, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public org.jooq.Identity<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.DatabaseVersionRecord, java.lang.Integer> getIdentity() {
+		return edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDENTITY_DATABASE_VERSION;
 	}
 
 	/**

@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.DatabaseVersionRecord;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -19,6 +20,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
@@ -112,9 +115,7 @@ public class DatabaseManager {
                 .fetchOptional()
                 .map(Record1::value1)
                 .orElseGet(() -> {
-                    context.insertInto(DATABASE_VERSION)
-                            .set(new DatabaseVersionRecord(null, currentVersion, null))
-                            .execute();
+                    context.executeInsert(new DatabaseVersionRecord(null, currentVersion, Timestamp.valueOf(LocalDateTime.now())));
                     return currentVersion;
                 });
         if (dbVersion != currentVersion) {

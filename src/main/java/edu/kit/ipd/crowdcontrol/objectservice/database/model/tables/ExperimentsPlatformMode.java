@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentsPlatformMode extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord> {
 
-	private static final long serialVersionUID = -1793089146;
+	private static final long serialVersionUID = 560288632;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Experiments_Platform_Mode</code>
@@ -66,6 +66,14 @@ public class ExperimentsPlatformMode extends org.jooq.impl.TableImpl<edu.kit.ipd
 
 	private ExperimentsPlatformMode(java.lang.String alias, org.jooq.Table<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord> aliased, org.jooq.Field<?>[] parameters) {
 		super(alias, edu.kit.ipd.crowdcontrol.objectservice.database.model.Crowdcontrol.CROWDCONTROL, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public org.jooq.Identity<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord, java.lang.Integer> getIdentity() {
+		return edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDENTITY_EXPERIMENTS_PLATFORM_MODE;
 	}
 
 	/**

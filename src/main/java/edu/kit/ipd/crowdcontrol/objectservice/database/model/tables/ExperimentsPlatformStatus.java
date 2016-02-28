@@ -11,7 +11,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentsPlatformStatus extends org.jooq.impl.TableImpl<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord> {
 
-	private static final long serialVersionUID = 2012582038;
+	private static final long serialVersionUID = -50965848;
 
 	/**
 	 * The singleton instance of <code>crowdcontrol.Experiments_Platform_Status</code>
@@ -66,6 +66,14 @@ public class ExperimentsPlatformStatus extends org.jooq.impl.TableImpl<edu.kit.i
 
 	private ExperimentsPlatformStatus(java.lang.String alias, org.jooq.Table<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord> aliased, org.jooq.Field<?>[] parameters) {
 		super(alias, edu.kit.ipd.crowdcontrol.objectservice.database.model.Crowdcontrol.CROWDCONTROL, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public org.jooq.Identity<edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord, java.lang.Integer> getIdentity() {
+		return edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys.IDENTITY_EXPERIMENTS_PLATFORM_STATUS;
 	}
 
 	/**
