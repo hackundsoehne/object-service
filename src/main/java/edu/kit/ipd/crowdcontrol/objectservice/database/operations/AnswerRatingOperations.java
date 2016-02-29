@@ -201,9 +201,9 @@ public class AnswerRatingOperations extends AbstractOperations {
      */
     public AnswerRecord insertNewAnswer(AnswerRecord answerRecord) throws IllegalArgumentException, IllegalStateException {
         answerRecord.setIdAnswer(null);
-        ExperimentRecord experiment = experimentOperations.getExperiment(answerRecord.getExperiment())
+        ExperimentRecord experimentRecord = experimentOperations.getExperiment(answerRecord.getExperiment())
                 .orElseThrow(() -> new IllegalArgumentException("Illegal experiment-value in answer record."));
-        if (getAnswerCount(answerRecord.getWorkerId()) >= experiment.getAnwersPerWorker()) {
+        if (getAnswerCount(answerRecord.getWorkerId(), experimentRecord.getIdExperiment()) >= experimentRecord.getAnwersPerWorker()) {
             throw new IllegalStateException(
                     String.format("Worker %d already submitted the maximum of allowed answers", answerRecord.getWorkerId())
             );
@@ -221,16 +221,18 @@ public class AnswerRatingOperations extends AbstractOperations {
     }
 
     /**
-     * returns the number answers a worker has submitted.
+     * Returns the number of answers a given worker has submitted for a given experiment.
      *
      * @param workerID the primary key of the worker
+     * @param experimentID the primary key of the experiment
      *
      * @return the number of answers
      */
-    private int getAnswerCount(int workerID) {
+    private int getAnswerCount(int workerID, int experimentID) {
         return create.fetchCount(
                 DSL.selectFrom(ANSWER)
                         .where(ANSWER.WORKER_ID.eq(workerID))
+                        .and(ANSWER.EXPERIMENT.eq(experimentID))
         );
     }
 
