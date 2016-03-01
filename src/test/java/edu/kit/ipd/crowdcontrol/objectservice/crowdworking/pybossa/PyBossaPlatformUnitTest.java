@@ -1,6 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentification;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentificationComputation;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
 import org.json.JSONArray;
@@ -65,7 +65,7 @@ public class PyBossaPlatformUnitTest {
 
     @Test
     public void testGetWorker() throws Exception {
-        Optional<WorkerIdentification> workerIdentification = pybossa.getWorker();
+        Optional<WorkerIdentificationComputation> workerIdentification = pybossa.getWorker();
 
         String code = "super code";
         String hashedEncodedCode = Base64.getUrlEncoder().encodeToString(messageDigest.digest(code.getBytes()));
@@ -79,7 +79,7 @@ public class PyBossaPlatformUnitTest {
         params.put("idTask", new String[]{idTask});
         params.put("workerId", new String[]{WORKER_ID});
         params.put("code", new String[]{code});
-        String verifiedWorkerId = workerIdentification.get().identifyWorker(params);
+        String verifiedWorkerId = workerIdentification.get().getWorker(params).getWorkerData();
 
         assertEquals(WORKER_ID, verifiedWorkerId);
     }
