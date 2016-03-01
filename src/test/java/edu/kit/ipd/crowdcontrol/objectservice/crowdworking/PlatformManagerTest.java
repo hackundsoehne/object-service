@@ -48,7 +48,7 @@ public class PlatformManagerTest {
         when(platformOps.getPlatform("test3")).thenReturn(Optional.empty());
 
         manager = new PlatformManager(platforms,
-                (stringMap, platform) -> WorkerIdentification.findByIdentification(platform, "42"),
+                platform -> params -> WorkerIdentification.findByIdentification(platform, "42"),
                 (id, experiment1, paymentJob) -> CompletableFuture.completedFuture(true),
                 experimentsPlatformOperations,
                 platformOps,
@@ -155,12 +155,13 @@ public class PlatformManagerTest {
             else
                 return Optional.of(this);
         }
+
         @Override
-        public Optional<WorkerIdentification> getWorker(Map<String, String[]> params) throws UnidentifiedWorkerException {
+        public Optional<WorkerIdentificationComputation> getWorker() {
             if (!handleWorker)
                 return Optional.empty();
             else
-                return Optional.of(WorkerIdentification.findByIdentification(getID(), "50"));
+                return Optional.of(params -> WorkerIdentification.findByIdentification(getID(), "50"));
         }
 
         @Override

@@ -63,18 +63,21 @@ public class MturkPlatform implements Platform,Payment {
     }
 
     @Override
-    public Optional<WorkerIdentification> getWorker(Map<String, String[]> params) throws UnidentifiedWorkerException {
-        String workerId = "";
-        if (params != null) {
-            String[] workerIdArray = params.get("mTurkWorkerId");
+    public Optional<WorkerIdentificationComputation> getWorker() {
+        return Optional.of(params -> {
+            String workerId = "";
+            if (params != null) {
+                String[] workerIdArray = params.get("mTurkWorkerId");
 
-            if (workerIdArray != null && workerIdArray.length > 0) {
-                workerId = workerIdArray[0];
-            } else {
-                throw new UnidentifiedWorkerException("mTurkWorkerId was not set!");
+                if (workerIdArray != null && workerIdArray.length > 0) {
+                    workerId = workerIdArray[0];
+                } else {
+                    throw new UnidentifiedWorkerException("mTurkWorkerId was not set!");
+                }
             }
-        }
-        return Optional.of(WorkerIdentification.findByIdentification(getID(),workerId));
+
+            return WorkerIdentification.findByIdentification(getID(),workerId);
+        });
     }
 
 

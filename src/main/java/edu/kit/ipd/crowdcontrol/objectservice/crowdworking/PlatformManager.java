@@ -2,7 +2,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 public class PlatformManager {
     private static final Logger LOGGER = LogManager.getRootLogger();
     private final Map<String, Platform> platforms;
-    private final BiFunction<Map<String, String[]>, String, WorkerIdentification> fallbackWorker;
+    private final Function<String, WorkerIdentificationComputation> fallbackWorker;
     private final Payment fallbackPayment;
     private ExperimentsPlatformOperations experimentsPlatformOps;
     private WorkerOperations workerOps;
@@ -41,14 +40,14 @@ public class PlatformManager {
      *                       will be used to setup the list of platforms in the database
      * @param fallbackWorker handler which is called if a platform does not support identifying a worker
      *                       for this case need_email on the platform is set and the email which got entered by the worker
-     *                       should be set as some param. The function takes the passed parameter and the name of the platform.
+     *                       should be set as some param. The function takes the name of the platform.
      * @param fallbackPayment handler which is called if a platform does not support payment
      * @param experimentsPlatformOps Used for the experimentsPlatform operations on the database
      * @param platformOps Used for the platform operations on the database
      * @param workerOps Used for the worker operations on the database
      */
-    public PlatformManager(List<Platform> crowdPlatforms, BiFunction<Map<String, String[]>, String, WorkerIdentification> fallbackWork,
-                           Payment fallbackPayment, TasksOperations tasksOps,
+    public PlatformManager(List<Platform> crowdPlatforms, Function<String, WorkerIdentificationComputation> fallbackWorker,
+                           Payment fallbackPayment, ExperimentsPlatformOperations experimentsPlatformOps,
                            PlatformOperations platformOps, WorkerOperations workerOps) {
         this.experimentsPlatformOps = experimentsPlatformOps;
         this.fallbackWorker = fallbackWorker;
@@ -81,7 +80,7 @@ public class PlatformManager {
             needemail = true;
 
         /* if platform cannot identify worker, we need to do that with a email adress */
-        if (!platform.getWorker(null).isPresent())
+        if (!platform.getWorker().isPresent())
             needemail = true;
 
         return needemail;
@@ -229,8 +228,9 @@ public class PlatformManager {
      */
     public WorkerIdentification identifyWorker(String name, Map<String, String[]> params) throws UnidentifiedWorkerException {
         return getPlatformOrThrow(name)
-                .getWorker(params)
-                .orElse(fallbackWorker.apply(params, name));
+                .getWorker()
+                .orElseGet(() -> fallbackWorker.apply(name))
+                .getWorker(params);
     }
 
     /**

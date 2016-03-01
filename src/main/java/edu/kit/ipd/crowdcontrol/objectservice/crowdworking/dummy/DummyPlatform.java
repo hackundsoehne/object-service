@@ -41,14 +41,11 @@ public class DummyPlatform implements Platform, Payment {
     }
 
     /**
-     * if the Platform has his own worker identification the interface can be returned here
-     *
-     * @param params The parameters which were sent by a platform
+     * if the Platform has his own worker identification the interface can be returned here.
      * @return the value to indicate if it supports worker identification or not.
-     * @throws UnidentifiedWorkerException if passed invalid params
      */
     @Override
-    public Optional<WorkerIdentification> getWorker(Map<String, String[]> params) throws UnidentifiedWorkerException {
+    public Optional<WorkerIdentificationComputation> getWorker() {
         return Optional.empty();
     }
 
