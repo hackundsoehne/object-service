@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentification;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.WorkerTransformer;
@@ -43,11 +44,12 @@ public class WorkerResource {
         try {
             WorkerRecord worker;
             String platform = request.params("platform");
-            Optional<WorkerRecord> optionalRecord = manager.getWorker(platform, request.queryMap().toMap());
+            WorkerIdentification workerIdentification = manager.identifyWorker(platform, request.queryMap().toMap());
+            Optional<WorkerRecord> optionalRecord = workerIdentification.findWorker(operations);
             if (optionalRecord.isPresent()) {
                 worker = optionalRecord.get();
             } else if (!manager.getNeedemail(platform) || (request.queryParams("email") != null && !request.queryParams("email").isEmpty())){
-                String identify = manager.identifyWorker(platform, request.queryMap().toMap());
+                String identify = workerIdentification.getWorkerData();
                 WorkerRecord workerRecord = new WorkerRecord(null, identify, platform, null, null);
                 worker = operations.insertWorker(workerRecord);
             } else {
@@ -96,7 +98,8 @@ public class WorkerResource {
         String identity;
 
         try {
-            identity = manager.identifyWorker(request.params("platform"), request.queryMap().toMap());
+            identity = manager.identifyWorker(request.params("platform"), request.queryMap().toMap())
+                    .getWorkerData();
         } catch (UnidentifiedWorkerException e) {
             throw new BadRequestException("Could not identify worker.");
         }

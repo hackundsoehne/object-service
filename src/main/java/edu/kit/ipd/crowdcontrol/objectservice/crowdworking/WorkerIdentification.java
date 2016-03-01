@@ -9,26 +9,38 @@ import java.util.Optional;
 /**
  * Created by marcel on 19.01.16.
  */
-@FunctionalInterface
 public interface WorkerIdentification {
     /**
      * Parse a worker id out of the params
-     * @param param The parameters which were sent by a platform
      * @return The id of the worker if one can be found
      */
-    String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException;
+    String getWorkerData() throws UnidentifiedWorkerException;
 
     /**
-     * Get a worker record from the identification
+     * Tries to find the worker in the database
      *
      * @param workerOperations The worker operations to use
-     * @param platform The platform on which this is called
-     * @param param The parameters of the platform
      * @return A WorkerRecord, if one is found
-     * @throws UnidentifiedWorkerException
      */
-    default Optional<WorkerRecord> getWorker(WorkerOperations workerOperations, String platform, Map<String, String[]> param) throws UnidentifiedWorkerException {
-        String uid = identifyWorker(param);
-        return workerOperations.getWorker(platform, uid);
+    Optional<WorkerRecord> findWorker(WorkerOperations workerOperations);
+
+    /**
+     * this instance of WorkerIdentification tries to identify the worker by the passed identification
+     * @param platform The platform on which this is called
+     * @param identification the computed id of the worker
+     * @return the resulting WorkerIdentification
+     */
+    static WorkerIdentification findByIdentification(String platform, String identification) {
+        return new WorkerIdentification() {
+            @Override
+            public String getWorkerData() throws UnidentifiedWorkerException {
+                return identification;
+            }
+
+            @Override
+            public Optional<WorkerRecord> findWorker(WorkerOperations workerOperations) {
+                return workerOperations.getWorker(platform, identification);
+            }
+        };
     }
 }

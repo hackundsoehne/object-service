@@ -1,9 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentification;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -67,6 +64,15 @@ public class PyBossaPlatform implements Platform {
         return Optional.empty();
     }
 
+    /**
+     * if the Platform has his own worker identification the interface can be returned here.
+     * @return the value to indicate if it supports worker identification or not.
+     */
+    @Override
+    public Optional<WorkerIdentificationComputation> getWorker() {
+        return Optional.of(params -> WorkerIdentification.findByIdentification(getID(), identifyWorker(params)));
+    }
+
     @Override
     public String getName() {
         return "Pybossa " + name;
@@ -118,11 +124,6 @@ public class PyBossaPlatform implements Platform {
         });
     }
 
-    @Override
-    public Optional<WorkerIdentification> getWorker() {
-        return Optional.of(this::identifyWorker);
-    }
-
     /**
      * IdentifyWorker takes the passed params and looks for a specified workerid, an idTask id and a code.
      * It then checks if there is one idTask that has been submitted by the worker before.
@@ -134,6 +135,9 @@ public class PyBossaPlatform implements Platform {
      * @throws UnidentifiedWorkerException if the worker cannot be identified
      */
     private String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException {
+        if (param == null) {
+            return "";
+        }
         String givenWorkerId = param.get("id")[0];
         String givenIdTask = param.get("idTask")[0];
         String givenCode = param.get("code")[0];

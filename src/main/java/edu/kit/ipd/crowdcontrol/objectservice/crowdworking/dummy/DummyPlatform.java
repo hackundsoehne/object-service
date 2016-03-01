@@ -4,6 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -40,12 +41,11 @@ public class DummyPlatform implements Platform, Payment {
     }
 
     /**
-     * if the Platform has his own worker identification the interface can be returned here
-     *
-     * @return The value to indicate if it supports worker identification or not.
+     * if the Platform has his own worker identification the interface can be returned here.
+     * @return the value to indicate if it supports worker identification or not.
      */
     @Override
-    public Optional<WorkerIdentification> getWorker() {
+    public Optional<WorkerIdentificationComputation> getWorker() {
         return Optional.empty();
     }
 
