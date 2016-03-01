@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @author MarcelHollerbach
  * @version 0.1
  */
-public class MturkPlatform implements Platform,Payment,WorkerIdentification {
+public class MturkPlatform implements Platform,Payment {
     public static final int THIRTY_DAYS = 60 * 60 * 24 * 30;
     public static final int TWO_HOURS = 60 * 60 * 2;
     private final String name;
@@ -63,8 +63,21 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
     }
 
     @Override
-    public Optional<WorkerIdentification> getWorker() {
-        return Optional.of(this);
+    public Optional<WorkerIdentificationComputation> getWorker() {
+        return Optional.of(params -> {
+            String workerId = "";
+            if (params != null) {
+                String[] workerIdArray = params.get("mTurkWorkerId");
+
+                if (workerIdArray != null && workerIdArray.length > 0) {
+                    workerId = workerIdArray[0];
+                } else {
+                    throw new UnidentifiedWorkerException("mTurkWorkerId was not set!");
+                }
+            }
+
+            return WorkerIdentification.findByIdentification(getID(),workerId);
+        });
     }
 
 
@@ -92,19 +105,6 @@ public class MturkPlatform implements Platform,Payment,WorkerIdentification {
     @Override
     public CompletableFuture<String> updateTask(String id, Experiment experiment) {
         return null;
-    }
-
-    @Override
-    public String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException {
-        String[] workerIdArray = param.get("mTurkWorkerId");
-        String workerId;
-
-        if (workerIdArray != null && workerIdArray.length > 0) {
-            workerId = workerIdArray[0];
-        } else {
-            throw new UnidentifiedWorkerException("mTurkWorkerId was not set!");
-        }
-        return workerId;
     }
 
     @Override

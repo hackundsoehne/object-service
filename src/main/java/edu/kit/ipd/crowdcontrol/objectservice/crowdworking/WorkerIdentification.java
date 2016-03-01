@@ -7,30 +7,40 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * This interface provides encapsulates functionality to identify a worker and retrieve the worker's data record.
- *
  * Created by marcel on 19.01.16.
  */
-@FunctionalInterface
 public interface WorkerIdentification {
     /**
-     * Parse a worker id out of the params.
-     * This may only work once for the given params and is platform dependant.
-     * @param param The parameters which were sent by a platform
+     * Parse a worker id out of the params
      * @return The id of the worker if one can be found
      */
-    String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException;
+    String getWorkerData() throws UnidentifiedWorkerException;
 
     /**
-     * Get a worker record from the identification
+     * Tries to find the worker in the database
      *
      * @param workerOperations The worker operations to use
-     * @param platform The platform on which this is called
-     * @param identification The previously obtained identification of the worker
      * @return A WorkerRecord, if one is found
-     * @throws UnidentifiedWorkerException
      */
-    default Optional<WorkerRecord> getWorker(String identification, WorkerOperations workerOperations, String platform) throws UnidentifiedWorkerException {
-        return workerOperations.getWorker(platform, identification);
+    Optional<WorkerRecord> findWorker(WorkerOperations workerOperations);
+
+    /**
+     * this instance of WorkerIdentification tries to identify the worker by the passed identification
+     * @param platform The platform on which this is called
+     * @param identification the computed id of the worker
+     * @return the resulting WorkerIdentification
+     */
+    static WorkerIdentification findByIdentification(String platform, String identification) {
+        return new WorkerIdentification() {
+            @Override
+            public String getWorkerData() throws UnidentifiedWorkerException {
+                return identification;
+            }
+
+            @Override
+            public Optional<WorkerRecord> findWorker(WorkerOperations workerOperations) {
+                return workerOperations.getWorker(platform, identification);
+            }
+        };
     }
 }

@@ -2,9 +2,12 @@ package edu.kit.ipd.crowdcontrol.objectservice.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.DatabaseVersionRecord;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
 import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -17,7 +20,11 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
+
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
 
 /**
  * Initializes and holds the connection to the database and eventually the database itself.
@@ -29,6 +36,7 @@ public class DatabaseManager {
     private final DSLContext context;
     private final String url;
     private final DataSource ds;
+    private final int currentVersion = 1;
 
     /**
      * creates new DatabaseManager.
@@ -86,9 +94,44 @@ public class DatabaseManager {
     }
 
     /**
-     * initializes the database if not already initialized.
+     * Initializes the database if not already initialized.
+     * @throws SQLException if there was a problem establishing a connection to the database
+     * @throws IllegalStateException if the version does not match the current version
      */
-    public void initDatabase() throws SQLException {
+    public void initDatabase() throws SQLException, IllegalStateException {
+        createSchemaIfNotExisting();
+        checkDBVersion();
+    }
+
+    /**
+     * Checks whether the db matches the current version and if not throws an exception.
+     * @throws IllegalStateException if the version does not match the current version
+     */
+    private void checkDBVersion() throws IllegalStateException {
+        Integer dbVersion = context.select(DATABASE_VERSION.VERSION)
+                .from(DATABASE_VERSION)
+                .orderBy(DATABASE_VERSION.TIMESTAMP.desc())
+                .limit(1)
+                .fetchOptional()
+                .map(Record1::value1)
+                .orElseGet(() -> {
+                    context.executeInsert(new DatabaseVersionRecord(null, currentVersion, Timestamp.valueOf(LocalDateTime.now())));
+                    return currentVersion;
+                });
+        if (dbVersion != currentVersion) {
+            throw new IllegalStateException(String.format(
+                    "Database Version is %d but the object-service expects %d",
+                    dbVersion,
+                    currentVersion
+            ));
+        }
+    }
+
+    /**
+     * Creates the db-schema if not already existing.
+     * @throws SQLException if there was a problem establishing a connection to the database
+     */
+    private void createSchemaIfNotExisting() throws SQLException {
         try (InputStream in = DatabaseManager.class.getResourceAsStream("/db.sql")) {
             String initScript = IOUtils.toString(in, "UTF-8");
             if (Boolean.getBoolean("dropSchema")) {

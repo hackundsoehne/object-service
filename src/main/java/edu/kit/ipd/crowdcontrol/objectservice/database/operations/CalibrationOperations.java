@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.CalibrationA
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationAnswerOptionRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.CalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.CalibrationTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
@@ -136,12 +137,21 @@ public class CalibrationOperations extends AbstractOperations {
      * @param experimentID the primary key of the experiment
      */
     public void storeExperimentCalibrations(String platform, List<Integer> calibrationIDs, int experimentID) {
+        ExperimentsPlatformRecord platformRecord = create.selectFrom(EXPERIMENTS_PLATFORM)
+                .where(EXPERIMENTS_PLATFORM.PLATFORM.eq(platform))
+                .and(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
+                .fetchOptional()
+                .orElseThrow(() -> new IllegalStateException(String.format(
+                        "platform %s is not existing for experiment %d",
+                        platform,
+                        experimentID
+                )));
         List<ExperimentsCalibrationRecord> calibrations = calibrationIDs.stream()
-                .map(calibration -> new ExperimentsCalibrationRecord(null, experimentID, calibration, platform, false))
+                .map(calibration -> new ExperimentsCalibrationRecord(null, platformRecord.getIdexperimentsPlatforms(), calibration, false))
                 .collect(Collectors.toList());
         create.transaction(conf -> {
             DSL.using(conf).deleteFrom(EXPERIMENTS_CALIBRATION)
-                    .where(EXPERIMENTS_CALIBRATION.REFERNCED_EXPERIMENT.eq(experimentID))
+                    .where(EXPERIMENTS_CALIBRATION.EXPERIMENTS_PLATFORM.eq(platformRecord.getIdexperimentsPlatforms()))
                     .execute();
             DSL.using(conf).batchInsert(calibrations).execute();
         });

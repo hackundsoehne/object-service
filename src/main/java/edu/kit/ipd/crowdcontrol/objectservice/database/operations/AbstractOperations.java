@@ -3,7 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.TaskStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableRecordImpl;
@@ -30,24 +30,29 @@ public abstract class AbstractOperations {
     }
 
     /**
-     * executes the function if the experiment is not running.
+     * executes the function if the experiment is in draft-mode.
      * @param experimentID the id of the experiment
      * @param function the function to execute
      * @param <R> the return type
      * @return the result of the function
      * @throws IllegalStateException if the experiment is running
      */
-    protected <R> R doIfNotRunning(int experimentID, Function<Configuration, R> function) throws IllegalStateException {
+    protected <R> R doIfDraft(int experimentID, Function<Configuration, R> function) throws IllegalStateException {
         return create.transactionResult(trans -> {
-            boolean running = DSL.using(trans).fetchExists(
-                    DSL.selectFrom(Tables.TASK)
-                            .where(Tables.TASK.EXPERIMENT.eq(experimentID))
-                            .and(Tables.TASK.STATUS.eq(TaskStatus.running).or(Tables.TASK.STATUS.eq(TaskStatus.stopping)))
+            boolean notDraft = DSL.using(trans).fetchExists(
+                    DSL.selectFrom(Tables.EXPERIMENTS_PLATFORM_STATUS)
+                            .where(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
+                                    DSL.select(Tables.EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                                            .from(Tables.EXPERIMENTS_PLATFORM)
+                                            .where(Tables.EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
+                            ))
+                            .and(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
+                                    .notEqual(ExperimentsPlatformStatusPlatformStatus.draft))
             );
-            if (!running) {
+            if (!notDraft) {
                 return function.apply(trans);
             } else {
-                throw new IllegalStateException("Experiment is running: " + experimentID);
+                throw new IllegalStateException("Experiment is not in draft: " + experimentID);
             }
         });
     }
@@ -63,11 +68,48 @@ public abstract class AbstractOperations {
     protected <R> R doIfRunning(int experimentID, Function<Configuration, R> function) throws IllegalStateException {
         return create.transactionResult(trans -> {
             boolean running = DSL.using(trans).fetchExists(
-                    DSL.selectFrom(Tables.TASK)
-                            .where(Tables.TASK.EXPERIMENT.eq(experimentID))
-                            .and(Tables.TASK.STATUS.eq(TaskStatus.running).or(Tables.TASK.STATUS.eq(TaskStatus.stopping)))
+                    DSL.selectFrom(Tables.EXPERIMENTS_PLATFORM_STATUS)
+                            .where(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
+                                    DSL.select(Tables.EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                                            .from(Tables.EXPERIMENTS_PLATFORM)
+                                            .where(Tables.EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
+                            ))
+                            .and(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
+                                    .eq(ExperimentsPlatformStatusPlatformStatus.running)
+                                    .or(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
+                                        .eq(ExperimentsPlatformStatusPlatformStatus.stopping)))
             );
             if (running) {
+                return function.apply(trans);
+            } else {
+                throw new IllegalStateException("Experiment is not running: " + experimentID);
+            }
+        });
+    }
+
+    /**
+     * executes the function if the experiment is not running.
+     * @param experimentID the id of the experiment
+     * @param function the function to execute
+     * @param <R> the return type
+     * @return the result of the function
+     * @throws IllegalStateException if the experiment is running
+     */
+    protected <R> R doIfNotRunning(int experimentID, Function<Configuration, R> function) throws IllegalStateException {
+        return create.transactionResult(trans -> {
+            boolean running = DSL.using(trans).fetchExists(
+                    DSL.selectFrom(Tables.EXPERIMENTS_PLATFORM_STATUS)
+                            .where(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
+                                    DSL.select(Tables.EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                                            .from(Tables.EXPERIMENTS_PLATFORM)
+                                            .where(Tables.EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
+                            ))
+                            .and(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
+                                    .eq(ExperimentsPlatformStatusPlatformStatus.running)
+                                    .or(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
+                                            .eq(ExperimentsPlatformStatusPlatformStatus.stopping)))
+            );
+            if (!running) {
                 return function.apply(trans);
             } else {
                 throw new IllegalStateException("Experiment is running: " + experimentID);
