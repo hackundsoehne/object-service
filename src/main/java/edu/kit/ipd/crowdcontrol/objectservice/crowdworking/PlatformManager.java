@@ -8,6 +8,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperat
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
  * Created by marcel on 19.01.16.
  */
 public class PlatformManager {
+    private static final Logger LOGGER = LogManager.getRootLogger();
     private final Map<String, Platform> platforms;
     private final WorkerIdentification fallbackWorker;
     private final Payment fallbackPayment;
@@ -156,7 +159,12 @@ public class PlatformManager {
             }
             //if there is no useful key throw!
             if (s1 == null || (s1.isEmpty())) {
-                //TODO: marcel: but it is published?
+                try {
+                    unpublishTask(name, experiment);
+                } catch (TaskOperationException e) {
+                    LOGGER.error("Platform " + name + " does not provide any useful key and has thrown an " +
+                            "exception when tried to unpublish the task", e);
+                }
                 experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
                         ExperimentsPlatformStatusPlatformStatus.running);
                 throw new IllegalStateException("Platform " + name + " does not provide any useful key");
