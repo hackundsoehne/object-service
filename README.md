@@ -9,7 +9,7 @@
 
 ### Docker:
 
-To start the backend, you can download the [docker-compose file](https://github.com/coolcrowd/object-service/blob/master/image/compose/docker-compose.yml) and 
+To start the backend, you can download the [docker-compose file](https://raw.githubusercontent.com/coolcrowd/object-service/docker/image/compose/docker-compose.yml) and 
 run `docker-compose up` (assuming docker is installed) to start the backend.
 
 ### Jar:
@@ -20,7 +20,7 @@ How to build the object-service is detailed below.
 ## Configuration
 
 It is possible to pass `-Dobjectservice.config=configLocation` to specify the config-location, the configuration file is detailed 
-[here](https://github.com/coolcrowd/object-service/blob/master/src/main/resources/config.sample.yml).
+[here](https://raw.githubusercontent.com/coolcrowd/object-service/master/src/main/resources/config.sample.yml).
 
 
 ## Installation
