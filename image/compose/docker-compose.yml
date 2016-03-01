@@ -22,7 +22,7 @@ services:
             - -Ddatabase.url=jdbc:mysql://db
             - -Ddatabase.username=root
             - -Ddatabase.password=root
-            - -Dos.url=http://objectservice
+            - -Dos.url=http://objectservice:4567
   db:
     image: mysql:latest
     environment:
