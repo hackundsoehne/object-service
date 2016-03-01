@@ -147,6 +147,8 @@ public class ExperimentResource {
     public Experiment put(Request request, Response response) {
         Experiment experiment = request.attribute("input");
 
+        assertRatingOptions(experiment);
+
         ExperimentRecord record = ExperimentTransformer.mergeProto(new ExperimentRecord(), experiment);
 
         Map<String, String> placeholders = experiment.getPlaceholders();
@@ -196,6 +198,18 @@ public class ExperimentResource {
         EventManager.EXPERIMENT_CREATE.emit(exp);
 
         return exp;
+    }
+
+    private void assertRatingOptions(Experiment experiment) {
+        if (experiment.getRatingOptionsCount() < 2) {
+            throw new BadRequestException("There must be at least two ratings options.");
+        }
+
+        experiment.getRatingOptionsList().stream().forEach(ratingOption -> {
+            if (ratingOption.getValue() < 0 || ratingOption.getValue() > 9) {
+                throw new BadRequestException("Rating option values must be between 0 and 9.");
+            }
+        });
     }
 
     private void storePopulations(int experimentId, List<Experiment.Population> populations) {
@@ -448,6 +462,10 @@ public class ExperimentResource {
 
         if (!old.getState().equals(Experiment.State.DRAFT)) {
             throw new IllegalStateException("When an experiment is running, only the state is allowed to be changed.");
+        }
+
+        if (!experiment.getRatingOptionsList().isEmpty()) {
+            assertRatingOptions(experiment);
         }
 
         ExperimentRecord experimentRecord = ExperimentTransformer.mergeProto(oldRecord, experiment);
