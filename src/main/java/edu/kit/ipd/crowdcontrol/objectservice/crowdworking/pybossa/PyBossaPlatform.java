@@ -1,10 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
 import com.google.common.primitives.Ints;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentification;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -75,6 +72,16 @@ public class PyBossaPlatform implements Platform {
         return Optional.empty();
     }
 
+    /**
+     * if the Platform has his own worker identification the interface can be returned here.
+     *
+     * @return the value to indicate if it supports worker identification or not.
+     */
+    @Override
+    public Optional<WorkerIdentificationComputation> getWorker() {
+        return Optional.of(params -> WorkerIdentification.findByIdentification(getID(), identifyWorker(params)));
+    }
+
     @Override
     public String getName() {
         return "Pybossa " + name;
@@ -129,11 +136,6 @@ public class PyBossaPlatform implements Platform {
                     .put("n_answers", experiment.getNeededAnswers()));
             return String.valueOf(updatedTask.getInt("id"));
         });
-    }
-
-    @Override
-    public Optional<WorkerIdentification> getWorker() {
-        return Optional.of(this::identifyWorker);
     }
 
     /**
