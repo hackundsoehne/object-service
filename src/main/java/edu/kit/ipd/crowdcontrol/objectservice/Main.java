@@ -15,7 +15,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatfo
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.CommandLineMailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.SQLEmailNotificationPolicy;
@@ -116,6 +119,12 @@ public class Main {
             platforms.add(platformInstance);
         }
 
+        boolean disabledMail = false;
+
+        if (config.mail != null) {
+            disabledMail = config.mail.disabled;
+        }
+
         try {
             databaseManager = new DatabaseManager(
                     config.database.writing.user,
@@ -134,7 +143,8 @@ public class Main {
                     config.moneytransfer.notificationMailAddress,
                     config.moneytransfer.parsingPassword,
                     config.moneytransfer.scheduleInterval,
-                    config.moneytransfer.payOffThreshold
+                    config.moneytransfer.payOffThreshold,
+                    disabledMail
             );
         } catch (NamingException | SQLException e) {
             System.err.println("Unable to establish database connection.");
@@ -147,7 +157,7 @@ public class Main {
         }
     }
 
-    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferMailAddress, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold) throws SQLException, IOException, MessagingException {
+    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferMailAddress, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold, boolean mailDisabled) throws SQLException, IOException, MessagingException {
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnly.user, readOnly.password);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
@@ -164,46 +174,7 @@ public class Main {
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
 
-        Properties properties = new Properties();
-        String mailPropertiesPath = "src/main/resources/mailConfig.properties";
-
-        try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(mailPropertiesPath))) {
-            properties.load(stream);
-        } catch (IOException e) {
-            LOGGER.warn(mailPropertiesPath + " not found, falling back to environment variables for Travis …");
-
-            if (System.getenv("MAIL_USERNAME") == null) {
-                LOGGER.error("MAIL_USERNAME not set …");
-                System.exit(-2);
-            }
-
-            if (System.getenv("MAIL_PASSWORD") == null) {
-                LOGGER.error("MAIL_PASSWORD not set …");
-                System.exit(-2);
-            }
-
-            properties.setProperty("username", System.getenv("MAIL_USERNAME"));
-            properties.setProperty("password", System.getenv("MAIL_PASSWORD"));
-            properties.setProperty("sender", System.getenv("MAIL_USERNAME"));
-            properties.setProperty("mail.smtp.host", "smtp.gmail.com");
-            properties.setProperty("mail.smtp.auth", "true");
-            properties.setProperty("mail.smtp.starttls.enable", "true");
-            properties.setProperty("mail.smtp.tls", "true");
-            properties.setProperty("mail.smtp.ssl.checkserveridentity", "true");
-            properties.setProperty("mail.store.protocol", "imap");
-            properties.setProperty("mail.imap.host", "imap.gmail.com");
-            properties.setProperty("mail.imap.port", "993");
-            properties.setProperty("mail.imap.ssl", "true");
-            properties.setProperty("mail.imap.ssl.enable", "true");
-            properties.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        }
-
-        MailHandler mailHandler = new MailHandler(properties, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
-            }
-        });
+        MailHandler mailHandler = getMailHandler(mailDisabled);
 
         MoneyTransferManager mng = new MoneyTransferManager(mailHandler, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
         mng.start();
@@ -240,5 +211,56 @@ public class Main {
                 new WorkerCalibrationResource(workerCalibrationOperations),
                 origin
         ).init();
+    }
+
+    private static MailHandler getMailHandler(boolean mailDisabled) throws MessagingException {
+        if (mailDisabled) {
+            return new CommandLineMailHandler();
+        }
+        Properties properties = new Properties();
+        String mailPropertiesPath;
+        if (System.getProperty("objectservice.config.mail") != null) {
+            mailPropertiesPath = System.getProperty("objectservice.config.mail");
+        } else {
+            mailPropertiesPath = "src/main/resources/mailConfig.properties";
+        }
+
+        try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(mailPropertiesPath))) {
+            properties.load(stream);
+        } catch (IOException e) {
+            LOGGER.warn(mailPropertiesPath + " not found, falling back to environment variables for Travis …");
+
+            if (System.getenv("MAIL_USERNAME") == null) {
+                LOGGER.error("MAIL_USERNAME not set …");
+                System.exit(-2);
+            }
+
+            if (System.getenv("MAIL_PASSWORD") == null) {
+                LOGGER.error("MAIL_PASSWORD not set …");
+                System.exit(-2);
+            }
+
+            properties.setProperty("username", System.getenv("MAIL_USERNAME"));
+            properties.setProperty("password", System.getenv("MAIL_PASSWORD"));
+            properties.setProperty("sender", System.getenv("MAIL_USERNAME"));
+            properties.setProperty("mail.smtp.host", "smtp.gmail.com");
+            properties.setProperty("mail.smtp.auth", "true");
+            properties.setProperty("mail.smtp.starttls.enable", "true");
+            properties.setProperty("mail.smtp.tls", "true");
+            properties.setProperty("mail.smtp.ssl.checkserveridentity", "true");
+            properties.setProperty("mail.store.protocol", "imap");
+            properties.setProperty("mail.imap.host", "imap.gmail.com");
+            properties.setProperty("mail.imap.port", "993");
+            properties.setProperty("mail.imap.ssl", "true");
+            properties.setProperty("mail.imap.ssl.enable", "true");
+            properties.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        }
+
+        return new MailHandler(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
+            }
+        });
     }
 }
