@@ -30,7 +30,7 @@ public class ExperimentResourceTest {
     private CalibrationOperations calibrationOperations;
     private TagConstraintsOperations tagConstraintsOperations;
     private AlgorithmOperations algorithmOperations;
-    private TasksOperations tasksOperations;
+    private ExperimentsPlatformOperations experimentsPlatformOperations;
     private PlatformManager platformManager;
 
     @Before
@@ -42,10 +42,10 @@ public class ExperimentResourceTest {
         calibrationOperations = mock(CalibrationOperations.class);
         tagConstraintsOperations = mock(TagConstraintsOperations.class);
         algorithmOperations = mock(AlgorithmOperations.class);
-        tasksOperations = mock(TasksOperations.class);
+        experimentsPlatformOperations = mock(ExperimentsPlatformOperations.class);
         platformManager = mock(PlatformManager.class);
 
-        resource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations, tasksOperations,  platformManager);
+        resource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations, experimentsPlatformOperations,  platformManager);
     }
 
     /**
