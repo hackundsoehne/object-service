@@ -3,13 +3,34 @@
 [![Build Status](https://travis-ci.org/coolcrowd/object-service.svg?branch=master)](https://travis-ci.org/coolcrowd/object-service)
 [![Coverage Status](https://coveralls.io/repos/github/coolcrowd/object-service/badge.svg?branch=master)](https://coveralls.io/github/coolcrowd/object-service?branch=master)
 
-## Requirements
+# Running
+
+## Backend
+
+### Docker:
+
+To start the backend, you can download the [docker-compose file](https://raw.githubusercontent.com/coolcrowd/object-service/docker/image/compose/docker-compose.yml) and 
+run `docker-compose up` (assuming docker is installed) to start the backend. It is only intended for development, not for production!
+Please create your own docker-compose file for production with suitable config-files.
+
+### Jar:
+
+How to build the object-service is detailed below.
+
+
+## Configuration
+
+It is possible to pass `-Dobjectservice.config=configLocation` to specify the config-location, the configuration file is detailed 
+[here](https://raw.githubusercontent.com/coolcrowd/object-service/master/src/main/resources/config.sample.yml).
+
+
+## Installation
+
+### Requirements
 
  * Java 8
  * MySQL 5.6
  * Gradle (optional, but recommended)
-
-## Installation
 
 ```bash
 # Clone repository and change into its directory.
@@ -26,6 +47,12 @@ git clone https://github.com/coolcrowd/object-service && cd object-service
 
 # Run it.
 ./gradlew run
+
+# Or create the jar
+./gradlew fatJar
 ```
 
-One can pass `-Dobjectservice.config=configLocation` to specify the config-location.
+## Run local installation with docker-compose
+
+Just delete the object-service entry and link the `- -Dos.url=http://objectservice:4567` to the running instance.
+The database is exposed at {dockerip}:3306`.
