@@ -50,3 +50,8 @@ git clone https://github.com/coolcrowd/object-service && cd object-service
 # Or create the jar
 ./gradlew fatJar
 ```
+
+## Run local installation with docker-compose
+
+Just delete the object-service entry and link the `- -Dos.url=http://objectservice:4567` to the running instance.
+The database is exposed at {dockerip}:3306`.
