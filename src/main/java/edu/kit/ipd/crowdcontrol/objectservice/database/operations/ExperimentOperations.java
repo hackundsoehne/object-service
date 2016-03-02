@@ -86,6 +86,7 @@ public class ExperimentOperations extends AbstractOperations {
      */
     public Experiment.State getExperimentState(int id) {
         Set<ExperimentsPlatformStatusPlatformStatus> statuses = create.select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS)
+                .from(EXPERIMENTS_PLATFORM_STATUS)
                 .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
                         DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
                                 .from(EXPERIMENTS_PLATFORM)
