@@ -161,6 +161,12 @@ public class Main {
         if (System.getProperty("workerservice.url") != null) {
             config.deployment.workerService = System.getProperty("workerservice.url");
         }
+        if (System.getProperty("origin.url") != null) {
+            config.deployment.origin = System.getProperty("origin.url");
+        }
+        if (System.getProperty("workerui.url") != null) {
+            config.deployment.workerUI = System.getProperty("workerui.url");
+        }
         return config;
     }
 
