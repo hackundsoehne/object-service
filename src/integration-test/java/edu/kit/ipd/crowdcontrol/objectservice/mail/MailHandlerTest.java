@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class MailHandlerTest {
     protected MailHandler handler;
     protected String mail;
+    protected String receiver;
     protected String folder;
 
     @Test
@@ -24,12 +25,8 @@ public abstract class MailHandlerTest {
         String uuid = UUID.randomUUID().toString();
         String subject = "[test] " + uuid;
 
-        Properties properties = new Properties();
-        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/integration-test/resources/mailHandlerTestProps.properties"));
-        properties.load(stream);
-        stream.close();
 
-        handler.sendMail(properties.getProperty("receiver"), subject, uuid);
+        handler.sendMail(receiver, subject, uuid);
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {

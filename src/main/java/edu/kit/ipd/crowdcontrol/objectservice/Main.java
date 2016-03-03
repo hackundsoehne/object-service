@@ -196,7 +196,7 @@ public class Main {
 
         MailHandler mailHandler = getMailHandler(mailDisabled);
 
-        MoneyTransferManager mng = new MoneyTransferManager(mailHandler, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
+        MoneyTransferManager mng = new MoneyTransferManager(mailHandler, mailHandler, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
         mng.start();
 
         // notifications might as well use another sendMail instance
