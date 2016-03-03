@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
  */
 @Ignore
 public class PyBossaPlatformTest {
+    // TODO read settings from config
     private static final String WORKER_SERVICE_URL = "http://localhost:8080";
     private static final String API_KEY = "8ec92fa1-1bd1-42ad-8524-3d2bab4588b1";
     private static final String API_URL = "http://localhost:5000/api";
