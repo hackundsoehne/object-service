@@ -23,6 +23,9 @@ deployment:
     #the url to the workerService
     workerService: https://worker.example.com
 
+    #the url where the worker-ui is hosted
+    workerUi: https://workerui.example.com
+
 # the defined platforms to run
 platforms :
     # type to use (mturk/pybossa/dummy)
@@ -37,6 +40,17 @@ platforms :
 
       # the url to give to the platform type
       url: http://example.com/
+
+    - type: pybossa
+      # the key to access the pybossa api
+      apiKey: 8ec92fa1-1bd1-42ad-8524-3d2bab4588b1
+      # the url to the pybossa api
+      url: http://localhost:5000/api
+      name: Pybossa
+      # the id of the pybossa project to use for all experiments
+      projectId: 1
+      # if calibrations are allowed on this platform
+      calibrationsAllowed: true
 
 moneytransfer:
     #the minimum amount of money in ct a worker has to earn, before he gets paid off

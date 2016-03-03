@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
  */
 public class PyBossaPlatformUnitTest {
     private static final String WORKER_SERVICE_URL = "http://localhost:8080";
+    private static final String WORKER_UI_URL = "http://localhost:3000";
     private static final String API_KEY = "8ec92fa1-1bd1-42ad-8524-3d2bab4588b1";
     private static final String API_URL = "http://localhost:5000/api";
     private static final String TASK_URL = API_URL + "/task";
@@ -51,7 +52,7 @@ public class PyBossaPlatformUnitTest {
     @Mock
     private static PyBossaRequests requests;
     @InjectMocks
-    private static PyBossaPlatform pybossa = new PyBossaPlatform(WORKER_SERVICE_URL, API_KEY, API_URL, NAME,
+    private static PyBossaPlatform pybossa = new PyBossaPlatform(WORKER_SERVICE_URL, WORKER_UI_URL, API_KEY, API_URL, NAME,
             String.valueOf(PROJECT_ID), true);
 
     @Before

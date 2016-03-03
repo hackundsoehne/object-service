@@ -9,7 +9,11 @@ public class Deployment {
      */
     public String origin;
     /**
-     * The url of the worker-ui
+     * The url of the worker service
      */
     public String workerService;
+    /**
+     * The url of the worker-ui
+     */
+    public String workerUi;
 }

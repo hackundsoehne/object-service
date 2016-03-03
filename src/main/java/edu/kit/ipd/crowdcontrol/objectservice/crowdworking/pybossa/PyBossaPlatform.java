@@ -25,6 +25,7 @@ public class PyBossaPlatform implements Platform {
      */
     private static final int IDTASK_COUNT = 3;
     private final String workerServiceUrl;
+    private final String workerUiUrl;
     private final String name;
     private final int projectID;
     private final Boolean calibsAllowed;
@@ -44,8 +45,10 @@ public class PyBossaPlatform implements Platform {
      * @param projectID        the project id
      * @param calibsAllowed    true if calibrations are allowed
      */
-    public PyBossaPlatform(String workerServiceUrl, String apiKey, String apiUrl, String name, String projectID, Boolean calibsAllowed) {
+    public PyBossaPlatform(String workerServiceUrl, String workerUiUrl, String apiKey, String apiUrl,
+                           String name, String projectID, Boolean calibsAllowed) {
         this.workerServiceUrl = workerServiceUrl;
+        this.workerUiUrl = workerUiUrl;
         this.name = name;
         this.projectID = java.lang.Integer.parseInt(projectID);
         this.calibsAllowed = calibsAllowed;
@@ -64,6 +67,7 @@ public class PyBossaPlatform implements Platform {
      * Initializes the pybossa idTasks. This makes requests to the pybossa platform
      */
     public void init() {
+        initializeTaskPresenter();
         initializeIdTasks();
     }
 
@@ -186,6 +190,11 @@ public class PyBossaPlatform implements Platform {
                     "workerId={id}&idTask={idTaskId}&code={theCode}";
         }
         throw new UnidentifiedWorkerException(errorMessage);
+    }
+
+    private void initializeTaskPresenter() {
+        String html = requests.getTaskPresenterFromUrl(workerUiUrl);
+        requests.setTaskPresenter(html, workerUiUrl);
     }
 
     /**

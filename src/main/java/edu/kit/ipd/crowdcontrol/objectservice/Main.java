@@ -99,6 +99,7 @@ public class Main {
                     break;
                 case "pybossa":
                     PyBossaPlatform pyBossa = new PyBossaPlatform(config.deployment.workerService,
+                            config.deployment.workerUi,
                             platform.apiKey,
                             platform.url,
                             platform.name,

@@ -212,4 +212,61 @@ public class PyBossaRequests {
             throw new PyBossaRequestException(String.format("Taskrun with id %s could not be deleted", taskRunId));
         }
     }
+
+    /**
+     * Tries to fetch the pybossa task presenter html from the given url.
+     * The url leads to the directory in which the task presenter html file is located.
+     * For example if the url is "http://example.com/worker-ui" this method expects to find
+     * "http://example.com/worker-ui/pybossaTaskPresenter.html" with "pybossaTaskPresenter.html" beeing the exact name
+     * of the task presenter html file.
+     *
+     * @return the task presenter html
+     */
+    public String getTaskPresenterFromUrl(String url) {
+        HttpResponse<String> response;
+        try {
+            response = Unirest.get(url + "/pybossaTaskPresenter.html").asString();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        if (response.getStatus() == 200) {
+            return response.getBody();
+        } else {
+            throw new PyBossaRequestException(String.format("Could not find pybossa task presenter under " +
+                    "\"%s/pybossaTaskPresenter.html\". Please ensure it is hosted under this address and has the same name", url));
+        }
+    }
+
+    /**
+     * Sets the task presenter for the configured project.
+     * The current url to the worker-ui library will be inserted before.
+     * This method will look for the worker-ui library under the workerUiUrl and expects the library to be named
+     * "crowdControl.js"
+     *
+     * @param html the task presenter html
+     * @param workerUiUrl the url of the worker-ui
+     */
+    public void setTaskPresenter(String html, String workerUiUrl) {
+        // TODO insert url
+
+        // send to pybossa
+        JsonNode jsonNode = new JsonNode("info");
+        jsonNode.getObject().put("task_presenter", html);
+
+        HttpResponse<JsonNode> response;
+        try {
+            response = Unirest.put(apiUrl + "/project/{projectId}")
+                    .header("Content-Type", "application/json")
+                    .routeParam("projectId", String.valueOf(projectId))
+                    .queryString("api_key", apiKey)
+                    .body(jsonNode)
+                    .asJson();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        if (response.getStatus() != 200) {
+            throw new PyBossaRequestException(response.getBody().getObject()
+                    .optString("exception_msg", "Publishing task failed"));
+        }
+    }
 }
