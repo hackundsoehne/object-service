@@ -149,6 +149,9 @@ public class PyBossaPlatform implements Platform {
      * @throws UnidentifiedWorkerException if the worker cannot be identified
      */
     private String identifyWorker(Map<String, String[]> param) throws UnidentifiedWorkerException {
+        if (param == null) {
+            throw new UnidentifiedWorkerException("The parameter map passed to PyBossaPlatform is null.");
+        }
         String[] emptyDefault = {""};
         String givenWorkerId = param.getOrDefault("workerId", emptyDefault)[0];
         String givenIdTask = param.getOrDefault("idTask", emptyDefault)[0];
