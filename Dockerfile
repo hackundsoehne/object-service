@@ -8,6 +8,7 @@ COPY gradle /gradle
 
 RUN /gradlew prepareDocker
 RUN /gradlew clean
+RUN rm -rf src/
 RUN rm -rf .gradle/
 RUN rm -rf $HOME/.gradle/caches/
 

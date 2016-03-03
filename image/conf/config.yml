@@ -12,8 +12,8 @@ database:
 
     # readonly user should really just be readonly
     readonly:
-        user: root
-        password: root
+        user: user
+        password: 123456
 
 # basic configurations for the mail-module
 mail :
