@@ -8,6 +8,9 @@ services:
      - db
     links:
      - db:db
+    command:
+      - -Dworkerservice.url=${DOCKERIP}:3333
+      - -Dworkerui.url=${DOCKERIP}:8080
   workerservice:
     image: coolcrowd/worker-service:latest
     ports:
@@ -23,6 +26,10 @@ services:
             - -Ddatabase.username=root
             - -Ddatabase.password=root
             - -Dos.url=http://objectservice:4567
+  workerui:
+      image: coolcrowd/worker-ui:latest
+      ports:
+        - "8080:80"
   db:
     image: mysql:latest
     environment:

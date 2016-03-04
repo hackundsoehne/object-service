@@ -37,10 +37,7 @@ import javax.mail.Authenticator;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.naming.NamingException;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,14 +67,8 @@ public class Main {
     public static void main(String[] args) throws IOException, ConfigException {
         LOGGER.trace("Entering application.");
 
-        InputStream configStream;
-        if (System.getProperty("objectservice.config") != null) {
-            LOGGER.debug("loading configuration from location: {}", System.getProperty("objectservice.config"));
-            configStream = new FileInputStream(System.getProperty("objectservice.config"));
-        } else {
-            configStream = Main.class.getResourceAsStream("/config.yml");
-        }
-        Config config = Yaml.loadType(configStream, Config.class);
+        Config config = getConfig();
+
 
         if (config.database.maintainInterval == 0)
             config.database.maintainInterval = 24;
@@ -156,6 +147,27 @@ public class Main {
             e.printStackTrace();
             System.exit(-1);
         }
+    }
+
+    private static Config getConfig() throws FileNotFoundException {
+        InputStream configStream;
+        if (System.getProperty("objectservice.config") != null) {
+            LOGGER.debug("loading configuration from location: {}", System.getProperty("objectservice.config"));
+            configStream = new FileInputStream(System.getProperty("objectservice.config"));
+        } else {
+            configStream = Main.class.getResourceAsStream("/config.yml");
+        }
+        Config config = Yaml.loadType(configStream, Config.class);
+        if (System.getProperty("workerservice.url") != null) {
+            config.deployment.workerService = System.getProperty("workerservice.url");
+        }
+        if (System.getProperty("origin.url") != null) {
+            config.deployment.origin = System.getProperty("origin.url");
+        }
+        if (System.getProperty("workerui.url") != null) {
+            config.deployment.workerUI = System.getProperty("workerui.url");
+        }
+        return config;
     }
 
     private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferMailAddress, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold, boolean mailDisabled) throws SQLException, IOException, MessagingException {

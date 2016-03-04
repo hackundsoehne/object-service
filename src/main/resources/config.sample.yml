@@ -22,6 +22,8 @@ deployment:
     origin: http://localhost:3000
     #the url to the workerService
     workerService: https://worker.example.com
+    #the url to the workerUI
+    workerUI: https://workerui.example.com
 
 # the defined platforms to run
 platforms :
