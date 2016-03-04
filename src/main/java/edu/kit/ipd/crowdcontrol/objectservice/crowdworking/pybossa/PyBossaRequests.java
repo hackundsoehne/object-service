@@ -214,42 +214,50 @@ public class PyBossaRequests {
     }
 
     /**
-     * Tries to fetch the pybossa task presenter html from the given url.
-     * The url leads to the directory in which the task presenter html file is located.
-     * For example if the url is "http://example.com/worker-ui" this method expects to find
-     * "http://example.com/worker-ui/pybossaTaskPresenter.html" with "pybossaTaskPresenter.html" beeing the exact name
-     * of the task presenter html file.
+     * Gets a String from the given url.
      *
-     * @return the task presenter html
+     * @param url the url to get the String from
+     * @return the String returned by the get request
+     * @throws PyBossaRequestException if the request fails
      */
-    public String getTaskPresenterFromUrl(String url) {
+    public String getStringFromUrl(String url) {
         HttpResponse<String> response;
         try {
-            response = Unirest.get(url + "/pybossaTaskPresenter.html").asString();
+            response = Unirest.get(url).asString();
         } catch (UnirestException e) {
             throw new PyBossaRequestException(e);
         }
         if (response.getStatus() == 200) {
             return response.getBody();
         } else {
-            throw new PyBossaRequestException(String.format("Could not find pybossa task presenter under " +
-                    "\"%s/pybossaTaskPresenter.html\". Please ensure it is hosted under this address and has the same name", url));
+            throw new PyBossaRequestException(String.format("The GET request to %s did not return a String.", url));
         }
     }
 
     /**
+     * Will check if the url exists.
+     *
+     * @param url the url to check
+     * @return true if the url returns status 200
+     * @throws PyBossaRequestException if the request fails
+     */
+    public boolean existsUrl(String url) {
+        HttpResponse<String> response;
+        try {
+            response = Unirest.get(url).asString();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        return response.getStatus() == 200;
+    }
+
+    /**
      * Sets the task presenter for the configured project.
-     * The current url to the worker-ui library will be inserted before.
-     * This method will look for the worker-ui library under the workerUiUrl and expects the library to be named
-     * "crowdControl.js"
      *
      * @param html the task presenter html
-     * @param workerUiUrl the url of the worker-ui
+     * @throws PyBossaRequestException if the request fails
      */
-    public void setTaskPresenter(String html, String workerUiUrl) {
-        // TODO insert url
-
-        // send to pybossa
+    public void setTaskPresenter(String html) {
         JsonNode jsonNode = new JsonNode("info");
         jsonNode.getObject().put("task_presenter", html);
 
@@ -266,7 +274,7 @@ public class PyBossaRequests {
         }
         if (response.getStatus() != 200) {
             throw new PyBossaRequestException(response.getBody().getObject()
-                    .optString("exception_msg", "Publishing task failed"));
+                    .optString("exception_msg", "Setting task presenter failed"));
         }
     }
 }

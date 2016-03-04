@@ -64,7 +64,8 @@ public class PyBossaPlatform implements Platform {
     }
 
     /**
-     * Initializes the pybossa idTasks. This makes requests to the pybossa platform
+     * Initializes the pybossa idTasks and taskPresenter. This makes requests to the pybossa platform.
+     * @throws PyBossaRequestException if the requests to the platform fail (e.g. the platform cannot be reached).
      */
     public void init() {
         initializeTaskPresenter();
@@ -192,13 +193,23 @@ public class PyBossaPlatform implements Platform {
         throw new UnidentifiedWorkerException(errorMessage);
     }
 
+    /**
+     * Initializes the task presenter by fetching the html from the given url
+     * and setting the task presenter for the configured pybossa platform.
+     */
     private void initializeTaskPresenter() {
-        String html = requests.getTaskPresenterFromUrl(workerUiUrl);
-        requests.setTaskPresenter(html, workerUiUrl);
+        String html = requests.getStringFromUrl(workerUiUrl + "/pybossa_task_presenter.html");
+        String workerUiLibraryUrl = workerUiUrl + "/crowd_control.js";
+        if (requests.existsUrl(workerUiLibraryUrl)) {
+            requests.setTaskPresenter(html);
+        } else {
+            throw new PyBossaRequestException(String.format("Could not find the worker ui library under the url \"%s\".",
+                    workerUiLibraryUrl));
+        }
     }
 
     /**
-     * Checks for existing idTasks and
+     * Checks for existing idTasks.
      *
      * @throws PyBossaRequestException when the idtask could not be initialized
      */

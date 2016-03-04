@@ -15,15 +15,17 @@ database:
         user: root
         password:
 
-# Deployment of the object service / control ui
+# Deployment of object service, control-ui, worker-ui
 deployment:
-    # Origin of the control ui
+    # Origin of the control-ui
     # port has to match the url of the ui and no / at the end
     origin: http://localhost:3000
-    #the url to the workerService
+
+    # the url to the workerService
     workerService: https://worker.example.com
 
-    #the url where the worker-ui is hosted
+    # the url to the root of the worker-ui. No / at the end.
+    # Object service will append particular file names like "/taskPresenter.html"
     workerUi: https://workerui.example.com
 
 # the defined platforms to run

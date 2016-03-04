@@ -70,16 +70,20 @@ public class PyBossaPlatformUnitTest {
 
         String code = "super code";
         String hashedEncodedCode = Base64.getUrlEncoder().encodeToString(messageDigest.digest(code.getBytes()));
+        // create a tusk run with the hashed code
         JSONArray taskRun = new JSONArray().put(new JSONObject()
                 .put("id", 2)
                 .put("user_id", WORKER_ID)
                 .put("info", new JSONObject()
                         .put("code", hashedEncodedCode)));
         when(requests.getTaskRuns(idTask, WORKER_ID)).thenReturn(taskRun);
+        // simulate params that would be passed by the worker-ui
         HashMap<String, String[]> params = new HashMap<>();
         params.put("idTask", new String[]{idTask});
         params.put("workerId", new String[]{WORKER_ID});
         params.put("code", new String[]{code});
+
+        //try to get worker
         String verifiedWorkerId = workerIdentification.get().getWorker(params).getWorkerData();
 
         assertEquals(WORKER_ID, verifiedWorkerId);
