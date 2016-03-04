@@ -258,8 +258,8 @@ public class PyBossaRequests {
      * @throws PyBossaRequestException if the request fails
      */
     public void setTaskPresenter(String html) {
-        JsonNode jsonNode = new JsonNode("info");
-        jsonNode.getObject().put("task_presenter", html);
+        JsonNode jsonNode = new JsonNode("");
+        jsonNode.getObject().put("info", new JSONObject().put("task_presenter", html));
 
         HttpResponse<JsonNode> response;
         try {

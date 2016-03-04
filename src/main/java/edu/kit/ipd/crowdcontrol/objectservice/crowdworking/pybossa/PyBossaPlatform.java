@@ -198,9 +198,10 @@ public class PyBossaPlatform implements Platform {
      * and setting the task presenter for the configured pybossa platform.
      */
     private void initializeTaskPresenter() {
-        String html = requests.getStringFromUrl(workerUiUrl + "/pybossa_task_presenter.html");
-        String workerUiLibraryUrl = workerUiUrl + "/crowd_control.js";
+        String html = requests.getStringFromUrl(workerUiUrl + "/platform/pybossa.html");
+        String workerUiLibraryUrl = workerUiUrl + "/worker_ui.js";
         if (requests.existsUrl(workerUiLibraryUrl)) {
+            html = html.replaceFirst("(<script id=\"worker_ui\" src=\")(.+)(\"></script>)", "$1" + workerUiLibraryUrl + "$3");
             requests.setTaskPresenter(html);
         } else {
             throw new PyBossaRequestException(String.format("Could not find the worker ui library under the url \"%s\".",
