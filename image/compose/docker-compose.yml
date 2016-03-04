@@ -10,6 +10,7 @@ services:
      - db:db
     command:
       - -Dworkerservice.url=${DOCKERIP}:3333
+      - -Dworkerui.url=${DOCKERIP}:8080
   workerservice:
     image: coolcrowd/worker-service:latest
     ports:
