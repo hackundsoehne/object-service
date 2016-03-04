@@ -9,7 +9,7 @@ services:
     links:
      - db:db
     command:
-      - -Dworkerservice.url={DOCKERIP}:3333
+      - -Dworkerservice.url=${DOCKERIP}:3333
   workerservice:
     image: coolcrowd/worker-service:latest
     ports:
