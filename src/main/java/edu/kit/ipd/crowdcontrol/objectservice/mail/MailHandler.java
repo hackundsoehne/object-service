@@ -14,7 +14,6 @@ import java.util.Properties;
  * @author Niklas Keller
  */
 public class MailHandler implements MailFetcher, MailSender {
-
     private String sender;
     private Properties props;
     private Authenticator auth;

@@ -25,4 +25,9 @@ public class Config {
      * moneytransfer configuration
      */
     public MoneyTransfer moneytransfer;
+
+    /**
+     * mail configuration
+     */
+    public Mail mail;
 }
