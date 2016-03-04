@@ -103,6 +103,8 @@ mailConfig.properties
 gmailTest.properties
 webTest.properties
 
+#unit test properties
+
 #mail properties
 mailConfig.properties
 

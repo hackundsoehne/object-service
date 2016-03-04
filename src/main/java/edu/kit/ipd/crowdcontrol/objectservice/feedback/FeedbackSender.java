@@ -1,6 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.feedback;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
@@ -46,29 +48,48 @@ public class FeedbackSender {
 
         LOGGER.trace("Started sending feedback to workers.");
 
-        String feedbackMessage = loadMessage("src/main/resources/feedbackMessage.txt");
-        String feedbackAnswer = loadMessage("src/main/resources/feedbackAnswer.txt");
-        String feedbackRating = loadMessage("src/main/resources/feedbackRating.txt");
+        String feedbackMessage = loadMessage("src/main/resources/feedback/feedbackMessage.txt");
+        String feedbackAnswer = loadMessage("src/main/resources/feedback/feedbackAnswer.txt");
+        String feedbackRating = loadMessage("src/main/resources/feedback/feedbackRating.txt");
 
         Result<AnswerRecord> answers = answerOps.getAnswersOfExperiment(expId);
 
-        Collections.sort(answers, new workerComparator());
+        //sort answers depending on the worker, who gave the answer
+        Collections.sort(answers, (answerRecord, t1) -> {
+            if (answerRecord.getWorkerId() < t1.getWorkerId()) {
+                return -1;
+            } else if (answerRecord.getWorkerId() > t1.getWorkerId()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
 
         StringBuilder answerMessage = new StringBuilder();
 
         Map<String, String> map = new HashMap<>();
-        map.put("answers", answerMessage.toString());
-        map.put("experimentName", expOps.getExperiment(expId).get().getTitle());
+        map.put("answers", feedbackAnswer);
+        Optional<ExperimentRecord> exp = expOps.getExperiment(expId);
+        if (exp.isPresent()) {
+            map.put("experimentName", exp.get().getTitle());
+        } else {
+            LOGGER.error("Error, experiment cannot be found.");
+            throw new FeedbackException("Experiment cannot be found.");
+        }
 
+        //iterate over answers and send them and the feedback to the workers
         int workerCount = 0;
         int prevWorkerId = -1;
         for (AnswerRecord answer : answers) {
+            //checks, if the worker changed. If so, send the message to the worker and begin a new
             if (prevWorkerId != answer.getWorkerId() && prevWorkerId != -1) {
                 workerCount++;
                 String workerMessage = Template.apply(feedbackMessage, map);
                 sendFeedback(prevWorkerId, workerMessage);
                 answerMessage = new StringBuilder();
             }
+
+            //List all ratings to an answer in the message.
             List<RatingRecord> ratings = answerOps.getRatingsOfAnswer(answer);
 
             StringBuilder ratingMessage = new StringBuilder();
@@ -82,6 +103,7 @@ public class FeedbackSender {
                 ratingMessage.append(Template.apply(feedbackRating, ratingMap));
             }
 
+            //Replace placeholders with answer and the ratings
             Map<String, String> answerMap = new HashMap<>();
             map.put("answer", answer.getAnswer());
             map.put("ratings", ratingMessage.toString());
@@ -90,6 +112,8 @@ public class FeedbackSender {
 
             prevWorkerId = answer.getWorkerId();
         }
+
+        //Send feedback to the last worker
         if (!answers.isEmpty()) {
             workerCount++;
             String workerMessage = Template.apply(feedbackMessage, map);
@@ -106,7 +130,7 @@ public class FeedbackSender {
                     handler.sendMail(workerOps.getWorker(workerID).get().getEmail(), "Feedback to your work", workerMessage);
                 }
             } catch (MessagingException e) {
-                LOGGER.error("Sending of feedback failed, because the mailhandler cannot send the mails.");
+                LOGGER.error("Sending of feedback failed, because the mailsender cannot send the mails.");
                 throw new FeedbackException("The mailHandler cannot send mails. It seems, that there is a problem with the mailserver or the properties file.");
             } catch (UnsupportedEncodingException e) {
                 LOGGER.error("Sending of feedback to worker " + workerID + " failed, because the mail address of this worker is invalid.");            }
@@ -134,19 +158,5 @@ public class FeedbackSender {
             throw new FeedbackException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
         }
         return content.toString();
-    }
-
-    private class workerComparator implements Comparator<AnswerRecord> {
-
-        @Override
-        public int compare(AnswerRecord answerRecord, AnswerRecord t1) {
-            if (answerRecord.getWorkerId() < t1.getWorkerId()) {
-                return -1;
-            } else if (answerRecord.getWorkerId() > t1.getWorkerId()) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
     }
 }
