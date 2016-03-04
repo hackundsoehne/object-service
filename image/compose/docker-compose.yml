@@ -25,6 +25,10 @@ services:
             - -Ddatabase.username=root
             - -Ddatabase.password=root
             - -Dos.url=http://objectservice:4567
+  workerui:
+      image: coolcrowd/worker-ui:latest
+      ports:
+        - "8080:80"
   db:
     image: mysql:latest
     environment:
