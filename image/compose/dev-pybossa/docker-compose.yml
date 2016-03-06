@@ -1,0 +1,67 @@
+version: '2'
+services:
+  objectservice:
+    image: coolcrowd/object-service:latest
+    ports:
+     - "4567:4567"
+    depends_on:
+     - db
+    links:
+     - db:db
+    command:
+      - -Dworkerservice.url=${DOCKERIP}:3333
+      - -Dworkerui.url=${DOCKERIP}:8080
+  workerservice:
+    image: coolcrowd/worker-service:latest
+    ports:
+      - "3333:4567"
+    depends_on:
+         - db
+         - objectservice
+    links:
+         - db:db
+         - objectservice:objectservice
+    command:
+            - -Ddatabase.url=jdbc:mysql://db
+            - -Ddatabase.username=root
+            - -Ddatabase.password=root
+            - -Dos.url=http://objectservice:4567
+  workerui:
+      image: coolcrowd/worker-ui:latest
+      ports:
+        - "8080:80"
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: crowdcontrol
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: root
+    command:
+        - --character-set-server=utf8mb4
+    ports:
+         - "3306:3306"
+  pybossa_redis:
+        image: redis
+  pybossa_redis_sentinel:
+      image: matthiaswiesner/redis-sentinel
+      links:
+         - pybossa_redis:redis
+      environment:
+          REDIS_PORT_6379_TCP_ADDR: redis
+          REDIS_PORT_6379_TCP_PORT: 6379
+  pybossa_postgres:
+          image: coolcrowd/pybossa-postgres
+          environment:
+              POSTGRES_USER: pybossa
+              POSTGRES_PASSWORD: tester
+  pybossa:
+          image: coolcrowd/pybossa
+          links:
+              - pybossa_redis_sentinel:dbredissentinel
+              - pybossa_postgres:dbpostgres
+          ports:
+              - "8080:5000"
+          depends_on:
+              - db_postgres
+              - redis_sentinel

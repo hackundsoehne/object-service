@@ -11,6 +11,7 @@ services:
     command:
       - -Dworkerservice.url=${DOCKERIP}:3333
       - -Dworkerui.url=${DOCKERIP}:8080
+      - -Dpybossa.disabled=true
   workerservice:
     image: coolcrowd/worker-service:latest
     ports:

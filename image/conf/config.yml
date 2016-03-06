@@ -34,6 +34,14 @@ platforms :
       # name which is used to display
       name: dummy
 
+    - type: pybossa
+          #apiKey: f66b69d3-467b-48ce-9822-e4e9a34403a2
+          apiKey: 777d203a-e067-4fe4-aa8c-f9d88307d894
+          url: http://pybossa:5000/api
+          name: pybossa
+          projectId: 2
+          calibrationsAllowed: true
+
 moneytransfer:
     payOffThreshold: 0
     parsingPassword: test
