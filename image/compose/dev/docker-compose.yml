@@ -1,7 +1,7 @@
 version: '2'
 services:
   objectservice:
-    image: coolcrowd/object-service:latest
+    image: coolcrowd/object-service:docker
     ports:
      - "4567:4567"
     depends_on:
