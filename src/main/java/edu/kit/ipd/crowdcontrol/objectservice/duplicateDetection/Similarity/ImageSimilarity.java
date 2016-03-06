@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection;
+package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity;
 
 import javax.swing.*;
 import java.awt.*;
