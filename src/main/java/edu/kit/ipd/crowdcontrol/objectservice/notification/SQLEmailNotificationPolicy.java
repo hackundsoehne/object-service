@@ -4,6 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Noti
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
@@ -125,13 +126,13 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
         if (tokens.size() > 1) {
             int i;
             for (i = 0; i < tokens.size() - 1; i++) {
-                concatedTokens.append(tokens.get(i));
+                concatedTokens.append(StringEscapeUtils.escapeHtml4(tokens.get(i)));
                 concatedTokens.append(", ");
             }
             concatedTokens.append("und ");
-            concatedTokens.append(tokens.get(i));
+            concatedTokens.append(StringEscapeUtils.escapeHtml4(tokens.get(i)));
         } else {
-            concatedTokens.append(tokens.get(0));
+            concatedTokens.append(StringEscapeUtils.escapeHtml4(tokens.get(0)));
         }
         return concatedTokens.toString();
     }
