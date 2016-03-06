@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection;
 
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.StringSimilarity;
 import org.junit.Ignore;
 import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.StringSimilarity;
 import org.junit.Ignore;
