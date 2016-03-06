@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,20 +30,26 @@ public class StringSimilarity {
      * @param string2 second string
      * @return hamming distance of the input strings
      */
-    public static int getHammingDistance(String string1, String string2) {
-        Set<String> shingle1 = Shingle.getShingle(string1);
-        Set<String> shingle2 = Shingle.getShingle(string2);
+    public static int getHammingDistanceOfStrings(String string1, String string2) {
+        Set<String> shingle1 = Shingle.getShingle(string1,3);
+        Set<String> shingle2 = Shingle.getShingle(string2,3);
 
         long hash1 = computeSimhashFromShingles(shingle1);
         long hash2 = computeSimhashFromShingles(shingle2);
 
-        long bits = hash1 ^ hash2;
-        int counter = 0;
-        while (bits != 0) {
-            bits &= bits - 1;
-            ++counter;
-        }
-        return counter;
+        return getHammingDistanceOfHashes(hash1,hash2);
+    }
+
+
+    /**
+     * Calculates the hamming-distance of two given hashes
+     * @param hash1 first hash
+     * @param hash2 second hash
+     * @return hamming distance of the specified hashes
+     */
+    public static int getHammingDistanceOfHashes(long hash1, long hash2){
+        long xor = hash1 ^ hash2;
+        return Long.bitCount(xor);
 
     }
 
@@ -55,8 +62,8 @@ public class StringSimilarity {
      * @return jaccard-coefficient of the two input strings
      */
     public static float getJaccardCoefficient(String stringA, String stringB){
-        Set<String> shinglesA = Shingle.getShingle(stringA);
-        Set<String> shinglesB = Shingle.getShingle(stringB);
+        Set<String> shinglesA = Shingle.getShingle(stringA,3);
+        Set<String> shinglesB = Shingle.getShingle(stringB,3);
         float intersection = Sets.intersection(shinglesA,shinglesB).size();
         float union = Sets.union(shinglesA,shinglesB).size();
         return intersection/union;
@@ -69,20 +76,17 @@ public class StringSimilarity {
      * @param string2 second string
      * @return the similarity of the two given strings
      */
-    public static double getSimilarityFromString(String string1, String string2) {
-        Set<String> shingle1 = Shingle.getShingle(string1);
-        Set<String> shingle2 = Shingle.getShingle(string2);
+    public static double getSimilarityFromTwoString(String string1, String string2, int shingleNgramSize) {
+        Set<String> shingle1 = Shingle.getShingle(string1,shingleNgramSize);
+        Set<String> shingle2 = Shingle.getShingle(string2,shingleNgramSize);
 
         long hash1 = computeSimhashFromShingles(shingle1);
         long hash2 = computeSimhashFromShingles(shingle2);
 
-        long xor = hash1 ^ hash2;
-        if (xor == 0) {
-            return 1.0;
-        }
-        return 1.0 - (((double) Long.bitCount(xor) + 1) / (65 - Long.numberOfLeadingZeros(xor)));
-
+        return getSimilarityFromHash(hash1,hash2);
     }
+
+
 
     /**
      * Computes the similarity of two hashes via simhash
