@@ -1,7 +1,11 @@
 package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
 
 /**
  * Created by lucaskrauss on 10.02.16.
@@ -127,6 +131,36 @@ public class ImageSimilarity {
 
         return newImage;
 
+    }
+
+    /**
+     * Calculates 64-bit perceptual image hash.
+     * The image is rescaled to 8x8-pixles. The hash is based on the grey-value of each pixel in comparision
+     * to the images overall grey-value.
+     * @param image source image
+     * @return perceptual image hash
+     */
+    public static long getImageHash(BufferedImage image){
+        image = rescale(image,8,8);
+        ImageFilter filter = new GrayFilter(true,50);
+        ImageProducer producer = new FilteredImageSource(image.getSource(),filter);
+
+        image = (BufferedImage)Toolkit.getDefaultToolkit().createImage(producer);
+
+        int buffer = 0;
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                buffer += image.getRGB(i,j);
+            }
+        }
+        long hash = 0;
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                hash += (image.getRGB(i,j) > buffer) ? 1 : 0;
+                hash = hash << 1;
+            }
+        }
+        return hash;
     }
 
 }
