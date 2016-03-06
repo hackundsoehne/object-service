@@ -8,14 +8,13 @@ import java.util.Set;
  */
 public class Shingle {
 
-    private static final int NGRAM_SIZE = 3;
-    public static Set<String> getShingle(String input){
+    public static Set<String> getShingle(String input, int ngramSize ){
 
         Set<String> shingles = new HashSet<>();
         input = input.replace(" ","").toLowerCase();
-        for (int i = 0; i < input.length() - (NGRAM_SIZE - 1); i++){
+        for (int i = 0; i < input.length() - (ngramSize - 1); i++){
 
-            String ngram = input.substring(i,i + NGRAM_SIZE);
+            String ngram = input.substring(i,i + ngramSize);
             shingles.add(ngram);
         }
         return shingles;
