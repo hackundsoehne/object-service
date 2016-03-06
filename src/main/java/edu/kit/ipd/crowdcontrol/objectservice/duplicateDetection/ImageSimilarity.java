@@ -24,15 +24,27 @@ public class ImageSimilarity {
      * Each image is divided in 25 sections, whose averaged color-values form the image-signature.
      * The similarity of the two images is based on the deviation of their color-value per image-section.
      *
-     * @param image1
-     * @param image2
-     * @return
+     * @param image1 first image
+     * @param image2 second image
+     * @return similarity of the two images
      */
     public static double identifyImageSimilarity(BufferedImage image1, BufferedImage image2) {
 
         Color[][] signatureImage1 = getImageSignature(image1);
         Color[][] signatureImage2 = getImageSignature(image2);
 
+        return identifyImageSignatureSimilarity(signatureImage1,signatureImage2);
+    }
+
+    /**
+     * Identifies the similarity of two given image-signatures
+     * It is based on the deviation of the signatures color-value per section.
+     *
+     * @param signatureImage1 signature of the first image
+     * @param signatureImage2 signature of the second image
+     * @return similarity of the specified signatures
+     */
+    public static double identifyImageSignatureSimilarity(Color[][] signatureImage1, Color[][] signatureImage2){
         //calc distance based on the difference of the RGB-values of the imageSignatures
         double distance = 0;
         for (int i = 0; i < signatureImage1.length; i++) {
@@ -57,9 +69,9 @@ public class ImageSimilarity {
      * @return a two dimensional Color-array. Each entry Color[x][y] contains the color-value of the image-section
      * (x,y) to (x+1,y+1). The locality of the image-section is preserved.
      */
-    private static Color[][] getImageSignature(BufferedImage image) {
+    public static Color[][] getImageSignature(BufferedImage image) {
         if (!(image.getHeight() == BASE_SIZE) && !(image.getWidth() == BASE_SIZE)) {
-            image = rescale(image);
+            image = rescale(image, BASE_SIZE,BASE_SIZE);
         }
         Color[][] imgSignature = new Color[5][5];
         for (int imgX = 0; imgX < imgSignature.length; imgX++) {
@@ -103,14 +115,14 @@ public class ImageSimilarity {
      * @param oldImage
      * @return
      */
-    private static BufferedImage rescale(BufferedImage oldImage) {
+    private static BufferedImage rescale(BufferedImage oldImage,int width,int heigth) {
 
-        BufferedImage newImage = new BufferedImage(BASE_SIZE, BASE_SIZE, BufferedImage.TYPE_INT_RGB);
+        BufferedImage newImage = new BufferedImage(width, heigth, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = newImage.createGraphics();
         RenderingHints renderingHints = graphics.getRenderingHints();
         renderingHints.put(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         graphics.setRenderingHints(renderingHints);
-        graphics.drawImage(oldImage,0,0,BASE_SIZE,BASE_SIZE,null);
+        graphics.drawImage(oldImage,0,0,width,heigth,null);
         graphics.dispose();
 
         return newImage;
