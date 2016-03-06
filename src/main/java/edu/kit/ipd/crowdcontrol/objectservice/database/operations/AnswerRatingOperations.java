@@ -412,11 +412,19 @@ public class AnswerRatingOperations extends AbstractOperations {
 
     /**
      * Returns the number of all answers with the correct number of ratings specified in the experiment.
-     * The answers quality has to be equal or above the experiment's quality-threshold
+     * The answers quality has to be equal or above the experiment's payment quality-threshold
      * @param idExperiment id of the experiment
      * @return number of answers with a final and good quality
      */
-    public int getNumberOfFinalGoodAns(int idExperiment) {
-        return 0;
+    public int getNumberOfFinalGoodAnswers(int idExperiment) {
+        return create.fetchCount(
+                DSL.selectFrom(ANSWER)
+                    .where(ANSWER.EXPERIMENT.eq(idExperiment))
+                    .and(ANSWER.QUALITY.greaterOrEqual(
+                            DSL.select(EXPERIMENT.PAYMENT_QUALITY_THRESHOLD)
+                                .from(EXPERIMENT)
+                                .where(EXPERIMENT.ID_EXPERIMENT.eq(idExperiment))
+                    ))
+        );
     }
 }
