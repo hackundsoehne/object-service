@@ -1,13 +1,13 @@
 package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.HashSimilarity;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.ImageSimilarity;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.StringSimilarity;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * Created by lucaskrauss at 02.02.2016
  *
  * @author lucaskrauss
- *         <p>
+ *
  *         This class provides the functionallity to find duplicates within all answers of an experiment
  */
 public class DuplicateChecker {
@@ -49,7 +49,7 @@ public class DuplicateChecker {
             }else{
                 Map<AnswerRecord,Color[][]> mapOfSignatures = new HashMap<>(); //TODO replace with db-op
                         if(mapOfSignatures.size() > 1){
-                duplicates.addAll(getImageDuplicates(mapOfSignatures));
+                duplicates.addAll(getImageDuplicatesFromSignatures(mapOfSignatures));
             }
             }
 
@@ -70,7 +70,7 @@ public class DuplicateChecker {
 
             mapOfHashes.forEach((answerRecordA, hashA) -> {
                 mapOfHashes.forEach((answerRecordB, hashB) -> {
-                    if (StringSimilarity.getSimilarityFromHash(hashA, hashB) > 0.85 && !answerRecordA.equals(answerRecordB)) {
+                    if (HashSimilarity.getSimilarityFromHash(hashA, hashB) > 0.85 && !answerRecordA.equals(answerRecordB)) {
                         duplicates.add(answerRecordA.getTimestamp().compareTo(answerRecordB.getTimestamp()) < 0 ? answerRecordB : answerRecordA);
                     }
                 });
@@ -88,7 +88,7 @@ public class DuplicateChecker {
                 Collections.sort(sortedEntries, (a, b) -> Long.compareUnsigned(a.getValue(), b.getValue()));
 
                 for (int j = 0; j < sortedEntries.size() - 1; j++) {
-                    if (StringSimilarity.getHammingDistanceOfHashes(sortedEntries.get(j).getValue(), sortedEntries.get(j + 1).getValue()) > 0.85) {
+                    if (HashSimilarity.getHammingDistanceOfHashes(sortedEntries.get(j).getValue(), sortedEntries.get(j + 1).getValue()) > 0.85) {
                         duplicates.add(
                                 sortedEntries.get(j).getKey().getTimestamp().compareTo(sortedEntries.get(j + 1).getKey().getTimestamp()) < 0 ? sortedEntries.get(j + 1).getKey() : sortedEntries.get(j).getKey());
                     }
@@ -104,7 +104,7 @@ public class DuplicateChecker {
 
     }
 
-    private Set<AnswerRecord> getImageDuplicates(Map<AnswerRecord, Color[][]> mapOfSignatures ) {
+    private Set<AnswerRecord> getImageDuplicatesFromSignatures(Map<AnswerRecord, Color[][]> mapOfSignatures ) {
         Set<AnswerRecord> duplicates = new HashSet<>();
 
         mapOfSignatures.forEach((answerRecordA, signatureA) ->{
