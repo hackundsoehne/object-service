@@ -61,7 +61,7 @@ services:
               - pybossa_redis_sentinel:dbredissentinel
               - pybossa_postgres:dbpostgres
           ports:
-              - "8080:5000"
+              - "5000:5000"
           depends_on:
               - db_postgres
               - redis_sentinel
