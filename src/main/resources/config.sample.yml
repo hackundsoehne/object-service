@@ -22,6 +22,8 @@ deployment:
     origin: http://localhost:3000
     #the url to the workerService
     workerService: https://worker.example.com
+    #the url to the workerUI
+    workerUI: https://workerui.example.com
 
 # the defined platforms to run
 platforms :
@@ -37,6 +39,11 @@ platforms :
 
       # the url to give to the platform type
       url: http://example.com/
+
+# basic configurations for the mail-module
+mail :
+    # disabled = true will ignore the mail configuration and print to the command-line
+    disabled : false
 
 moneytransfer:
     #the minimum amount of money in ct a worker has to earn, before he gets paid off

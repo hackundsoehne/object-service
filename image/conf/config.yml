@@ -1,0 +1,41 @@
+database:
+    # the url where to find the database
+    url: jdbc:mysql://db:3306/crowdcontrol
+
+    # dialekt to use for communication
+    dialect: MYSQL
+
+    # the writing user
+    writing:
+        user: root
+        password: root
+
+    # readonly user should really just be readonly
+    readonly:
+        user: user
+        password: 123456
+
+# basic configurations for the mail-module
+mail :
+    # disabled = true will ignore the mail configuration and print to the command-line
+    disabled : true
+
+# Deployment of the object service / control ui
+deployment:
+    # Origin of the control ui
+    # port has to match the url of the ui and no / at the end
+    origin: *
+
+# the defined platforms to run
+platforms :
+    # type to use (mturk/pybossa/dummy)
+    - type: dummy
+
+      # name which is used to display
+      name: dummy
+
+moneytransfer:
+    payOffThreshold: 0
+    parsingPassword: test
+    notificationMailAddress: pseipd@gmail.com
+    scheduleInterval: 7

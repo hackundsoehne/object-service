@@ -223,3 +223,12 @@ task fatJar(type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
+
+//docker-related
+task prepareDocker(type: Copy) {
+    dependsOn "fatJar"
+    file("./bin").mkdirs()
+    from "$buildDir/libs/" + project.name + '-all-' + project.version +".jar"
+    into "./bin"
+    rename (project.name + '-all-' + project.version +".jar", project.name + '.jar')
+}
