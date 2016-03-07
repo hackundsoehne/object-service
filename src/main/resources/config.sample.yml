@@ -24,7 +24,10 @@ deployment:
     workerService: https://worker.example.com
     # the url to the root of the worker-ui. No / at the end.
     # Object service will append particular file names like "/taskPresenter.html"
-    workerUI: https://workerui.example.com
+    workerUIPublic: https://workerui.example.com
+    # the local url of the worker-ui, for cases where the public url cannot be accessed (docker image)
+    # can be ommitted
+    workerUiLocal: http://localhost:8080
 
 # the defined platforms to run
 platforms :

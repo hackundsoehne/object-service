@@ -16,9 +16,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.CommandLineMailHandler;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.SQLEmailNotificationPolicy;
@@ -93,8 +91,12 @@ public class Main {
                             config.deployment.workerService);
                     break;
                 case "pybossa":
+                    if (config.deployment.workerUILocal == null) {
+                        config.deployment.workerUILocal = config.deployment.workerUIPublic;
+                    }
                     PyBossaPlatform pyBossa = new PyBossaPlatform(config.deployment.workerService,
-                            config.deployment.workerUI,
+                            config.deployment.workerUIPublic,
+                            config.deployment.workerUILocal,
                             platform.apiKey,
                             platform.url,
                             platform.name,
@@ -166,7 +168,10 @@ public class Main {
             config.deployment.origin = System.getProperty("origin.url");
         }
         if (System.getProperty("workerui.url") != null) {
-            config.deployment.workerUI = System.getProperty("workerui.url");
+            config.deployment.workerUIPublic = System.getProperty("workeruipublic.url");
+        }
+        if (System.getProperty("workerui.url") != null) {
+            config.deployment.workerUILocal = System.getProperty("workeruilocal.url");
         }
         return config;
     }

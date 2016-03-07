@@ -25,7 +25,8 @@ public class PyBossaPlatform implements Platform {
      */
     private static final int IDTASK_COUNT = 3;
     private final String workerServiceUrl;
-    private final String workerUiUrl;
+    private final String workerUiPublicUrl;
+    private String workerUiLocalUrl;
     private final String name;
     private final int projectID;
     private final Boolean calibsAllowed;
@@ -38,17 +39,19 @@ public class PyBossaPlatform implements Platform {
      * Call init after instantiation.
      * You need to setup a project on the specified pybossa platform before you can use this.
      *
-     * @param workerServiceUrl the url of the worker-service
-     * @param apiKey           the api key to access the pyboss api
-     * @param apiUrl           the api of the url
-     * @param name             the name of the platform
-     * @param projectID        the project id
-     * @param calibsAllowed    true if calibrations are allowed
+     * @param workerServiceUrl  the url of the worker-service
+     * @param workerUiUrl       the url of the worker-ui
+     * @param apiKey            the api key to access the pyboss api
+     * @param apiUrl            the api of the url
+     * @param name              the name of the platform
+     * @param projectID         the project id
+     * @param calibsAllowed     true if calibrations are allowed
      */
     public PyBossaPlatform(String workerServiceUrl, String workerUiUrl, String apiKey, String apiUrl,
                            String name, String projectID, Boolean calibsAllowed) {
         this.workerServiceUrl = workerServiceUrl;
-        this.workerUiUrl = workerUiUrl;
+        this.workerUiPublicUrl = workerUiUrl;
+        this.workerUiLocalUrl = workerUiUrl;
         this.name = name;
         this.projectID = java.lang.Integer.parseInt(projectID);
         this.calibsAllowed = calibsAllowed;
@@ -61,6 +64,26 @@ public class PyBossaPlatform implements Platform {
             // it's unlikely that this exception will ever occur since the algorithm is fixed.
             e.printStackTrace();
         }
+    }
+
+    /**
+     * The implementation of the pybossa platform.
+     * Call init after instantiation.
+     * You need to setup a project on the specified pybossa platform before you can use this.
+     *
+     * @param workerServiceUrl  the url of the worker-service
+     * @param workerUiPublicUrl the public url of the worker-ui
+     * @param workerUiLocalUrl  the local url of the worker-ui
+     * @param apiKey            the api key to access the pyboss api
+     * @param apiUrl            the api of the url
+     * @param name              the name of the platform
+     * @param projectID         the project id
+     * @param calibsAllowed     true if calibrations are allowed
+     */
+    public PyBossaPlatform(String workerServiceUrl, String workerUiPublicUrl, String workerUiLocalUrl, String apiKey, String apiUrl,
+                           String name, String projectID, Boolean calibsAllowed) {
+        this(workerServiceUrl, workerUiPublicUrl, apiKey, apiUrl, name, projectID, calibsAllowed);
+        this.workerUiLocalUrl = workerUiLocalUrl;
     }
 
     /**
@@ -198,12 +221,12 @@ public class PyBossaPlatform implements Platform {
      * and setting the task presenter for the configured pybossa platform.
      */
     private void initializeTaskPresenter() {
-        String html = requests.getStringFromUrl(workerUiUrl + "/platform/pybossa.html");
-        String workerUiLibraryUrl = workerUiUrl + "/worker_ui.js";
+        String html = requests.getStringFromUrl(workerUiLocalUrl + "/platform/pybossa.html");
+        String workerUiLibraryUrl = workerUiLocalUrl + "/worker_ui.js";
         String projectShortName = requests.getProject().getString("short_name");
         if (requests.existsUrl(workerUiLibraryUrl)) {
             // replace worker-ui url
-            html = html.replaceFirst("(<script id=\"worker_ui\" src=\")(.+)(\"></script>)", "$1" + workerUiLibraryUrl + "$3");
+            html = html.replaceFirst("(<script id=\"worker_ui\" src=\")(.+)(\"></script>)", "$1" + workerUiPublicUrl + "/worker_ui.js$3");
             // replace project short name
             html = html.replaceFirst("(pybossa\\.run\\(')(.+)('\\);)", "$1" + projectShortName + "$3");
             requests.setTaskPresenter(html);
