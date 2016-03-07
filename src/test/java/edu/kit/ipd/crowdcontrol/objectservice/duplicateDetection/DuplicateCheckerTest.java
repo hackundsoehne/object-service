@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.*;
 public class DuplicateCheckerTest {
 
     private AnswerRatingOperations answerRatingOperations;
+    private ExperimentOperations experimentOperations;
     private Experiment experiment;
     private DuplicateChecker duplicateChecker;
     private Result<AnswerRecord> answerRecords;
@@ -41,6 +43,7 @@ public class DuplicateCheckerTest {
     public void setUp() throws Exception {
         answerQualityMap = new HashMap<>();
         answersWithAssuredQuality = new HashSet<>();
+        experimentOperations = mock(ExperimentOperations.class);
 
         DSLContext create = DSL.using(SQLDialect.MYSQL);
         answerRecords = create.newResult(Tables.ANSWER);
@@ -70,7 +73,7 @@ public class DuplicateCheckerTest {
 
 
 
-        duplicateChecker = new DuplicateChecker(answerRatingOperations);
+        duplicateChecker = new DuplicateChecker(answerRatingOperations,experimentOperations);
 
 
 
