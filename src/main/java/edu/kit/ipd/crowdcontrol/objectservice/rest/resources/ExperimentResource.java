@@ -2,7 +2,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PreActionException;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeStopgap;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
@@ -392,22 +391,44 @@ public class ExperimentResource {
                 .filter(population -> !existing.contains(population.getPlatformId()))
                 .collect(Collectors.toList());
 
+        class PlatformPopulation {
+            CompletableFuture<Boolean> job;
+            String population;
+        }
+
         newPopulations.stream()
                 .map(population -> {
                     try {
+                        //insert the population into the databae
                         insertPopulation(id, population, ExperimentsPlatformModeStopgap.disabled);
-                        return platformManager.publishTask(population.getPlatformId(), old);
+
+                        PlatformPopulation platformPopulation = new PlatformPopulation();
+                        platformPopulation.job = platformManager.publishTask(population.getPlatformId(), old);
+                        platformPopulation.population = population.getPlatformId();
+                        return platformPopulation;
+
                     } catch (PreActionException e) {
                         log.fatal("Failed to publish experiment "+ experiment +" on platform "+ population.getPlatformId(), e.getCause());
                     }
                     return null;
                 })
                 .filter(Objects::nonNull)
-                .forEach(booleanCompletableFuture -> {
+                .forEach(platformPopulation -> {
+                    boolean recovery = false;
+
                     try {
-                        booleanCompletableFuture.join();
+                        recovery = !platformPopulation.job.join();
                     } catch (CompletionException e) {
-                        log.fatal("Publishing the experiment "+experiment+ " on a platform failed.", e.getCause());
+                        log.fatal("Publishing the experiment "+experiment+ " on "+ platformPopulation.population+" failed.", e.getCause());
+                        recovery = true;
+                    }
+
+                    if (recovery) {
+                        try {
+                            platformManager.unpublishTask(platformPopulation.population, old).join();
+                        } catch (PreActionException | CompletionException e) {
+                            log.fatal("Tried to recover, unpublish experiment "+ old+ " failed", e.getCause());
+                        }
                     }
                 });
 
