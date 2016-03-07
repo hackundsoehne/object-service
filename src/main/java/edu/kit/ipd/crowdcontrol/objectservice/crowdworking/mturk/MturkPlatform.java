@@ -90,7 +90,8 @@ public class MturkPlatform implements Platform,Payment {
                 "",
                 "initMturk('"+getID()+
                         "', '"+workerServiceUrl+
-                        "', " +experiment.getId()+");");
+                        "', " +experiment.getId()+");",
+                workerServiceUrl);
     }
 
     @Override
