@@ -112,7 +112,7 @@ public class ExperimentResource {
             } catch (PreActionException e) {
                 log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e.getCause());
             } catch (CompletionException e) {
-                log.fatal("publish failed, cause by "+e);
+                log.fatal("publish failed, cause by ", e);
             }
         }
 

@@ -201,7 +201,7 @@ public class PlatformManager {
     }
 
     /**
-     * Get teh experimentsPlatformRecord or throw a preaction exception
+     * Get the experimentsPlatformRecord or throw a preaction exception
      * @param name of the platform
      * @param experiment experiment id to look for
      * @return the experimentsPlatformRecord found in the database
