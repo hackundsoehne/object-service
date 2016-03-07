@@ -64,6 +64,7 @@ public class PyBossaPlatformUnitTest {
         when(requests.getAllTasks()).thenReturn(getAllTasksDummy(3, 2));
         when(requests.getStringFromUrl(anyString())).thenReturn("");
         when(requests.existsUrl(anyString())).thenReturn(true);
+        when(requests.getProject()).thenReturn(new JSONObject().put("short_name", "test"));
         pybossa.init();
     }
 
