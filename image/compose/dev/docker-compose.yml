@@ -9,8 +9,8 @@ services:
     links:
      - db:db
     command:
-      - -Dworkerservice.url=${DOCKERIP}:3333
-      - -Dworkerui.url=${DOCKERIP}:8080
+      - -Dworkerservice.url=http://${DOCKERIP}:3333
+      - -Dworkerui.url=http://${DOCKERIP}:8080
       - -Dpybossa.disabled=true
   workerservice:
     image: coolcrowd/worker-service:latest

@@ -9,8 +9,8 @@ services:
     links:
      - db:db
     command:
-      - -Dworkerservice.url=${DOCKERIP}:3333
-      - -Dworkerui.url=${DOCKERIP}:8080
+      - -Dworkerservice.url=http://${DOCKERIP}:3333
+      - -Dworkerui.url=http://${DOCKERIP}:8080
   workerservice:
     image: coolcrowd/worker-service:latest
     ports:
@@ -63,5 +63,5 @@ services:
           ports:
               - "5000:5000"
           depends_on:
-              - db_postgres
-              - redis_sentinel
+              - pybossa_postgres
+              - pybossa_redis_sentinel
