@@ -38,7 +38,7 @@ public class MturkPlatformTest {
                 properties.getProperty("User"),
                 properties.getProperty("Password"),
                 "https://mechanicalturk.sandbox.amazonaws.com/",
-                "Sandbox","");
+                "Sandbox","http://example.com/");
 
         connection = new MTurkConnection(
                 properties.getProperty("User"),
