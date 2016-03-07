@@ -33,7 +33,6 @@ public class WebMailTest extends MailHandlerTest {
         };
 
         Properties props = new Properties();
-        props.put("sender", this.mail);
         props.put("mail.smtp.host", "smtp.web.de");
         props.put("mail.smtp.port", "587");
         props.put("mail.transport.protocol", "smtp");
@@ -48,6 +47,6 @@ public class WebMailTest extends MailHandlerTest {
         props.put("mail.imap.ssl.enable", "true");
         props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
-        handler = new MailHandler(props, auth);
+        handler = new MailHandler(props, auth, this.mail);
     }
 }

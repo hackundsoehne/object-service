@@ -77,6 +77,9 @@ mail:
     # disabled = true will ignore the mail configuration and print to the command line
     disabled : false
 
+    #specifies the mail address, that gets displayed as sender in moneytransfer mails
+    sendMail: pseipd@gmail.com
+
 moneytransfer:
     # Minimum amount of money in US cent a worker has to earn before he gets paid off
     payOffThreshold: 0

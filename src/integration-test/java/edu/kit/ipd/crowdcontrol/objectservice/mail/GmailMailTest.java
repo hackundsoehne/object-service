@@ -35,7 +35,6 @@ public class GmailMailTest extends MailHandlerTest {
         };
 
         Properties props = new Properties();
-        props.put("sender", this.mail);
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
@@ -47,6 +46,6 @@ public class GmailMailTest extends MailHandlerTest {
         props.put("mail.imap.port", "993");
         props.put("mail.imap.ssl.enable", "true");
 
-        handler = new MailHandler(props, auth);
+        handler = new MailHandler(props, auth, this.mail);
     }
 }

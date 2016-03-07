@@ -28,7 +28,7 @@ public class CommandLineMailHandler extends MailHandler {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return super.getPasswordAuthentication();
             }
-        });
+        }, "");
     }
 
     /**
