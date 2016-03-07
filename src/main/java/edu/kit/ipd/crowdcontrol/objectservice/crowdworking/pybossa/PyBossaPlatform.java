@@ -200,8 +200,12 @@ public class PyBossaPlatform implements Platform {
     private void initializeTaskPresenter() {
         String html = requests.getStringFromUrl(workerUiUrl + "/platform/pybossa.html");
         String workerUiLibraryUrl = workerUiUrl + "/worker_ui.js";
+        String projectShortName = requests.getProject().getString("short_name");
         if (requests.existsUrl(workerUiLibraryUrl)) {
+            // replace worker-ui url
             html = html.replaceFirst("(<script id=\"worker_ui\" src=\")(.+)(\"></script>)", "$1" + workerUiLibraryUrl + "$3");
+            // replace project short name
+            html = html.replaceFirst("(pybossa\\.run\\(')(.+)('\\);)", "$1" + projectShortName + "$3");
             requests.setTaskPresenter(html);
         } else {
             throw new PyBossaRequestException(String.format("Could not find the worker ui library under the url \"%s\".",

@@ -214,6 +214,29 @@ public class PyBossaRequests {
     }
 
     /**
+     * Get the current project.
+     *
+     * @return the project
+     * @throws PyBossaRequestException if the project cannot be fetched
+     */
+    public JSONObject getProject() {
+        HttpResponse<JsonNode> response;
+        try {
+            response = Unirest.get(apiUrl + "/project/{id}")
+                    .queryString("api_key", apiKey)
+                    .routeParam("id", String.valueOf(projectId))
+                    .asJson();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        if (response.getStatus() != 200) {
+            throw new PyBossaRequestException(String.format("GET project with id %s failed", projectId));
+        } else {
+            return response.getBody().getObject();
+        }
+    }
+
+    /**
      * Gets a String from the given url.
      *
      * @param url the url to get the String from
