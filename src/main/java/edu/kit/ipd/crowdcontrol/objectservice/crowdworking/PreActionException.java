@@ -13,6 +13,6 @@ public class PreActionException extends Exception {
      * @param exception The reason why a action could not take place
      */
     public PreActionException(Exception exception) {
-        super("A exception happends before the action took place", exception);
+        super("A exception happend before the action took place", exception);
     }
 }

@@ -112,6 +112,7 @@ public class PlatformManager {
      * If there is no Platform with the given name None is returned.
      *
      * @param name The name of the platform to use
+     * @throws PreActionException if the platform was not found
      * @return The interface used for payment
      */
     public Payment getPlatformPayment(String name) throws PreActionException {
@@ -127,7 +128,7 @@ public class PlatformManager {
      *
      * @param name The name of the platform
      * @param experiment The experiment to publish
-     * @throws IllegalStateException if this gets thrown the experiment is not published.
+     * @throws PreActionException if this gets thrown the experiment is not published.
      * @return A completable future object which indicates if the publishing was successful or not
      */
     public CompletableFuture<Boolean> publishTask(String name, Experiment experiment) throws PreActionException {
@@ -178,6 +179,7 @@ public class PlatformManager {
      *
      * @param name The name of the platform
      * @param experiment The experiment to unpublish
+     * @throws PreActionException if there was a error before the action took place
      * @return None if the platform was not found, false if the unpublish failed and true if everything went fine
      */
     public CompletableFuture<Boolean> unpublishTask(String name, Experiment experiment) throws PreActionException {
@@ -221,6 +223,7 @@ public class PlatformManager {
      * @param params Params passed by the platform
      * @return A String if the platform exists
      * @throws UnidentifiedWorkerException if passed invalid params
+     * @throws PreActionException if there was a exception before the action took place
      */
     public WorkerIdentification identifyWorker(String name, Map<String, String[]> params) throws PreActionException, UnidentifiedWorkerException {
         return getPlatformOrThrow(name)
@@ -240,7 +243,7 @@ public class PlatformManager {
      * @param experiment experiment which is published
      * @param paymentJobs tuples which are defining the amount to pay
      * @return a future object which indicates if the payment was successful or not
-     * @throws IllegalWorkerSetException if this exception is thrown NO payment requests are given to the platform
+     * @throws PreActionException if there was a exception before the action took place
      *
      */
     public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws PreActionException {
