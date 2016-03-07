@@ -40,7 +40,7 @@ public interface Platform {
     /**
      * Publish a passed experiment on the platform
      * @param experiment the object which should be published
-     * @return this should return a unique string which is used to identify the published experiment later.
+     * @return this should return a unique string (this mean NO "" or null string) which is used to identify the published experiment later.
      *         Or finish with a exception if the publishing failed.
      */
     CompletableFuture<String> publishTask(Experiment experiment);
