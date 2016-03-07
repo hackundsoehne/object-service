@@ -82,10 +82,8 @@ public class ExperimentResource {
                 platformManager.publishTask(population.getPlatformId(), experiment).join();
                 successfulOps.add(population);
 
-            } catch (PreActionException e) {
-                log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e.getCause());
-            } catch (CompletionException e) {
-                log.fatal("publish failed, cause by "+e);
+            } catch (PreActionException | CompletionException e) {
+                log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e);
             }
         }
 
@@ -94,10 +92,8 @@ public class ExperimentResource {
                     successfulOps) {
                 try {
                     platformManager.unpublishTask(population.getPlatformId(), experiment).join();
-                } catch (PreActionException e) {
-                    log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e.getCause());
-                } catch (CompletionException e) {
-                    log.fatal("publish failed, cause by "+e);
+                } catch (PreActionException | CompletionException e) {
+                    log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e);
                 }
             }
         }
@@ -109,10 +105,8 @@ public class ExperimentResource {
                 experiment.getPopulationsList()) {
             try {
                 platformManager.unpublishTask(population.getPlatformId(), experiment).join();
-            } catch (PreActionException e) {
-                log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e.getCause());
-            } catch (CompletionException e) {
-                log.fatal("publish failed, cause by ", e);
+            } catch (PreActionException | CompletionException e) {
+                log.fatal("Failed to publish experiment " + experiment + " on platform " + population.getPlatformId(), e);
             }
         }
 
