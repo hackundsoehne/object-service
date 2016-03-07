@@ -4,6 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Noti
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
@@ -133,7 +134,7 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
         } else {
             concatedTokens.append(tokens.get(0));
         }
-        return concatedTokens.toString();
+        return StringEscapeUtils.escapeHtml4(concatedTokens.toString());
     }
 }
 
