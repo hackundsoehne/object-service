@@ -202,24 +202,6 @@ public class PlatformManager {
     }
 
     /**
-     * update the given experiment on the given platform
-     * @param name The name of the platform
-     * @param experiment The experiment to update
-     * @return None if the platform was not found, false if the update failed and true if everything went fine.
-     */
-    public CompletableFuture<Boolean> updateTask(String name, Experiment experiment) throws TaskOperationException {
-        ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
-                orElseThrow(() -> new TaskOperationException("Experiment is not published"));
-
-        return getPlatformOrThrow(name)
-                .updateTask(record.getPlatformData(), experiment)
-                .thenApply(s -> {
-                    record.setPlatformData(s);
-                    return experimentsPlatformOps.updateExperimentsPlatform(record);
-                });
-    }
-
-    /**
      * Parse a worker id out of the params which got passed by a platform
      * @param name The name of the platform
      * @param params Params passed by the platform

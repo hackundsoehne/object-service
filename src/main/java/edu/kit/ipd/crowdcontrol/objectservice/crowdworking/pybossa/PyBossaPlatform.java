@@ -150,22 +150,6 @@ public class PyBossaPlatform implements Platform {
         return CompletableFuture.supplyAsync(() -> requests.deleteTask(id));
     }
 
-    @Override
-    @Deprecated
-    public CompletableFuture<String> updateTask(String id, Experiment experiment) {
-        return CompletableFuture.supplyAsync(() -> {
-            JSONObject updatedTask = requests.updateTask(new JSONObject()
-                    .put("info", new JSONObject()
-                            .put("url", workerServiceUrl)
-                            .put("expID", experiment.getId())
-                            .put("platform", getID())
-                            .put("idTasks", new JSONArray(idTasks))
-                    )
-                    .put("n_answers", experiment.getNeededAnswers()));
-            return String.valueOf(updatedTask.getInt("id"));
-        });
-    }
-
     /**
      * IdentifyWorker takes the passed params and looks for a specified workerId, an idTask id and a code.
      * It then checks if there is one idTask that has been submitted by the worker before.

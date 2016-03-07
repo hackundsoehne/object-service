@@ -82,24 +82,6 @@ public class PlatformManagerTest {
     }
 
     @Test
-    public void updateTest() {
-        platforms.forEach(platform -> {
-            ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
-            record.setExperiment(42);
-            record.setPlatform(platform.getName());
-            record.setIdexperimentsPlatforms(platform.hashCode());
-            record.setPlatformData(42 + "");
-
-            when(experimentsPlatformOperations.getExperimentsPlatform(platform.getID(), experiment.getId())).thenReturn(Optional.of(record));
-            try {
-                manager.updateTask(platform.getID(), experiment).join();
-            } catch (TaskOperationException e) {
-                e.printStackTrace();
-            }
-            verify(experimentsPlatformOperations).updateExperimentsPlatform(record);
-        });
-    }
-    @Test
     public void unpublishTask() {
         platforms.forEach(platform -> {
             ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
@@ -182,11 +164,6 @@ public class PlatformManagerTest {
         @Override
         public CompletableFuture<Boolean> unpublishTask(String id) {
             return CompletableFuture.completedFuture(true);
-        }
-
-        @Override
-        public CompletableFuture<String> updateTask(String id, Experiment experiment) {
-            return CompletableFuture.completedFuture(id);
         }
 
         @Override

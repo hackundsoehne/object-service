@@ -103,11 +103,6 @@ public class MturkPlatform implements Platform,Payment {
     }
 
     @Override
-    public CompletableFuture<String> updateTask(String id, Experiment experiment) {
-        return null;
-    }
-
-    @Override
     public CompletableFuture<Boolean> payExperiment(String id, Experiment experiment, List<PaymentJob> paymentJobs) {
         /**
          * this code works under the assumation that basepayment is part of the amout!!!!!!
