@@ -9,8 +9,9 @@
 
 ### Docker:
 
-To start the backend, you can download the [docker-compose file](https://raw.githubusercontent.com/coolcrowd/object-service/docker/image/compose/docker-compose.yml),
-change ${DOCKERIP} to the address the docker container are exposed to, or you can set the it via an environment variable `DOCKERIP`. 
+To start the backend, you can download an docker-compose file from [here](https://github.com/coolcrowd/object-service/tree/master/image/compose),
+change ${DOCKERIP} to the address the docker container are exposed to, or you can set the it via an environment variable `DOCKERIP` (recommended).
+`dev-pybossa` contains pybossa and `dev` is just the minimal configuration. 
 The you can run `docker-compose up` (assuming docker is installed) to start the backend. It is only intended for development, not for production!
 Please create your own docker-compose file for production with suitable config-files.
 
