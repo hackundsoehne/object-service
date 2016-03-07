@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
+import edu.kit.ipd.crowdcontrol.objectservice.config.MoneyTransfer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
@@ -394,11 +395,11 @@ public class MoneyTransferManager {
         double rate = Double.parseDouble(responseBody);
 
         if (rate > 2) {
-            rate = 2;
-            LOGGER.error("Warning: Exchange rate is above 2. The exchange rate got capped to 2.");
+            LOGGER.error("Exchange rate is above 2. The exchange rate must not be above 2.");
+            throw new MoneyTransferException("Exchange rate is above 2. The exchange rate must not be above 2.");
         } else if (rate < 0.5) {
-            rate = 0.5;
-            LOGGER.error("Warning: Exchange rate is below 0.5. The exchange rate got capped to 0.5.");
+            LOGGER.error("Exchange rate is below 0.5. The exchange rate must not be below 0.5.");
+            throw new MoneyTransferException("Exchange rate is below 0.5. The exchange rate must not be below 0.5.");
         }
 
         LOGGER.trace("Completed fetching currency exchange rates.");
