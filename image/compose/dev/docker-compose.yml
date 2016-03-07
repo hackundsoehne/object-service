@@ -6,8 +6,10 @@ services:
      - "4567:4567"
     depends_on:
      - db
+     - workerui
     links:
      - db:db
+     - workerui:workerui
     command:
       - -Dworkerservice.url=http://${DOCKERIP}:3333
       - -Dworkerui.url=http://${DOCKERIP}:8080

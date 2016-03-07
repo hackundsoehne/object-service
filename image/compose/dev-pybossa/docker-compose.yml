@@ -6,11 +6,14 @@ services:
      - "4567:4567"
     depends_on:
      - db
+     - workerui
+     - pybossa
     links:
      - db:db
+     - workerui:workerui
     command:
       - -Dworkerservice.url=http://${DOCKERIP}:3333
-      - -Dworkerui.url=http://${DOCKERIP}:8080
+      - -Dworkeruipublic.url=http://${DOCKERIP}:8080
   workerservice:
     image: coolcrowd/worker-service:latest
     ports:
