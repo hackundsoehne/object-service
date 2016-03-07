@@ -118,7 +118,6 @@ public class ExperimentOperations extends AbstractOperations {
                 .from(EXPERIMENTS_PLATFORM)
                 .join(EXPERIMENTS_CALIBRATION).onKey()
                 .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(id))
-                .groupBy(EXPERIMENTS_PLATFORM.fields())
                 .fetchGroups(EXPERIMENTS_PLATFORM, record -> record.into(EXPERIMENTS_CALIBRATION));
     }
 
