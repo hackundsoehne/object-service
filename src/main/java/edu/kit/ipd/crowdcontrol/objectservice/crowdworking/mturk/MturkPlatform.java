@@ -12,6 +12,10 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 
@@ -102,6 +106,18 @@ public class MturkPlatform implements Platform,Payment {
         return new UnpublishHIT(connection, id);
     }
 
+    public <A> List<A> getFullList(int startIndex, Function<Integer, CompletableFuture<List<A>>> producer) throws ExecutionException, InterruptedException {
+        int i = startIndex;
+        List<A> part = producer.apply(i).get();
+        List<A> complete = new ArrayList<>();
+        while(part != null && part.size() != 0) {
+            complete.addAll(part);
+            i++;
+            part = producer.apply(i).get();
+        }
+        return complete;
+    }
+
     @Override
     public CompletableFuture<Boolean> payExperiment(String id, Experiment experiment, List<PaymentJob> paymentJobs) {
         /**
@@ -111,32 +127,22 @@ public class MturkPlatform implements Platform,Payment {
         Map<String, BigDecimal> bonusPayed = new HashMap<>();
 
         try {
-            int i = 0;
-            //first get a hashmap of all assignmentids and worker ids
-            List<Assignment> assignmentList = new GetAssignments(connection,id,1).get();
-            while (assignmentList.size() > 0) {
-                for(Assignment assignment : assignmentList) {
-                    workerAssignmentId.put(assignment.getWorkerId(), assignment);
-                }
-                i++;
-                assignmentList = new GetAssignments(connection,id,i).get();
-            }
+            // get all assignments from the project and sort them to the function
+            getFullList(1, index -> new GetAssignments(connection, id, index))
+                    .forEach(assignment -> workerAssignmentId.put(assignment.getWorkerId(), assignment));
 
-            i = 1;
-            List<BonusPayment> bonusPayments = new GetBonusPayments(connection, id, 1).get();
-            while (bonusPayments.size() > 0) {
-                for (BonusPayment bonusPayment : bonusPayments) {
-                    BigDecimal bigDecimal = bonusPayed.get(bonusPayment.getWorkerId());
-                    if (bigDecimal != null) {
-                        bigDecimal = bigDecimal.add(bonusPayment.getBonusAmount().getAmount());
-                    } else {
-                        bigDecimal = bonusPayment.getBonusAmount().getAmount();
-                    }
-                    bonusPayed.put(bonusPayment.getWorkerId(), bigDecimal);
-                }
-                i++;
-                bonusPayments = new GetBonusPayments(connection, id, i).get();
-            }
+            //get all done payments
+            getFullList(1, index -> new GetBonusPayments(connection, id, index))
+                    .forEach(bonusPayment -> {
+                        BigDecimal bigDecimal = bonusPayed.get(bonusPayment.getWorkerId());
+                        if (bigDecimal != null) {
+                            bigDecimal = bigDecimal.add(bonusPayment.getBonusAmount().getAmount());
+                        } else {
+                            bigDecimal = bonusPayment.getBonusAmount().getAmount();
+                        }
+                        bonusPayed.put(bonusPayment.getWorkerId(), bigDecimal);
+                    });
+
         } catch (InterruptedException | ExecutionException e) {
             CompletableFuture<Boolean> completableFuture= new CompletableFuture<>();
             completableFuture.completeExceptionally(e);
