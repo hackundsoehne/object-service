@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PreActionException;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentification;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
@@ -57,7 +58,7 @@ public class WorkerResource {
             }
 
             return WorkerTransformer.toProto(worker);
-        } catch (UnidentifiedWorkerException e) {
+        } catch (UnidentifiedWorkerException | PreActionException e) {
             throw new BadRequestException("Could not identify worker.");
         }
     }
@@ -100,7 +101,7 @@ public class WorkerResource {
         try {
             identity = manager.identifyWorker(request.params("platform"), request.queryMap().toMap())
                     .getWorkerData();
-        } catch (UnidentifiedWorkerException e) {
+        } catch (UnidentifiedWorkerException | PreActionException e) {
             throw new BadRequestException("Could not identify worker.");
         }
 

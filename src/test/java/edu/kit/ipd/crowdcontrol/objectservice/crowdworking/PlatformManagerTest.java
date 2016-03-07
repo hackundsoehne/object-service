@@ -72,7 +72,7 @@ public class PlatformManagerTest {
 
             try {
                 manager.publishTask(record.getPlatform(), experiment).join();
-            } catch (TaskOperationException e) {
+            } catch (PreActionException e) {
                 e.printStackTrace();
             }
 
@@ -93,7 +93,7 @@ public class PlatformManagerTest {
             when(experimentsPlatformOperations.getExperimentsPlatform(platform.getID(),experiment.getId())).thenReturn(Optional.of(record));
             try {
                 manager.unpublishTask(platform.getID(), experiment).join();
-            } catch (TaskOperationException e) {
+            } catch (PreActionException e) {
                 e.printStackTrace();
             }
             //record.setStatus(TaskStatus.finished);
