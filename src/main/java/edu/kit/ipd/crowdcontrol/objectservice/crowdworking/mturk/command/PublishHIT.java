@@ -35,12 +35,13 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
      * @param autoApprovalDelayInSeconds after how many seconds a assignment is approved
      * @param data is attached to the hit and can be accessed later
      * @param initCall the call is executed as js with the standard lib
-     * @param
+     * @param workerUiUrl the location of the workerui
      */
     public PublishHIT(MTurkConnection connection, Object title,
                       String description, double reward, int assignmentDurationInSeconds,
                       int lifetimeInSeconds, String keywords, int maxAssignments,
-                      int autoApprovalDelayInSeconds, String data, String initCall, String workerUiLocation) {
+                      int autoApprovalDelayInSeconds, String data, String initCall,
+                      String workerUiUrl) {
         super(connection,
                 "CreateHIT","Minimal","2014-08-15",CreateHITResponse.class,
                 () -> {
@@ -64,7 +65,7 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
                                     "  <script type='text/javascript' src='https://code.jquery.com/jquery-2.0.0.js'></script>" +
                                     " </head>\n" +
                                     " <body onload=\""+initCall+"\">\n" +
-                                    "<script type='text/javascript' src='"+workerUiLocation+"/worker_ui.js'></script>" +
+                                    "<script type='text/javascript' src='"+workerUiUrl+"/worker_ui.js'></script>" +
                                     loadFiles(jsFiles).stream().map(s ->  "<script type='text/javascript'>"+s+"</script>").collect(Collectors.joining())+
                                     "   <div id=\"ractive-container\"></div>" +
                                     "   <button onclick='sendFinish()'>Submit</button>" +

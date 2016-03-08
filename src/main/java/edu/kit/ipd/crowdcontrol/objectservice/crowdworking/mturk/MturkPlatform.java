@@ -26,13 +26,16 @@ public class MturkPlatform implements Platform,Payment {
     private final String name;
     private final MTurkConnection connection;
     private final String workerServiceUrl;
+    private final String workerUIUrl;
     /**
      * A new mturk platform instance
      * @param user user to login
      * @param password password to use
      * @param url instance to connect to
+     * @param workerUIUrl path where to find the workerUI
      */
-    public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl) {
+    public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl, String workerUIUrl) {
+        this.workerUIUrl = workerUIUrl;
         connection = new MTurkConnection(user, password, url);
         this.workerServiceUrl = workerServiceUrl;
         this.name = name;
@@ -91,7 +94,7 @@ public class MturkPlatform implements Platform,Payment {
                 "initMturk('"+getID()+
                         "', '"+workerServiceUrl+
                         "', " +experiment.getId()+");",
-                workerServiceUrl);
+                workerUIUrl);
     }
 
     @Override

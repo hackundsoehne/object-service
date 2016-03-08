@@ -90,7 +90,8 @@ public class Main {
                             platform.password,
                             "https://mechanicalturk.sandbox.amazonaws.com/",
                             platform.name,
-                            config.deployment.workerService);
+                            config.deployment.workerService,
+                            config.deployment.workerUIPublic);
                     break;
                 case "pybossa":
                     if (config.deployment.workerUILocal == null) {

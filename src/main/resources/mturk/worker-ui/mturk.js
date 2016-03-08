@@ -30,8 +30,6 @@ function initMturk(platformName, workerServiceUrl, experiment) {
         experiment: experiment,
         preview: preview
     });
-    //load initial bits
-    WorkerUI.load();
     WorkerUI.onSubmitAnswer(function (viewData, submittedData) {
         //TODO log this
     });
@@ -41,4 +39,6 @@ function initMturk(platformName, workerServiceUrl, experiment) {
     WorkerUI.onFinished(function (data) {
         sendFinish();
     });
+    //load initial bits
+    WorkerUI.load();
 }
