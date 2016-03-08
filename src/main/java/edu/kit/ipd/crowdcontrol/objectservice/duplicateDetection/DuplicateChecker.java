@@ -30,6 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class DuplicateChecker implements Runnable {
 
+    private volatile boolean running = false;
     private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final BlockingQueue<AnswerRecord> queue = new LinkedBlockingQueue<>();
@@ -54,21 +55,21 @@ public class DuplicateChecker implements Runnable {
             }
             this.notify();
         });
-
-       // this.run();
     }
 
     /**
      * While running, the DuplicateChecker hashes the answers in the queue and checks them for duplicates.
      */
     public void run() {
-        while (true) {
+        running = true;
+        while (running) {
             AnswerRecord answerRecord = null;
             try {
                 answerRecord = queue.take();
             } catch (InterruptedException e) {
                 //TODO react
                 e.printStackTrace();
+                running = false;
             }
             if (answerRecord != null) {
                 //trying to acquire answer-hash
@@ -85,9 +86,15 @@ public class DuplicateChecker implements Runnable {
                     answerRatingOperations.setAnswerQualityAssured(answerRecord);
                 }
             }
-
         }
+    }
 
+    /**
+     * Terminates the running duplicateDetector
+     */
+    public void terminate(){
+        running = false;
+        this.notify();
     }
 
     /**
