@@ -1,7 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PreActionException;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeStopgap;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
@@ -27,6 +27,7 @@ import spark.Response;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -81,11 +82,8 @@ public class ExperimentResource {
                 platformManager.publishTask(population.getPlatformId(), experiment).join();
                 successfulOps.add(population);
 
-            } catch (TaskOperationException e) {
-                log.fatal(String.format("Error! Could not create experiment on platform %s!", population.getPlatformId()), e);
-            } catch (Exception e) {
-
-                log.fatal("Error! Could not create experiment! " + e.getMessage());
+            } catch (PreActionException | CompletionException e) {
+                log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e);
             }
         }
 
@@ -94,14 +92,11 @@ public class ExperimentResource {
                     successfulOps) {
                 try {
                     platformManager.unpublishTask(population.getPlatformId(), experiment).join();
-                } catch (TaskOperationException e) {
-                    log.fatal("Fatal ERROR! Cannot unpublish!" + e.getMessage());
-                } catch (Exception e) {
-                    log.fatal("Fatal Error! Was not able to unpublish experiment" + e.getMessage());
+                } catch (PreActionException | CompletionException e) {
+                    log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e);
                 }
             }
         }
-
     }
 
 
@@ -110,10 +105,8 @@ public class ExperimentResource {
                 experiment.getPopulationsList()) {
             try {
                 platformManager.unpublishTask(population.getPlatformId(), experiment).join();
-            } catch (TaskOperationException e) {
-                log.fatal("Fatal ERROR! Cannot unpublish!" + e.getMessage());
-            } catch (Exception e) {
-                log.fatal("Fatal Error! Was not able to unpublish experiment" + e.getMessage());
+            } catch (PreActionException | CompletionException e) {
+                log.fatal("Failed to publish experiment " + experiment + " on platform " + population.getPlatformId(), e);
             }
         }
 
@@ -392,22 +385,35 @@ public class ExperimentResource {
                 .filter(population -> !existing.contains(population.getPlatformId()))
                 .collect(Collectors.toList());
 
+        class PlatformPopulation {
+            CompletableFuture<Boolean> job;
+            String population;
+        }
+
         newPopulations.stream()
                 .map(population -> {
                     try {
+                        //insert the population into the databae
                         insertPopulation(id, population, ExperimentsPlatformModeStopgap.disabled);
-                        return platformManager.publishTask(population.getPlatformId(), old);
-                    } catch (TaskOperationException e) {
-                        log.fatal(String.format("Error! Could not publish experiment %s on platfrom %s", experiment.getTitle(), population.getPlatformId()), e);
-                        e.printStackTrace();
-                    } catch (IllegalStateException | IllegalArgumentException e) {
-                        log.fatal("Error! Could not create experiment!" + e.getMessage());
+
+                        PlatformPopulation platformPopulation = new PlatformPopulation();
+                        platformPopulation.job = platformManager.publishTask(population.getPlatformId(), old);
+                        platformPopulation.population = population.getPlatformId();
+                        return platformPopulation;
+
+                    } catch (PreActionException e) {
+                        log.fatal("Failed to publish experiment "+ experiment +" on platform "+ population.getPlatformId(), e.getCause());
                     }
                     return null;
                 })
                 .filter(Objects::nonNull)
-                //TODO what about return type Boolean?
-                .forEach(CompletableFuture::join);
+                .forEach(platformPopulation -> {
+                    try {
+                        platformPopulation.job.join();
+                    } catch (CompletionException e) {
+                        log.fatal("Publishing the experiment "+experiment+ " on "+ platformPopulation.population+" failed.", e.getCause());
+                    }
+                });
 
         List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream()
                 .filter(existing::contains)

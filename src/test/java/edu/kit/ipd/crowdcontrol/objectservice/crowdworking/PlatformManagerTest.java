@@ -72,7 +72,7 @@ public class PlatformManagerTest {
 
             try {
                 manager.publishTask(record.getPlatform(), experiment).join();
-            } catch (TaskOperationException e) {
+            } catch (PreActionException e) {
                 e.printStackTrace();
             }
 
@@ -81,24 +81,6 @@ public class PlatformManagerTest {
         });
     }
 
-    @Test
-    public void updateTest() {
-        platforms.forEach(platform -> {
-            ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
-            record.setExperiment(42);
-            record.setPlatform(platform.getName());
-            record.setIdexperimentsPlatforms(platform.hashCode());
-            record.setPlatformData(42 + "");
-
-            when(experimentsPlatformOperations.getExperimentsPlatform(platform.getID(), experiment.getId())).thenReturn(Optional.of(record));
-            try {
-                manager.updateTask(platform.getID(), experiment).join();
-            } catch (TaskOperationException e) {
-                e.printStackTrace();
-            }
-            verify(experimentsPlatformOperations).updateExperimentsPlatform(record);
-        });
-    }
     @Test
     public void unpublishTask() {
         platforms.forEach(platform -> {
@@ -111,7 +93,7 @@ public class PlatformManagerTest {
             when(experimentsPlatformOperations.getExperimentsPlatform(platform.getID(),experiment.getId())).thenReturn(Optional.of(record));
             try {
                 manager.unpublishTask(platform.getID(), experiment).join();
-            } catch (TaskOperationException e) {
+            } catch (PreActionException e) {
                 e.printStackTrace();
             }
             //record.setStatus(TaskStatus.finished);
@@ -182,11 +164,6 @@ public class PlatformManagerTest {
         @Override
         public CompletableFuture<Boolean> unpublishTask(String id) {
             return CompletableFuture.completedFuture(true);
-        }
-
-        @Override
-        public CompletableFuture<String> updateTask(String id, Experiment experiment) {
-            return CompletableFuture.completedFuture(id);
         }
 
         @Override

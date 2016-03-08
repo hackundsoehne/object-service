@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -111,9 +112,10 @@ public class PlatformManager {
      * If there is no Platform with the given name None is returned.
      *
      * @param name The name of the platform to use
+     * @throws PreActionException if the platform was not found
      * @return The interface used for payment
      */
-    public Payment getPlatformPayment(String name) {
+    public Payment getPlatformPayment(String name) throws PreActionException {
         return getPlatformOrThrow(name)
                 .getPayment().orElse(fallbackPayment);
     }
@@ -126,12 +128,11 @@ public class PlatformManager {
      *
      * @param name The name of the platform
      * @param experiment The experiment to publish
-     * @return None if the platform does not exist
+     * @throws PreActionException if this gets thrown the experiment is not published.
+     * @return A completable future object which indicates if the publishing was successful or not
      */
-    //TODO improve doc: what is none? Completable with null (bad api) what does true/false mean? or does it return null?
-    public CompletableFuture<Boolean> publishTask(String name, Experiment experiment) throws TaskOperationException {
-        ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
-                orElseThrow(() -> new IllegalStateException("Platform is not activated for experiment " + experiment));
+    public CompletableFuture<Boolean> publishTask(String name, Experiment experiment) throws PreActionException {
+        ExperimentsPlatformRecord record = getExperimentsPlatformRecord(name, experiment);
 
         BiFunction<String, Throwable, Boolean> handlePublishResult = (s1, throwable) -> {
             //if the creation was successful update the db
@@ -141,30 +142,39 @@ public class PlatformManager {
                 record.setPlatformData(s1);
                 experimentsPlatformOps.updateExperimentsPlatform(record);
                 if (!experimentsPlatformOps.updateExperimentsPlatform(record)) {
-                    getPlatformOrThrow(name).unpublishTask(record.getPlatformData())
+                    getPlatform(name).get().unpublishTask(record.getPlatformData())
                             .join();
                     throw new IllegalStateException("Updating record for published experimentsPlatform failed");
                 }
             }
-            //if there is no useful key throw!
-            if (s1 == null || (s1.isEmpty())) {
+
+            //if not rethrow the exception and update the db
+            if (throwable != null) {
                 try {
-                    unpublishTask(name, experiment);
-                } catch (TaskOperationException e) {
+                    unpublishTask(name, experiment).join();
+                } catch (PreActionException | CompletionException e) {
                     LOGGER.error("Platform " + name + " does not provide any useful key and has thrown an " +
                             "exception when tried to unpublish the task", e);
                 }
-                experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
-                        ExperimentsPlatformStatusPlatformStatus.running);
-                throw new IllegalStateException("Platform " + name + " does not provide any useful key");
-            }
-            //if not rethrow the exception and update the db
-            if (throwable != null) {
                 experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
                         ExperimentsPlatformStatusPlatformStatus.failedPublishing);
 
                 throw new RuntimeException(throwable);
             }
+
+            //if there is no useful key throw!
+            if (s1 == null || (s1.isEmpty())) {
+                try {
+                    unpublishTask(name, experiment).join();
+                } catch (PreActionException | CompletionException e) {
+                    LOGGER.error("Platform " + name + " does not provide any useful key and has thrown an " +
+                            "exception when tried to unpublish the task", e);
+                }
+                experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                        ExperimentsPlatformStatusPlatformStatus.failedPublishing);
+                throw new IllegalStateException("Platform " + name + " does not provide any useful key");
+            }
+
             return true;
         };
 
@@ -178,45 +188,42 @@ public class PlatformManager {
      *
      * @param name The name of the platform
      * @param experiment The experiment to unpublish
+     * @throws PreActionException if there was a error before the action took place
      * @return None if the platform was not found, false if the unpublish failed and true if everything went fine
      */
-    public CompletableFuture<Boolean> unpublishTask(String name, Experiment experiment) throws TaskOperationException {
-        ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId())
-                .orElse(null);
+    public CompletableFuture<Boolean> unpublishTask(String name, Experiment experiment) throws PreActionException {
+        ExperimentsPlatformRecord record = getExperimentsPlatformRecord(name, experiment);
 
         if (record == null)
             return CompletableFuture.completedFuture(true);
 
         return getPlatformOrThrow(name).unpublishTask(record.getPlatformData())
-                .thenApply(aBoolean -> {
-                    //TODO: marcel why do you ignore the return type of unpublishTask?
-                    experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
-                            ExperimentsPlatformStatusPlatformStatus.finished);
-                    return true;
-                });
-    }
+                .handle((success, throwable) -> {
+                    if (throwable != null) throw new RuntimeException(throwable);
 
-    private Platform getPlatformOrThrow(String name) {
-        return getPlatform(name)
-                .orElseThrow(() -> new IllegalArgumentException("Platform \""+name+"\" not found"));
+                    if (success) {
+                        experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                                ExperimentsPlatformStatusPlatformStatus.finished);
+                    }
+                    return success;
+                });
     }
 
     /**
-     * update the given experiment on the given platform
-     * @param name The name of the platform
-     * @param experiment The experiment to update
-     * @return None if the platform was not found, false if the update failed and true if everything went fine.
+     * Get the experimentsPlatformRecord or throw a preaction exception
+     * @param name of the platform
+     * @param experiment experiment id to look for
+     * @return the experimentsPlatformRecord found in the database
+     * @throws PreActionException Something in the database went wrong the experiment and platform could not be found
      */
-    public CompletableFuture<Boolean> updateTask(String name, Experiment experiment) throws TaskOperationException {
-        ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
-                orElseThrow(() -> new TaskOperationException("Experiment is not published"));
+    private ExperimentsPlatformRecord getExperimentsPlatformRecord(String name, Experiment experiment) throws PreActionException {
+        return experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId())
+                    .orElseThrow(() -> new PreActionException(new IllegalStateException("Platform is not activated for experiment " + experiment)));
+    }
 
-        return getPlatformOrThrow(name)
-                .updateTask(record.getPlatformData(), experiment)
-                .thenApply(s -> {
-                    record.setPlatformData(s);
-                    return experimentsPlatformOps.updateExperimentsPlatform(record);
-                });
+    private Platform getPlatformOrThrow(String name) throws PreActionException {
+        return getPlatform(name)
+                .orElseThrow(() -> new PreActionException(new IllegalArgumentException("Platform \""+name+"\" not found")));
     }
 
     /**
@@ -225,8 +232,9 @@ public class PlatformManager {
      * @param params Params passed by the platform
      * @return A String if the platform exists
      * @throws UnidentifiedWorkerException if passed invalid params
+     * @throws PreActionException if there was a exception before the action took place
      */
-    public WorkerIdentification identifyWorker(String name, Map<String, String[]> params) throws UnidentifiedWorkerException {
+    public WorkerIdentification identifyWorker(String name, Map<String, String[]> params) throws PreActionException, UnidentifiedWorkerException {
         return getPlatformOrThrow(name)
                 .getWorker()
                 .orElseGet(() -> fallbackWorker.apply(name))
@@ -244,20 +252,20 @@ public class PlatformManager {
      * @param experiment experiment which is published
      * @param paymentJobs tuples which are defining the amount to pay
      * @return a future object which indicates if the payment was successful or not
-     * @throws IllegalWorkerSetException if this exception is thrown NO payment requests are given to the platform
+     * @throws PreActionException if there was a exception before the action took place
      *
      */
-    public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws TaskOperationException, IllegalWorkerSetException {
+    public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws PreActionException {
         ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
-                orElseThrow(() -> new TaskOperationException("Platform is not activated for experiment "+experiment));
+                orElseThrow(() -> new PreActionException(new TaskOperationException("Platform is not activated for experiment "+experiment)));
         List<WorkerRecord> workerRecords = workerOps.getWorkerWithWork(experiment.getId(), name);
 
         Set<String> given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toSet());
         Set<String> should = workerRecords.stream().map(WorkerRecord::getIdentification).collect(Collectors.toSet());
 
         if (!given.equals(should)) {
-            throw new IllegalWorkerSetException(
-                    "The list of payment Jobs need to have all workers which worked on this experiment on the given platform");
+            throw new PreActionException(new IllegalWorkerSetException(
+                    "The list of payment Jobs need to have all workers which worked on this experiment on the given platform"));
         }
 
         return getPlatformPayment(name).payExperiment(record.getPlatformData(), experiment,paymentJobs);

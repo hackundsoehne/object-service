@@ -1,9 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.payment;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.IllegalWorkerSetException;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.TaskOperationException;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
@@ -64,9 +61,9 @@ public class PaymentDispatcher  {
                 .forEach((platform, paymentJobs) -> {
                     try {
                         platformManager.payExperiment(platform, exp, paymentJobs);
-                    } catch (TaskOperationException | IllegalWorkerSetException e) {
-                        //TODO maybe notify researcher?
-                        log.fatal(String.format("Unable to pay workers for platform %s", platform), e);
+                        //TODO props to the guy which missed the .join          ^^^^^^^^
+                    } catch (PreActionException e) {
+                        log.fatal("Payment of experiment "+exp+" on platform "+platform+" could not take place!", e.getCause());
                     }
                 });
     }

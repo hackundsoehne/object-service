@@ -102,18 +102,6 @@ public class DummyPlatform implements Platform, Payment {
     }
 
     /**
-     * Update the published task, with the given id, to the parameters of experiment
-     *
-     * @param id         The id of the published Task
-     * @param experiment The experiment with the new parameters
-     * @return The new id or a Exception if the update failed.
-     */
-    @Override
-    public CompletableFuture<String> updateTask(String id, Experiment experiment) {
-        return CompletableFuture.completedFuture("dummytask");
-    }
-
-    /**
      * Returns if calibration questions can be asked on this platform
      *
      * @return true or false
