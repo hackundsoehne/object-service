@@ -563,6 +563,7 @@ public class ExperimentResource {
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
             int answersCount = answerRatingOperations.getNumberOfFinalGoodAnswers(id);
             //update db
+            //TODO: proper shutdown: wait 2 hours for ratings etc, also reserved answers once that is available
             if (answersCount != 0) {
                 experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {
                     experimentsPlatformOperations.setPlatformStatus(record.getIdexperimentsPlatforms(),
