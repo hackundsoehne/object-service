@@ -55,7 +55,7 @@ public class DuplicateChecker implements Runnable {
             this.notify();
         });
 
-        this.run();
+       // this.run();
     }
 
     /**
