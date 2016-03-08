@@ -31,7 +31,6 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
@@ -43,6 +42,7 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
  * @author Marcel Hollerbach
  */
 public class ExperimentResource {
+    private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final CalibrationOperations calibrationOperations;
     private final TagConstraintsOperations tagConstraintsOperations;
@@ -51,9 +51,10 @@ public class ExperimentResource {
     private final PlatformManager platformManager;
     private static final Logger log = LogManager.getLogger("ExperimentResource");
 
-    public ExperimentResource(ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
+    public ExperimentResource(AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
                               TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmsOperations,
                               ExperimentsPlatformOperations experimentsPlatformOperations, PlatformManager platformManager) {
+        this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.calibrationOperations = calibrationOperations;
         this.tagConstraintsOperations = tagConstraintsOperations;
@@ -560,11 +561,19 @@ public class ExperimentResource {
 
         //check if we are not creative Stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
+            int answersCount = answerRatingOperations.getNumberOfFinalGoodAnswers(id);
             //update db
-            experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {
-                experimentsPlatformOperations.setPlatformStatus(record.getIdexperimentsPlatforms(),
-                        ExperimentsPlatformStatusPlatformStatus.stopping);
-            });
+            if (answersCount != 0) {
+                experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {
+                    experimentsPlatformOperations.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                            ExperimentsPlatformStatusPlatformStatus.stopping);
+                });
+            } else {
+                experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {
+                    experimentsPlatformOperations.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                            ExperimentsPlatformStatusPlatformStatus.finished);
+                });
+            }
         }
 
         resulting = fetchExperiment(id);

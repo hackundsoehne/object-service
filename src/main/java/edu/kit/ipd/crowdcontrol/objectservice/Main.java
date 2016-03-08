@@ -219,7 +219,7 @@ public class Main {
 
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, experimentsPlatformOperations, platformOperations,
                 workerOperations);
-        ExperimentResource experimentResource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations, experimentsPlatformOperations, platformManager);
+        ExperimentResource experimentResource = new ExperimentResource(answerRatingOperations, experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations, experimentsPlatformOperations, platformManager);
 
         QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations, answerRatingOperations, experimentOperations, experimentResource);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations, workerOperations);
