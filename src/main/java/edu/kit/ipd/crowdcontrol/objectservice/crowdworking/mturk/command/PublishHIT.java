@@ -64,7 +64,7 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
                                     "  <script type='text/javascript' src='https://code.jquery.com/jquery-2.0.0.js'></script>" +
                                     " </head>\n" +
                                     " <body onload=\""+initCall+"\">\n" +
-                                    "<script type='text/javascript' src='"+workerUiLocation+"/ui/worker_ui.js'></script>" +
+                                    "<script type='text/javascript' src='"+workerUiLocation+"/worker_ui.js'></script>" +
                                     loadFiles(jsFiles).stream().map(s ->  "<script type='text/javascript'>"+s+"</script>").collect(Collectors.joining())+
                                     "   <div id=\"ractive-container\"></div>" +
                                     "   <button onclick='sendFinish()'>Submit</button>" +
