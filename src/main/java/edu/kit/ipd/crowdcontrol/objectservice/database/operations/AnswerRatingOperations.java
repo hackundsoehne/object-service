@@ -49,6 +49,7 @@ public class AnswerRatingOperations extends AbstractOperations {
     public Result<RatingRecord> getRatingsOfAnswer(AnswerRecord answerRecord) {
         return create.selectFrom(RATING)
                 .where(RATING.ANSWER_R.eq(answerRecord.getIdAnswer()))
+                .and(RATING.RATING_.isNotNull())
                 .fetch();
     }
 
@@ -156,7 +157,7 @@ public class AnswerRatingOperations extends AbstractOperations {
     public Result<RatingRecord> getGoodRatingsOfAnswer(AnswerRecord answerRecord, int threshold) {
         return create.selectFrom(RATING)
                 .where(RATING.ANSWER_R.eq(answerRecord.getIdAnswer()))
-                .and(RATING.QUALITY.greaterThan(0))
+                .and(RATING.QUALITY.greaterThan(threshold))
                 .fetch();
     }
 
@@ -400,6 +401,7 @@ public class AnswerRatingOperations extends AbstractOperations {
         return ratingRecords.stream().map((ratingRecord) -> {
             Result<RatingConstraintRecord> ratingConstraints = create.selectFrom(RATING_CONSTRAINT)
                     .where(RATING_CONSTRAINT.REF_RATING.eq(ratingRecord.getIdRating()))
+                    .and(RATING.RATING_.isNotNull())
                     .fetch();
 
             Result<ConstraintRecord> constraints = create.selectFrom(CONSTRAINT)
