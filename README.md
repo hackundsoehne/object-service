@@ -14,6 +14,7 @@ change ${DOCKERIP} to the address the docker container are exposed to, or you ca
 `dev-pybossa` contains pybossa and `dev` is just the minimal configuration. 
 The you can run `docker-compose up` (assuming docker is installed) to start the backend. It is only intended for development, not for production!
 Please create your own docker-compose file for production with suitable config-files.
+The pybossa account is: `pseipd@gmail.com` with the password `pse`.
 
 ### Jar:
 
