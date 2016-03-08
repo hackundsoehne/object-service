@@ -212,4 +212,92 @@ public class PyBossaRequests {
             throw new PyBossaRequestException(String.format("Taskrun with id %s could not be deleted", taskRunId));
         }
     }
+
+    /**
+     * Get the current project.
+     *
+     * @return the project
+     * @throws PyBossaRequestException if the project cannot be fetched
+     */
+    public JSONObject getProject() {
+        HttpResponse<JsonNode> response;
+        try {
+            response = Unirest.get(apiUrl + "/project/{id}")
+                    .queryString("api_key", apiKey)
+                    .routeParam("id", String.valueOf(projectId))
+                    .asJson();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        if (response.getStatus() != 200) {
+            throw new PyBossaRequestException(String.format("GET project with id %s failed", projectId));
+        } else {
+            return response.getBody().getObject();
+        }
+    }
+
+    /**
+     * Gets a String from the given url.
+     *
+     * @param url the url to get the String from
+     * @return the String returned by the get request
+     * @throws PyBossaRequestException if the request fails
+     */
+    public String getStringFromUrl(String url) {
+        HttpResponse<String> response;
+        try {
+            response = Unirest.get(url).asString();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        if (response.getStatus() == 200) {
+            return response.getBody();
+        } else {
+            throw new PyBossaRequestException(String.format("The GET request to %s did not return a String.", url));
+        }
+    }
+
+    /**
+     * Will check if the url exists.
+     *
+     * @param url the url to check
+     * @return true if the url returns status 200
+     * @throws PyBossaRequestException if the request fails
+     */
+    public boolean existsUrl(String url) {
+        HttpResponse<String> response;
+        try {
+            response = Unirest.get(url).asString();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        return response.getStatus() == 200;
+    }
+
+    /**
+     * Sets the task presenter for the configured project.
+     *
+     * @param html the task presenter html
+     * @throws PyBossaRequestException if the request fails
+     */
+    public void setTaskPresenter(String html) {
+        JsonNode jsonNode = new JsonNode("");
+        jsonNode.getObject().put("info", new JSONObject().put("task_presenter", html));
+
+        HttpResponse<JsonNode> response;
+        try {
+            response = Unirest.put(apiUrl + "/project/{projectId}")
+                    .header("Content-Type", "application/json")
+                    .routeParam("projectId", String.valueOf(projectId))
+                    .queryString("api_key", apiKey)
+                    .body(jsonNode)
+                    .asJson();
+        } catch (UnirestException e) {
+            throw new PyBossaRequestException(e);
+        }
+        if (response.getStatus() != 200) {
+            throw new PyBossaRequestException(response.getBody().getObject()
+                    .optString("exception_msg", "Setting task presenter failed"));
+        }
+    }
 }

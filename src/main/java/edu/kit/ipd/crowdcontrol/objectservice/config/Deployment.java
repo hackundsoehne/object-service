@@ -13,7 +13,11 @@ public class Deployment {
      */
     public String workerService;
     /**
-     * The url of the worker-ui
+     * The local url of the worker-ui
      */
-    public String workerUI;
+    public String workerUILocal;
+    /**
+     * The public url of the worker-ui
+     */
+    public String workerUIPublic;
 }
