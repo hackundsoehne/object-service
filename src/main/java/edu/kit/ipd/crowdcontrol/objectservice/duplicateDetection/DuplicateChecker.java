@@ -37,7 +37,8 @@ public class DuplicateChecker implements Runnable {
     /**
      * Constructor
      *
-     * @param answerRatingOperations
+     * @param answerRatingOperations used to set quality and quality-assured bit to duplicates
+     * @param experimentOperations db-operations used to determine the answer-type of an experiment
      */
     public DuplicateChecker(AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations) {
 
@@ -117,25 +118,26 @@ public class DuplicateChecker implements Runnable {
      *
      * @param answerRecord the answer which should be hashed
      * @param answerType the type of the answer
-     * @return Optional<Long> if nthe answer could be hashed or an empty-optional otherwise
+     * @return Optional<Long> if the answer could be hashed or an empty-optional otherwise
      */
     private Optional<Long> getHashFromAnswer(AnswerRecord answerRecord, String answerType) {
         if (answerType == null) { //String answer
             return Optional.of(StringSimilarity.computeSimhashFromShingles(Shingle.getShingle(answerRecord.getAnswer(), 3)));
-        } else { //Picture ulr
+        } else {
+            //Picture ulr
             //PictureFetch
             BufferedImage image;
             URL url;
             try {
                 url = new URL(answerRecord.getAnswer());
             } catch (MalformedURLException e) {
-                e.printStackTrace();//TODO  specify reason for zero-quality in response field
+                //TODO  specify reason for zero-quality in response field
                 return Optional.empty();
             }
             try {
                 image = ImageIO.read(url);
             } catch (IOException e) {
-                e.printStackTrace(); //TODO  specify reason for zero-quality in response field
+              //TODO  specify reason for zero-quality in response field
                 return Optional.empty();
             }
             if (image == null) {
