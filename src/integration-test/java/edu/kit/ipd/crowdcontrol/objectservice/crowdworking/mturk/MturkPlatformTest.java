@@ -65,7 +65,7 @@ public class MturkPlatformTest {
 
         //shound not fail
         List<PaymentJob> paymentJobs = new ArrayList<>();
-        paymentJobs.add(new PaymentJob(new WorkerRecord(0,"testworker","MTurk","",0),20));
+        paymentJobs.add(new PaymentJob(new WorkerRecord(0,"testworker","MTurk","",0),20, ""));
         platform.payExperiment(id, experiment, paymentJobs).join();
     }
 }

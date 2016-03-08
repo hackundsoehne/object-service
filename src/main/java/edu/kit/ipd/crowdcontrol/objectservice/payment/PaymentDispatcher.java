@@ -56,7 +56,7 @@ public class PaymentDispatcher  {
         paymentCalc.estimatePayment(exp).entrySet().stream()
                 .collect(Collectors.groupingBy(
                         entry -> entry.getKey().getPlatform(),
-                        Collectors.mapping(entry -> new PaymentJob(entry.getKey(), entry.getValue()), Collectors.toList())
+                        Collectors.mapping(entry -> new PaymentJob(entry.getKey(), entry.getValue(), ""), Collectors.toList())
                 ))
                 .forEach((platform, paymentJobs) -> {
                     try {
