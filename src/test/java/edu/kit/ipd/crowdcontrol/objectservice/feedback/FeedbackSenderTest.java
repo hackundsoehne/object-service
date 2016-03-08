@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.feedback;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Answer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
@@ -9,12 +8,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOp
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import org.jooq.Result;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import javax.mail.MessagingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +21,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * Tests the feedback sender
+ *
  * @author Felix Rittler
  */
 public class FeedbackSenderTest {
@@ -45,30 +44,30 @@ public class FeedbackSenderTest {
 
     @Test
     public void testSendFeedback() throws Exception {
-        Result<AnswerRecord> answers = mock(Result.class);
+        List<AnswerRecord> answers = mock(Result.class);
         doReturn(answers).when(answerRatingOperations).getAnswersOfExperiment(0);
         Iterator<AnswerRecord> it = mock(Iterator.class);
 
-        AnswerRecord a1 = mock(AnswerRecord.class);
-        when(a1.getWorkerId()).thenReturn(0);
-        when(a1.getAnswer()).thenReturn("baz1");
+        AnswerRecord a1 = new AnswerRecord();
+        a1.setWorkerId(0);
+        a1.setAnswer("baz1");
 
-        AnswerRecord a2 = mock(AnswerRecord.class);
-        when(a2.getWorkerId()).thenReturn(1);
-        when(a2.getAnswer()).thenReturn("baz2");
+        AnswerRecord a2 = new AnswerRecord();
+        a2.setWorkerId(0);
+        a2.setAnswer("baz2");
 
-        AnswerRecord a3 = mock(AnswerRecord.class);
-        when(a3.getWorkerId()).thenReturn(0);
-        when(a3.getAnswer()).thenReturn("baz3");
+        AnswerRecord a3 = new AnswerRecord();
+        a3.setWorkerId(0);
+        a3.setAnswer("baz3");
 
-        AnswerRecord a4 = mock(AnswerRecord.class);
-        when(a4.getWorkerId()).thenReturn(0);
-        when(a4.getAnswer()).thenReturn("baz4");
+        AnswerRecord a4 = new AnswerRecord();
+        a4.setWorkerId(1);
+        a4.setAnswer("baz4");
 
         WorkerRecord w1 = mock(WorkerRecord.class);
         Optional<WorkerRecord> o1 = Optional.of(w1);
         when(workerOperations.getWorker(0)).thenReturn(o1);
-        when(w1.getEmail()).thenReturn("");
+        when(w1.getEmail()).thenReturn("coolcrowd@42.pi");
 
         WorkerRecord w2 = mock(WorkerRecord.class);
         Optional<WorkerRecord> o2 = Optional.of(w2);
@@ -149,11 +148,40 @@ public class FeedbackSenderTest {
         when(it.next()).thenReturn(a1).thenReturn(a2).thenReturn(a3).thenReturn(a4);
 
         ExperimentRecord exp = mock(ExperimentRecord.class);
+        when(exp.getTitle()).thenReturn("foobarExperiment");
+        Optional<ExperimentRecord> expOpt = Optional.of(exp);
+        doReturn(expOpt).when(experimentOperations).getExperiment(0);
+
+
+        doNothing().when(handler).sendMail(anyString(), anyString(), anyString());
+        sender.sendFeedback(0);
+
+        String message = sender.loadMessage("src/test/resources/feedback/workermessage2.txt");
+        verify(handler).sendMail("foobar@baz.xyz", "Feedback to your work", message);
+
+
+        String message2 = sender.loadMessage("src/test/resources/feedback/workermessage1.txt");
+        verify(handler).sendMail("coolcrowd@42.pi", "Feedback to your work", message2);
+    }
+
+    @Test
+    public void testNoAnswers() throws Exception {
+        List<AnswerRecord> answers = mock(Result.class);
+        doReturn(answers).when(answerRatingOperations).getAnswersOfExperiment(0);
+        Iterator<AnswerRecord> it = mock(Iterator.class);
+        when(answers.iterator()).thenReturn(it);
+        when(it.hasNext()).thenReturn(false);
+        when(answers.isEmpty()).thenReturn(true);
+        doThrow(new MessagingException()).when(handler).sendMail(anyString(), anyString(), anyString());
+
+        ExperimentRecord exp = mock(ExperimentRecord.class);
+        when(exp.getTitle()).thenReturn("foobarExperiment");
         Optional<ExperimentRecord> expOpt = Optional.of(exp);
         doReturn(expOpt).when(experimentOperations).getExperiment(0);
 
         sender.sendFeedback(0);
 
-
     }
+
+
 }
