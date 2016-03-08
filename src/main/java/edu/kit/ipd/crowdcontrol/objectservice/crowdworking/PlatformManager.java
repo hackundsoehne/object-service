@@ -161,6 +161,12 @@ public class PlatformManager {
             }
             //if not rethrow the exception and update the db
             if (throwable != null) {
+                try {
+                    unpublishTask(name, experiment).join();
+                } catch (PreActionException | CompletionException e) {
+                    LOGGER.error("Platform " + name + " does not provide any useful key and has thrown an " +
+                            "exception when tried to unpublish the task", e);
+                }
                 experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
                         ExperimentsPlatformStatusPlatformStatus.failedPublishing);
 
