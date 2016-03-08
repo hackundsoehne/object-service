@@ -2,9 +2,12 @@ package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.Shingle;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.StringSimilarity;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -33,7 +36,7 @@ public class DuplicateCheckerTest {
 
     private AnswerRatingOperations answerRatingOperations;
     private ExperimentOperations experimentOperations;
-    private Experiment experiment;
+    private ExperimentRecord experimentRecord;
     private DuplicateChecker duplicateChecker;
     private Result<AnswerRecord> answerRecords;
     private Map<AnswerRecord,Integer> answerQualityMap;
@@ -47,12 +50,11 @@ public class DuplicateCheckerTest {
 
         DSLContext create = DSL.using(SQLDialect.MYSQL);
         answerRecords = create.newResult(Tables.ANSWER);
-
-
-        experiment = Experiment.newBuilder().setId(1).build();
+        experimentRecord = create.newRecord(Tables.EXPERIMENT);
+        experimentRecord.setIdExperiment(1);
 
         answerRatingOperations = mock(AnswerRatingOperations.class);
-        when(answerRatingOperations.getAnswersOfExperiment(experiment.getId())).thenReturn((Result)answerRecords);
+        when(answerRatingOperations.getAnswersOfExperiment(experimentRecord.getIdExperiment())).thenReturn((Result)answerRecords);
 
         doAnswer(new Answer() {
                      @Override
@@ -82,22 +84,21 @@ public class DuplicateCheckerTest {
 
     @After
     public void tearDown() throws Exception {
-        experiment = null;
+        experimentRecord = null;
         answerRecords = null;
         answerRatingOperations = null;
         duplicateChecker = null;
 
     }
-    @Ignore
     @Test
     public void testCheckExperimentForDuplicates() throws Exception {
-        AnswerRecord uniqueAnswer = new AnswerRecord(0,experiment.getId(),"A very different answer",new Timestamp(0),0,6,false);
+        AnswerRecord uniqueAnswer = new AnswerRecord(0,experimentRecord.getIdExperiment(),"A very different answer",new Timestamp(0),0,6,false);
 
-        AnswerRecord originalOne = new AnswerRecord(0,experiment.getId(),"This may be a duplicate",new Timestamp(0),0,6,false);
-        AnswerRecord duplicateOne = new AnswerRecord(0,experiment.getId(),"This MAY be a Duplicate toO",new Timestamp(1),0,6,false);
+        AnswerRecord originalOne = new AnswerRecord(0,experimentRecord.getIdExperiment(),"This may be a duplicate",new Timestamp(0),0,6,false);
+        AnswerRecord duplicateOne = new AnswerRecord(0,experimentRecord.getIdExperiment(),"This MAY be a Duplicate toO",new Timestamp(1),0,6,false);
 
-        AnswerRecord originalTwo = new AnswerRecord(0,experiment.getId(),"An answer should not be similar to other answers, else it is a duplicate",new Timestamp(0),0,6,false);
-        AnswerRecord duplicateTwo = new AnswerRecord(0,experiment.getId(),"an ANSWER shouLd NoT bE similaR to other duplicates, else it is a duplicate",new Timestamp(1),0,6,false);
+        AnswerRecord originalTwo = new AnswerRecord(0,experimentRecord.getIdExperiment(),"An answer should not be similar to other answers, else it is a duplicate",new Timestamp(0),0,6,false);
+        AnswerRecord duplicateTwo = new AnswerRecord(0,experimentRecord.getIdExperiment(),"an ANSWER shouLd NoT bE similaR to other duplicates, else it is a duplicate",new Timestamp(1),0,6,false);
 
         answerRecords.add(uniqueAnswer);
         answerRecords.add(originalOne);
@@ -106,8 +107,9 @@ public class DuplicateCheckerTest {
         answerRecords.add(duplicateTwo);
 
         answerRecords.forEach(answerRecord -> answerQualityMap.put(answerRecord,answerRecord.getQuality()));
-
-    //    duplicateChecker.checkExperimentForDuplicates(ExperimentTransformer.toRecord(experiment));
+        Map<AnswerRecord,Long>mappingOfAnswersHashes = new HashMap<>();
+        answerRecords.forEach(answerRecord -> mappingOfAnswersHashes.put(answerRecord, StringSimilarity.computeSimhashFromShingles(Shingle.getShingle(answerRecord.getAnswer(),3))));
+        duplicateChecker.checkExperimentForDuplicates(mappingOfAnswersHashes);
 
         assertEquals((int)answerQualityMap.get(duplicateOne) , 0);
         assertEquals((int)answerQualityMap.get(originalOne) , 6);
@@ -116,12 +118,6 @@ public class DuplicateCheckerTest {
         assertEquals((int)answerQualityMap.get(duplicateTwo), 0);
 
         assertEquals((int) answersWithAssuredQuality.size(), 2);
-
-
-
-
-
-
 
 
     }
