@@ -3,7 +3,7 @@ services:
   controlui:
     image: coolcrowd/control-ui:latest
     ports:
-       - "80:80"
+       - "8000:80"
     environment:
        - API_URL=http://${DOCKERIP}:4567/
        - API_AUTH=false
