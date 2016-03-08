@@ -1,0 +1,48 @@
+# Deployment of the object service / control ui
+deployment:
+    # Origin of the control ui
+    # port has to match the url of the ui and no / at the end
+    origin: http://localhost:3002
+    #the url to the workerService
+    workerService: http://localhost:8080
+    # the url to the root of the worker-ui. No / at the end.
+    # Object service will append particular file names like "/taskPresenter.html"
+    workerUIPublic: http://localhost:3000
+
+
+# the defined platforms to run
+platforms :
+    # type to use (mturk/pybossa/dummy)
+    - type: dummy
+
+      # standard credentials
+      user: samplePlatformUser
+      password: samplePassword
+
+      # name which is used to display
+      name: Sandbox
+
+      # the url to give to the platform type
+      url: http://example.com/
+
+    - type: pybossa
+      #apiKey: f66b69d3-467b-48ce-9822-e4e9a34403a2
+      #url: http://pybossa.pse.kelunik.com/api
+      apiKey: 8ec92fa1-1bd1-42ad-8524-3d2bab4588b1
+      url: http://localhost:5000/api
+      name: test
+      projectId: 1
+      calibrationsAllowed: true
+
+moneytransfer:
+    #the minimum amount of money in ct a worker has to earn, before he gets paid off
+    payOffThreshold: 0
+
+    #the password used, to verify a valid amazon giftcode email (enter password as message at amazon homepage, while buying giftcodes
+    parsingPassword: test
+
+    #the mail address to send notification mails to
+    notificationMailAddress: pseipd@gmail.com
+
+    #the interval in days, when the workers get paid off
+    scheduleInterval: 7

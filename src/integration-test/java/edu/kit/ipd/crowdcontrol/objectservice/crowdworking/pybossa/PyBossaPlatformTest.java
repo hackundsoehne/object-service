@@ -6,13 +6,17 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
+import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
+import org.ho.yaml.Yaml;
 import org.json.JSONArray;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
@@ -24,14 +28,13 @@ import static org.junit.Assert.assertTrue;
  */
 @Ignore
 public class PyBossaPlatformTest {
-    // TODO read settings from config
-    private static final String WORKER_SERVICE_URL = "http://localhost:8080";
-    private static final String WORKER_UI_URL = "http://localhost:3000";
-    private static final String API_KEY = "8ec92fa1-1bd1-42ad-8524-3d2bab4588b1";
-    private static final String API_URL = "http://localhost:5000/api";
-    private static final String TASK_URL = API_URL + "/task";
-    private static final String NAME = "pybossa";
-    private static final int PROJECT_ID = 1;
+    private static String workerServiceUrl;
+    private static String workerUiUrl;
+    private static String apiKey;
+    private static String apiUrl;
+    private static String taskUrl;
+    private static String name;
+    private static int projectId = 1;
 
     private static Experiment experiment = Experiment.newBuilder()
             .setId(1)
@@ -42,14 +45,33 @@ public class PyBossaPlatformTest {
             .setRatingsPerAnswer(Integer.newBuilder().setValue(5).build())
             .build();
 
-    private static PyBossaRequests requests = new PyBossaRequests(API_URL, PROJECT_ID, API_KEY);
+    private static PyBossaRequests requests;
     private static PyBossaPlatform pybossa;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        deleteAllTasks(TASK_URL, API_KEY, PROJECT_ID);
-        pybossa = new PyBossaPlatform(WORKER_SERVICE_URL, WORKER_UI_URL, API_KEY,
-                API_URL, NAME, String.valueOf(PROJECT_ID), true);
+        // load config
+        File configFile = new File("src/integration-test/resources/config.yml");
+        Config config = Yaml.loadType(configFile, Config.class);
+        workerServiceUrl = config.deployment.workerService;
+        workerUiUrl = config.deployment.workerUIPublic;
+        for (ConfigPlatform platform : config.platforms) {
+            if (platform.type.toLowerCase().equals("pybossa")) {
+                if (config.deployment.workerUILocal == null) {
+                    config.deployment.workerUILocal = config.deployment.workerUIPublic;
+                }
+                apiKey = platform.apiKey;
+                apiUrl = platform.url;
+                name = platform.name;
+                projectId = java.lang.Integer.valueOf(platform.projectId);
+            }
+        }
+        taskUrl = apiUrl + "/task";
+        requests = new PyBossaRequests(apiUrl, projectId, apiKey);
+
+        deleteAllTasks(taskUrl, apiKey, projectId);
+        pybossa = new PyBossaPlatform(workerServiceUrl, workerUiUrl, apiKey,
+                apiUrl, name, String.valueOf(projectId), true);
         pybossa.init();
     }
 
@@ -62,8 +84,8 @@ public class PyBossaPlatformTest {
         // get task with id = publishedid
         HttpResponse<JsonNode> response;
         try {
-            response = Unirest.get(TASK_URL + "/{id}")
-                    .queryString("api_key", API_KEY)
+            response = Unirest.get(taskUrl + "/{id}")
+                    .queryString("api_key", apiKey)
                     .routeParam("id", publishedId.getAsJsonObject().get("identification").getAsString())
                     .asJson();
         } catch (UnirestException e) {
