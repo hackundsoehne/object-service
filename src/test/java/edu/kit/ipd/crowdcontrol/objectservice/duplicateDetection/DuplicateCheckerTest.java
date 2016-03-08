@@ -121,4 +121,9 @@ public class DuplicateCheckerTest {
 
 
     }
+
+    @Test
+    public void testImageDuplicateDetection() throws Exception{
+
+    }
 }
