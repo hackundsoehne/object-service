@@ -55,7 +55,7 @@ public class MTurkRestApiTest {
     public void testPublishHIT() throws Exception {
         String id = new PublishHIT(connection,"Title1", "Description2",
                 0.20,60,2000,"test,for,everything",
-                2,2000000,"data","").get();
+                2,2000000,"data","","").get();
 
         assertNotEquals(id, null);
 
