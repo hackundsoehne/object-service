@@ -11,6 +11,8 @@ import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -100,11 +102,12 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                 .and(EXPERIMENTS_PLATFORM.PLATFORM.in(platformsInserted))
                 .fetch();
 
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
         List<ExperimentsPlatformStatusRecord> statusesToInsert = inTheDatabase.stream()
                 .map(record -> new ExperimentsPlatformStatusRecord(
                         null,
                         ExperimentsPlatformStatusPlatformStatus.draft,
-                        null,
+                        timestamp,
                         record.getIdexperimentsPlatforms()
                 ))
                 .collect(Collectors.toList());
@@ -131,7 +134,8 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                         experiment
                 )));
 
-        ExperimentsPlatformModeRecord toInsert = new ExperimentsPlatformModeRecord(null, experimentsPlatform, mode, null);
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+        ExperimentsPlatformModeRecord toInsert = new ExperimentsPlatformModeRecord(null, experimentsPlatform, mode, timestamp);
 
         create.batchInsert(toInsert).execute();
     }
@@ -142,7 +146,8 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @param mode the mode to set to
      */
     public void setPlatformMode(int experimentsPlatform, ExperimentsPlatformModeStopgap mode) {
-        ExperimentsPlatformModeRecord toInsert = new ExperimentsPlatformModeRecord(null, experimentsPlatform, mode, null);
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+        ExperimentsPlatformModeRecord toInsert = new ExperimentsPlatformModeRecord(null, experimentsPlatform, mode, timestamp);
 
         create.executeInsert(toInsert);
     }
@@ -153,7 +158,8 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @param status the status to set to
      */
     public void setPlatformStatus(int experimentsPlatform, ExperimentsPlatformStatusPlatformStatus status) {
-        ExperimentsPlatformStatusRecord toInsert = new ExperimentsPlatformStatusRecord(null, status, null, experimentsPlatform);
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+        ExperimentsPlatformStatusRecord toInsert = new ExperimentsPlatformStatusRecord(null, status, timestamp, experimentsPlatform);
 
         create.executeInsert(toInsert);
     }
