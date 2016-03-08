@@ -209,7 +209,6 @@ public class AlgorithmOperations extends AbstractOperations {
                 .leftJoin(CHOSEN_TASK_CHOOSER_PARAM).onKey()
                 .where(CHOSEN_TASK_CHOOSER_PARAM.EXPERIMENT.eq(experimentID))
                 .and(ALGORITHM_TASK_CHOOSER_PARAM.ALGORITHM.eq(taskChooserID))
-                .groupBy(ALGORITHM_TASK_CHOOSER_PARAM.fields())
                 .fetchMap(ALGORITHM_TASK_CHOOSER_PARAM, record -> record.getValue(CHOSEN_TASK_CHOOSER_PARAM.VALUE));
     }
 
@@ -227,7 +226,6 @@ public class AlgorithmOperations extends AbstractOperations {
                 .leftJoin(CHOSEN_ANSWER_QUALITY_PARAM).onKey()
                 .where(CHOSEN_ANSWER_QUALITY_PARAM.EXPERIMENT.eq(experimentID))
                 .and(ALGORITHM_ANSWER_QUALITY_PARAM.ALGORITHM.eq(answerQualityID))
-                .groupBy(ALGORITHM_ANSWER_QUALITY_PARAM.fields())
                 .fetchMap(ALGORITHM_ANSWER_QUALITY_PARAM, record -> record.getValue(CHOSEN_ANSWER_QUALITY_PARAM.VALUE));
     }
 
@@ -245,7 +243,6 @@ public class AlgorithmOperations extends AbstractOperations {
                 .leftJoin(CHOSEN_RATING_QUALITY_PARAM).onKey()
                 .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(experimentID))
                 .and(ALGORITHM_RATING_QUALITY_PARAM.ALGORITHM.eq(ratingQualityID))
-                .groupBy(ALGORITHM_RATING_QUALITY_PARAM.fields())
                 .fetchMap(ALGORITHM_RATING_QUALITY_PARAM, record -> record.getValue(CHOSEN_RATING_QUALITY_PARAM.VALUE));
     }
 

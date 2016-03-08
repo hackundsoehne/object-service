@@ -38,9 +38,11 @@ import javax.naming.NamingException;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * @author Niklas Keller
@@ -167,12 +169,15 @@ public class Main {
         if (System.getProperty("origin.url") != null) {
             config.deployment.origin = System.getProperty("origin.url");
         }
-        if (System.getProperty("workerui.url") != null) {
+        if (System.getProperty("workeruipublic.url") != null) {
             config.deployment.workerUIPublic = System.getProperty("workeruipublic.url");
         }
-        if (System.getProperty("workerui.url") != null) {
+        if (System.getProperty("workeruilocal.url") != null) {
             config.deployment.workerUILocal = System.getProperty("workeruilocal.url");
         }
+        config.platforms = Arrays.stream(config.platforms)
+                .filter(platform -> !Boolean.getBoolean(platform.name+".disabled"))
+                .toArray(ConfigPlatform[]::new);
         return config;
     }
 
