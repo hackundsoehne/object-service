@@ -408,21 +408,10 @@ public class ExperimentResource {
                 })
                 .filter(Objects::nonNull)
                 .forEach(platformPopulation -> {
-                    boolean recovery = false;
-
                     try {
-                        recovery = !platformPopulation.job.join();
+                        platformPopulation.job.join();
                     } catch (CompletionException e) {
                         log.fatal("Publishing the experiment "+experiment+ " on "+ platformPopulation.population+" failed.", e.getCause());
-                        recovery = true;
-                    }
-
-                    if (recovery) {
-                        try {
-                            platformManager.unpublishTask(platformPopulation.population, old).join();
-                        } catch (PreActionException | CompletionException e) {
-                            log.fatal("Tried to recover, unpublish experiment "+ old+ " failed", e.getCause());
-                        }
                     }
                 });
 
