@@ -1,5 +1,13 @@
 version: '2'
 services:
+  controlui:
+    image: coolcrowd/control-ui:latest
+    ports:
+       - "8000:80"
+    environment:
+       - API_URL=http://${DOCKERIP}:4567/
+       - API_AUTH=false
+
   objectservice:
     image: coolcrowd/object-service:latest
     ports:
@@ -12,8 +20,9 @@ services:
      - workerui:workerui
     command:
       - -Dworkerservice.url=http://${DOCKERIP}:3333
-      - -Dworkerui.url=http://${DOCKERIP}:8080
+      - -Dworkeruipublic.url=http://${DOCKERIP}:8080
       - -Dpybossa.disabled=true
+
   workerservice:
     image: coolcrowd/worker-service:latest
     ports:
@@ -29,10 +38,12 @@ services:
             - -Ddatabase.username=root
             - -Ddatabase.password=root
             - -Dos.url=http://objectservice:4567
+
   workerui:
       image: coolcrowd/worker-ui:latest
       ports:
         - "8080:80"
+
   db:
     image: mysql:latest
     environment:

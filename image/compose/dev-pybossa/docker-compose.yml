@@ -1,5 +1,13 @@
 version: '2'
 services:
+  controlui:
+    image: coolcrowd/control-ui:latest
+    ports:
+       - "80:80"
+    environment:
+       - API_URL=http://${DOCKERIP}:4567/
+       - API_AUTH=false
+
   objectservice:
     image: coolcrowd/object-service:latest
     ports:
@@ -14,6 +22,7 @@ services:
     command:
       - -Dworkerservice.url=http://${DOCKERIP}:3333
       - -Dworkeruipublic.url=http://${DOCKERIP}:8080
+
   workerservice:
     image: coolcrowd/worker-service:latest
     ports:
@@ -29,10 +38,12 @@ services:
             - -Ddatabase.username=root
             - -Ddatabase.password=root
             - -Dos.url=http://objectservice:4567
+
   workerui:
       image: coolcrowd/worker-ui:latest
       ports:
         - "8080:80"
+
   db:
     image: mysql:latest
     environment:
@@ -44,8 +55,10 @@ services:
         - --character-set-server=utf8mb4
     ports:
          - "3306:3306"
+
   pybossa_redis:
         image: redis
+
   pybossa_redis_sentinel:
       image: matthiaswiesner/redis-sentinel
       links:
@@ -53,11 +66,13 @@ services:
       environment:
           REDIS_PORT_6379_TCP_ADDR: redis
           REDIS_PORT_6379_TCP_PORT: 6379
+
   pybossa_postgres:
           image: coolcrowd/pybossa-postgres
           environment:
               POSTGRES_USER: pybossa
               POSTGRES_PASSWORD: tester
+
   pybossa:
           image: coolcrowd/pybossa
           links:
