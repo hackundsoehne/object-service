@@ -28,13 +28,13 @@ import java.util.concurrent.LinkedBlockingQueue;
  *         <p>
  *         This class provides the functionallity to find duplicates within all answers of an experiment
  */
-public class DuplicateChecker implements Runnable {
+public class DuplicateChecker {
 
-    private volatile boolean running = false;
+
     private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final BlockingQueue<AnswerRecord> queue = new LinkedBlockingQueue<>();
-
+    private final DuplicateWatcherThread thread;
     /**
      * Constructor
      *
@@ -45,6 +45,7 @@ public class DuplicateChecker implements Runnable {
 
         this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
+        this.thread = new DuplicateWatcherThread();
 
         EventManager.ANSWER_CREATE.getObservable().subscribe(answerEvent -> {
             try {
@@ -53,48 +54,18 @@ public class DuplicateChecker implements Runnable {
                 //TODO react
                 e.printStackTrace();
             }
-            this.notify();
         });
+
+        thread.start();
     }
 
-    /**
-     * While running, the DuplicateChecker hashes the answers in the queue and checks them for duplicates.
-     */
-    public void run() {
-        running = true;
-        while (running) {
-            AnswerRecord answerRecord = null;
-            try {
-                answerRecord = queue.take();
-            } catch (InterruptedException e) {
-                //TODO react
-                e.printStackTrace();
-                running = false;
-            }
-            if (answerRecord != null) {
-                //trying to acquire answer-hash
-                Optional<Long> answerHash = getHashFromAnswer(answerRecord, experimentOperations.getExperiment(answerRecord.getExperiment())
-                        .orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID!")).getAnswerType());
-
-                if (answerHash.isPresent()) {
-                    Map<AnswerRecord, Long> mapOfHashes = answerRatingOperations.getMapOfHashesOfNonDuplicateAnswers(answerRecord.getExperiment());
-                    mapOfHashes.put(answerRecord, answerHash.get());
-                    checkExperimentForDuplicates(mapOfHashes);
-                } else {//If optional is empty and thus the picture-hashing failed, the answers quality will be set to zero.
-                        // The reason for the failure is described in the response-field
-                    answerRatingOperations.setQualityToAnswer(answerRecord,0);
-                    answerRatingOperations.setAnswerQualityAssured(answerRecord);
-                }
-            }
-        }
-    }
-
-    /**
+     /**
      * Terminates the running duplicateDetector
      */
-    public void terminate(){
-        running = false;
-        this.notify();
+    public boolean terminate(){
+        thread.interrupt();
+        return thread.isInterrupted();
+
     }
 
     /**
@@ -144,7 +115,7 @@ public class DuplicateChecker implements Runnable {
             try {
                 image = ImageIO.read(url);
             } catch (IOException e) {
-              //TODO  specify reason for zero-quality in response field
+                //TODO  specify reason for zero-quality in response field
                 return Optional.empty();
             }
             if (image == null) {
@@ -156,14 +127,19 @@ public class DuplicateChecker implements Runnable {
     }
 
 
+    /**
+     * Identifies duplicates of the given answer-hash-mapping.
+     * Different algorithms are used based on the number of answers
+     * @param mapOfHashes mapping of answers to their hashes
+     * @return Set of answers which are considered a duplicate
+     */
     private Set<AnswerRecord> getDuplicatesFromHash(Map<AnswerRecord, Long> mapOfHashes) {
         Set<AnswerRecord> duplicates = new HashSet<>();
-
         //Caparison for small number of answers
         if (mapOfHashes.size() < 100) {
             mapOfHashes.forEach((answerRecordA, hashA) -> {
                 mapOfHashes.forEach((answerRecordB, hashB) -> {
-                    if (HashSimilarity.getSimilarityFromHash(hashA, hashB) > 0.85 && !answerRecordA.equals(answerRecordB)) {
+                    if (!answerRecordA.equals(answerRecordB) && HashSimilarity.getSimilarityFromHash(hashA, hashB) > 0.85 ) {
                         duplicates.add(answerRecordA.getTimestamp().compareTo(answerRecordB.getTimestamp()) < 0 ? answerRecordB : answerRecordA);
                     }
                 });
@@ -204,9 +180,44 @@ public class DuplicateChecker implements Runnable {
                 }
             });
         });
-
         return duplicates;
     }
 
 
+    private class DuplicateWatcherThread extends Thread
+    {
+        /**
+         * While running, the DuplicateChecker hashes the answers in the queue and checks them for duplicates.
+         */
+        public void run() {
+
+            while (!Thread.currentThread().isInterrupted()) {
+                AnswerRecord answerRecord;
+                try {
+                    answerRecord = queue.take();
+
+                } catch (InterruptedException e) {
+                    System.out.println("DuplicateChecker terminated!");
+                    return;
+                }
+                if (answerRecord != null) {
+                    //trying to acquire answer-hash
+                    Optional<Long> answerHash = getHashFromAnswer(answerRecord, experimentOperations.getExperiment(answerRecord.getExperiment())
+                            .orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID!")).getAnswerType());
+                    if (answerHash.isPresent()) {
+                        Map<AnswerRecord, Long> mapOfHashes = answerRatingOperations.getMapOfHashesOfNonDuplicateAnswers(answerRecord.getExperiment());
+                        mapOfHashes.put(answerRecord, answerHash.get());
+                        checkExperimentForDuplicates(mapOfHashes);
+
+                    } else {
+                        // If optional is empty and thus the hashing failed, the answers quality will be set to zero.
+                        // The reason for the failure is described in the response-field
+                        answerRatingOperations.setQualityToAnswer(answerRecord,0);
+                        answerRatingOperations.setAnswerQualityAssured(answerRecord);
+                    }
+                }
+            }
+            System.out.println("DuplicateChecker terminated!");
+        }
+    }
 }
