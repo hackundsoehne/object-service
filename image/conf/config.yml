@@ -25,6 +25,9 @@ deployment:
     # Origin of the control ui
     # port has to match the url of the ui and no / at the end
     origin: *
+    # the local url of the worker-ui, for cases where the public url cannot be accessed (docker image)
+    # can be ommitted
+    workerUILocal: http://workerui:80
 
 # the defined platforms to run
 platforms :
@@ -33,6 +36,14 @@ platforms :
 
       # name which is used to display
       name: dummy
+
+    - type: pybossa
+          #apiKey: f66b69d3-467b-48ce-9822-e4e9a34403a2
+          apiKey: 777d203a-e067-4fe4-aa8c-f9d88307d894
+          url: http://pybossa:5000/api
+          name: pybossa
+          projectId: 2
+          calibrationsAllowed: true
 
 moneytransfer:
     payOffThreshold: 0

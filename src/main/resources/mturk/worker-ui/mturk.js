@@ -21,7 +21,7 @@ function initMturk(platformName, workerServiceUrl, experiment) {
     }
 
     //init lib for workerService
-    CreativeCrowd.init(properties = {
+    WorkerUI.init(properties = {
         workerServiceURL: workerServiceUrl,
         platform: platformName,
         osParams: {
@@ -30,15 +30,15 @@ function initMturk(platformName, workerServiceUrl, experiment) {
         experiment: experiment,
         preview: preview
     });
-    //load initial bits
-    CreativeCrowd.load();
-    CreativeCrowd.onSubmitAnswer(function (viewData, submittedData) {
+    WorkerUI.onSubmitAnswer(function (viewData, submittedData) {
         //TODO log this
     });
-    CreativeCrowd.onSubmitCalibration(function (data) {
+    WorkerUI.onSubmitCalibration(function (data) {
         //TODO log this
     });
-    CreativeCrowd.onFinished(function (data) {
+    WorkerUI.onFinished(function (data) {
         sendFinish();
     });
+    //load initial bits
+    WorkerUI.load();
 }

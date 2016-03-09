@@ -1,8 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.GetAssignments;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.GetHIT;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
@@ -38,7 +36,7 @@ public class MturkPlatformTest {
                 properties.getProperty("User"),
                 properties.getProperty("Password"),
                 "https://mechanicalturk.sandbox.amazonaws.com/",
-                "Sandbox","http://example.com/");
+                "Sandbox","http://example.com/", "http://worker.example.com/");
 
         connection = new MTurkConnection(
                 properties.getProperty("User"),

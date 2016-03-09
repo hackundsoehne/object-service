@@ -32,12 +32,14 @@ public class ExperimentResourceTest {
     private AlgorithmOperations algorithmOperations;
     private ExperimentsPlatformOperations experimentsPlatformOperations;
     private PlatformManager platformManager;
+    private AnswerRatingOperations answerRatingOperations;
 
     @Before
     public void setUp() {
         request = mock(Request.class);
         response = mock(Response.class);
 
+        answerRatingOperations = mock(AnswerRatingOperations.class);
         experimentOperations = mock(ExperimentOperations.class);
         calibrationOperations = mock(CalibrationOperations.class);
         tagConstraintsOperations = mock(TagConstraintsOperations.class);
@@ -45,7 +47,7 @@ public class ExperimentResourceTest {
         experimentsPlatformOperations = mock(ExperimentsPlatformOperations.class);
         platformManager = mock(PlatformManager.class);
 
-        resource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations, experimentsPlatformOperations,  platformManager);
+        resource = new ExperimentResource(answerRatingOperations, experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations, experimentsPlatformOperations,  platformManager);
     }
 
     /**

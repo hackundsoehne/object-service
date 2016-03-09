@@ -38,9 +38,11 @@ import javax.naming.NamingException;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * @author Niklas Keller
@@ -88,7 +90,8 @@ public class Main {
                             platform.password,
                             "https://mechanicalturk.sandbox.amazonaws.com/",
                             platform.name,
-                            config.deployment.workerService);
+                            config.deployment.workerService,
+                            config.deployment.workerUIPublic);
                     break;
                 case "pybossa":
                     if (config.deployment.workerUILocal == null) {
@@ -167,12 +170,15 @@ public class Main {
         if (System.getProperty("origin.url") != null) {
             config.deployment.origin = System.getProperty("origin.url");
         }
-        if (System.getProperty("workerui.url") != null) {
+        if (System.getProperty("workeruipublic.url") != null) {
             config.deployment.workerUIPublic = System.getProperty("workeruipublic.url");
         }
-        if (System.getProperty("workerui.url") != null) {
+        if (System.getProperty("workeruilocal.url") != null) {
             config.deployment.workerUILocal = System.getProperty("workeruilocal.url");
         }
+        config.platforms = Arrays.stream(config.platforms)
+                .filter(platform -> !Boolean.getBoolean(platform.name+".disabled"))
+                .toArray(ConfigPlatform[]::new);
         return config;
     }
 
@@ -214,7 +220,7 @@ public class Main {
 
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, experimentsPlatformOperations, platformOperations,
                 workerOperations);
-        ExperimentResource experimentResource = new ExperimentResource(experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations, experimentsPlatformOperations, platformManager);
+        ExperimentResource experimentResource = new ExperimentResource(answerRatingOperations, experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations, experimentsPlatformOperations, platformManager);
 
         QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations, answerRatingOperations, experimentOperations, experimentResource);
         PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations, workerOperations);
