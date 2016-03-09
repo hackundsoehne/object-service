@@ -5,9 +5,13 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Answ
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.HashSimilarity;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.ImageSimilarity;
 import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.Shingle;
 import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.StringSimilarity;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -20,13 +24,14 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -52,6 +57,8 @@ public class DuplicateCheckerTest {
         answerRecords = create.newResult(Tables.ANSWER);
         experimentRecord = create.newRecord(Tables.EXPERIMENT);
         experimentRecord.setIdExperiment(1);
+        experimentRecord.setAnswerType(null);
+        when(experimentOperations.getExperiment(experimentRecord.getIdExperiment())).thenReturn(Optional.of(experimentRecord));
 
         answerRatingOperations = mock(AnswerRatingOperations.class);
         when(answerRatingOperations.getAnswersOfExperiment(experimentRecord.getIdExperiment())).thenReturn((Result)answerRecords);
@@ -123,7 +130,70 @@ public class DuplicateCheckerTest {
     }
 
     @Test
+    public void testTermination() throws Exception{
+        AnswerRecord uniqueAnswer = new AnswerRecord(0,experimentRecord.getIdExperiment(),"A very different answer",new Timestamp(0),0,6,false);
+        answerRecords.add(uniqueAnswer);
+        answerRecords.forEach(answerRecord -> answerQualityMap.put(answerRecord,answerRecord.getQuality()));
+
+        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer,new ArrayList<>()));
+        Thread.sleep(1000);
+        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer,new ArrayList<>()));
+        Thread.sleep(1000);
+
+        assertTrue(duplicateChecker.terminate());
+
+    }
+
+
+
+    @Test
     public void testImageDuplicateDetection() throws Exception{
+        Map<AnswerRecord,Long> mapOfNonDuplicateAnswers = new HashMap<>();
+        when(answerRatingOperations.getMapOfHashesOfNonDuplicateAnswers(experimentRecord.getIdExperiment())).thenReturn(mapOfNonDuplicateAnswers);
+        experimentRecord.setAnswerType("picture");
+
+
+
+
+        AnswerRecord answerRecord1 = new AnswerRecord(0,experimentRecord.getIdExperiment(),"http://www.franz-sales-verlag.de/fsvwiki/uploads/Lexikon/Baum.jpg",new Timestamp(0),0,6,false);
+        AnswerRecord answerRecord2 = new AnswerRecord(0,experimentRecord.getIdExperiment(),"https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg",new Timestamp(1),0,6,false);
+        AnswerRecord answerRecord2Duplicate = new AnswerRecord(0,experimentRecord.getIdExperiment(),"https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg",new Timestamp(4),0,6,false);
+        AnswerRecord answerRecordMalformedURL = new AnswerRecord(0,experimentRecord.getIdExperiment(),"htt214ljbaq    dlkjps://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg",new Timestamp(1),0,6,false);
+
+
+        answerRecords.add(answerRecord1);
+        answerRecords.add(answerRecord2);
+        answerRecords.add(answerRecord2Duplicate);
+        answerRecords.add(answerRecordMalformedURL);
+
+        answerRecords.forEach(answerRecord -> answerQualityMap.put(answerRecord,answerRecord.getQuality()));
+
+
+        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecordMalformedURL,new ArrayList<>()));
+
+        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord1,new ArrayList<>()));
+
+        BufferedImage image;
+        URL url;
+        url = new URL(answerRecord1.getAnswer());
+        image = ImageIO.read(url);
+        mapOfNonDuplicateAnswers.put(answerRecord1,ImageSimilarity.getImageHash(image));
+
+        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2,new ArrayList<>()));
+
+        url = new URL(answerRecord2.getAnswer());
+        image = ImageIO.read(url);
+        mapOfNonDuplicateAnswers.put(answerRecord2,ImageSimilarity.getImageHash(image));
+
+        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2Duplicate,new ArrayList<>()));
+
+
+        // assertEquals((int)answerQualityMap.get(answerRecordMalformedURL),0);  Cannot test that, because the AnswerRatingTransform creates a different object
+        assertEquals(answerQualityMap.get(answerRecord1),answerRecord1.getQuality());
+        assertEquals(answerQualityMap.get(answerRecord2), answerRecord2.getQuality());
+        //assertEquals((int)answerQualityMap.get(answerRecord2Duplicate), 0);  Cannot test that, because the AnswerRatingTransform creates a different object
+
+        duplicateChecker.terminate();
 
     }
 }

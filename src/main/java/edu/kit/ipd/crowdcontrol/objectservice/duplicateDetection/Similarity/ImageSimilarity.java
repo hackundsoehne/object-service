@@ -1,11 +1,15 @@
 package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Created by lucaskrauss on 10.02.16.
@@ -137,29 +141,35 @@ public class ImageSimilarity {
      * Calculates 64-bit perceptual image hash.
      * The image is rescaled to 8x8-pixles. The hash is based on the grey-value of each pixel in comparision
      * to the images overall grey-value.
-     * @param image source image
+     * @param bufferedImage source image
      * @return perceptual image hash
      */
-    public static long getImageHash(BufferedImage image){
-        image = rescale(image,8,8);
-        ImageFilter filter = new GrayFilter(true,50);
-        ImageProducer producer = new FilteredImageSource(image.getSource(),filter);
+    public static long getImageHash(BufferedImage bufferedImage){
+        bufferedImage = rescale(bufferedImage,8,8);
 
-        image = (BufferedImage)Toolkit.getDefaultToolkit().createImage(producer);
+        ImageFilter filter = new GrayFilter(true,50);
+        ImageProducer producer = new FilteredImageSource(bufferedImage.getSource(),filter);
+
+        Image image =Toolkit.getDefaultToolkit().createImage(producer);
+        bufferedImage = new BufferedImage(image.getWidth(null),image.getHeight(null),BufferedImage.TYPE_INT_RGB);
+        bufferedImage.getGraphics().drawImage(image,0,0,null); //TODO
+
 
         int buffer = 0;
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                buffer += image.getRGB(i,j);
+        for (int i = 0; i < bufferedImage.getHeight(); i++) {
+            for (int j = 0; j < bufferedImage.getWidth(); j++) {
+                buffer += bufferedImage.getRGB(i,j);
             }
         }
+        buffer /= 64;
         long hash = 0;
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                hash += (image.getRGB(i,j) > buffer) ? 1 : 0;
+        for (int i = 0; i < bufferedImage.getHeight(); i++) {
+            for (int j = 0; j < bufferedImage.getWidth(); j++) {
+                hash += (bufferedImage.getRGB(i,j) > buffer) ? 1 : 0;
                 hash = hash << 1;
             }
         }
+
         return hash;
     }
 
