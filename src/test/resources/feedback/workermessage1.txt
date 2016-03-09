@@ -32,21 +32,6 @@ Feedback: Foobar4
 Quality: 4
 Rating: 4
 
-Answer:
-baz3
-
-Rating:
-
-Feedback: Foobar5
-Quality: 5
-Rating: 5
-
-Rating:
-
-Feedback: Foobar6
-Quality: 6
-Rating: 6
-
 
 
 Yours sincerely

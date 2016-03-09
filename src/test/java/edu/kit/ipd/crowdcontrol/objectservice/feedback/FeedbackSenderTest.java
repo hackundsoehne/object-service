@@ -11,6 +11,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import org.jooq.Result;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 
 import javax.mail.MessagingException;
 import java.util.Iterator;
@@ -45,7 +46,7 @@ public class FeedbackSenderTest {
     @Test
     public void testSendFeedback() throws Exception {
         List<AnswerRecord> answers = mock(Result.class);
-        doReturn(answers).when(answerRatingOperations).getAnswersOfExperiment(0);
+        doReturn(answers).when(answerRatingOperations).getAnswersOfExperimentOfWorker(0,0);
         Iterator<AnswerRecord> it = mock(Iterator.class);
 
         AnswerRecord a1 = new AnswerRecord();
@@ -56,23 +57,10 @@ public class FeedbackSenderTest {
         a2.setWorkerId(0);
         a2.setAnswer("baz2");
 
-        AnswerRecord a3 = new AnswerRecord();
-        a3.setWorkerId(0);
-        a3.setAnswer("baz3");
-
-        AnswerRecord a4 = new AnswerRecord();
-        a4.setWorkerId(1);
-        a4.setAnswer("baz4");
-
         WorkerRecord w1 = mock(WorkerRecord.class);
         Optional<WorkerRecord> o1 = Optional.of(w1);
         when(workerOperations.getWorker(0)).thenReturn(o1);
         when(w1.getEmail()).thenReturn("coolcrowd@42.pi");
-
-        WorkerRecord w2 = mock(WorkerRecord.class);
-        Optional<WorkerRecord> o2 = Optional.of(w2);
-        when(workerOperations.getWorker(1)).thenReturn(o2);
-        when(w2.getEmail()).thenReturn("foobar@baz.xyz");
 
         RatingRecord r1 = new RatingRecord();
         r1.setFeedback("Foobar1");
@@ -94,26 +82,6 @@ public class FeedbackSenderTest {
         r4.setQuality(4);
         r4.setRating(4);
 
-        RatingRecord r5 = new RatingRecord();
-        r5.setFeedback("Foobar5");
-        r5.setQuality(5);
-        r5.setRating(5);
-
-        RatingRecord r6 = new RatingRecord();
-        r6.setFeedback("Foobar6");
-        r6.setQuality(6);
-        r6.setRating(6);
-
-        RatingRecord r7 = new RatingRecord();
-        r7.setFeedback("Foobar7");
-        r7.setQuality(7);
-        r7.setRating(7);
-
-        RatingRecord r8 = new RatingRecord();
-        r8.setFeedback("Foobar8");
-        r8.setQuality(8);
-        r8.setRating(8);
-
         Result<RatingRecord> l1 = mock(Result.class);
         Iterator<RatingRecord> it1 = mock(Iterator.class);
         when(l1.iterator()).thenReturn(it1);
@@ -126,26 +94,12 @@ public class FeedbackSenderTest {
         when(it2.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
         when(it2.next()).thenReturn(r3).thenReturn(r4);
 
-        Result<RatingRecord> l3 = mock(Result.class);
-        Iterator<RatingRecord> it3 = mock(Iterator.class);
-        when(l3.iterator()).thenReturn(it3);
-        when(it3.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
-        when((it3.next())).thenReturn(r5).thenReturn(r6);
-
-        Result<RatingRecord> l4 = mock(Result.class);
-        Iterator<RatingRecord> it4 = mock(Iterator.class);
-        when(l4.iterator()).thenReturn(it4);
-        when(it4.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
-        when(it4.next()).thenReturn(r7).thenReturn(r8);
-
         when(answerRatingOperations.getRatingsOfAnswer(a1)).thenReturn(l1);
         when(answerRatingOperations.getRatingsOfAnswer(a2)).thenReturn(l2);
-        when(answerRatingOperations.getRatingsOfAnswer(a3)).thenReturn(l3);
-        when(answerRatingOperations.getRatingsOfAnswer(a4)).thenReturn(l4);
 
         when(answers.iterator()).thenReturn(it);
-        when(it.hasNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(false);
-        when(it.next()).thenReturn(a1).thenReturn(a2).thenReturn(a3).thenReturn(a4);
+        when(it.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
+        when(it.next()).thenReturn(a1).thenReturn(a2);
 
         ExperimentRecord exp = mock(ExperimentRecord.class);
         when(exp.getTitle()).thenReturn("foobarExperiment");
@@ -154,20 +108,18 @@ public class FeedbackSenderTest {
 
 
         doNothing().when(handler).sendMail(anyString(), anyString(), anyString());
-        sender.sendFeedback(0);
 
-        String message = sender.loadMessage("src/test/resources/feedback/workermessage2.txt");
-        verify(handler).sendMail("foobar@baz.xyz", "Feedback to your work", message);
+
 
 
         String message2 = sender.loadMessage("src/test/resources/feedback/workermessage1.txt");
-        verify(handler).sendMail("coolcrowd@42.pi", "Feedback to your work", message2);
+        Assert.assertEquals(sender.getFeedback(0,0), message2);
     }
 
     @Test
     public void testNoAnswers() throws Exception {
         List<AnswerRecord> answers = mock(Result.class);
-        doReturn(answers).when(answerRatingOperations).getAnswersOfExperiment(0);
+        doReturn(answers).when(answerRatingOperations).getAnswersOfExperimentOfWorker(0,0);
         Iterator<AnswerRecord> it = mock(Iterator.class);
         when(answers.iterator()).thenReturn(it);
         when(it.hasNext()).thenReturn(false);
@@ -178,9 +130,7 @@ public class FeedbackSenderTest {
         when(exp.getTitle()).thenReturn("foobarExperiment");
         Optional<ExperimentRecord> expOpt = Optional.of(exp);
         doReturn(expOpt).when(experimentOperations).getExperiment(0);
-
-        sender.sendFeedback(0);
-
+        Assert.assertEquals("", sender.getFeedback(0,0));
     }
 
 

@@ -37,26 +37,15 @@ public class FeedbackSender {
         this.workerOps = workerOps;
     }
 
-    public void sendFeedback(int expId) throws FeedbackException {
+    public String getFeedback(int expId, int workerId) throws FeedbackException {
 
-        LOGGER.trace("Started sending feedback to workers.");
+        LOGGER.trace("Started creating feedback message to worker " + workerId + ".");
 
         String feedbackMessage = loadMessage("src/main/resources/feedback/feedbackMessage.txt");
         String feedbackAnswer = loadMessage("src/main/resources/feedback/feedbackAnswer.txt");
         String feedbackRating = loadMessage("src/main/resources/feedback/feedbackRating.txt");
 
-        List<AnswerRecord> answers = answerOps.getAnswersOfExperiment(expId);
-
-        //sort answers depending on the worker, who gave the answer
-        Collections.sort(answers, (answerRecord, t1) -> {
-            if (answerRecord.getWorkerId() < t1.getWorkerId()) {
-                return -1;
-            } else if (answerRecord.getWorkerId() > t1.getWorkerId()) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
+        List<AnswerRecord> answers = answerOps.getAnswersOfExperimentOfWorker(expId, workerId);
 
         StringBuilder answerMessage = new StringBuilder();
 
@@ -70,18 +59,7 @@ public class FeedbackSender {
         }
 
         //iterate over answers and send them and the feedback to the workers
-        int workerCount = 0;
-        int prevWorkerId = -1;
         for (AnswerRecord answer : answers) {
-            //checks, if the worker changed. If so, send the message to the worker and begin a new
-            if (prevWorkerId != answer.getWorkerId() && prevWorkerId != -1) {
-                workerCount++;
-                map.put("answers", answerMessage.toString());
-                String workerMessage = Template.apply(feedbackMessage, map);
-                sendFeedback(prevWorkerId, workerMessage);
-                answerMessage = new StringBuilder();
-            }
-
             //List all ratings to an answer in the message.
             List<RatingRecord> ratings = answerOps.getRatingsOfAnswer(answer);
 
@@ -102,19 +80,16 @@ public class FeedbackSender {
             answerMap.put("ratings", ratingMessage.toString());
 
             answerMessage.append(Template.apply(feedbackAnswer, answerMap));
-
-            prevWorkerId = answer.getWorkerId();
         }
 
         //Send feedback to the last worker
+        String message = "";
         if (!answers.isEmpty()) {
-            workerCount++;
             map.put("answers", answerMessage.toString());
-            String workerMessage = Template.apply(feedbackMessage, map);
-            sendFeedback(prevWorkerId, workerMessage);
+            message = Template.apply(feedbackMessage, map);
         }
-
-        LOGGER.trace("Completed sending feedback to " + workerCount + " workers");
+        LOGGER.trace("Completed creating feedback message to worker " + workerId + ".");
+        return message;
     }
 
     static String loadMessage(String path) throws FeedbackException {
