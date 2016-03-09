@@ -1,12 +1,23 @@
+
+var ratingAnswers = new Array();
+var creativeAnswers = new Array();
+
 function sendFinish() {
-    ratingsText = "You gave the following ratings ";
-    for (var rating in ratingAnswers) {
-        ratingsText += "\n Rating: "+rating.rating+" with the feedback: "+rating.feedback;
+    var ratingsText;
+    var creativeAnswersText;
+
+    if (ratingAnswers.length !== 0) {
+        ratingsText = "You gave the following ratings ";
+        for (var rating in ratingAnswers) {
+            ratingsText += "\n - Rating "+ratingAnswers[rating].rating+" with feedback "+ratingAnswers[rating].feedback;
+        }
     }
 
-    creativeAnswersText = "\n and the following creative answers ";
-    for (var creativeAnswer in creativeAnswers) {
-        creativeAnswersText += "\n "+creativeAnswer;
+    if (creativeAnswers.length !== 0) {
+        creativeAnswersText = "\n and the following creative answers ";
+        for (var creativeAnswer in creativeAnswers) {
+            creativeAnswersText += "\n - "+creativeAnswers[creativeAnswer];
+        }
     }
 
     $('body')
@@ -22,9 +33,6 @@ function sendFinish() {
                 .submit();
 
 }
-
-var ratingAnswers = [];
-var creativeAnswers = [];
 
 function initMturk(platformName, workerServiceUrl, experiment) {
     var preview = false;
@@ -48,10 +56,12 @@ function initMturk(platformName, workerServiceUrl, experiment) {
     });
 
     WorkerUI.onSubmitAnswer(function (viewData, submittedData) {
+        console.log("Save answer "+submittedData.answer);
         creativeAnswers.push(submittedData.answer)
     });
     WorkerUI.onSubmitRating(function (data) {
         for (var rating in data) {
+            console.log("Save Rating "+rating.rating+" - "+rating.answer);
             ratingAnswers.push(rating)
         }
     });
