@@ -3,11 +3,16 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 import com.amazonaws.mturk.requester.doc._2014_08_15.Assignment;
 import com.amazonaws.mturk.requester.doc._2014_08_15.AssignmentStatus;
 import com.amazonaws.mturk.requester.doc._2014_08_15.BonusPayment;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -83,10 +88,42 @@ public class MturkPlatform implements Platform,Payment {
         });
     }
 
+    private static List<String> loadFiles(List<String> files) {
+        return files.stream().map(s -> {
+            try {
+                return CharStreams
+                        .toString(new InputStreamReader(
+                                Main.class.getResourceAsStream(s)
+                                , Charsets.UTF_8));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        })
+        .filter(s1 -> !s1.isEmpty())
+        .collect(Collectors.toList());
+    }
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
+
+        List<String> jsFiles = new ArrayList<>();
+        jsFiles.add("/mturk/worker-ui/mturk.js");
+
+        String content =  "<html>\n" +
+                " <head>\n" +
+                "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>\n" +
+                "  <script type='text/javascript' src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script>\n" +
+                "  <script type='text/javascript' src='https://code.jquery.com/jquery-2.0.0.js'></script>" +
+                " </head>\n" +
+                " <body onload=\"initMturk('"+getID()+"','"+workerServiceUrl+"', '"+experiment.getId()+"');\">" +
+                "<script type='text/javascript' src='"+workerUIUrl+"/worker_ui.js'></script>" +
+                loadFiles(jsFiles).stream().map(s ->  "<script type='text/javascript'>"+s+"</script>").collect(Collectors.joining())+
+                "   <div id=\"ractive-container\"></div>" +
+                " </body>\n" +
+                "</html>\n";
+
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
                 experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dallers
                 TWO_HOURS, //you have 2 hours to do the assignment
@@ -95,10 +132,7 @@ public class MturkPlatform implements Platform,Payment {
                 experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
                 2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
                 "",
-                "initMturk('"+getID()+
-                        "', '"+workerServiceUrl+
-                        "', " +experiment.getId()+");",
-                workerUIUrl);
+                content);
     }
 
     @Override

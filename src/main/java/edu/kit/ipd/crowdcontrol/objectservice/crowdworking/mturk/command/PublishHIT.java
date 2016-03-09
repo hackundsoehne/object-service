@@ -34,20 +34,17 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
      * @param maxAssignments maximum number of assignments before this hit is closed
      * @param autoApprovalDelayInSeconds after how many seconds a assignment is approved
      * @param data is attached to the hit and can be accessed later
-     * @param initCall the call is executed as js with the standard lib
-     * @param workerUiUrl the location of the workerui
+     * @param content the htmlcontent which should be displayed in the question
      */
     public PublishHIT(MTurkConnection connection, Object title,
                       String description, double reward, int assignmentDurationInSeconds,
                       int lifetimeInSeconds, String keywords, int maxAssignments,
-                      int autoApprovalDelayInSeconds, String data, String initCall,
-                      String workerUiUrl) {
+                      int autoApprovalDelayInSeconds, String data, String content) {
         super(connection,
                 "CreateHIT","Minimal","2014-08-15",CreateHITResponse.class,
                 () -> {
                     Map<String, Object> values = new HashMap<>();
-                    List<String> jsFiles = new ArrayList<>();
-                    jsFiles.add("/mturk/worker-ui/mturk.js");
+
 
                     values.put("Title", title);
                     values.put("Description", description);
@@ -56,20 +53,7 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
                                     "  <HTMLContent>" +
                                     "<![CDATA[\n" +
                                     "<!DOCTYPE html>\n" +
-
-
-                                    "<html>\n" +
-                                    " <head>\n" +
-                                    "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>\n" +
-                                    "  <script type='text/javascript' src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script>\n" +
-                                    "  <script type='text/javascript' src='https://code.jquery.com/jquery-2.0.0.js'></script>" +
-                                    " </head>\n" +
-                                    " <body onload=\""+initCall+"\">\n" +
-                                    "<script type='text/javascript' src='"+workerUiUrl+"/worker_ui.js'></script>" +
-                                    loadFiles(jsFiles).stream().map(s ->  "<script type='text/javascript'>"+s+"</script>").collect(Collectors.joining())+
-                                    "   <div id=\"ractive-container\"></div>" +
-                                    " </body>\n" +
-                                    "</html>\n" +
+                                    content +
                                     "]]>\n" +
                                     "  </HTMLContent>\n" +
                                     "  <FrameHeight>450</FrameHeight>\n" +
@@ -98,20 +82,5 @@ public class PublishHIT extends MturkRestCommand<String, CreateHITResponse> {
                     //return HITId
                     return created.getHITId();
                 });
-    }
-    private static List<String> loadFiles(List<String> files) {
-        return files.stream().map(s -> {
-            try {
-                return CharStreams
-                        .toString(new InputStreamReader(
-                                Main.class.getResourceAsStream(s)
-                                , Charsets.UTF_8));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        })
-        .filter(s1 -> !s1.isEmpty())
-                .collect(Collectors.toList());
     }
 }
