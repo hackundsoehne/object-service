@@ -158,7 +158,7 @@ public class DuplicateChecker {
             for (int i = 0; i < 64; i++) {
                 Collections.sort(sortedEntries, (a, b) -> Long.compareUnsigned(a.getValue(), b.getValue()));
                 for (int j = 0; j < sortedEntries.size() - 1; j++) {
-                    if (HashSimilarity.getHammingDistanceOfHashes(sortedEntries.get(j).getValue(), sortedEntries.get(j + 1).getValue()) > 0.85) {
+                    if (HashSimilarity.getSimilarityFromHash(sortedEntries.get(j).getValue(), sortedEntries.get(j + 1).getValue()) > 0.85) {
                         duplicates.add(
                                 sortedEntries.get(j).getKey().getTimestamp().compareTo(sortedEntries.get(j + 1).getKey().getTimestamp()) < 0 ? sortedEntries.get(j + 1).getKey() : sortedEntries.get(j).getKey());
                     }
