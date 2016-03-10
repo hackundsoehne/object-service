@@ -140,6 +140,15 @@ public class MturkPlatform implements Platform,Payment {
         return new UnpublishHIT(connection, id);
     }
 
+    /**
+     * Returns the full list of a paginated request
+     * @param startIndex the index to start
+     * @param producer execute the statement and returns a patial list of the complete
+     * @param <A> Type of the list
+     * @return The full list of elements
+     * @throws ExecutionException If something bad happens while executing
+     * @throws InterruptedException the execution was interrupted
+     */
     public <A> List<A> getFullList(int startIndex, Function<Integer, CompletableFuture<List<A>>> producer) throws ExecutionException, InterruptedException {
         int i = startIndex;
         List<A> part = producer.apply(i).get();
