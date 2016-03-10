@@ -15,7 +15,10 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Describes a Manager for money transfers. The Manager can log payments and pay off.
@@ -85,8 +88,7 @@ public class MoneyTransferManager {
             }
         };
 
-
-        schedule = scheduler.scheduleAtFixedRate(runnable, scheduleIntervalDays, scheduleIntervalDays, TimeUnit.DAYS);
+        schedule = scheduler.scheduleAtFixedRate(runnable, 0, scheduleIntervalDays, TimeUnit.DAYS);
 
     }
 
