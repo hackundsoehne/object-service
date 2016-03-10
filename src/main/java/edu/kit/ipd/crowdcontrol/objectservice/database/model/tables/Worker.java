@@ -6,7 +6,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 
 import com.google.gson.JsonElement;
 
-import edu.kit.ipd.crowdcontrol.objectservice.JSONGsonBinding;
+import edu.kit.ipd.crowdcontrol.objectservice.database.bindings.JSONGsonBinding;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Crowdcontrol;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Worker extends TableImpl<WorkerRecord> {
 
-	private static final long serialVersionUID = 197795010;
+	private static final long serialVersionUID = 2010808373;
 
 	/**
 	 * The reference instance of <code>crowdcontrol.Worker</code>

@@ -6,7 +6,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.model.tables;
 
 import com.google.gson.JsonElement;
 
-import edu.kit.ipd.crowdcontrol.objectservice.JSONGsonBinding;
+import edu.kit.ipd.crowdcontrol.objectservice.database.bindings.JSONGsonBinding;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Crowdcontrol;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Keys;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentsPlatform extends TableImpl<ExperimentsPlatformRecord> {
 
-	private static final long serialVersionUID = 1740198604;
+	private static final long serialVersionUID = -872526145;
 
 	/**
 	 * The reference instance of <code>crowdcontrol.Experiments_Platform</code>
