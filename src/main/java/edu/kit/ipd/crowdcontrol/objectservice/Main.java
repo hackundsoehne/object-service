@@ -42,7 +42,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * @author Niklas Keller
@@ -54,14 +53,6 @@ public class Main {
         // Disable jOOQ's self-advertising
         // http://stackoverflow.com/a/28283538/2373138
         System.setProperty("org.jooq.no-logo", "true");
-
-        Configurator.setLevel("com.zaxxer.hikari", Level.WARN);
-        Configurator.setLevel("org.eclipse.jetty", Level.WARN);
-        Configurator.setLevel("org.jooq.impl.DefaultBinding", Level.WARN);
-        Configurator.setLevel("org.jooq.impl.DefaultConnectionProvider", Level.WARN);
-        Configurator.setLevel("org.jooq.tools.StopWatch", Level.WARN);
-        Configurator.setLevel("spark.webserver.MatcherFilter", Level.WARN);
-        Configurator.setLevel("spark.Request", Level.WARN);
     }
 
     public static void main(String[] args) throws IOException, ConfigException {
@@ -69,11 +60,14 @@ public class Main {
 
         Config config = getConfig();
 
+        config.log.forEach((key, value) -> {
+            Configurator.setLevel(key, Level.getLevel(value));
+        });
 
         if (config.database.maintainInterval == 0)
             config.database.maintainInterval = 24;
         else if (config.database.maintainInterval < 0)
-            throw new ConfigException("negativ maintainInterval of database is not valid");
+            throw new ConfigException("negative maintainInterval of database is not valid");
 
         SQLDialect dialect = SQLDialect.valueOf(config.database.dialect);
         DatabaseManager databaseManager;

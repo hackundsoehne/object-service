@@ -20,11 +20,14 @@ deployment:
     # Origin of the control ui
     # port has to match the url of the ui and no / at the end
     origin: http://localhost:3000
+
     #the url to the workerService
     workerService: https://worker.example.com
+
     # the url to the root of the worker-ui. No / at the end.
     # Object service will append particular file names like "/taskPresenter.html"
     workerUIPublic: https://workerui.example.com
+
     # the local url of the worker-ui, for cases where the public url cannot be accessed (docker image)
     # can be ommitted
     workerUILocal: http://localhost:8080
@@ -45,30 +48,45 @@ platforms :
       url: http://example.com/
 
     - type: pybossa
+
       # the key to access the pybossa api
       apiKey: 8ec92fa1-1bd1-42ad-8524-3d2bab4588b1
+
       # the url to the pybossa api
       url: http://localhost:5000/api
+
+      # name which is used to display
       name: Pybossa
+
       # the id of the pybossa project to use for all experiments
       projectId: 1
+
       # if calibrations are allowed on this platform
       calibrationsAllowed: true
 
 # basic configurations for the mail-module
-mail :
+mail:
     # disabled = true will ignore the mail configuration and print to the command-line
     disabled : false
 
 moneytransfer:
-    #the minimum amount of money in ct a worker has to earn, before he gets paid off
+    # the minimum amount of money in ct a worker has to earn, before he gets paid off
     payOffThreshold: 0
 
-    #the password used, to verify a valid amazon giftcode email (enter password as message at amazon homepage, while buying giftcodes
+    # the password used, to verify a valid amazon giftcode email (enter password as message at amazon homepage, while buying giftcodes
     parsingPassword: test
 
-    #the mail address to send notification mails to
+    # the mail address to send notification mails to
     notificationMailAddress: pseipd@gmail.com
 
-    #the interval in days, when the workers get paid off
+    # the interval in days, when the workers get paid off
     scheduleInterval: 7
+
+log:
+    com.zaxxer.hikari: WARN
+    org.eclipse.jetty: WARN
+    org.jooq.impl.DefaultBinding: WARN
+    org.jooq.impl.DefaultConnectionProvider: WARN
+    org.jooq.tools.StopWatch: WARN
+    spark.webserver.MatcherFilter: WARN
+    spark.Request: WARN
