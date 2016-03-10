@@ -6,16 +6,17 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Rati
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jooq.Result;
 
-import javax.mail.MessagingException;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Sends feedback to workers according to their answers.
@@ -25,16 +26,35 @@ import java.util.*;
 public class FeedbackSender {
 
     private static final Logger LOGGER = LogManager.getLogger(FeedbackSender.class);
-    private MailSender handler;
     private AnswerRatingOperations answerOps;
     private ExperimentOperations expOps;
     private WorkerOperations workerOps;
 
-    public FeedbackSender(MailHandler handler, AnswerRatingOperations answerOps, ExperimentOperations expOps, WorkerOperations workerOps) {
-        this.handler = handler;
+    public FeedbackSender(AnswerRatingOperations answerOps, ExperimentOperations expOps, WorkerOperations workerOps) {
         this.answerOps = answerOps;
         this.expOps = expOps;
         this.workerOps = workerOps;
+    }
+
+    static String loadMessage(String path) throws FeedbackException {
+        StringBuilder content = new StringBuilder();
+
+        try {
+            FileReader file = new FileReader(path);
+            BufferedReader reader = new BufferedReader(file);
+            String messageLine;
+            while ((messageLine = reader.readLine()) != null) {
+                content.append(messageLine);
+                content.append(System.getProperty("line.separator"));
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Sending of feedback failed, because the message sources cannot be found.");
+            throw new FeedbackException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.");
+        } catch (IOException e) {
+            LOGGER.error("Sending of feedback failed, because the message sources are invalid.");
+            throw new FeedbackException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
+        }
+        return content.toString();
     }
 
     public String getFeedback(int expId, int workerId) throws FeedbackException {
@@ -45,18 +65,14 @@ public class FeedbackSender {
         String feedbackAnswer = loadMessage("src/main/resources/feedback/feedbackAnswer.txt");
         String feedbackRating = loadMessage("src/main/resources/feedback/feedbackRating.txt");
 
+        ExperimentRecord exp = expOps.getExperiment(expId).orElseThrow(() -> new FeedbackException("Experiment cannot be found."));
+
         List<AnswerRecord> answers = answerOps.getAnswersOfExperimentOfWorker(expId, workerId);
 
         StringBuilder answerMessage = new StringBuilder();
 
         Map<String, String> map = new HashMap<>();
-        Optional<ExperimentRecord> exp = expOps.getExperiment(expId);
-        if (exp.isPresent()) {
-            map.put("experimentName", exp.get().getTitle());
-        } else {
-            LOGGER.error("Error, experiment cannot be found.");
-            throw new FeedbackException("Experiment cannot be found.");
-        }
+        map.put("experimentName", exp.getTitle());
 
         //iterate over answers and send them and the feedback to the workers
         for (AnswerRecord answer : answers) {
@@ -90,43 +106,5 @@ public class FeedbackSender {
         }
         LOGGER.trace("Completed creating feedback message to worker " + workerId + ".");
         return message;
-    }
-
-    static String loadMessage(String path) throws FeedbackException {
-        StringBuilder content = new StringBuilder();
-
-        try {
-            FileReader file = new FileReader(path);
-            BufferedReader reader = new BufferedReader(file);
-            String messageLine;
-            while ((messageLine = reader.readLine()) != null) {
-                content.append(messageLine);
-                content.append(System.getProperty("line.separator"));
-            }
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Sending of feedback failed, because the message sources cannot be found.");
-            throw new FeedbackException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.");
-        } catch (IOException e) {
-            LOGGER.error("Sending of feedback failed, because the message sources are invalid.");
-            throw new FeedbackException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
-        }
-        return content.toString();
-    }
-
-    private void sendFeedback(int workerID, String workerMessage) throws FeedbackException {
-        if (workerOps.getWorker(workerID).isPresent()) {
-            try {
-                if (!workerOps.getWorker(workerID).get().getEmail().equals("")) {
-                    handler.sendMail(workerOps.getWorker(workerID).get().getEmail(), "Feedback to your work", workerMessage);
-                }
-            } catch (MessagingException e) {
-                LOGGER.error("Sending of feedback failed, because the mailsender cannot send the mails.");
-                throw new FeedbackException("The mailHandler cannot send mails. It seems, that there is a problem with the mailserver or the properties file.");
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.error("Sending of feedback to worker " + workerID + " failed, because the mail address of this worker is invalid.");
-            }
-        } else {
-            LOGGER.error("Sending of feedback to worker " + workerID + " failed, because the worker cannot get found in the database.");
-        }
     }
 }
