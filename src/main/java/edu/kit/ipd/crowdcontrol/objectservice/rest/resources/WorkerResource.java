@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
+import com.google.gson.JsonElement;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PreActionException;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
@@ -50,8 +51,8 @@ public class WorkerResource {
             if (optionalRecord.isPresent()) {
                 worker = optionalRecord.get();
             } else if (!manager.getNeedemail(platform) || (request.queryParams("email") != null && !request.queryParams("email").isEmpty())){
-                String identify = workerIdentification.getWorkerData();
-                WorkerRecord workerRecord = new WorkerRecord(null, identify, platform, null, null);
+                JsonElement data = workerIdentification.getWorkerData();
+                WorkerRecord workerRecord = new WorkerRecord(null, data, platform, null, null, null);
                 worker = operations.insertWorker(workerRecord);
             } else {
                 throw new NotFoundException();
@@ -96,7 +97,7 @@ public class WorkerResource {
      */
     public Worker put(Request request, Response response) {
         Worker worker = request.attribute("input");
-        String identity;
+        JsonElement identity;
 
         try {
             identity = manager.identifyWorker(request.params("platform"), request.queryMap().toMap())
