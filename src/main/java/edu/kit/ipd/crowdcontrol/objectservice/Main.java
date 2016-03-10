@@ -208,7 +208,7 @@ public class Main {
                 new SQLEmailNotificationPolicy(mailSender, notificationRestOperations));
         notificationController.init();
 
-        Payment payment = (id, experiment, paymentJob) -> {
+        Payment payment = (id, data, experiment, paymentJob) -> {
             for (PaymentJob job : paymentJob) {
                 mng.addMoneyTransfer(job.getWorkerRecord().getIdWorker(), job.getAmount(), experiment.getId());
             }
