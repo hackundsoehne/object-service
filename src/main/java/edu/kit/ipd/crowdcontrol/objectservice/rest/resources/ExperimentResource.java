@@ -400,7 +400,7 @@ public class ExperimentResource {
                 .map(population -> {
                     try {
                         //insert the population into the databae
-                        insertPopulation(id, population, ExperimentsPlatformModeMode.disabled);
+                        insertPopulation(id, population, ExperimentsPlatformModeMode.normal);
 
                         PlatformPopulation platformPopulation = new PlatformPopulation();
                         platformPopulation.job = platformManager.publishTask(population.getPlatformId(), old);
