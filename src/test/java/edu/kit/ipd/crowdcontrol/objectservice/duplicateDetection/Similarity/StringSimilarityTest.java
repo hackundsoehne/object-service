@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection;
+package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity;
 
 import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.StringSimilarity;
 import org.junit.Ignore;
@@ -49,6 +49,12 @@ public class StringSimilarityTest {
         //test different strings
         assertTrue(StringSimilarity.getSimilarityFromTwoString(diffA,diffB,3) < 0.8);
 
+    }
+
+    @Test
+    public void testHammingDistance() throws Exception{
+        assertTrue(StringSimilarity.getHammingDistanceOfStrings(simA1,simA1) == 0);
+        assertTrue(StringSimilarity.getHammingDistanceOfStrings(simA1,simB1) > 30);
     }
 
 
