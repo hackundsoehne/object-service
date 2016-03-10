@@ -136,7 +136,7 @@ public class DuplicateCheckerTest {
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer, new ArrayList<>()));
         Thread.sleep(500);
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer, new ArrayList<>()));
-        Thread.sleep(500);
+        Thread.sleep(1000);
 
         assertTrue(duplicateChecker.terminate());
 
