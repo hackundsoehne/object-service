@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 
@@ -86,8 +88,8 @@ public class DummyPlatform implements Platform, Payment {
      * Or finish with a exception if the publishing failed.
      */
     @Override
-    public CompletableFuture<String> publishTask(Experiment experiment) {
-        return CompletableFuture.completedFuture("dummytask");
+    public CompletableFuture<JsonElement> publishTask(Experiment experiment) {
+        return CompletableFuture.completedFuture(new JsonPrimitive("dummytask"));
     }
 
     /**
@@ -97,7 +99,7 @@ public class DummyPlatform implements Platform, Payment {
      * @return true on success, false or a exception if it failed
      */
     @Override
-    public CompletableFuture<Boolean> unpublishTask(String id) {
+    public CompletableFuture<Boolean> unpublishTask(int id, JsonElement data) {
         return CompletableFuture.completedFuture(true);
     }
 
@@ -122,7 +124,7 @@ public class DummyPlatform implements Platform, Payment {
      * @return
      */
     @Override
-    public CompletableFuture<Boolean> payExperiment(String id, Experiment experiment, List<PaymentJob> paymentJob) {
+    public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {
         return CompletableFuture.completedFuture(true);
     }
 }
