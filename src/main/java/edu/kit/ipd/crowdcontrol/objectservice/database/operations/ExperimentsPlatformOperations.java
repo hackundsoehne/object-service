@@ -36,7 +36,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @throws IllegalArgumentException if the platform is already existing
      */
     public void insertPlatform(String platform, int experimentId, ExperimentsPlatformModeMode mode) throws IllegalArgumentException {
-        ExperimentsPlatformRecord record = new ExperimentsPlatformRecord(null, experimentId, platform, null);
+        ExperimentsPlatformRecord record = new ExperimentsPlatformRecord(null, experimentId, platform, null, null);
         ExperimentsPlatformRecord inserted = create.transactionResult(conf -> {
             boolean exists = DSL.using(conf).fetchExists(
                     DSL.selectFrom(EXPERIMENTS_PLATFORM)
@@ -70,7 +70,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      */
     public void storePlatforms(List<String> platforms, int experimentId) {
         Set<ExperimentsPlatformRecord> toStore = platforms.stream()
-                .map(platform -> new ExperimentsPlatformRecord(null, experimentId, platform, null))
+                .map(platform -> new ExperimentsPlatformRecord(null, experimentId, platform, null, null))
                 .collect(Collectors.toSet());
 
         List<ExperimentsPlatformRecord> inserted = create.transactionResult(conf -> {

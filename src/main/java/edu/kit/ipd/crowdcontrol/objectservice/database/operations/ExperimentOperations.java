@@ -272,7 +272,7 @@ public class ExperimentOperations extends AbstractOperations {
 
             List<ExperimentsPlatformRecord> toInsert = platforms.stream()
                     .filter(platform -> !existing.contains(platform))
-                    .map(platform -> new ExperimentsPlatformRecord(null, experimentId, platform, null))
+                    .map(platform -> new ExperimentsPlatformRecord(null, experimentId, platform, null, null))
                     .collect(Collectors.toList());
 
             DSL.using(conf).batchInsert(toInsert).execute();
