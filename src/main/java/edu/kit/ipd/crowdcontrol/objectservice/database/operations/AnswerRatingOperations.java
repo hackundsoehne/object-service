@@ -12,6 +12,8 @@ import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -210,13 +212,22 @@ public class AnswerRatingOperations extends AbstractOperations {
             );
         }
 
-        AnswerRecord result = doIfRunning(answerRecord.getExperiment(), conf ->
-                        DSL.using(conf)
-                                .insertInto(ANSWER)
-                                .set(answerRecord)
-                                .returning()
-                                .fetchOne()
-        );
+        AnswerRecord result = doIfRunning(answerRecord.getExperiment(), conf -> {
+            boolean isUsed = DSL.using(conf).fetchExists(
+                    DSL.selectFrom(ANSWER)
+                            .where(ANSWER.RESERVATION.eq(answerRecord.getReservation()))
+            );
+
+            if (!isUsed) {
+                throw new IllegalStateException(String.format("Reservation %d is already in use", answerRecord.getReservation()));
+            }
+
+            return DSL.using(conf)
+                    .insertInto(ANSWER)
+                    .set(answerRecord)
+                    .returning()
+                    .fetchOne();
+        });
         addToExperimentCalibration(answerRecord.getWorkerId(), answerRecord.getExperiment());
         return result;
     }
@@ -263,18 +274,8 @@ public class AnswerRatingOperations extends AbstractOperations {
      *                                  existing
      * @throws IllegalStateException    if the worker is not allowed to submit more ratings
      */
-    public Rating updateRating(Rating rating) throws IllegalArgumentException, IllegalStateException {
-        assertHasField(rating, Rating.RATING_ID_FIELD_NUMBER);
-
-        boolean isReserved = create.fetchExists(
-                DSL.selectFrom(RATING)
-                        .where(RATING.ID_RATING.eq(rating.getRatingId()))
-                        .and(RATING.WORKER_ID.eq(rating.getWorker()))
-        );
-
-        if (!isReserved) {
-            throw new IllegalStateException(String.format("Rating %d is not reserved for worker %d", rating.getRatingId(), rating.getWorker()));
-        }
+    public Rating insertRating(Rating rating) throws IllegalArgumentException, IllegalStateException {
+        assertHasField(rating, Rating.RESERVATION_FIELD_NUMBER);
 
         String feedback = null;
 
@@ -282,18 +283,44 @@ public class AnswerRatingOperations extends AbstractOperations {
             feedback = rating.getFeedback();
         }
 
-        create.update(RATING)
-                .set(RATING.RATING_, rating.getRating())
-                .set(RATING.FEEDBACK, feedback)
-                .where(RATING.ID_RATING.eq(rating.getRatingId()))
-                .execute();
+        RatingReservationRecord ratingReservationRecord = create.selectFrom(RATING_RESERVATION)
+                .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
+                .fetchOptional()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Reservation %d is not existing", rating.getReservation())));
 
-        RatingRecord ratingRecord = create.fetchOne(RATING, RATING.ID_RATING.eq(rating.getRatingId()));
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+        RatingRecord ratingRecord = new RatingRecord(
+                null,
+                rating.getExperimentId(),
+                ratingReservationRecord.getAnswer(),
+                timestamp,
+                rating.getRating(),
+                rating.getReservation(),
+                feedback,
+                rating.getWorker(),
+                null
+                );
+
+        RatingRecord result = doIfRunning(rating.getExperimentId(), conf -> {
+            boolean isUsed = DSL.using(conf).fetchExists(
+                    DSL.selectFrom(RATING)
+                            .where(RATING.RESERVATION.eq(rating.getReservation()))
+            );
+
+            if (!isUsed) {
+                throw new IllegalStateException(String.format("Reservation %d is already in use", rating.getReservation()));
+            }
+
+            return create.insertInto(RATING)
+                    .set(ratingRecord)
+                    .returning()
+                    .fetchOne();
+        });
 
         List<RatingConstraintRecord> toInsert = rating.getViolatedConstraintsList().stream()
                 .map(constraint -> {
                     RatingConstraintRecord constraintRecord = new RatingConstraintRecord();
-                    constraintRecord.setRefRating(ratingRecord.getIdRating());
+                    constraintRecord.setRefRating(result.getIdRating());
                     constraintRecord.setOffConstraint(constraint.getId());
                     return constraintRecord;
                 })
@@ -301,7 +328,7 @@ public class AnswerRatingOperations extends AbstractOperations {
 
         create.batchInsert(toInsert).execute();
 
-        addToExperimentCalibration(ratingRecord.getWorkerId(), ratingRecord.getExperiment());
+        addToExperimentCalibration(result.getWorkerId(), result.getExperiment());
 
         Result<RatingConstraintRecord> ratingConstraints = create.selectFrom(RATING_CONSTRAINT)
                 .where(RATING_CONSTRAINT.REF_RATING.eq(ratingRecord.getIdRating()))
