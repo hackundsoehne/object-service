@@ -59,8 +59,8 @@ function initMturk(platformName, workerServiceUrl, experiment) {
         console.log("Save answer "+submittedData.answer);
         creativeAnswers.push(submittedData.answer)
     });
-    WorkerUI.onSubmitRating(function (data) {
-        for (var rating in data) {
+    WorkerUI.onSubmitRating(function (viewData, submittedData) {
+        for (var rating in submittedData) {
             console.log("Save Rating "+rating.rating+" - "+rating.answer);
             ratingAnswers.push(rating)
         }
