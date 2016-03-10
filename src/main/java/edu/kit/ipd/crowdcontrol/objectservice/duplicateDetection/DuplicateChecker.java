@@ -9,6 +9,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.Imag
 import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.Shingle;
 import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.StringSimilarity;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -30,11 +32,12 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class DuplicateChecker {
 
-
+    private final Logger logger = LogManager.getLogger(DuplicateChecker.class);
     private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final BlockingQueue<AnswerRecord> queue = new LinkedBlockingQueue<>();
     private final DuplicateWatcherThread thread;
+    private boolean threadRunning = false;
     /**
      * Constructor
      *
@@ -63,8 +66,9 @@ public class DuplicateChecker {
      * Terminates the running duplicateDetector
      */
     public boolean terminate(){
+        threadRunning = false;
         thread.interrupt();
-        return thread.isInterrupted();
+        return thread.isAlive();
 
     }
 
@@ -115,6 +119,7 @@ public class DuplicateChecker {
             try {
                 image = ImageIO.read(url);
             } catch (IOException e) {
+                System.out.println("IO");
                 //TODO  specify reason for zero-quality in response field
                 return Optional.empty();
             }
@@ -190,15 +195,16 @@ public class DuplicateChecker {
          * While running, the DuplicateChecker hashes the answers in the queue and checks them for duplicates.
          */
         public void run() {
-
-            while (!Thread.currentThread().isInterrupted()) {
+            threadRunning = true;
+            while (threadRunning) {
                 AnswerRecord answerRecord;
                 try {
                     answerRecord = queue.take();
 
                 } catch (InterruptedException e) {
-                    System.out.println("DuplicateChecker terminated!");
+                    logger.info("DuplicateChecker terminated!!");
                     return;
+
                 }
                 if (answerRecord != null) {
                     //trying to acquire answer-hash
@@ -217,7 +223,7 @@ public class DuplicateChecker {
                     }
                 }
             }
-            System.out.println("DuplicateChecker terminated!");
+            logger.info("DuplicateChecker terminated!");
         }
     }
 }
