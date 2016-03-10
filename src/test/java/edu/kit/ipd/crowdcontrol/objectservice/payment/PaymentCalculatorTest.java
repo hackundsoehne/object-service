@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.payment;
 
+import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
@@ -70,8 +71,8 @@ public class PaymentCalculatorTest {
     @Test
     public void testEstimatePayment() throws Exception {
 
-        WorkerRecord workerOne = new WorkerRecord(0, "", "", "", 0);
-        WorkerRecord workerTwo = new WorkerRecord(1, "", "", "", 0);
+        WorkerRecord workerOne = new WorkerRecord(0, new JsonPrimitive(""), "", "", 0, "");
+        WorkerRecord workerTwo = new WorkerRecord(1, new JsonPrimitive(""), "", "", 0, "");
 
         workerAnswerMap.put(workerOne, 5);
         workerAnswerMap.put(workerTwo, 2);
