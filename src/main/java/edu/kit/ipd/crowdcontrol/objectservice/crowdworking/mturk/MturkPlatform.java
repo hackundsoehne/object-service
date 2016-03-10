@@ -88,28 +88,21 @@ public class MturkPlatform implements Platform,Payment {
         });
     }
 
-    private static List<String> loadFiles(List<String> files) {
-        return files.stream().map(s -> {
-            try {
-                return CharStreams
-                        .toString(new InputStreamReader(
-                                Main.class.getResourceAsStream(s)
-                                , Charsets.UTF_8));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        })
-        .filter(s1 -> !s1.isEmpty())
-        .collect(Collectors.toList());
+    private static String loadFiles(String file) {
+        try {
+            return CharStreams
+                    .toString(new InputStreamReader(
+                            Main.class.getResourceAsStream(file)
+                            , Charsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
-
-        List<String> jsFiles = new ArrayList<>();
-        jsFiles.add("/mturk/worker-ui/mturk.js");
 
         String content =  "<html>\n" +
                 " <head>\n" +
@@ -119,7 +112,7 @@ public class MturkPlatform implements Platform,Payment {
                 " </head>\n" +
                 " <body onload=\"initMturk('"+getID()+"','"+workerServiceUrl+"', '"+experiment.getId()+"');\">" +
                 "<script type='text/javascript' src='"+workerUIUrl+"/worker_ui.js'></script>" +
-                loadFiles(jsFiles).stream().map(s ->  "<script type='text/javascript'>"+s+"</script>").collect(Collectors.joining())+
+                "<script type='text/javascript'>"+loadFiles("/mturk/worker-ui/mturk.js")+"</script>" +
                 "   <div id=\"ractive-container\"></div>" +
                 " </body>\n" +
                 "</html>\n";
@@ -281,24 +274,22 @@ public class MturkPlatform implements Platform,Payment {
         }
     }
 
-    public String getTooLongMessage() {
-        return "You will get another email containing more information.";
-    }
-
     private CompletableFuture<Boolean> notifyWorker(PaymentJob paymentJob) {
         int length = paymentJob.getMessage().length();
         int current_location = 0;
         int counter = 0;
         List<CompletableFuture<Boolean>> messages = new ArrayList<>();
 
+        String tooLongMessage = loadFiles("/mturk/TooLongMessage.txt");
+
         //while loop sents messages if needed message would be gibber than MAX_LENGTH
         while(length - current_location > NotifyWorker.MAX_LENGTH) {
             int old_current_location = current_location;
             //the new location is the maximum - the too long message
-            current_location = current_location + (NotifyWorker.MAX_LENGTH - getTooLongMessage().length());
+            current_location = current_location + (NotifyWorker.MAX_LENGTH - tooLongMessage.length());
 
             String message = paymentJob.getMessage()
-                    .substring(old_current_location, current_location) + "\n"+getTooLongMessage();
+                    .substring(old_current_location, current_location) + "\n"+tooLongMessage;
 
             String subject = "Details to your assignment ( Message "+counter+")";
 
