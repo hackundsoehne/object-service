@@ -7,13 +7,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Work
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import org.jooq.Result;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
-import javax.mail.MessagingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -25,12 +23,12 @@ import static org.mockito.Mockito.*;
  *
  * @author Felix Rittler
  */
-public class FeedbackSenderTest {
+public class FeedbackCreatorTest {
 
     private AnswerRatingOperations answerRatingOperations;
     private ExperimentOperations experimentOperations;
     private WorkerOperations workerOperations;
-    private FeedbackSender sender;
+    private FeedbackCreator sender;
 
     @Before
     public void setUp() throws Exception {
@@ -38,7 +36,7 @@ public class FeedbackSenderTest {
         experimentOperations = mock(ExperimentOperations.class);
         workerOperations = mock(WorkerOperations.class);
 
-        sender = new FeedbackSender(answerRatingOperations, experimentOperations, workerOperations);
+        sender = new FeedbackCreator(answerRatingOperations, experimentOperations, workerOperations);
     }
 
     @Test

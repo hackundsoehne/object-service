@@ -9,6 +9,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
+import edu.kit.ipd.crowdcontrol.objectservice.feedback.FeedbackCreator;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailReceiver;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
@@ -265,6 +266,8 @@ public class Main {
             platforms.add(platformInstance);
         }
         return platforms;
+
+
     }
 
     /**

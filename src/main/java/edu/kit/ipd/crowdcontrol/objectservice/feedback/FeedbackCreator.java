@@ -23,14 +23,14 @@ import java.util.Map;
  *
  * @author Felix Rittler
  */
-public class FeedbackSender {
+public class FeedbackCreator {
 
-    private static final Logger LOGGER = LogManager.getLogger(FeedbackSender.class);
+    private static final Logger LOGGER = LogManager.getLogger(FeedbackCreator.class);
     private AnswerRatingOperations answerOps;
     private ExperimentOperations expOps;
     private WorkerOperations workerOps;
 
-    public FeedbackSender(AnswerRatingOperations answerOps, ExperimentOperations expOps, WorkerOperations workerOps) {
+    public FeedbackCreator(AnswerRatingOperations answerOps, ExperimentOperations expOps, WorkerOperations workerOps) {
         this.answerOps = answerOps;
         this.expOps = expOps;
         this.workerOps = workerOps;
@@ -48,11 +48,9 @@ public class FeedbackSender {
                 content.append(System.getProperty("line.separator"));
             }
         } catch (FileNotFoundException e) {
-            LOGGER.error("Sending of feedback failed, because the message sources cannot be found.");
-            throw new FeedbackException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.");
+            throw new FeedbackException("Sending of Feedback failed: The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.");
         } catch (IOException e) {
-            LOGGER.error("Sending of feedback failed, because the message sources are invalid.");
-            throw new FeedbackException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
+            throw new FeedbackException("Sending of Feedback failed: The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
         }
         return content.toString();
     }
