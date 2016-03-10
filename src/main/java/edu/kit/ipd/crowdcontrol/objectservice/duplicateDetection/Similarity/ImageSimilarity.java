@@ -16,9 +16,17 @@ import java.io.OutputStream;
  * @author lucaskrauss
  *
  * Calculates the similarity of two images.
- * For that each image is seperated in 25 sections and for each of them its color-signature is calculated.
- * The corresponding sections of the pictures are copared after that. Their similarity is based on the deviation of
- * the colorsignature of each section and thus based on location and color
+ * Two algorithms are implemented:
+ * Similarity via image-signature
+ *  This approach is the more reliable one of the two given algorithms but the slower one aswell.
+ *  For that each image is seperated in 25 sections and for each of them its color-signature is calculated.
+ *  The corresponding sections of the pictures are copared after that. Their similarity is based on the deviation of
+ *  the colorsignature of each section and thus based on location and color
+ *
+ * Similarity via a simple perceptual hash algorithm
+ *  This approach is less reliable than similarity-calculation via image-signature,
+ *  it is more likely to give false negatives if one of the given images is a cutout from the other
+ *
  */
 public class ImageSimilarity {
 
@@ -36,12 +44,24 @@ public class ImageSimilarity {
      * @param image2 second image
      * @return similarity of the two images
      */
-    public static double identifyImageSimilarity(BufferedImage image1, BufferedImage image2) {
+    public static double identifyImageSimilarityBasedOnSignature(BufferedImage image1, BufferedImage image2) {
 
         Color[][] signatureImage1 = getImageSignature(image1);
         Color[][] signatureImage2 = getImageSignature(image2);
 
         return identifyImageSignatureSimilarity(signatureImage1,signatureImage2);
+    }
+
+    /**
+     * Identifies the similarity of the two given images.
+     * The similarity is based on the hamming-distance of the perceptual-hashes of the two images {@link #getImageHash(BufferedImage)}
+     * For more details refer to the class-description
+     * @param bufferedImage1 first image
+     * @param bufferedImage2 second image
+     * @return similarity of the two images
+     */
+    public static double identifyImageSimilarityBasedOnPHash(BufferedImage bufferedImage1, BufferedImage bufferedImage2){
+        return HashSimilarity.getSimilarityFromHash(getImageHash(bufferedImage1),getImageHash(bufferedImage2));
     }
 
     /**
@@ -147,12 +167,12 @@ public class ImageSimilarity {
     public static long getImageHash(BufferedImage bufferedImage){
         bufferedImage = rescale(bufferedImage,8,8);
 
-        ImageFilter filter = new GrayFilter(true,50);
+         ImageFilter filter = new GrayFilter(true,50);
         ImageProducer producer = new FilteredImageSource(bufferedImage.getSource(),filter);
 
         Image image =Toolkit.getDefaultToolkit().createImage(producer);
         bufferedImage = new BufferedImage(image.getWidth(null),image.getHeight(null),BufferedImage.TYPE_INT_RGB);
-        bufferedImage.getGraphics().drawImage(image,0,0,null); //TODO
+        bufferedImage.getGraphics().drawImage(image,0,0,null);
 
 
         int buffer = 0;
