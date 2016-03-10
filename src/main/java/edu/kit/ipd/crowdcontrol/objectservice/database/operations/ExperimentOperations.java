@@ -97,7 +97,9 @@ public class ExperimentOperations extends AbstractOperations {
             return Experiment.State.DRAFT;
         } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)) {
             return Experiment.State.PUBLISHED;
-        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.stopping)) {
+        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
+            return Experiment.State.PUBLISHED; //TODO: maybe more options?
+        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.creative_stopping)) {
             return Experiment.State.CREATIVE_STOPPED;
         } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.stopped)) {
             return Experiment.State.STOPPED;

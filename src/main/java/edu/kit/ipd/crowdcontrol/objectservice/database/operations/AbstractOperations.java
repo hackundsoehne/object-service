@@ -66,25 +66,27 @@ public abstract class AbstractOperations {
      * @throws IllegalStateException if the experiment is not running
      */
     protected <R> R doIfRunning(int experimentID, Function<Configuration, R> function) throws IllegalStateException {
-        return create.transactionResult(trans -> {
-            boolean running = DSL.using(trans).fetchExists(
-                    DSL.selectFrom(Tables.EXPERIMENTS_PLATFORM_STATUS)
-                            .where(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
-                                    DSL.select(Tables.EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
-                                            .from(Tables.EXPERIMENTS_PLATFORM)
-                                            .where(Tables.EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
-                            ))
-                            .and(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
-                                    .eq(ExperimentsPlatformStatusPlatformStatus.running)
-                                    .or(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
-                                        .eq(ExperimentsPlatformStatusPlatformStatus.stopping)))
-            );
-            if (running) {
-                return function.apply(trans);
-            } else {
-                throw new IllegalStateException("Experiment is not running: " + experimentID);
-            }
-        });
+        boolean running = create.fetchExists(
+                DSL.selectFrom(Tables.EXPERIMENTS_PLATFORM_STATUS)
+                        .where(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
+                                DSL.select(Tables.EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                                        .from(Tables.EXPERIMENTS_PLATFORM)
+                                        .where(Tables.EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
+                        ))
+                        .and(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
+                                .eq(ExperimentsPlatformStatusPlatformStatus.running)
+                                .or(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
+                                    .eq(ExperimentsPlatformStatusPlatformStatus.creative_stopping))
+                                .or(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
+                                    .eq(ExperimentsPlatformStatusPlatformStatus.shutdown))
+                        )
+
+        );
+        if (running) {
+            return create.transactionResult(function::apply);
+        } else {
+            throw new IllegalStateException("Experiment is not running: " + experimentID);
+        }
     }
 
     /**
@@ -107,7 +109,10 @@ public abstract class AbstractOperations {
                             .and(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
                                     .eq(ExperimentsPlatformStatusPlatformStatus.running)
                                     .or(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
-                                            .eq(ExperimentsPlatformStatusPlatformStatus.stopping)))
+                                            .eq(ExperimentsPlatformStatusPlatformStatus.creative_stopping))
+                                    .or(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
+                                            .eq(ExperimentsPlatformStatusPlatformStatus.shutdown))
+                            )
             );
             if (!running) {
                 return function.apply(trans);

@@ -1,7 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import com.google.common.collect.Sets;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeStopgap;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
@@ -32,9 +32,10 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * Inserts the passed platform into the database with the status draft
      * @param platform the name of the platform
      * @param experimentId the primary key of the experiment
+     * @param mode the mode of the platform
      * @throws IllegalArgumentException if the platform is already existing
      */
-    public void insertPlatform(String platform, int experimentId, ExperimentsPlatformModeStopgap mode) throws IllegalArgumentException {
+    public void insertPlatform(String platform, int experimentId, ExperimentsPlatformModeMode mode) throws IllegalArgumentException {
         ExperimentsPlatformRecord record = new ExperimentsPlatformRecord(null, experimentId, platform, null);
         ExperimentsPlatformRecord inserted = create.transactionResult(conf -> {
             boolean exists = DSL.using(conf).fetchExists(
@@ -121,7 +122,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @param experiment the primary key of the experiment
      * @param mode the mode to set the platforms to
      */
-    public void setPlatformMode(String platform, int experiment, ExperimentsPlatformModeStopgap mode) {
+    public void setPlatformMode(String platform, int experiment, ExperimentsPlatformModeMode mode) {
         Integer experimentsPlatform = create.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
                 .from(EXPERIMENTS_PLATFORM)
                 .where(EXPERIMENTS_PLATFORM.PLATFORM.eq(platform))
@@ -145,7 +146,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @param experimentsPlatform the primary key of the ExperimentsPlatform
      * @param mode the mode to set to
      */
-    public void setPlatformMode(int experimentsPlatform, ExperimentsPlatformModeStopgap mode) {
+    public void setPlatformMode(int experimentsPlatform, ExperimentsPlatformModeMode mode) {
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
         ExperimentsPlatformModeRecord toInsert = new ExperimentsPlatformModeRecord(null, experimentsPlatform, mode, timestamp);
 
