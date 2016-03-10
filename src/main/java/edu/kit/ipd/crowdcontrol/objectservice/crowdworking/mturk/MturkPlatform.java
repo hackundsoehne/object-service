@@ -226,6 +226,7 @@ public class MturkPlatform implements Platform,Payment {
                     jobs.add(new ApproveAssignment(connection,assignment.getAssignmentId(),
                             "Thx for passing your answer!"));
                     jobs.add(payBonus(paymentJob, assignment, restAmount));
+                    jobs.add(notifyWorker(paymentJob));
                 } else if (assignment.getAssignmentStatus().equals(AssignmentStatus.APPROVED)) {
                     //the assignment is already approved
                     //check if a bonus was payed
@@ -239,6 +240,12 @@ public class MturkPlatform implements Platform,Payment {
 
                     System.out.println("We should "+should+" diff: "+ difference+"i");
 
+                    //only sent the mail if there was no payedBonus yet
+                    if (payedBonus.compareTo(new BigDecimal(0.001d)) > 0) {
+                        //there will be something payed
+                        jobs.add(notifyWorker(paymentJob));
+                    }
+
                     //check if we payed enough bonus
                     if (difference > 0) {
                         //we need to pay the rest of the bonus
@@ -249,7 +256,7 @@ public class MturkPlatform implements Platform,Payment {
         }
         return CompletableFuture.supplyAsync(() ->
                 jobs.stream().map(CompletableFuture::join)
-                        .filter(aBoolean -> !aBoolean).count() == 0);
+                        .allMatch(Boolean::booleanValue));
     }
 
     /**
@@ -274,12 +281,49 @@ public class MturkPlatform implements Platform,Payment {
         }
     }
 
+    public String getTooLongMessage() {
+        return "You will get another email containing more information.";
+    }
+
+    private CompletableFuture<Boolean> notifyWorker(PaymentJob paymentJob) {
+        int length = paymentJob.getMessage().length();
+        int current_location = 0;
+        int counter = 0;
+        List<CompletableFuture<Boolean>> messages = new ArrayList<>();
+
+        //while loop sents messages if needed message would be gibber than MAX_LENGTH
+        while(length - current_location > NotifyWorker.MAX_LENGTH) {
+            int old_current_location = current_location;
+            //the new location is the maximum - the too long message
+            current_location = current_location + (NotifyWorker.MAX_LENGTH - getTooLongMessage().length());
+
+            String message = paymentJob.getMessage()
+                    .substring(old_current_location, current_location) + "\n"+getTooLongMessage();
+
+            String subject = "Details to your assignment ( Message "+counter+")";
+
+            messages.add(new NotifyWorker(connection, paymentJob.getWorkerRecord().getIdentification(), subject, message));
+
+            counter ++;
+        }
+        messages.add(new NotifyWorker(connection, paymentJob.getWorkerRecord().getIdentification(),
+                "Details to your assignment ( Message "+counter+")",
+                paymentJob.getMessage().substring(current_location, length)));
+
+        return CompletableFuture.supplyAsync(() ->
+                messages.stream()
+                .map(CompletableFuture::join)
+                        .allMatch(Boolean::booleanValue));
+    }
+
     private CompletableFuture<Boolean> payBonus(PaymentJob paymentJob, Assignment assignment, int amount) {
         //if there is money left pay a bonus
         if (amount >= 0) {
-            new GrantBonus(connection,assignment.getAssignmentId(),
+            return new GrantBonus(connection,assignment.getAssignmentId(),
                        paymentJob.getWorkerRecord().getIdentification(),(amount/100d),"This is the bonus for a high rating!");
+        } else {
+            return CompletableFuture.completedFuture(true);
         }
-        return CompletableFuture.completedFuture(true);
+
     }
 }
