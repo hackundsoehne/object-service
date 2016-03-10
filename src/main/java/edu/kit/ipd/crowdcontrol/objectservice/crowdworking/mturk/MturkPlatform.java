@@ -3,15 +3,24 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 import com.amazonaws.mturk.requester.doc._2014_08_15.Assignment;
 import com.amazonaws.mturk.requester.doc._2014_08_15.AssignmentStatus;
 import com.amazonaws.mturk.requester.doc._2014_08_15.BonusPayment;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 
@@ -79,10 +88,42 @@ public class MturkPlatform implements Platform,Payment {
         });
     }
 
+    private static List<String> loadFiles(List<String> files) {
+        return files.stream().map(s -> {
+            try {
+                return CharStreams
+                        .toString(new InputStreamReader(
+                                Main.class.getResourceAsStream(s)
+                                , Charsets.UTF_8));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        })
+        .filter(s1 -> !s1.isEmpty())
+        .collect(Collectors.toList());
+    }
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
+
+        List<String> jsFiles = new ArrayList<>();
+        jsFiles.add("/mturk/worker-ui/mturk.js");
+
+        String content =  "<html>\n" +
+                " <head>\n" +
+                "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>\n" +
+                "  <script type='text/javascript' src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script>\n" +
+                "  <script type='text/javascript' src='https://code.jquery.com/jquery-2.0.0.js'></script>" +
+                " </head>\n" +
+                " <body onload=\"initMturk('"+getID()+"','"+workerServiceUrl+"', '"+experiment.getId()+"');\">" +
+                "<script type='text/javascript' src='"+workerUIUrl+"/worker_ui.js'></script>" +
+                loadFiles(jsFiles).stream().map(s ->  "<script type='text/javascript'>"+s+"</script>").collect(Collectors.joining())+
+                "   <div id=\"ractive-container\"></div>" +
+                " </body>\n" +
+                "</html>\n";
+
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
                 experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dallers
                 TWO_HOURS, //you have 2 hours to do the assignment
@@ -91,15 +132,33 @@ public class MturkPlatform implements Platform,Payment {
                 experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
                 2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
                 "",
-                "initMturk('"+getID()+
-                        "', '"+workerServiceUrl+
-                        "', " +experiment.getId()+");",
-                workerUIUrl);
+                content);
     }
 
     @Override
     public CompletableFuture<Boolean> unpublishTask(String id) {
         return new UnpublishHIT(connection, id);
+    }
+
+    /**
+     * Returns the full list of a paginated request
+     * @param startIndex the index to start
+     * @param producer execute the statement and returns a patial list of the complete
+     * @param <A> Type of the list
+     * @return The full list of elements
+     * @throws ExecutionException If something bad happens while executing
+     * @throws InterruptedException the execution was interrupted
+     */
+    public <A> List<A> getFullList(int startIndex, Function<Integer, CompletableFuture<List<A>>> producer) throws ExecutionException, InterruptedException {
+        int i = startIndex;
+        List<A> part = producer.apply(i).get();
+        List<A> complete = new ArrayList<>();
+        while(part != null && part.size() != 0) {
+            complete.addAll(part);
+            i++;
+            part = producer.apply(i).get();
+        }
+        return complete;
     }
 
     @Override
@@ -111,32 +170,22 @@ public class MturkPlatform implements Platform,Payment {
         Map<String, BigDecimal> bonusPayed = new HashMap<>();
 
         try {
-            int i = 0;
-            //first get a hashmap of all assignmentids and worker ids
-            List<Assignment> assignmentList = new GetAssignments(connection,id,1).get();
-            while (assignmentList.size() > 0) {
-                for(Assignment assignment : assignmentList) {
-                    workerAssignmentId.put(assignment.getWorkerId(), assignment);
-                }
-                i++;
-                assignmentList = new GetAssignments(connection,id,i).get();
-            }
+            // get all assignments from the project and sort them to the function
+            getFullList(1, index -> new GetAssignments(connection, id, index))
+                    .forEach(assignment -> workerAssignmentId.put(assignment.getWorkerId(), assignment));
 
-            i = 1;
-            List<BonusPayment> bonusPayments = new GetBonusPayments(connection, id, 1).get();
-            while (bonusPayments.size() > 0) {
-                for (BonusPayment bonusPayment : bonusPayments) {
-                    BigDecimal bigDecimal = bonusPayed.get(bonusPayment.getWorkerId());
-                    if (bigDecimal != null) {
-                        bigDecimal = bigDecimal.add(bonusPayment.getBonusAmount().getAmount());
-                    } else {
-                        bigDecimal = bonusPayment.getBonusAmount().getAmount();
-                    }
-                    bonusPayed.put(bonusPayment.getWorkerId(), bigDecimal);
-                }
-                i++;
-                bonusPayments = new GetBonusPayments(connection, id, i).get();
-            }
+            //get all done payments
+            getFullList(1, index -> new GetBonusPayments(connection, id, index))
+                    .forEach(bonusPayment -> {
+                        BigDecimal bigDecimal = bonusPayed.get(bonusPayment.getWorkerId());
+                        if (bigDecimal != null) {
+                            bigDecimal = bigDecimal.add(bonusPayment.getBonusAmount().getAmount());
+                        } else {
+                            bigDecimal = bonusPayment.getBonusAmount().getAmount();
+                        }
+                        bonusPayed.put(bonusPayment.getWorkerId(), bigDecimal);
+                    });
+
         } catch (InterruptedException | ExecutionException e) {
             CompletableFuture<Boolean> completableFuture= new CompletableFuture<>();
             completableFuture.completeExceptionally(e);
