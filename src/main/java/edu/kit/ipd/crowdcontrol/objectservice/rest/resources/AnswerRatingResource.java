@@ -97,8 +97,10 @@ public class AnswerRatingResource {
         AnswerRecord record;
 
         try {
+            AnswerRecord answerRecord = AnswerRatingTransformer.toAnswerRecord(answer, experimentId);
+            answerRecord.setQuality(null);
             record = answerRatingOperations.insertNewAnswer(
-                    AnswerRatingTransformer.toAnswerRecord(answer, experimentId)
+                    answerRecord
             );
         } catch (IllegalArgumentException | IllegalStateException e) {
             throw new BadRequestException(e.getMessage());
@@ -151,7 +153,7 @@ public class AnswerRatingResource {
         Rating result;
 
         try {
-            result = answerRatingOperations.updateRating(rating);
+            result = answerRatingOperations.insertRating(rating);
         } catch (IllegalArgumentException | IllegalStateException e) {
             throw new BadRequestException(e.getMessage());
         }
