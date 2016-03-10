@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 
@@ -12,9 +14,9 @@ import java.util.Optional;
 public interface WorkerIdentification {
     /**
      * Parse a worker id out of the params
-     * @return The id of the worker if one can be found
+     * @return The id of the worker if one can be found, as JSON
      */
-    String getWorkerData() throws UnidentifiedWorkerException;
+    JsonElement getWorkerData() throws UnidentifiedWorkerException;
 
     /**
      * Tries to find the worker in the database
@@ -33,8 +35,8 @@ public interface WorkerIdentification {
     static WorkerIdentification findByIdentification(String platform, String identification) {
         return new WorkerIdentification() {
             @Override
-            public String getWorkerData() throws UnidentifiedWorkerException {
-                return identification;
+            public JsonElement getWorkerData() throws UnidentifiedWorkerException {
+                return new JsonPrimitive(identification);
             }
 
             @Override

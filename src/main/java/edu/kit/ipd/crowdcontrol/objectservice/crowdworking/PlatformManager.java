@@ -1,5 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
@@ -134,15 +138,15 @@ public class PlatformManager {
     public CompletableFuture<Boolean> publishTask(String name, Experiment experiment) throws PreActionException {
         ExperimentsPlatformRecord record = getExperimentsPlatformRecord(name, experiment);
 
-        BiFunction<String, Throwable, Boolean> handlePublishResult = (s1, throwable) -> {
+        BiFunction<JsonElement, Throwable, Boolean> handlePublishResult = (s1, throwable) -> {
             //if the creation was successful update the db
-            if (s1 != null && throwable == null && !s1.isEmpty()) {
+            if (s1 != null && throwable == null) {
                 experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
                         ExperimentsPlatformStatusPlatformStatus.running);
                 record.setPlatformData(s1);
                 experimentsPlatformOps.updateExperimentsPlatform(record);
                 if (!experimentsPlatformOps.updateExperimentsPlatform(record)) {
-                    getPlatform(name).get().unpublishTask(record.getPlatformData())
+                    getPlatform(name).get().unpublishTask(record.getIdexperimentsPlatforms(), record.getPlatformData())
                             .join();
                     throw new IllegalStateException("Updating record for published experimentsPlatform failed");
                 }
@@ -163,7 +167,7 @@ public class PlatformManager {
             }
 
             //if there is no useful key throw!
-            if (s1 == null || (s1.isEmpty())) {
+            if (s1 == null) {
                 try {
                     unpublishTask(name, experiment).join();
                 } catch (PreActionException | CompletionException e) {
@@ -197,7 +201,7 @@ public class PlatformManager {
         if (record == null)
             return CompletableFuture.completedFuture(true);
 
-        return getPlatformOrThrow(name).unpublishTask(record.getPlatformData())
+        return getPlatformOrThrow(name).unpublishTask(record.getIdexperimentsPlatforms(), record.getPlatformData())
                 .handle((success, throwable) -> {
                     if (throwable != null) throw new RuntimeException(throwable);
 
@@ -268,6 +272,6 @@ public class PlatformManager {
                     "The list of payment Jobs need to have all workers which worked on this experiment on the given platform"));
         }
 
-        return getPlatformPayment(name).payExperiment(record.getPlatformData(), experiment,paymentJobs);
+        return getPlatformPayment(name).payExperiment(record.getIdexperimentsPlatforms(), record.getPlatformData(), experiment,paymentJobs);
     }
 }
