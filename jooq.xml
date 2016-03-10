@@ -20,7 +20,7 @@
                     <type>com.google.gson.JsonElement</type>
 
                     <!-- Associate that custom type with your binding. -->
-                    <binding>edu.kit.ipd.crowdcontrol.objectservice.JSONGsonBinding</binding>
+                    <binding>edu.kit.ipd.crowdcontrol.objectservice.database.bindings.JSONGsonBinding</binding>
                 </customType>
             </customTypes>
 
