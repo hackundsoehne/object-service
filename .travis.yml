@@ -15,7 +15,7 @@ cache:
   - "$HOME/.gradle/wrapper/"
 
 before_script:
-# disabled because last travis mysql was 2015-04-09 (and this was rolled back i think), and mysql 5.7 was released in october
+# disabled because last travis mysql was 2015-04-09 (and this was rolled back i think), and we require mysql 5.7, which was released in october
 #- mysql -u "root" < src/main/resources/db.sql
 - cp src/main/resources/config.travis.yml src/main/resources/config.yml
 
