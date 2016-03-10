@@ -264,7 +264,7 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @throws IllegalStateException    if the worker is not allowed to submit more ratings
      */
     public Rating updateRating(Rating rating) throws IllegalArgumentException, IllegalStateException {
-        assertHasField(rating, Rating.RATING_FIELD_NUMBER, Rating.RATING_ID_FIELD_NUMBER);
+        assertHasField(rating, Rating.RATING_ID_FIELD_NUMBER);
 
         boolean isReserved = create.fetchExists(
                 DSL.selectFrom(RATING)
