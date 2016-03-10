@@ -213,14 +213,17 @@ public class AnswerRatingOperations extends AbstractOperations {
         }
 
         AnswerRecord result = doIfRunning(answerRecord.getExperiment(), conf -> {
-            boolean isUsed = DSL.using(conf).fetchExists(
-                    DSL.selectFrom(ANSWER)
-                            .where(ANSWER.RESERVATION.eq(answerRecord.getReservation()))
-            );
+            AnswerReservationRecord reservation = DSL.using(conf).selectFrom(ANSWER_RESERVATION)
+                    .where(ANSWER_RESERVATION.IDANSWER_RESERVATION.eq(answerRecord.getReservation()))
+                    .fetchOne();
 
-            if (!isUsed) {
+            if (reservation.getUsed()) {
                 throw new IllegalStateException(String.format("Reservation %d is already in use", answerRecord.getReservation()));
             }
+
+            reservation.setUsed(true);
+
+            DSL.using(conf).executeUpdate(reservation);
 
             return DSL.using(conf)
                     .insertInto(ANSWER)
@@ -302,14 +305,17 @@ public class AnswerRatingOperations extends AbstractOperations {
                 );
 
         RatingRecord result = doIfRunning(rating.getExperimentId(), conf -> {
-            boolean isUsed = DSL.using(conf).fetchExists(
-                    DSL.selectFrom(RATING)
-                            .where(RATING.RESERVATION.eq(rating.getReservation()))
-            );
+            RatingReservationRecord reservation = DSL.using(conf).selectFrom(RATING_RESERVATION)
+                    .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
+                    .fetchOne();
 
-            if (!isUsed) {
+            if (reservation.getUsed()) {
                 throw new IllegalStateException(String.format("Reservation %d is already in use", rating.getReservation()));
             }
+
+            reservation.setUsed(true);
+
+            DSL.using(conf).executeUpdate(ratingRecord);
 
             return create.insertInto(RATING)
                     .set(ratingRecord)
