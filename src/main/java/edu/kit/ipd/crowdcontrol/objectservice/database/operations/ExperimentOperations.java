@@ -1,12 +1,12 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
-import com.google.protobuf.Descriptors;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingOptionExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
@@ -236,7 +236,15 @@ public class ExperimentOperations extends AbstractOperations {
      * @param experimentId the primary key of the Experiment-Table
      */
     public void storeRatingOptions(List<Experiment.RatingOption> ratingOptions, int experimentId) {
-        Descriptors.Descriptor descriptor = Experiment.RatingOption.getDescriptor();
+        if (ratingOptions.size() < 2) {
+            throw new BadRequestException("There must be at least two ratings options.");
+        }
+
+        ratingOptions.stream().forEach(ratingOption -> {
+            if (ratingOption.getValue() < 0 || ratingOption.getValue() > 9) {
+                throw new BadRequestException("Rating option values must be between 0 and 9.");
+            }
+        });
 
         List<RatingOptionExperimentRecord> toInsert = ratingOptions.stream()
                 .map(option -> new RatingOptionExperimentRecord(null, option.getName(), option.getValue(), experimentId))

@@ -100,7 +100,6 @@ public class ExperimentResource {
         }
     }
 
-
     public void endExperiment(Experiment experiment) {
         for (Experiment.Population population :
                 experiment.getPopulationsList()) {
