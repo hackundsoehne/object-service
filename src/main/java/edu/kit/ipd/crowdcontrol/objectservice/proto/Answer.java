@@ -22,6 +22,7 @@ public  final class Answer extends
     content_ = "";
     time_ = 0L;
     quality_ = 0;
+    systemresponse_ = "";
     ratings_ = java.util.Collections.emptyList();
   }
 
@@ -86,9 +87,15 @@ public  final class Answer extends
             break;
           }
           case 66: {
-            if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            systemresponse_ = s;
+            break;
+          }
+          case 74: {
+            if (!((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
               ratings_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating>();
-              mutable_bitField0_ |= 0x00000080;
+              mutable_bitField0_ |= 0x00000100;
             }
             ratings_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.parser(), extensionRegistry));
             break;
@@ -102,7 +109,7 @@ public  final class Answer extends
           new com.google.protobuf.InvalidProtocolBufferException(
               e.getMessage()).setUnfinishedMessage(this));
     } finally {
-      if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+      if (((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
         ratings_ = java.util.Collections.unmodifiableList(ratings_);
       }
       makeExtensionsImmutable();
@@ -209,35 +216,69 @@ public  final class Answer extends
     return quality_;
   }
 
-  public static final int RATINGS_FIELD_NUMBER = 8;
+  public static final int SYSTEMRESPONSE_FIELD_NUMBER = 8;
+  private volatile java.lang.Object systemresponse_;
+  /**
+   * <code>optional string systemresponse = 8;</code>
+   */
+  public java.lang.String getSystemresponse() {
+    java.lang.Object ref = systemresponse_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      systemresponse_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>optional string systemresponse = 8;</code>
+   */
+  public com.google.protobuf.ByteString
+      getSystemresponseBytes() {
+    java.lang.Object ref = systemresponse_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      systemresponse_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int RATINGS_FIELD_NUMBER = 9;
   private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating> ratings_;
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating> getRatingsList() {
     return ratings_;
   }
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder> 
       getRatingsOrBuilderList() {
     return ratings_;
   }
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   public int getRatingsCount() {
     return ratings_.size();
   }
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   public edu.kit.ipd.crowdcontrol.objectservice.proto.Rating getRatings(int index) {
     return ratings_.get(index);
   }
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   public edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder getRatingsOrBuilder(
       int index) {
@@ -277,8 +318,11 @@ public  final class Answer extends
     if (quality_ != 0) {
       output.writeInt32(7, quality_);
     }
+    if (!getSystemresponseBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 8, systemresponse_);
+    }
     for (int i = 0; i < ratings_.size(); i++) {
-      output.writeMessage(8, ratings_.get(i));
+      output.writeMessage(9, ratings_.get(i));
     }
   }
 
@@ -314,9 +358,12 @@ public  final class Answer extends
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(7, quality_);
     }
+    if (!getSystemresponseBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(8, systemresponse_);
+    }
     for (int i = 0; i < ratings_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(8, ratings_.get(i));
+        .computeMessageSize(9, ratings_.get(i));
     }
     memoizedSize = size;
     return size;
@@ -444,9 +491,11 @@ public  final class Answer extends
 
       quality_ = 0;
 
+      systemresponse_ = "";
+
       if (ratingsBuilder_ == null) {
         ratings_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
       } else {
         ratingsBuilder_.clear();
       }
@@ -481,10 +530,11 @@ public  final class Answer extends
       result.content_ = content_;
       result.time_ = time_;
       result.quality_ = quality_;
+      result.systemresponse_ = systemresponse_;
       if (ratingsBuilder_ == null) {
-        if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        if (((bitField0_ & 0x00000100) == 0x00000100)) {
           ratings_ = java.util.Collections.unmodifiableList(ratings_);
-          bitField0_ = (bitField0_ & ~0x00000080);
+          bitField0_ = (bitField0_ & ~0x00000100);
         }
         result.ratings_ = ratings_;
       } else {
@@ -528,11 +578,15 @@ public  final class Answer extends
       if (other.getQuality() != 0) {
         setQuality(other.getQuality());
       }
+      if (!other.getSystemresponse().isEmpty()) {
+        systemresponse_ = other.systemresponse_;
+        onChanged();
+      }
       if (ratingsBuilder_ == null) {
         if (!other.ratings_.isEmpty()) {
           if (ratings_.isEmpty()) {
             ratings_ = other.ratings_;
-            bitField0_ = (bitField0_ & ~0x00000080);
+            bitField0_ = (bitField0_ & ~0x00000100);
           } else {
             ensureRatingsIsMutable();
             ratings_.addAll(other.ratings_);
@@ -545,7 +599,7 @@ public  final class Answer extends
             ratingsBuilder_.dispose();
             ratingsBuilder_ = null;
             ratings_ = other.ratings_;
-            bitField0_ = (bitField0_ & ~0x00000080);
+            bitField0_ = (bitField0_ & ~0x00000100);
             ratingsBuilder_ = 
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                  getRatingsFieldBuilder() : null;
@@ -806,12 +860,81 @@ public  final class Answer extends
       return this;
     }
 
+    private java.lang.Object systemresponse_ = "";
+    /**
+     * <code>optional string systemresponse = 8;</code>
+     */
+    public java.lang.String getSystemresponse() {
+      java.lang.Object ref = systemresponse_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        systemresponse_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>optional string systemresponse = 8;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSystemresponseBytes() {
+      java.lang.Object ref = systemresponse_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        systemresponse_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>optional string systemresponse = 8;</code>
+     */
+    public Builder setSystemresponse(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      systemresponse_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string systemresponse = 8;</code>
+     */
+    public Builder clearSystemresponse() {
+      
+      systemresponse_ = getDefaultInstance().getSystemresponse();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string systemresponse = 8;</code>
+     */
+    public Builder setSystemresponseBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      systemresponse_ = value;
+      onChanged();
+      return this;
+    }
+
     private java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating> ratings_ =
       java.util.Collections.emptyList();
     private void ensureRatingsIsMutable() {
-      if (!((bitField0_ & 0x00000080) == 0x00000080)) {
+      if (!((bitField0_ & 0x00000100) == 0x00000100)) {
         ratings_ = new java.util.ArrayList<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating>(ratings_);
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
        }
     }
 
@@ -819,7 +942,7 @@ public  final class Answer extends
         edu.kit.ipd.crowdcontrol.objectservice.proto.Rating, edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder> ratingsBuilder_;
 
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating> getRatingsList() {
       if (ratingsBuilder_ == null) {
@@ -829,7 +952,7 @@ public  final class Answer extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public int getRatingsCount() {
       if (ratingsBuilder_ == null) {
@@ -839,7 +962,7 @@ public  final class Answer extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Rating getRatings(int index) {
       if (ratingsBuilder_ == null) {
@@ -849,7 +972,7 @@ public  final class Answer extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public Builder setRatings(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Rating value) {
@@ -866,7 +989,7 @@ public  final class Answer extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public Builder setRatings(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder builderForValue) {
@@ -880,7 +1003,7 @@ public  final class Answer extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public Builder addRatings(edu.kit.ipd.crowdcontrol.objectservice.proto.Rating value) {
       if (ratingsBuilder_ == null) {
@@ -896,7 +1019,7 @@ public  final class Answer extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public Builder addRatings(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Rating value) {
@@ -913,7 +1036,7 @@ public  final class Answer extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public Builder addRatings(
         edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder builderForValue) {
@@ -927,7 +1050,7 @@ public  final class Answer extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public Builder addRatings(
         int index, edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder builderForValue) {
@@ -941,7 +1064,7 @@ public  final class Answer extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public Builder addAllRatings(
         java.lang.Iterable<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.Rating> values) {
@@ -956,12 +1079,12 @@ public  final class Answer extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public Builder clearRatings() {
       if (ratingsBuilder_ == null) {
         ratings_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         onChanged();
       } else {
         ratingsBuilder_.clear();
@@ -969,7 +1092,7 @@ public  final class Answer extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public Builder removeRatings(int index) {
       if (ratingsBuilder_ == null) {
@@ -982,14 +1105,14 @@ public  final class Answer extends
       return this;
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder getRatingsBuilder(
         int index) {
       return getRatingsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder getRatingsOrBuilder(
         int index) {
@@ -999,7 +1122,7 @@ public  final class Answer extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder> 
          getRatingsOrBuilderList() {
@@ -1010,14 +1133,14 @@ public  final class Answer extends
       }
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder addRatingsBuilder() {
       return getRatingsFieldBuilder().addBuilder(
           edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder addRatingsBuilder(
         int index) {
@@ -1025,7 +1148,7 @@ public  final class Answer extends
           index, edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.getDefaultInstance());
     }
     /**
-     * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+     * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
      */
     public java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder> 
          getRatingsBuilderList() {
@@ -1038,7 +1161,7 @@ public  final class Answer extends
         ratingsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
             edu.kit.ipd.crowdcontrol.objectservice.proto.Rating, edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.Builder, edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder>(
                 ratings_,
-                ((bitField0_ & 0x00000080) == 0x00000080),
+                ((bitField0_ & 0x00000100) == 0x00000100),
                 getParentForChildren(),
                 isClean());
         ratings_ = null;

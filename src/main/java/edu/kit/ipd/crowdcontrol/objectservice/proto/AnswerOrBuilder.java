@@ -48,25 +48,35 @@ public interface AnswerOrBuilder extends
   int getQuality();
 
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>optional string systemresponse = 8;</code>
+   */
+  java.lang.String getSystemresponse();
+  /**
+   * <code>optional string systemresponse = 8;</code>
+   */
+  com.google.protobuf.ByteString
+      getSystemresponseBytes();
+
+  /**
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   java.util.List<edu.kit.ipd.crowdcontrol.objectservice.proto.Rating> 
       getRatingsList();
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.Rating getRatings(int index);
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   int getRatingsCount();
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   java.util.List<? extends edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder> 
       getRatingsOrBuilderList();
   /**
-   * <code>repeated .crowdcontrol.Rating ratings = 8;</code>
+   * <code>repeated .crowdcontrol.Rating ratings = 9;</code>
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder getRatingsOrBuilder(
       int index);
