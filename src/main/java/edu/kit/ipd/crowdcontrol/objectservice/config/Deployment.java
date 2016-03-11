@@ -7,7 +7,7 @@ public class Deployment {
     /**
      * Port to listen on
      */
-    public Integer port;
+    public int port = 4567;
     /**
      * Deployment origin of the control-ui
      */

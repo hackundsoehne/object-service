@@ -137,7 +137,7 @@ public class Main {
                     config.moneytransfer.scheduleInterval,
                     config.moneytransfer.payOffThreshold,
                     disabledMail,
-                    config.deployment.port == null ? 4567 : config.deployment.port
+                    config.deployment.port
             );
         } catch (NamingException | SQLException e) {
             System.err.println("Unable to establish database connection.");
