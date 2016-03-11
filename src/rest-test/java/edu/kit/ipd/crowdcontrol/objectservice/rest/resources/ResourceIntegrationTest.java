@@ -131,8 +131,15 @@ public class ResourceIntegrationTest {
         assertEquals(406, response.getStatus());
 
         response = Unirest.put(ORIGIN + "/templates")
+                .header("accept", "application/json")
+                .body("").asString();
+
+        assertEquals(415, response.getStatus());
+
+        response = Unirest.put(ORIGIN + "/templates")
                 .header("content-type", "text/plain")
-                .asString();
+                .header("accept", "application/json")
+                .body("").asString();
 
         assertEquals(415, response.getStatus());
     }

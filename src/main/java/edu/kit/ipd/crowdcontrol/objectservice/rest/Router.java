@@ -120,7 +120,7 @@ public class Router implements SparkApplication {
             LOGGER.debug("Dispatching request " + request.requestMethod() + " " + request.uri());
 
             if (request.headers("accept") == null) {
-                throw new BadRequestException("Missing required 'accept' header.");
+                throw new NotAcceptableException("", "application/json", "application/protobuf");
             }
 
             response.header("access-control-allow-origin", origin);
@@ -251,9 +251,11 @@ public class Router implements SparkApplication {
         if (code == null) {
             code = "";
         }
+
         if (detail == null) {
             detail = "";
         }
+
         ErrorResponse error = ErrorResponse.newBuilder().setCode(code).setDetail(detail).build();
         return OutputTransformer.transform(request, response, error);
     }

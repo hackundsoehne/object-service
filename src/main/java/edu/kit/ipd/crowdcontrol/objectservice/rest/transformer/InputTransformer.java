@@ -51,6 +51,10 @@ public class InputTransformer implements Route {
         String body = request.body();
         String contentType = request.contentType();
 
+        if (contentType == null) {
+            throw new UnsupportedMediaTypeException("", "application/json", "application/protobuf");
+        }
+
         Method method = this.type.getMethod("newBuilder");
         Message.Builder builder = (Message.Builder) method.invoke(null);
 
