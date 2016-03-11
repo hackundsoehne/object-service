@@ -42,16 +42,21 @@ public class ResourceIntegrationTest {
         Calibration put = Calibration.newBuilder()
                 .setName("Gender")
                 .setQuestion("What's your gender?")
-                .addAnswers(Calibration.Answer.newBuilder().setAnswer("answer1").build())
-                .addAnswers(Calibration.Answer.newBuilder().setAnswer("answer2").build())
-                .addAcceptedAnswers(Calibration.Answer.newBuilder().setAnswer("answer1").build())
+                .addAnswers(Calibration.Answer.newBuilder().setAnswer("male").build())
+                .addAnswers(Calibration.Answer.newBuilder().setAnswer("female").build())
+                .addAnswers(Calibration.Answer.newBuilder().setAnswer("other").build())
+                .addAcceptedAnswers(Calibration.Answer.newBuilder().setAnswer("male").build())
                 .build();
 
         Calibration calibration = httpPut("/calibrations", put, Calibration.class);
 
+        // ID gets ignored
         assertTrue(calibration.getId() > 0);
-        assertEquals(put.toBuilder().clearAcceptedAnswers().clearAnswers().build(), calibration.toBuilder().setId(0).clearAnswers().build());
 
+        // Accepted answers must not be saved
+        assertEquals(put.toBuilder().clearAcceptedAnswers().build(), calibration.toBuilder().clearId().build());
+
+        // Returned calibration must be equal to the returned version when using GET
         Calibration received = httpGet("/calibrations/" + calibration.getId(), Calibration.class);
         assertEquals(calibration, received);
 
@@ -62,6 +67,9 @@ public class ResourceIntegrationTest {
 
         list = httpGet("/calibrations", CalibrationList.class);
         assertSame(0, list.getItemsCount());
+
+        ErrorResponse error = httpGet("/calibrations/42", ErrorResponse.class);
+        assertEquals("notFound", error.getCode());
     }
 
     @Test
@@ -75,13 +83,19 @@ public class ResourceIntegrationTest {
                 .setAnswerType(AnswerType.TEXT)
                 .addConstraints(Constraint.newBuilder().setName("constraint").build())
                 .addTags(Tag.newBuilder().setName("tag").build())
+                .addRatingOptions(Template.RatingOption.newBuilder().setName("good").setValue(9).build())
+                .addRatingOptions(Template.RatingOption.newBuilder().setName("bad").setValue(0).build())
                 .build();
 
         Template template = httpPut("/templates", put, Template.class);
 
+        // ID gets ignored
         assertTrue(template.getId() > 0);
-        assertEquals(put, template.toBuilder().setId(0).build());
 
+        // All properties except ID must be equal
+        assertEquals(put, template.toBuilder().clearId().build());
+
+        // Returned template must be equal to the returned version when using GET
         Template received = httpGet("/templates/" + template.getId(), Template.class);
         assertEquals(template, received);
 
@@ -92,6 +106,9 @@ public class ResourceIntegrationTest {
 
         list = httpGet("/templates", TemplateList.class);
         assertSame(0, list.getItemsCount());
+
+        ErrorResponse error = httpGet("/templates/42", ErrorResponse.class);
+        assertEquals("notFound", error.getCode());
     }
 
     public static <T extends Message> T httpGet(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
