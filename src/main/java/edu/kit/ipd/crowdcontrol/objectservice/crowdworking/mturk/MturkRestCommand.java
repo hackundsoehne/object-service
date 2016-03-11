@@ -33,7 +33,6 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
     private final HttpRequest request;
     private final Class<K> klass;
     private final String uniqueRestToken;
-    private final String version;
 
     /**
      * Creates a new command
@@ -51,7 +50,6 @@ public abstract class MturkRestCommand<T,K> extends CompletableFuture<T> impleme
         this.uniqueRestToken = UUID.randomUUID().toString().substring(0,20);
         this.klass = klass;
         this.transformer = transformer;
-        this.version = version;
 
         request = Unirest.get(con.url)
                 .queryString("UniqueRequestToken", uniqueRestToken)
