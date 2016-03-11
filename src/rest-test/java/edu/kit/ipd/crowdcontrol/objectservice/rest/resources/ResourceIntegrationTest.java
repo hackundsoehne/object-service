@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -46,7 +47,6 @@ public class ResourceIntegrationTest {
                 .setQuestion("What's your gender?")
                 .addAnswers(Calibration.Answer.newBuilder().setAnswer("male").build())
                 .addAnswers(Calibration.Answer.newBuilder().setAnswer("female").build())
-                .addAnswers(Calibration.Answer.newBuilder().setAnswer("other").build())
                 .addAcceptedAnswers(Calibration.Answer.newBuilder().setAnswer("male").build())
                 .build();
 
@@ -183,6 +183,21 @@ public class ResourceIntegrationTest {
     private static <T extends Message> T fromResponse(HttpResponse<InputStream> response, Class<T> type) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         if (response.getStatus() == 204) {
             return null;
+        }
+
+        if (response.getStatus() >= 400 && !(type.equals(ErrorResponse.class))) {
+            try {
+                ErrorResponse.Builder builder = ErrorResponse.newBuilder();
+                builder.mergeFrom(response.getBody());
+
+                throw new RuntimeException("Error (" + response.getStatus() + "): " + builder.getCode() + ": " + builder.getDetail());
+            } catch (InvalidProtocolBufferException e) {
+                try (java.util.Scanner s = new java.util.Scanner(response.getBody())) {
+                    String body = s.useDelimiter("\\A").hasNext() ? s.next() : "";
+
+                    throw new RuntimeException("Error (" + response.getStatus() + "): " + body);
+                }
+            }
         }
 
         Method method = type.getMethod("newBuilder");
