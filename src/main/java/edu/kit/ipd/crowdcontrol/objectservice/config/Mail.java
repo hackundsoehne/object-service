@@ -14,7 +14,7 @@ public class Mail {
     /**
      * The mail address, that gets displayed as sender in moneytransfer mails.
      */
-    public String sendMail;
+    public String sendsMailsFrom;
 
 
 }

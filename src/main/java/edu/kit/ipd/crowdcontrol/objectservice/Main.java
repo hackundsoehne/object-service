@@ -139,7 +139,7 @@ public class Main {
                     config.moneytransfer.scheduleInterval,
                     config.moneytransfer.payOffThreshold,
                     disabledMail,
-                    config.mail.sendMail,
+                    config.mail.sendsMailsFrom,
                     config.deployment.port
             );
         } catch (NamingException | SQLException e) {
@@ -197,14 +197,15 @@ public class Main {
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
 
-        MailHandler mailHandler = getMailHandler(mailDisabled, sendMail);
+        MailFetcher mailFetcher = getMailFetcher(mailDisabled, sendMail);
+        MailSender mailSender = getMailSender(mailDisabled, sendMail);
 
-        MoneyTransferManager mng = new MoneyTransferManager(mailHandler, mailHandler, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
+        MoneyTransferManager mng = new MoneyTransferManager(mailFetcher, mailSender, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
         mng.start();
 
         // notifications might as well use another sendMail instance
         NotificationController notificationController = new NotificationController(notificationRestOperations,
-                new SQLEmailNotificationPolicy(mailHandler, notificationRestOperations));
+                new SQLEmailNotificationPolicy(mailSender, notificationRestOperations));
         notificationController.init();
 
         Payment payment = (id, experiment, paymentJob) -> {
@@ -237,10 +238,21 @@ public class Main {
         ).init();
     }
 
-    private static MailHandler getMailHandler(boolean mailDisabled, String sendMailAddress) throws MessagingException {
+    private static MailSender getMailSender(boolean mailDisabled, String sendMailAddress) throws MessagingException {
         if (mailDisabled) {
             return new CommandLineMailHandler();
         }
+        return getMailHandler(sendMailAddress);
+    }
+
+    private static MailFetcher getMailFetcher(boolean mailDisabled, String sendMailAddress) throws MessagingException {
+        if (mailDisabled) {
+            return new CommandLineMailHandler();
+        }
+        return getMailHandler(sendMailAddress);
+    }
+
+    private static MailHandler getMailHandler(String sendMailAddress) throws MessagingException {
         Properties properties = new Properties();
         String mailPropertiesPath;
         if (System.getProperty("objectservice.config.mail") != null) {
