@@ -16,8 +16,12 @@ database:
         user: crowdreader
         password:
 
-# Deployment of object service, control-ui, worker-ui
+# Deployment of object-service, control-ui, worker-ui
 deployment:
+    # Port for the object-service (optional)
+    # default value is 4567 if ommited
+    port: 4567
+
     # Origin of the control-ui
     # Port has to match the URL of the UI and have no / at the end
     origin: http://localhost:3000
