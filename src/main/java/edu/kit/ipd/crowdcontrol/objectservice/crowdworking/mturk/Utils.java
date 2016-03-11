@@ -32,7 +32,7 @@ public class Utils {
                 builder.append(error.getMessage());
                 builder.append("\n");
                 for (KeyValuePair pair : error.getData()) {
-                    builder.append(pair.getKey()+" = "+pair.getValue());
+                    builder.append(pair.getKey()).append(" = ").append(pair.getValue());
                 }
             }
             throw new RequestException(builder.toString());

@@ -22,7 +22,7 @@ public interface Payment {
      * @param data the data associated with the ExperimentsPlatformRecord
      * @param experiment experiment which is to be payed
      * @param paymentJob a list of tuples which maps each worker to a value
-     * @return
+     * @return A Completable future which completes once the list of payments is submitted and done
      */
     CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob);
 }
