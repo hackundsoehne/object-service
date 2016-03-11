@@ -128,13 +128,13 @@ public class ResourceIntegrationTest {
                 .header("accept", "text/plain")
                 .asString();
 
-        assertSame(406, response.getStatus());
+        assertEquals(406, response.getStatus());
 
         response = Unirest.get(ORIGIN + "/templates")
                 .header("content-type", "text/plain")
                 .asString();
 
-        assertSame(415, response.getStatus());
+        assertEquals(415, response.getStatus());
     }
 
     public static <T extends Message> T httpGet(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
