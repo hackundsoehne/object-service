@@ -280,7 +280,7 @@ public class MturkPlatform implements Platform,Payment {
         List<CompletableFuture<Boolean>> messages = new ArrayList<>();
 
         String tooLongMessage = loadFiles("/mturk/TooLongMessage.txt");
-        String subjectLine = loadFiles("/mturk/subjectLine.txt");
+        String subjectLine = loadFiles("/mturk/SubjectLine.txt");
         //while loop sents messages if needed message would be gibber than MAX_LENGTH
         while(length - current_location > NotifyWorker.MAX_LENGTH) {
             int old_current_location = current_location;
