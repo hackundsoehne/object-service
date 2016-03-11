@@ -4,7 +4,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Gift
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +15,10 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Describes a Manager for money transfers. The Manager can log payments and pay off.
@@ -24,7 +28,8 @@ import java.util.concurrent.*;
 public class MoneyTransferManager {
 
     private static final Logger LOGGER = LogManager.getLogger(MoneyTransferManager.class);
-    private final MailHandler mailHandler;
+    private final MailSender mailSender;
+    private final MailFetcher mailFetcher;
     private final WorkerBalanceOperations workerBalanceOperations;
     private final WorkerOperations workerOperations;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -43,13 +48,15 @@ public class MoneyTransferManager {
     /**
      * Creates a new instance of the MoneyTransferManager
      *
-     * @param mailHandler             the mailhandler, used to fetch new giftcodes and send notification and payment messages
+     * @param mailFetcher             the mailfetcher, used to fetch new giftcodes
+     * @param mailSender              the mailsender, used send notification and payment messages
      * @param workerBalanceOperations the workerBalanceOperations, used to change the credit balance of a worker
      * @param workerOperations        the workerOperations, used to do operations on workers
      * @param notificationMailAddress the mail address to send notifications
      */
-    public MoneyTransferManager(MailHandler mailHandler, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, String notificationMailAddress, String parsingPassword, int scheduleIntervalDays, int payOffThreshold) {
-        this.mailHandler = mailHandler;
+    public MoneyTransferManager(MailFetcher mailFetcher, MailSender mailSender, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, String notificationMailAddress, String parsingPassword, int scheduleIntervalDays, int payOffThreshold) {
+        this.mailFetcher = mailFetcher;
+        this.mailSender = mailSender;
         this.workerOperations = workerOperations;
         this.workerBalanceOperations = workerBalanceOperations;
         this.payOffThreshold = payOffThreshold;
@@ -81,8 +88,7 @@ public class MoneyTransferManager {
             }
         };
 
-
-        schedule = scheduler.scheduleAtFixedRate(runnable, scheduleIntervalDays, scheduleIntervalDays, TimeUnit.DAYS);
+        schedule = scheduler.scheduleAtFixedRate(runnable, 0, scheduleIntervalDays, TimeUnit.DAYS);
 
     }
 
@@ -150,7 +156,7 @@ public class MoneyTransferManager {
 
         //fetch new mails
         try {
-            messages = mailHandler.fetchUnseen("inbox");
+            messages = mailFetcher.fetchUnseen("inbox");
         } catch (MessagingException e) {
             throw new MoneyTransferException("The MailHandler couldn't fetch new giftcodes from the mailserver. " +
                     "It seems, that there is either a problem with the server or with the properties file.");
@@ -167,7 +173,7 @@ public class MoneyTransferManager {
                 }
             } catch (MoneyTransferException e) {
                 try {
-                    mailHandler.markAsUnseen(message);
+                    mailFetcher.markAsUnseen(message);
                     throw new MoneyTransferException(e.getMessage());
                 } catch (MessagingException f) {
 
@@ -264,7 +270,7 @@ public class MoneyTransferManager {
 
         //sends payment message and saves the giftcodes to the database
         try {
-            mailHandler.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage);
+            mailSender.sendMail(worker.getEmail(), "Your payment for your Crowdworking", paymentMessage);
             for (GiftCodeRecord rec : giftCodes) {
                 workerBalanceOperations.addDebit(worker.getIdWorker(), rec.getAmount(), rec.getIdGiftCode());
             }
@@ -295,7 +301,7 @@ public class MoneyTransferManager {
         try {
             if (notificationText.length() != 0) {
                 LOGGER.trace("Started sending a notification about problems with submission of giftcodes.");
-                mailHandler.sendMail(notificationMailAddress, subject, mail.toString());
+                mailSender.sendMail(notificationMailAddress, subject, mail.toString());
                 LOGGER.trace("Completed sending a notification about problems with submission of giftcodes.");
             }
         } catch (MessagingException e) {
@@ -325,7 +331,7 @@ public class MoneyTransferManager {
         try {
             if (notificationText.length() != 0) {
                 LOGGER.trace("Started sending a notification about errors with submission of giftcodes.");
-                mailHandler.sendMail(notificationMailAddress, subject, mail.toString());
+                mailSender.sendMail(notificationMailAddress, subject, mail.toString());
                 LOGGER.trace("Completed sending a notification about errors with submission of giftcodes.");
             }
         } catch (MessagingException | UnsupportedEncodingException e) {

@@ -97,12 +97,14 @@ gradle-app.setting
 !gradle-wrapper.jar
 
 #integration-test properties
-gmailLogin.properties
-webLogin.properties
-mailHandlerTestProps.properties
+gmailTest.properties
+webTest.properties
 
 #mail properties
 mailConfig.properties
+
+#moneytransferTest properties
+gmailLogin.properties
 
 config.yaml
 mturk.properties

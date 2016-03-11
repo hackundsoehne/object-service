@@ -18,8 +18,21 @@ public class WebMailTest extends MailHandlerTest {
         this.mail = "pse2016@web.de";
         this.folder = "INBOX";
 
+        Properties properties = new Properties();
+        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/integration-test/resources/webTest.properties"));
+        properties.load(stream);
+        stream.close();
+
+        this.receiver = properties.getProperty("receiver");
+
+        Authenticator auth = new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
+            }
+        };
+
         Properties props = new Properties();
-        props.put("sender", this.mail);
         props.put("mail.smtp.host", "smtp.web.de");
         props.put("mail.smtp.port", "587");
         props.put("mail.transport.protocol", "smtp");
@@ -31,23 +44,9 @@ public class WebMailTest extends MailHandlerTest {
         props.put("mail.store.protocol", "imap");
         props.put("mail.imap.host", "imap.web.de");
         props.put("mail.imap.port", "993");
-        props.put("mail.imap.ssl", "true");
-        props.put("mail.imal.ssl.enable", "true");
-        java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+        props.put("mail.imap.ssl.enable", "true");
         props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.put("mail.imap.socketFactory.fallback", "false");
 
-        Properties properties = new Properties();
-        BufferedInputStream stream = new BufferedInputStream(new FileInputStream("src/integration-test/resources/webLogin.properties"));
-        properties.load(stream);
-        stream.close();
-
-        Authenticator auth = new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
-            }
-        };
-        handler = new MailHandler(props, auth);
+        handler = new MailHandler(props, auth, this.mail);
     }
 }

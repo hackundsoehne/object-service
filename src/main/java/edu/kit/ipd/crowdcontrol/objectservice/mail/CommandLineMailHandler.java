@@ -15,21 +15,8 @@ import java.util.Properties;
  * @author LeanderK
  * @version 1.0
  */
-public class CommandLineMailHandler extends MailHandler {
+public class CommandLineMailHandler implements MailSender, MailFetcher {
     private static final Logger LOGGER = LogManager.getRootLogger();
-
-    /**
-     * A CommandLineMailHandler object to send and fetch emails.
-     * @throws MessagingException            For other problems e.g. with properties object: unvalid domains, ports not valid etc.
-     */
-    public CommandLineMailHandler() throws MessagingException {
-        super(new Properties(), new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return super.getPasswordAuthentication();
-            }
-        });
-    }
 
     /**
      * Fetches all unseen mails in a certain folder and marks them as seen.

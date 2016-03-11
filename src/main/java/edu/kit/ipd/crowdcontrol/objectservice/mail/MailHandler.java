@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
+import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -27,9 +29,8 @@ public class MailHandler implements MailFetcher, MailSender {
      * @throws AuthenticationFailedException Throws this exception, if there is a problem with the authentication
      * @throws MessagingException            For other problems e.g. with properties object: unvalid domains, ports not valid etc.
      */
-    public MailHandler(Properties props, Authenticator auth) throws MessagingException {
-        sender = props.getProperty("sender");
-        props.remove("sender");
+    public MailHandler(Properties props, Authenticator auth, String sender) throws MessagingException {
+        this.sender = sender;
         this.props = props;
         this.auth = auth;
     }

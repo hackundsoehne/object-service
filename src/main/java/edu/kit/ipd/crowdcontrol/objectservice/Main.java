@@ -16,7 +16,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.CommandLineMailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.SQLEmailNotificationPolicy;
@@ -137,6 +139,7 @@ public class Main {
                     config.moneytransfer.scheduleInterval,
                     config.moneytransfer.payOffThreshold,
                     disabledMail,
+                    config.mail.sendsMailsFrom,
                     config.deployment.port
             );
         } catch (NamingException | SQLException e) {
@@ -177,7 +180,7 @@ public class Main {
         return config;
     }
 
-    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferMailAddress, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold, boolean mailDisabled, int port) throws SQLException, IOException, MessagingException {
+    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferMailAddress, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold, boolean mailDisabled, String sendMail, int port) throws SQLException, IOException, MessagingException {
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnly.user, readOnly.password);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
@@ -194,14 +197,15 @@ public class Main {
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
 
-        MailHandler mailHandler = getMailHandler(mailDisabled);
+        MailFetcher mailFetcher = getMailFetcher(mailDisabled, sendMail);
+        MailSender mailSender = getMailSender(mailDisabled, sendMail);
 
-        MoneyTransferManager mng = new MoneyTransferManager(mailHandler, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
+        MoneyTransferManager mng = new MoneyTransferManager(mailFetcher, mailSender, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
         mng.start();
 
         // notifications might as well use another sendMail instance
         NotificationController notificationController = new NotificationController(notificationRestOperations,
-                new SQLEmailNotificationPolicy(mailHandler, notificationRestOperations));
+                new SQLEmailNotificationPolicy(mailSender, notificationRestOperations));
         notificationController.init();
 
         Payment payment = (id, experiment, paymentJob) -> {
@@ -234,10 +238,21 @@ public class Main {
         ).init();
     }
 
-    private static MailHandler getMailHandler(boolean mailDisabled) throws MessagingException {
+    private static MailSender getMailSender(boolean mailDisabled, String sendMailAddress) throws MessagingException {
         if (mailDisabled) {
             return new CommandLineMailHandler();
         }
+        return getMailHandler(sendMailAddress);
+    }
+
+    private static MailFetcher getMailFetcher(boolean mailDisabled, String sendMailAddress) throws MessagingException {
+        if (mailDisabled) {
+            return new CommandLineMailHandler();
+        }
+        return getMailHandler(sendMailAddress);
+    }
+
+    private static MailHandler getMailHandler(String sendMailAddress) throws MessagingException {
         Properties properties = new Properties();
         String mailPropertiesPath;
         if (System.getProperty("objectservice.config.mail") != null) {
@@ -246,6 +261,7 @@ public class Main {
             mailPropertiesPath = "src/main/resources/mailConfig.properties";
         }
 
+        String sender = sendMailAddress;
         try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(mailPropertiesPath))) {
             properties.load(stream);
         } catch (IOException e) {
@@ -263,7 +279,6 @@ public class Main {
 
             properties.setProperty("username", System.getenv("MAIL_USERNAME"));
             properties.setProperty("password", System.getenv("MAIL_PASSWORD"));
-            properties.setProperty("sender", System.getenv("MAIL_USERNAME"));
             properties.setProperty("mail.smtp.host", "smtp.gmail.com");
             properties.setProperty("mail.smtp.auth", "true");
             properties.setProperty("mail.smtp.starttls.enable", "true");
@@ -275,6 +290,8 @@ public class Main {
             properties.setProperty("mail.imap.ssl", "true");
             properties.setProperty("mail.imap.ssl.enable", "true");
             properties.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+
+            sender = System.getenv("MAIL_USERNAME");
         }
 
         return new MailHandler(properties, new Authenticator() {
@@ -282,6 +299,6 @@ public class Main {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
             }
-        });
+        }, sender);
     }
 }

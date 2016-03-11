@@ -14,6 +14,9 @@ deployment:
 platforms :
     - type: dummy
 
+mail:
+    sendsMailsFrom: pseipd@gmail.com
+
 moneytransfer:
     payOffThreshold: 0
     parsingPassword: test
