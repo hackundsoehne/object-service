@@ -130,7 +130,7 @@ public class ResourceIntegrationTest {
 
         assertEquals(406, response.getStatus());
 
-        response = Unirest.get(ORIGIN + "/templates")
+        response = Unirest.put(ORIGIN + "/templates")
                 .header("content-type", "text/plain")
                 .asString();
 
