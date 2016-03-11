@@ -154,7 +154,7 @@ public class PyBossaPlatform implements Platform {
     }
 
     @Override
-    public CompletableFuture<Boolean> unpublishTask(int id, JsonElement data) {
+    public CompletableFuture<Boolean> unpublishTask(JsonElement data) {
         return CompletableFuture.supplyAsync(() -> requests.deleteTask(data.getAsJsonObject().get("identification").getAsString()));
     }
 

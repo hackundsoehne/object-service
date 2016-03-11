@@ -50,11 +50,10 @@ public interface Platform {
 
     /**
      * Unpublish the given id from the platform, after this call no worker should be able access the before published experiment.
-     * @param id the id of ExperimentsPlatform the before published experiment
      * @param data the stored data
      * @return true on success, false or a exception if it failed
      */
-    CompletableFuture<Boolean> unpublishTask(int id, JsonElement data);
+    CompletableFuture<Boolean> unpublishTask(JsonElement data);
 
     /**
      * Returns if calibration questions can be asked on this platform

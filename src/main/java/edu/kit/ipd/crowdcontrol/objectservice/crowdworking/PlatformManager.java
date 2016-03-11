@@ -146,7 +146,7 @@ public class PlatformManager {
                 record.setPlatformData(s1);
                 experimentsPlatformOps.updateExperimentsPlatform(record);
                 if (!experimentsPlatformOps.updateExperimentsPlatform(record)) {
-                    getPlatform(name).get().unpublishTask(record.getIdexperimentsPlatforms(), record.getPlatformData())
+                    getPlatform(name).get().unpublishTask(record.getPlatformData())
                             .join();
                     throw new IllegalStateException("Updating record for published experimentsPlatform failed");
                 }
@@ -201,7 +201,7 @@ public class PlatformManager {
         if (record == null)
             return CompletableFuture.completedFuture(true);
 
-        return getPlatformOrThrow(name).unpublishTask(record.getIdexperimentsPlatforms(), record.getPlatformData())
+        return getPlatformOrThrow(name).unpublishTask(record.getPlatformData())
                 .handle((success, throwable) -> {
                     if (throwable != null) throw new RuntimeException(throwable);
 

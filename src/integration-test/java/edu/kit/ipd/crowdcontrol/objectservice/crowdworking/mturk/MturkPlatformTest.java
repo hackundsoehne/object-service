@@ -49,12 +49,12 @@ public class MturkPlatformTest {
 
     @Test
     public void testPlatform() throws Exception {
-        JsonElement id = platform.publishTask(experiment).join();
+        JsonElement data = platform.publishTask(experiment).join();
 
-        platform.unpublishTask(0, id).join();
+        platform.unpublishTask(data).join();
 
         //shound not fail
-        platform.payExperiment(0, id, experiment, Collections.emptyList()).join();
+        platform.payExperiment(0, data, experiment, Collections.emptyList()).join();
 
     }
 
@@ -62,7 +62,7 @@ public class MturkPlatformTest {
     public void testFailure() throws Exception {
         JsonElement id = platform.publishTask(experiment).join();
 
-        platform.unpublishTask(0, id).join();
+        platform.unpublishTask(id).join();
 
         //shound not fail
         List<PaymentJob> paymentJobs = new ArrayList<>();

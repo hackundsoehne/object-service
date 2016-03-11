@@ -99,7 +99,7 @@ public class DummyPlatform implements Platform, Payment {
      * @return true on success, false or a exception if it failed
      */
     @Override
-    public CompletableFuture<Boolean> unpublishTask(int id, JsonElement data) {
+    public CompletableFuture<Boolean> unpublishTask(JsonElement data) {
         return CompletableFuture.completedFuture(true);
     }
 

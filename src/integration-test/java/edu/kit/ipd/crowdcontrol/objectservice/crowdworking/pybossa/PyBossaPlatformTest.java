@@ -78,7 +78,7 @@ public class PyBossaPlatformTest {
         // get first available task
         JSONArray tasks = requests.getAllTasks();
         String taskId = String.valueOf(tasks.optJSONObject(0).getInt("id"));
-        CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(0, new JsonPrimitive(taskId));
+        CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(new JsonPrimitive(taskId));
         assertTrue(booleanCompletableFuture.get());
     }
 

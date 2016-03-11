@@ -140,7 +140,7 @@ public class MturkPlatform implements Platform,Payment {
     }
 
     @Override
-    public CompletableFuture<Boolean> unpublishTask(int id, JsonElement data) {
+    public CompletableFuture<Boolean> unpublishTask(JsonElement data) {
         return new UnpublishHIT(connection, data.getAsJsonObject().get("identification").getAsString());
     }
 
