@@ -10,6 +10,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
+import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -103,19 +104,17 @@ public class MturkPlatform implements Platform,Payment {
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
+        String jsContent = loadFiles("/mturk/worker-ui/mturk.js");
+        String htmlContent = loadFiles("/mturk/worker-ui/MturkContent.html");
 
-        String content =  "<html>\n" +
-                " <head>\n" +
-                "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>\n" +
-                "  <script type='text/javascript' src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script>\n" +
-                "  <script type='text/javascript' src='https://code.jquery.com/jquery-2.0.0.js'></script>" +
-                " </head>\n" +
-                " <body onload=\"initMturk('"+getID()+"','"+workerServiceUrl+"', '"+experiment.getId()+"');\">" +
-                "<script type='text/javascript' src='"+workerUIUrl+"/worker_ui.js'></script>" +
-                "<script type='text/javascript'>"+loadFiles("/mturk/worker-ui/mturk.js")+"</script>" +
-                "   <div id=\"ractive-container\"></div>" +
-                " </body>\n" +
-                "</html>\n";
+        Map<String, String> params = new HashMap<>();
+        params.put("PlatformName", getID());
+        params.put("WorkerServiceUrl", workerServiceUrl);
+        params.put("WorkerUIUrl", workerUIUrl);
+        params.put("ExperimentId", experiment.getId()+"");
+        params.put("JsEmbed", jsContent);
+
+        String content = Template.apply(htmlContent, params);
 
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
                 experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dallers
@@ -281,7 +280,7 @@ public class MturkPlatform implements Platform,Payment {
         List<CompletableFuture<Boolean>> messages = new ArrayList<>();
 
         String tooLongMessage = loadFiles("/mturk/TooLongMessage.txt");
-
+        String subjectLine = loadFiles("/mturk/subjectLine.txt");
         //while loop sents messages if needed message would be gibber than MAX_LENGTH
         while(length - current_location > NotifyWorker.MAX_LENGTH) {
             int old_current_location = current_location;
@@ -291,15 +290,14 @@ public class MturkPlatform implements Platform,Payment {
             String message = paymentJob.getMessage()
                     .substring(old_current_location, current_location) + "\n"+tooLongMessage;
 
-            String subject = "Details to your assignment ( Message "+counter+")";
+            String subject = String.format(subjectLine, counter);
 
             messages.add(new NotifyWorker(connection, paymentJob.getWorkerRecord().getIdentification(), subject, message));
 
             counter ++;
         }
         messages.add(new NotifyWorker(connection, paymentJob.getWorkerRecord().getIdentification(),
-                "Details to your assignment ( Message "+counter+")",
-                paymentJob.getMessage().substring(current_location, length)));
+                String.format(subjectLine, counter), paymentJob.getMessage().substring(current_location, length)));
 
         return CompletableFuture.supplyAsync(() ->
                 messages.stream()
@@ -308,10 +306,11 @@ public class MturkPlatform implements Platform,Payment {
     }
 
     private CompletableFuture<Boolean> payBonus(PaymentJob paymentJob, Assignment assignment, int amount) {
+        String bonusMessage = loadFiles("/mturk/BonusMessage.txt");
         //if there is money left pay a bonus
         if (amount >= 0) {
             return new GrantBonus(connection,assignment.getAssignmentId(),
-                       paymentJob.getWorkerRecord().getIdentification(),(amount/100d),"This is the bonus for a high rating!");
+                       paymentJob.getWorkerRecord().getIdentification(),(amount/100d), bonusMessage);
         } else {
             return CompletableFuture.completedFuture(true);
         }
