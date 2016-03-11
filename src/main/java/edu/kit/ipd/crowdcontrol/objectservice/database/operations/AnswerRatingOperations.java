@@ -435,7 +435,6 @@ public class AnswerRatingOperations extends AbstractOperations {
         return ratingRecords.stream().map((ratingRecord) -> {
             Result<RatingConstraintRecord> ratingConstraints = create.selectFrom(RATING_CONSTRAINT)
                     .where(RATING_CONSTRAINT.REF_RATING.eq(ratingRecord.getIdRating()))
-                    .and(RATING.RATING_.isNotNull())
                     .fetch();
 
             Result<ConstraintRecord> constraints = create.selectFrom(CONSTRAINT)
