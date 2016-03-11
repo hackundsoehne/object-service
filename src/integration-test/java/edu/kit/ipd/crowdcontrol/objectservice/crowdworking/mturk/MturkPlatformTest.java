@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;

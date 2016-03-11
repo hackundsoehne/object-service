@@ -24,7 +24,7 @@ public class GrantBonus extends MturkRestCommand<Boolean, GrantBonusResponse> {
      * @param message message why you are paying this
      */
     public GrantBonus(MTurkConnection connection, String assignmentId, String workerId, double amount, String message) {
-        super(connection,"GrantBonus", "GrantBonusResult","2014-08-15",
+        super(connection,"GrantBonus", null,"2014-08-15",
                 GrantBonusResponse.class,
                 () -> {
                     Map<String, Object> values = new HashMap<>();

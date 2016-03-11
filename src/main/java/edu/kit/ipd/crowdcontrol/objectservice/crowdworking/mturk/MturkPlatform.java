@@ -10,10 +10,15 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
+import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -88,44 +93,35 @@ public class MturkPlatform implements Platform,Payment {
         });
     }
 
-    private static List<String> loadFiles(List<String> files) {
-        return files.stream().map(s -> {
-            try {
-                return CharStreams
-                        .toString(new InputStreamReader(
-                                Main.class.getResourceAsStream(s)
-                                , Charsets.UTF_8));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        })
-        .filter(s1 -> !s1.isEmpty())
-        .collect(Collectors.toList());
+    private static String loadFiles(String file) {
+        try {
+            return CharStreams
+                    .toString(new InputStreamReader(
+                            Main.class.getResourceAsStream(file)
+                            , Charsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     @Override
     public CompletableFuture<String> publishTask(Experiment experiment) {
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
+        String jsContent = loadFiles("/mturk/worker-ui/mturk.js");
+        String htmlContent = loadFiles("/mturk/worker-ui/MturkContent.html");
 
-        List<String> jsFiles = new ArrayList<>();
-        jsFiles.add("/mturk/worker-ui/mturk.js");
+        Map<String, String> params = new HashMap<>();
+        params.put("PlatformName", getID());
+        params.put("WorkerServiceUrl", workerServiceUrl);
+        params.put("WorkerUIUrl", workerUIUrl);
+        params.put("ExperimentId", experiment.getId()+"");
+        params.put("JsEmbed", jsContent);
 
-        String content =  "<html>\n" +
-                " <head>\n" +
-                "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>\n" +
-                "  <script type='text/javascript' src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script>\n" +
-                "  <script type='text/javascript' src='https://code.jquery.com/jquery-2.0.0.js'></script>" +
-                " </head>\n" +
-                " <body onload=\"initMturk('"+getID()+"','"+workerServiceUrl+"', '"+experiment.getId()+"');\">" +
-                "<script type='text/javascript' src='"+workerUIUrl+"/worker_ui.js'></script>" +
-                loadFiles(jsFiles).stream().map(s ->  "<script type='text/javascript'>"+s+"</script>").collect(Collectors.joining())+
-                "   <div id=\"ractive-container\"></div>" +
-                " </body>\n" +
-                "</html>\n";
+        String content = Template.apply(htmlContent, params);
 
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
-                experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dallers
+                experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dollars
                 TWO_HOURS, //you have 2 hours to do the assignment
                 THIRTY_DAYS, // the experiment is staying for 30 days
                 tags,
@@ -226,6 +222,7 @@ public class MturkPlatform implements Platform,Payment {
                     jobs.add(new ApproveAssignment(connection,assignment.getAssignmentId(),
                             "Thx for passing your answer!"));
                     jobs.add(payBonus(paymentJob, assignment, restAmount));
+                    jobs.add(notifyWorker(paymentJob));
                 } else if (assignment.getAssignmentStatus().equals(AssignmentStatus.APPROVED)) {
                     //the assignment is already approved
                     //check if a bonus was payed
@@ -239,6 +236,12 @@ public class MturkPlatform implements Platform,Payment {
 
                     System.out.println("We should "+should+" diff: "+ difference+"i");
 
+                    //only sent the mail if there was no payedBonus yet
+                    if (payedBonus.compareTo(new BigDecimal(0.001d)) > 0) {
+                        //there will be something payed
+                        jobs.add(notifyWorker(paymentJob));
+                    }
+
                     //check if we payed enough bonus
                     if (difference > 0) {
                         //we need to pay the rest of the bonus
@@ -249,7 +252,7 @@ public class MturkPlatform implements Platform,Payment {
         }
         return CompletableFuture.supplyAsync(() ->
                 jobs.stream().map(CompletableFuture::join)
-                        .filter(aBoolean -> !aBoolean).count() == 0);
+                        .allMatch(Boolean::booleanValue));
     }
 
     /**
@@ -274,12 +277,55 @@ public class MturkPlatform implements Platform,Payment {
         }
     }
 
+    /**
+     * This will notify the worker from the job with the given message from the job
+     *
+     * If the message is longer than 4096 symbols the message is slitted in multiple messages
+     * @param paymentJob the job to pay
+     *
+     * @return A future object that completes when all messages are sent.
+     */
+    private CompletableFuture<Boolean> notifyWorker(PaymentJob paymentJob) {
+        int length = paymentJob.getMessage().length();
+        int current_location = 0;
+        int counter = 0;
+        List<CompletableFuture<Boolean>> messages = new ArrayList<>();
+
+        String tooLongMessage = loadFiles("/mturk/TooLongMessage.txt");
+        String subjectLine = loadFiles("/mturk/SubjectLine.txt");
+        //while loop sents messages if needed message would be gibber than MAX_LENGTH
+        while(length - current_location > NotifyWorker.MAX_LENGTH) {
+            int old_current_location = current_location;
+            //the new location is the maximum - the too long message
+            current_location = current_location + (NotifyWorker.MAX_LENGTH - tooLongMessage.length());
+
+            String message = paymentJob.getMessage()
+                    .substring(old_current_location, current_location) + "\n"+tooLongMessage;
+
+            String subject = String.format(subjectLine, counter);
+
+            messages.add(new NotifyWorker(connection, paymentJob.getWorkerRecord().getIdentification(), subject, message));
+
+            counter ++;
+        }
+        messages.add(new NotifyWorker(connection, paymentJob.getWorkerRecord().getIdentification(),
+                String.format(subjectLine, counter), paymentJob.getMessage().substring(current_location, length)));
+
+        return CompletableFuture.supplyAsync(() ->
+                messages.stream()
+                .map(CompletableFuture::join)
+                        .allMatch(Boolean::booleanValue));
+    }
+
     private CompletableFuture<Boolean> payBonus(PaymentJob paymentJob, Assignment assignment, int amount) {
+        String bonusMessage = loadFiles("/mturk/BonusMessage.txt");
         //if there is money left pay a bonus
         if (amount >= 0) {
-            new GrantBonus(connection,assignment.getAssignmentId(),
-                       paymentJob.getWorkerRecord().getIdentification(),(amount/100d),"This is the bonus for a high rating!");
+            return new GrantBonus(connection,assignment.getAssignmentId(),
+                       paymentJob.getWorkerRecord().getIdentification(),(amount/100d), bonusMessage);
+        } else {
+            return CompletableFuture.completedFuture(true);
         }
-        return CompletableFuture.completedFuture(true);
+
     }
 }
