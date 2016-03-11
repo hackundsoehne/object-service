@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
@@ -452,14 +453,15 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @return number of answers with a final and good quality
      */
     public int getNumberOfFinalGoodAnswers(int idExperiment) {
-        return create.fetchCount(
+        return  return create.fetchCount(
                 DSL.selectFrom(ANSWER)
-                    .where(ANSWER.EXPERIMENT.eq(idExperiment))
-                    .and(ANSWER.QUALITY.greaterOrEqual(
-                            DSL.select(EXPERIMENT.PAYMENT_QUALITY_THRESHOLD)
-                                .from(EXPERIMENT)
-                                .where(EXPERIMENT.ID_EXPERIMENT.eq(idExperiment))
-                    ))
+                        .where(ANSWER.EXPERIMENT.eq(idExperiment))
+                        .and(ANSWER.QUALITY_ASSURED.eq(true).and(Tables.ANSWER.QUALITY.greaterThan(
+                                DSL.select(EXPERIMENT.PAYMENT_QUALITY_THRESHOLD)
+                                        .from(EXPERIMENT)
+                                        .where(EXPERIMENT.ID_EXPERIMENT.eq(idExperiment)))
+                        ))
+                        .or(DSL.condition(true))
         );
     }
 }
