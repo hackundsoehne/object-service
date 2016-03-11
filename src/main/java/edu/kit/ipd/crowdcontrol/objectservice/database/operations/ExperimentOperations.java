@@ -290,6 +290,10 @@ public class ExperimentOperations extends AbstractOperations {
                 .map(Record1::value1);
     }
 
+    /**
+     * Asserts that there are at least two rating options and that their values are between 0 and 9.
+     * @param ratingOptions List of rating options.
+     */
     public void assertRatingOptions(List<Experiment.RatingOption> ratingOptions) {
         if (ratingOptions.size() < 2) {
             throw new IllegalArgumentException("There must be at least two ratings options.");
