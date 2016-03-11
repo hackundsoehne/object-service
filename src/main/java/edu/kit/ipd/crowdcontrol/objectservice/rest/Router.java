@@ -39,6 +39,7 @@ public class Router implements SparkApplication {
     private final AnswerRatingResource answerRatingResource;
     private final WorkerCalibrationResource workerCalibrationResource;
     private final String origin;
+    private final int port;
 
     /**
      * Creates a new instance. Call {@link #init()} afterwards to initialize the routes.
@@ -52,7 +53,8 @@ public class Router implements SparkApplication {
                   AlgorithmResources algorithmResources,
                   AnswerRatingResource answerRatingResource,
                   WorkerCalibrationResource workerCalibrationResource,
-                  String origin) {
+                  String origin,
+                  int port) {
         this.templateResource = templateResource;
         this.notificationResource = notificationResource;
         this.platformResource = platformResource;
@@ -63,11 +65,14 @@ public class Router implements SparkApplication {
         this.answerRatingResource = answerRatingResource;
         this.workerCalibrationResource = workerCalibrationResource;
         this.origin = origin;
+        this.port = port;
     }
 
     @Override
     public void init() {
         LOGGER.trace("Setting up routes for Spark.");
+
+        Spark.port(this.port);
 
         exception(Exception.class, (exception, request, response) -> {
             LOGGER.error("an unknown exception occurred", exception);

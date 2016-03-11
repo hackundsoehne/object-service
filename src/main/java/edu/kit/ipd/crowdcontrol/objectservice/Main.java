@@ -136,7 +136,8 @@ public class Main {
                     config.moneytransfer.parsingPassword,
                     config.moneytransfer.scheduleInterval,
                     config.moneytransfer.payOffThreshold,
-                    disabledMail
+                    disabledMail,
+                    config.deployment.port == null ? 4567 : config.deployment.port
             );
         } catch (NamingException | SQLException e) {
             System.err.println("Unable to establish database connection.");
@@ -176,7 +177,7 @@ public class Main {
         return config;
     }
 
-    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferMailAddress, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold, boolean mailDisabled) throws SQLException, IOException, MessagingException {
+    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferMailAddress, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold, boolean mailDisabled, int port) throws SQLException, IOException, MessagingException {
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnly.user, readOnly.password);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
@@ -228,7 +229,8 @@ public class Main {
                 experimentResource, new AlgorithmResources(algorithmsOperations),
                 new AnswerRatingResource(experimentOperations, answerRatingOperations, workerOperations),
                 new WorkerCalibrationResource(workerCalibrationOperations),
-                origin
+                origin,
+                port
         ).init();
     }
 
