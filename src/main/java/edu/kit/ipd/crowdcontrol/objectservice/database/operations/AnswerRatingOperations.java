@@ -453,7 +453,7 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @return number of answers with a final and good quality
      */
     public int getNumberOfFinalGoodAnswers(int idExperiment) {
-        return  return create.fetchCount(
+        return create.fetchCount(
                 DSL.selectFrom(ANSWER)
                         .where(ANSWER.EXPERIMENT.eq(idExperiment))
                         .and(ANSWER.QUALITY_ASSURED.eq(true).and(Tables.ANSWER.QUALITY.greaterThan(
