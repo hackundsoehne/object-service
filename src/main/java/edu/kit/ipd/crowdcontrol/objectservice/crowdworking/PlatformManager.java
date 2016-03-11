@@ -34,8 +34,8 @@ public class PlatformManager {
     private final Map<String, Platform> platforms;
     private final Function<String, WorkerIdentificationComputation> fallbackWorker;
     private final Payment fallbackPayment;
-    private ExperimentsPlatformOperations experimentsPlatformOps;
-    private WorkerOperations workerOps;
+    private final ExperimentsPlatformOperations experimentsPlatformOps;
+    private final WorkerOperations workerOps;
 
     /**
      * Create a new manager for platforms. The known platforms in the database will be deleted,
