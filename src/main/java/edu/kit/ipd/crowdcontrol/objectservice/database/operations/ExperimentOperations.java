@@ -70,6 +70,10 @@ public class ExperimentOperations extends AbstractOperations {
      */
     public boolean deleteExperiment(int id) throws IllegalStateException {
         return doIfNotRunning(id, trans -> {
+            DSL.using(trans).deleteFrom(EXPERIMENTS_PLATFORM)
+                    .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(id))
+                    .execute();
+
             int deleted = DSL.using(trans)
                     .deleteFrom(EXPERIMENT)
                     .where(EXPERIMENT.ID_EXPERIMENT.eq(id))
