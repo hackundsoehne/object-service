@@ -20,7 +20,7 @@ public class Config {
     public Deployment deployment;
 
     /**
-     * Platform configuration.
+     * Platform configurations
      */
     public ConfigPlatform[] platforms;
 
