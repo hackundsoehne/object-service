@@ -122,8 +122,16 @@ public class ResourceIntegrationTest {
 
     @Test
     public void unsupportedMediaType() throws UnirestException {
-        HttpResponse<String> response = Unirest.get(ORIGIN + "/templates")
+        HttpResponse<String> response;
+
+        response = Unirest.get(ORIGIN + "/templates")
                 .header("accept", "text/plain")
+                .asString();
+
+        assertSame(406, response.getStatus());
+
+        response = Unirest.get(ORIGIN + "/templates")
+                .header("content-type", "text/plain")
                 .asString();
 
         assertSame(415, response.getStatus());
