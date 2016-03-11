@@ -15,6 +15,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -117,7 +121,7 @@ public class MturkPlatform implements Platform,Payment {
         String content = Template.apply(htmlContent, params);
 
         return new PublishHIT(connection,experiment.getTitle(),experiment.getDescription(),
-                experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dallers
+                experiment.getPaymentBase().getValue()/100d, //we are getting cents passed and have to pass dollars
                 TWO_HOURS, //you have 2 hours to do the assignment
                 THIRTY_DAYS, // the experiment is staying for 30 days
                 tags,
@@ -273,6 +277,14 @@ public class MturkPlatform implements Platform,Payment {
         }
     }
 
+    /**
+     * This will notify the worker from the job with the given message from the job
+     *
+     * If the message is longer than 4096 symbols the message is slitted in multiple messages
+     * @param paymentJob the job to pay
+     *
+     * @return A future object that completes when all messages are sent.
+     */
     private CompletableFuture<Boolean> notifyWorker(PaymentJob paymentJob) {
         int length = paymentJob.getMessage().length();
         int current_location = 0;
