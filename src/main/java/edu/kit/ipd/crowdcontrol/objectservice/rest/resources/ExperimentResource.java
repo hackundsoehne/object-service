@@ -100,7 +100,6 @@ public class ExperimentResource {
         }
     }
 
-
     public void endExperiment(Experiment experiment) {
         for (Experiment.Population population :
                 experiment.getPopulationsList()) {
@@ -146,6 +145,12 @@ public class ExperimentResource {
      */
     public Experiment put(Request request, Response response) {
         Experiment experiment = request.attribute("input");
+
+        try {
+            experimentOperations.assertRatingOptions(experiment.getRatingOptionsList());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         ExperimentRecord record = ExperimentTransformer.mergeProto(new ExperimentRecord(), experiment);
 
@@ -448,6 +453,14 @@ public class ExperimentResource {
 
         if (!old.getState().equals(Experiment.State.DRAFT)) {
             throw new IllegalStateException("When an experiment is running, only the state is allowed to be changed.");
+        }
+
+        if (!experiment.getRatingOptionsList().isEmpty()) {
+            try {
+                experimentOperations.assertRatingOptions(experiment.getRatingOptionsList());
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException(e.getMessage());
+            }
         }
 
         ExperimentRecord experimentRecord = ExperimentTransformer.mergeProto(oldRecord, experiment);

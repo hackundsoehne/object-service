@@ -11,7 +11,9 @@ import org.junit.rules.ExpectedException;
 import spark.Request;
 import spark.Response;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Matchers.any;
@@ -61,7 +63,7 @@ public class ExperimentResourceTest {
         expectedException.expect(BadRequestException.class);
         expectedException.expectMessage("Description and placeholder keys must match.");
 
-        Experiment experiment = Experiment.newBuilder().setDescription("{{Person}}").build();
+        Experiment experiment = Experiment.newBuilder().addAllRatingOptions(generateDefaultRatingOptions()).setDescription("{{Person}}").build();
         when(request.attribute("input")).thenReturn(experiment);
 
         resource.put(request, response);
@@ -72,7 +74,7 @@ public class ExperimentResourceTest {
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("Everything went fine");
 
-        Experiment experiment = Experiment.newBuilder().setDescription("foobar").build();
+        Experiment experiment = Experiment.newBuilder().addAllRatingOptions(generateDefaultRatingOptions()).setDescription("foobar").build();
         when(request.attribute("input")).thenReturn(experiment);
 
         when(experimentOperations.insertNewExperiment(any())).thenThrow(new RuntimeException("Everything went fine"));
@@ -88,11 +90,20 @@ public class ExperimentResourceTest {
         Map<String, String> placeholders = new HashMap<>();
         placeholders.put("foobar", "foo");
 
-        Experiment experiment = Experiment.newBuilder().setDescription("{{foobar}}").putAllPlaceholders(placeholders).build();
+        Experiment experiment = Experiment.newBuilder().addAllRatingOptions(generateDefaultRatingOptions()).setDescription("{{foobar}}").putAllPlaceholders(placeholders).build();
         when(request.attribute("input")).thenReturn(experiment);
 
         when(experimentOperations.insertNewExperiment(any())).thenThrow(new RuntimeException("Everything went fine"));
 
         resource.put(request, response);
+    }
+
+    private List<Experiment.RatingOption> generateDefaultRatingOptions() {
+        List<Experiment.RatingOption> ratingOptions = new ArrayList<>();
+
+        ratingOptions.add(Experiment.RatingOption.newBuilder().setName("Good").setValue(9).build());
+        ratingOptions.add(Experiment.RatingOption.newBuilder().setName("Bad").setValue(0).build());
+
+        return ratingOptions;
     }
 }

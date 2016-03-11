@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
-import com.google.protobuf.Descriptors;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
@@ -236,7 +235,7 @@ public class ExperimentOperations extends AbstractOperations {
      * @param experimentId the primary key of the Experiment-Table
      */
     public void storeRatingOptions(List<Experiment.RatingOption> ratingOptions, int experimentId) {
-        Descriptors.Descriptor descriptor = Experiment.RatingOption.getDescriptor();
+        assertRatingOptions(ratingOptions);
 
         List<RatingOptionExperimentRecord> toInsert = ratingOptions.stream()
                 .map(option -> new RatingOptionExperimentRecord(null, option.getName(), option.getValue(), experimentId))
@@ -289,5 +288,21 @@ public class ExperimentOperations extends AbstractOperations {
                 .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
                 .fetch()
                 .map(Record1::value1);
+    }
+
+    /**
+     * Asserts that there are at least two rating options and that their values are between 0 and 9.
+     * @param ratingOptions List of rating options.
+     */
+    public void assertRatingOptions(List<Experiment.RatingOption> ratingOptions) {
+        if (ratingOptions.size() < 2) {
+            throw new IllegalArgumentException("There must be at least two ratings options.");
+        }
+
+        ratingOptions.stream().forEach(ratingOption -> {
+            if (ratingOption.getValue() < 0 || ratingOption.getValue() > 9) {
+                throw new IllegalArgumentException("Rating option values must be between 0 and 9.");
+            }
+        });
     }
 }
