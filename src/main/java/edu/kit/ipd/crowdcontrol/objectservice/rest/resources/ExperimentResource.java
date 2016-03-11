@@ -146,7 +146,11 @@ public class ExperimentResource {
     public Experiment put(Request request, Response response) {
         Experiment experiment = request.attribute("input");
 
-        assertRatingOptions(experiment);
+        try {
+            experimentOperations.assertRatingOptions(experiment.getRatingOptionsList());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         ExperimentRecord record = ExperimentTransformer.mergeProto(new ExperimentRecord(), experiment);
 
@@ -197,18 +201,6 @@ public class ExperimentResource {
         EventManager.EXPERIMENT_CREATE.emit(exp);
 
         return exp;
-    }
-
-    private void assertRatingOptions(Experiment experiment) {
-        if (experiment.getRatingOptionsCount() < 2) {
-            throw new BadRequestException("There must be at least two ratings options.");
-        }
-
-        experiment.getRatingOptionsList().stream().forEach(ratingOption -> {
-            if (ratingOption.getValue() < 0 || ratingOption.getValue() > 9) {
-                throw new BadRequestException("Rating option values must be between 0 and 9.");
-            }
-        });
     }
 
     private void storePopulations(int experimentId, List<Experiment.Population> populations) {
@@ -464,7 +456,11 @@ public class ExperimentResource {
         }
 
         if (!experiment.getRatingOptionsList().isEmpty()) {
-            assertRatingOptions(experiment);
+            try {
+                experimentOperations.assertRatingOptions(experiment.getRatingOptionsList());
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException(e.getMessage());
+            }
         }
 
         ExperimentRecord experimentRecord = ExperimentTransformer.mergeProto(oldRecord, experiment);
