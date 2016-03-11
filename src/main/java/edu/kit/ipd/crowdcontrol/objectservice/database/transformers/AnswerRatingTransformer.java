@@ -32,6 +32,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
     public static Answer toAnswerProto(AnswerRecord answerRecord, List<Rating> ratings) {
         return builder(Answer.newBuilder())
                 .set(answerRecord.getQuality(), Answer.Builder::setQuality)
+                .set(answerRecord.getSystemResponse(), Answer.Builder::setSystemresponse)
                 .getBuilder()
                 .setExperimentId(answerRecord.getExperiment())
                 .setContent(answerRecord.getAnswer())
@@ -67,6 +68,9 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                     break;
                 case Answer.RESERVATION_FIELD_NUMBER:
                     record.setReservation(answer.getReservation());
+                    break;
+                case Answer.SYSTEMRESPONSE_FIELD_NUMBER:
+                    record.setSystemResponse(answer.getSystemresponse());
                     break;
             }
         });
