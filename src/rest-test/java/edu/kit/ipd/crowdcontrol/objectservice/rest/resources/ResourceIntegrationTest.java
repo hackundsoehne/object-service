@@ -4,7 +4,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigException;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
@@ -16,7 +15,6 @@ import spark.Spark;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +36,7 @@ public class ResourceIntegrationTest {
     }
 
     @Test
-    public void calibrations() throws NoSuchMethodException, UnirestException, IllegalAccessException, IOException, InvocationTargetException {
+    public void calibrations() throws Exception {
         CalibrationList list = httpGet("/calibrations", CalibrationList.class);
         assertSame(0, list.getItemsCount());
 
@@ -82,7 +80,7 @@ public class ResourceIntegrationTest {
     }
 
     @Test
-    public void templates() throws NoSuchMethodException, UnirestException, IllegalAccessException, IOException, InvocationTargetException {
+    public void templates() throws Exception {
         TemplateList list = httpGet("/templates", TemplateList.class);
         assertSame(0, list.getItemsCount());
 
@@ -121,7 +119,7 @@ public class ResourceIntegrationTest {
     }
 
     @Test
-    public void unsupportedMediaType() throws UnirestException {
+    public void unsupportedMediaType() throws Exception {
         HttpResponse<String> response;
 
         response = Unirest.get(ORIGIN + "/templates")
@@ -144,7 +142,7 @@ public class ResourceIntegrationTest {
         assertEquals(415, response.getStatus());
     }
 
-    public static <T extends Message> T httpGet(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public static <T extends Message> T httpGet(String path, Class<T> type) throws Exception {
         HttpResponse<InputStream> response = Unirest.get(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .asBinary();
@@ -152,7 +150,7 @@ public class ResourceIntegrationTest {
         return fromResponse(response, type);
     }
 
-    public static <T extends Message> T httpPut(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public static <T extends Message> T httpPut(String path, T input, Class<T> type) throws Exception {
         HttpResponse<InputStream> response = Unirest.put(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .header("content-type", "application/protobuf")
@@ -162,7 +160,7 @@ public class ResourceIntegrationTest {
         return fromResponse(response, type);
     }
 
-    public static <T extends Message> T httpPatch(String path, T input, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public static <T extends Message> T httpPatch(String path, T input, Class<T> type) throws Exception {
         HttpResponse<InputStream> response = Unirest.patch(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .header("content-type", "application/protobuf")
@@ -172,7 +170,7 @@ public class ResourceIntegrationTest {
         return fromResponse(response, type);
     }
 
-    public static <T extends Message> T httpDelete(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    public static <T extends Message> T httpDelete(String path, Class<T> type) throws Exception {
         HttpResponse<InputStream> response = Unirest.delete(ORIGIN + path)
                 .header("accept", "application/protobuf")
                 .asBinary();
@@ -180,7 +178,7 @@ public class ResourceIntegrationTest {
         return fromResponse(response, type);
     }
 
-    private static <T extends Message> T fromResponse(HttpResponse<InputStream> response, Class<T> type) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
+    private static <T extends Message> T fromResponse(HttpResponse<InputStream> response, Class<T> type) throws Exception {
         if (response.getStatus() == 204) {
             return null;
         }
