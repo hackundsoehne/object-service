@@ -143,8 +143,8 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .select(count)
                 .from(WORKER)
                 .rightJoin(RATING).onKey()
-                .where(ANSWER.EXPERIMENT.eq(expID))
-                .and(ANSWER.QUALITY.greaterOrEqual(threshold))
+                .where(RATING.EXPERIMENT.eq(expID))
+                .and(RATING.QUALITY.greaterOrEqual(threshold))
                 .groupBy(WORKER.fields())
                 .fetchMap(WORKER, record -> record.getValue(count));
     }
