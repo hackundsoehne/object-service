@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -53,8 +55,15 @@ public class ResourceIntegrationTest {
         // ID gets ignored
         assertTrue(calibration.getId() > 0);
 
+        // Clear all answer IDs
+        Calibration.Builder calibrationWithoutAnswerIds = calibration.toBuilder().clearId();
+        List<Calibration.Answer> answers = calibrationWithoutAnswerIds.getAnswersList().stream().map(answer -> answer.toBuilder().clearId().build()).collect(Collectors.toList());
+
+        calibrationWithoutAnswerIds.clearAnswers();
+        calibrationWithoutAnswerIds.addAllAnswers(answers);
+
         // Accepted answers must not be saved
-        assertEquals(put.toBuilder().clearAcceptedAnswers().build(), calibration.toBuilder().clearId().build());
+        assertEquals(put.toBuilder().clearAcceptedAnswers().build(), calibrationWithoutAnswerIds.build());
 
         // Returned calibration must be equal to the returned version when using GET
         Calibration received = httpGet("/calibrations/" + calibration.getId(), Calibration.class);
@@ -109,6 +118,15 @@ public class ResourceIntegrationTest {
 
         ErrorResponse error = httpGet("/templates/42", ErrorResponse.class);
         assertEquals("notFound", error.getCode());
+    }
+
+    @Test
+    public void unsupportedMediaType() throws UnirestException {
+        HttpResponse<String> response = Unirest.get(ORIGIN + "/templates")
+                .header("accept", "text/plain")
+                .asString();
+
+        assertSame(415, response.getStatus());
     }
 
     public static <T extends Message> T httpGet(String path, Class<T> type) throws UnirestException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
