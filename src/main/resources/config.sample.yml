@@ -1,74 +1,100 @@
+# Database configuration
 database:
-    # the url where to find the database
+    # URL where to find the database
     url: jdbc:mysql://localhost:3306/crowdcontrol
 
-    # dialekt to use for communication
+    # Dialekt to use for communication
     dialect: MYSQL
 
-    # the writing user
+    # User with read and write access
     writing:
-        user: root
+        user: crowdcontrol
         password:
 
-    # readonly user should really just be readonly
+    # User with read-only access
     readonly:
-        user: root
+        user: crowdreader
         password:
 
 # Deployment of object service, control-ui, worker-ui
 deployment:
-    # Origin of the control ui
-    # port has to match the url of the ui and no / at the end
+    # Origin of the control-ui
+    # Port has to match the URL of the UI and have no / at the end
     origin: http://localhost:3000
-    #the url to the workerService
+
+    # URL of the worker-service
     workerService: https://worker.example.com
-    # the url to the root of the worker-ui. No / at the end.
-    # Object service will append particular file names like "/taskPresenter.html"
+
+    # URL to the root of the worker-ui with no / at the end
+    # object-service will append particular file names like "/taskPresenter.html"
     workerUIPublic: https://workerui.example.com
-    # the local url of the worker-ui, for cases where the public url cannot be accessed (docker image)
-    # can be ommitted
+
+    # Local URL of the worker-ui, for cases where the public URL cannot be accessed
+    # Can be ommitted if not using Docker
     workerUILocal: http://localhost:8080
 
-# the defined platforms to run
-platforms :
-    # type to use (mturk/pybossa/dummy)
+# Defined platforms to run
+platforms:
+    # Type to use:
+    # - mturk
+    # - pybossa
+    # - dummy
     - type: dummy
 
-      # standard credentials
+      # Standard credentials
       user: samplePlatformUser
       password: samplePassword
 
-      # name which is used to display
+      # Name which is used to display
       name: Sandbox
 
-      # the url to give to the platform type
+      # URL to the platform
       url: http://example.com/
 
     - type: pybossa
-      # the key to access the pybossa api
+
+      # Key to access the PyBossa API
       apiKey: 8ec92fa1-1bd1-42ad-8524-3d2bab4588b1
-      # the url to the pybossa api
+
+      # URL to the PyBossa API
       url: http://localhost:5000/api
+
+      # Name which is used to display
       name: Pybossa
-      # the id of the pybossa project to use for all experiments
+
+      # ID of the PyBossa project to use for all experiments
       projectId: 1
-      # if calibrations are allowed on this platform
+
+      # Whether calibrations should be displayed / used on this platform
       calibrationsAllowed: true
 
-# basic configurations for the mail-module
-mail :
-    # disabled = true will ignore the mail configuration and print to the command-line
+# Basic configurations for the mail module
+mail:
+    # disabled = true will ignore the mail configuration and print to the command line
     disabled : false
 
 moneytransfer:
-    #the minimum amount of money in ct a worker has to earn, before he gets paid off
+    # Minimum amount of money in US cent a worker has to earn before he gets paid off
     payOffThreshold: 0
 
-    #the password used, to verify a valid amazon giftcode email (enter password as message at amazon homepage, while buying giftcodes
+    # Password used to verify a valid Amazon GiftCode e-mail
+    # enter password as message on the Amazon homepage when buying GiftCodes
     parsingPassword: test
 
-    #the mail address to send notification mails to
+    # E-mail address to send notification mails to
     notificationMailAddress: pseipd@gmail.com
 
-    #the interval in days, when the workers get paid off
+    # Interval in days, when the workers get paid off
     scheduleInterval: 7
+
+# Map of packages to log levels, e.g.
+# log:
+#    org.package.name: WARN
+log:
+    com.zaxxer.hikari: WARN
+    org.eclipse.jetty: WARN
+    org.jooq.impl.DefaultBinding: WARN
+    org.jooq.impl.DefaultConnectionProvider: WARN
+    org.jooq.tools.StopWatch: WARN
+    spark.webserver.MatcherFilter: WARN
+    spark.Request: WARN

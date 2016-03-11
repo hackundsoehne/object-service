@@ -1,13 +1,16 @@
 package edu.kit.ipd.crowdcontrol.objectservice.config;
 
+import java.util.Map;
+
 /**
- * Config of which is saved in config file
- * @author MarcelHollerbach
- * @version 1.0
+ * Config of which is saved in config file.
+ *
+ * @author Marcel Hollerbach
+ * @author Niklas Keller
  */
 public class Config {
     /**
-     * Databasepart of the config
+     * Database configuration
      */
     public Database database;
 
@@ -17,17 +20,24 @@ public class Config {
     public Deployment deployment;
 
     /**
-     * all specified platforms in the config
+     * Platform configurations
      */
     public ConfigPlatform[] platforms;
 
     /**
-     * moneytransfer configuration
+     * Money transfer configuration
      */
     public MoneyTransfer moneytransfer;
 
     /**
-     * mail configuration
+     * Mail configuration
      */
     public Mail mail;
+
+    /**
+     * Log level configuration
+     *
+     * Maps package to log constant, e.g. 'org.eclipse.jetty: WARN'.
+     */
+    public Map<String, String> log;
 }

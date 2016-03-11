@@ -19,3 +19,12 @@ moneytransfer:
     parsingPassword: test
     notificationMailAddress: pseipd@gmail.com
     scheduleInterval: 7
+
+log:
+    com.zaxxer.hikari: WARN
+    org.eclipse.jetty: WARN
+    org.jooq.impl.DefaultBinding: WARN
+    org.jooq.impl.DefaultConnectionProvider: WARN
+    org.jooq.tools.StopWatch: WARN
+    spark.webserver.MatcherFilter: WARN
+    spark.Request: WARN
