@@ -39,10 +39,7 @@ import javax.mail.PasswordAuthentication;
 import javax.naming.NamingException;
 import java.io.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -62,6 +59,9 @@ public class Main {
 
         Config config = getConfig();
 
+        if (config.log == null) {
+            config.log = new HashMap<>();
+        }
         config.log.forEach((key, value) -> {
             Configurator.setLevel(key, Level.getLevel(value));
         });
