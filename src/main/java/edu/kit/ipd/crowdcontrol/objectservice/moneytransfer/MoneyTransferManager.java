@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
-import edu.kit.ipd.crowdcontrol.objectservice.config.MoneyTransfer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
@@ -8,16 +7,13 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperatio
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
-
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.plugins.convert.TypeConverters;
 import org.jooq.Result;
 
 import javax.mail.Message;
@@ -37,22 +33,20 @@ import java.util.concurrent.TimeUnit;
 public class MoneyTransferManager {
 
     private static final Logger LOGGER = LogManager.getLogger(MoneyTransferManager.class);
+    private static final String MAIL_FAILURE_MESSAGE = "The MailHandler was not able to send mails." +
+            "It seems, that there is either a problem with the server or with the properties file.";
     private final MailSender mailSender;
     private final MailFetcher mailFetcher;
     private final WorkerBalanceOperations workerBalanceOperations;
     private final WorkerOperations workerOperations;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private ScheduledFuture<?> schedule = null;
-
-    private StringBuilder notificationText;
-    private static final String MAIL_FAILURE_MESSAGE = "The MailHandler was not able to send mails." +
-            "It seems, that there is either a problem with the server or with the properties file.";
-
     //config-file data
     private final int payOffThreshold;
     private final String parsingPassword;
     private final String notificationMailAddress;
     private final int scheduleIntervalDays;
+    private ScheduledFuture<?> schedule = null;
+    private StringBuilder notificationText;
 
     /**
      * Creates a new instance of the MoneyTransferManager
@@ -161,8 +155,6 @@ public class MoneyTransferManager {
     private void fetchNewGiftCodes() throws MoneyTransferException {
         LOGGER.trace("Started fetching new giftcodes.");
 
-        double eurUsdRate = getEurUsdExchangeRate();
-
         Message[] messages;
 
         //fetch new mails
@@ -179,7 +171,7 @@ public class MoneyTransferManager {
             try {
                 Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(message, parsingPassword);
                 if (rec.isPresent()) {
-                    workerBalanceOperations.addGiftCode(rec.get().getCode(), (int) (rec.get().getAmount() * eurUsdRate));
+                    workerBalanceOperations.addGiftCode(rec.get().getCode(), rec.get().getAmount());
                     giftCodesCount++;
                 }
             } catch (MoneyTransferException e) {
@@ -215,9 +207,9 @@ public class MoneyTransferManager {
         for (int i = 0; i < giftCodes.size(); i++) {
             int weight = giftCodes.get(i).getAmount();
 
-            for(int j = creditBalanceAtStart; j >= weight; j--) {
+            for (int j = creditBalanceAtStart; j >= weight; j--) {
 
-                if (weights[j-weight] + weight > weights[j]) {
+                if (weights[j - weight] + weight > weights[j]) {
                     weights[j] = weights[j - weight] + weight;
                     decision[i][j] = true;
                 }
@@ -376,6 +368,7 @@ public class MoneyTransferManager {
         return content.toString();
     }
 
+
     protected static double getEurUsdExchangeRate() throws MoneyTransferException {
         LOGGER.trace("Started fetching currency exchange rates from EUR to USD.");
 
@@ -406,4 +399,5 @@ public class MoneyTransferManager {
 
         return rate;
     }
+
 }
