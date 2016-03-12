@@ -27,7 +27,7 @@ public enum ExperimentsPlatformModeMode implements EnumType {
 
 	rating("rating"),
 
-	normal("normal");
+	disabled("disabled");
 
 	private final String literal;
 

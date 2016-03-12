@@ -16,6 +16,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AnswerReservation extends TableImpl<AnswerReservationRecord> {
 
-	private static final long serialVersionUID = 1176109081;
+	private static final long serialVersionUID = 2097864487;
 
 	/**
 	 * The reference instance of <code>crowdcontrol.Answer_Reservation</code>
@@ -71,11 +72,6 @@ public class AnswerReservation extends TableImpl<AnswerReservationRecord> {
 	public final TableField<AnswerReservationRecord, Timestamp> TIMESTAMP = createField("timestamp", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaulted(true), this, "");
 
 	/**
-	 * The column <code>crowdcontrol.Answer_Reservation.used</code>.
-	 */
-	public final TableField<AnswerReservationRecord, Boolean> USED = createField("used", org.jooq.impl.SQLDataType.BIT.nullable(false), this, "");
-
-	/**
 	 * Create a <code>crowdcontrol.Answer_Reservation</code> table reference
 	 */
 	public AnswerReservation() {
@@ -95,6 +91,14 @@ public class AnswerReservation extends TableImpl<AnswerReservationRecord> {
 
 	private AnswerReservation(String alias, Table<AnswerReservationRecord> aliased, Field<?>[] parameters) {
 		super(alias, Crowdcontrol.CROWDCONTROL, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Identity<AnswerReservationRecord, Integer> getIdentity() {
+		return Keys.IDENTITY_ANSWER_RESERVATION;
 	}
 
 	/**

@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ExperimentsPlatform extends TableImpl<ExperimentsPlatformRecord> {
 
-	private static final long serialVersionUID = -9574870;
+	private static final long serialVersionUID = -872526145;
 
 	/**
 	 * The reference instance of <code>crowdcontrol.Experiments_Platform</code>
@@ -72,11 +72,6 @@ public class ExperimentsPlatform extends TableImpl<ExperimentsPlatformRecord> {
 	 * The column <code>crowdcontrol.Experiments_Platform.platform_data</code>.
 	 */
 	public final TableField<ExperimentsPlatformRecord, JsonElement> PLATFORM_DATA = createField("platform_data", org.jooq.impl.DefaultDataType.getDefaultDataType("json"), this, "", new JSONGsonBinding());
-
-	/**
-	 * The column <code>crowdcontrol.Experiments_Platform.identification</code>.
-	 */
-	public final TableField<ExperimentsPlatformRecord, String> IDENTIFICATION = createField("identification", org.jooq.impl.SQLDataType.VARCHAR.length(191), this, "");
 
 	/**
 	 * Create a <code>crowdcontrol.Experiments_Platform</code> table reference

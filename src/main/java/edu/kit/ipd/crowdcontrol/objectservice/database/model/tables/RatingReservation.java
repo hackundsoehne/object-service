@@ -16,6 +16,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class RatingReservation extends TableImpl<RatingReservationRecord> {
 
-	private static final long serialVersionUID = 1230904750;
+	private static final long serialVersionUID = -457499680;
 
 	/**
 	 * The reference instance of <code>crowdcontrol.Rating_Reservation</code>
@@ -76,11 +77,6 @@ public class RatingReservation extends TableImpl<RatingReservationRecord> {
 	public final TableField<RatingReservationRecord, Timestamp> TIMESTAMP = createField("timestamp", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaulted(true), this, "");
 
 	/**
-	 * The column <code>crowdcontrol.Rating_Reservation.used</code>.
-	 */
-	public final TableField<RatingReservationRecord, Boolean> USED = createField("used", org.jooq.impl.SQLDataType.BIT.nullable(false), this, "");
-
-	/**
 	 * Create a <code>crowdcontrol.Rating_Reservation</code> table reference
 	 */
 	public RatingReservation() {
@@ -100,6 +96,14 @@ public class RatingReservation extends TableImpl<RatingReservationRecord> {
 
 	private RatingReservation(String alias, Table<RatingReservationRecord> aliased, Field<?>[] parameters) {
 		super(alias, Crowdcontrol.CROWDCONTROL, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Identity<RatingReservationRecord, Integer> getIdentity() {
+		return Keys.IDENTITY_RATING_RESERVATION;
 	}
 
 	/**
