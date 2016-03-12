@@ -503,6 +503,10 @@ public class AnswerRatingOperations extends AbstractOperations {
      * Sets system-response-field of specified answerRecord
      */
     public void setSystemResponseField(AnswerRecord answerRecord, String systemResponse){
-        //TODO
+        assertHasField(answerRecord, ANSWER.ID_ANSWER);
+        create.update(ANSWER)
+                .set(ANSWER.SYSTEM_RESPONSE, systemResponse)
+                .where(ANSWER.ID_ANSWER.eq(answerRecord.getIdAnswer()))
+                .execute();
     }
 }
