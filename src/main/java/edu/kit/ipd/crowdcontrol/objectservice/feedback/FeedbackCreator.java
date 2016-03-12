@@ -65,7 +65,7 @@ public class FeedbackCreator {
 
         ExperimentRecord exp = expOps.getExperiment(expId).orElseThrow(() -> new FeedbackException("Experiment cannot be found."));
 
-        List<AnswerRecord> answers = answerOps.getAnswersOfExperimentOfWorker(expId, workerId);
+        List<AnswerRecord> answers = answerOps.getAnswersOfWorkerFromExperiment(expId, workerId);
 
         StringBuilder answerMessage = new StringBuilder();
 

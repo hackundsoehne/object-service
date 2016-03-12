@@ -59,9 +59,11 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @param workerID the id of the worker
      * @return list of all answers from a worker to an experiment
      */
-    public Result<AnswerRecord> getAnswersOfExperimentOfWorker(int expID, int workerID) {
-        //TODO
-        return null;
+    public Result<AnswerRecord> getAnswersOfWorkerFromExperiment(int expID, int workerID) {
+        return create.selectFrom(ANSWER)
+                .where(ANSWER.WORKER_ID.eq(workerID))
+                .and(ANSWER.EXPERIMENT.eq(expID))
+                .fetch();
     }
 
     /**

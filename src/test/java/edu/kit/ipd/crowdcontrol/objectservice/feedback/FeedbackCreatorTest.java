@@ -42,7 +42,7 @@ public class FeedbackCreatorTest {
     @Test
     public void testSendFeedback() throws Exception {
         List<AnswerRecord> answers = mock(Result.class);
-        doReturn(answers).when(answerRatingOperations).getAnswersOfExperimentOfWorker(0,0);
+        doReturn(answers).when(answerRatingOperations).getAnswersOfWorkerFromExperiment(0,0);
         Iterator<AnswerRecord> answerIterator = mock(Iterator.class);
 
         AnswerRecord a1 = new AnswerRecord();
@@ -109,7 +109,7 @@ public class FeedbackCreatorTest {
     @Test
     public void testNoAnswers() throws Exception {
         List<AnswerRecord> answers = mock(Result.class);
-        doReturn(answers).when(answerRatingOperations).getAnswersOfExperimentOfWorker(0,0);
+        doReturn(answers).when(answerRatingOperations).getAnswersOfWorkerFromExperiment(0,0);
         Iterator<AnswerRecord> it = mock(Iterator.class);
         when(answers.iterator()).thenReturn(it);
         when(it.hasNext()).thenReturn(false);
