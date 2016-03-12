@@ -271,7 +271,7 @@ public class PlatformManager {
 
         if (!given.equals(should)) {
             throw new PreActionException(new IllegalWorkerSetException(
-                    "The list of payment Jobs need to have all workers which worked on this experiment on the given platform"));
+            ));
         }
 
         return getPlatformPayment(name).payExperiment(record.getIdexperimentsPlatforms(), record.getPlatformData(), experiment,paymentJobs);

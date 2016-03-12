@@ -6,9 +6,8 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 public class IllegalWorkerSetException extends Exception {
     /**
      * Create the new exception
-     * @param s message to show
      */
-    public IllegalWorkerSetException(String s) {
-        super(s);
+    public IllegalWorkerSetException() {
+        super("The list of payment Jobs need to have all workers which worked on this experiment on the given platform");
     }
 }
