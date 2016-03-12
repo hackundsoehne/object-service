@@ -64,13 +64,15 @@ public class PlatformManager {
                 .collect(Collectors.toMap(Platform::getID, Function.identity()));
 
         //update database
+        //TODO @Marcel add currency!
         List<PlatformRecord> records = platforms.values().stream()
                 .map(platform -> new PlatformRecord(
                         platform.getID(),
                         platform.getName(),
                         platform.isCalibrationAllowed(),
                         isNeedemail(platform),
-                        false
+                        false,
+                        -1
                 ))
                 .collect(Collectors.toList());
 
