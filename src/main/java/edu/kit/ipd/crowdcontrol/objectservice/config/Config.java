@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.config;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -39,5 +40,5 @@ public class Config {
      *
      * Maps package to log constant, e.g. 'org.eclipse.jetty: WARN'.
      */
-    public Map<String, String> log;
+    public Map<String, String> log = new HashMap<>();
 }

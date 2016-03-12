@@ -59,9 +59,6 @@ public class Main {
 
         Config config = getConfig();
 
-        if (config.log == null) {
-            config.log = new HashMap<>();
-        }
         config.log.forEach((key, value) -> {
             Configurator.setLevel(key, Level.getLevel(value));
         });
