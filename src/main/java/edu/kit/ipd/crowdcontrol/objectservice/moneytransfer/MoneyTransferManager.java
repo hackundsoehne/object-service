@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
@@ -14,11 +15,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.jooq.Result;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,6 +44,7 @@ public class MoneyTransferManager {
     private final MailFetcher mailFetcher;
     private final WorkerBalanceOperations workerBalanceOperations;
     private final WorkerOperations workerOperations;
+    private final PlatformOperations platformOperations;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     //config-file data
     private final int payOffThreshold;
@@ -47,6 +53,7 @@ public class MoneyTransferManager {
     private final int scheduleIntervalDays;
     private ScheduledFuture<?> schedule = null;
     private StringBuilder notificationText;
+    private Map<String, BigDecimal> exchangeRates;
 
     /**
      * Creates a new instance of the MoneyTransferManager
@@ -57,16 +64,18 @@ public class MoneyTransferManager {
      * @param workerOperations        the workerOperations, used to do operations on workers
      * @param notificationMailAddress the mail address to send notifications
      */
-    public MoneyTransferManager(MailFetcher mailFetcher, MailSender mailSender, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, String notificationMailAddress, String parsingPassword, int scheduleIntervalDays, int payOffThreshold) {
+    public MoneyTransferManager(MailFetcher mailFetcher, MailSender mailSender, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, PlatformOperations platformOperations, String notificationMailAddress, String parsingPassword, int scheduleIntervalDays, int payOffThreshold) {
         this.mailFetcher = mailFetcher;
         this.mailSender = mailSender;
         this.workerOperations = workerOperations;
         this.workerBalanceOperations = workerBalanceOperations;
+        this.platformOperations = platformOperations;
         this.payOffThreshold = payOffThreshold;
         this.notificationMailAddress = notificationMailAddress;
         this.notificationText = new StringBuilder();
         this.parsingPassword = parsingPassword;
         this.scheduleIntervalDays = scheduleIntervalDays;
+        this.exchangeRates = new HashMap<>();
     }
 
     /**
@@ -143,7 +152,7 @@ public class MoneyTransferManager {
 
         //sends a notification about problems with submission of giftcodes
         sendNotification(notificationText.toString());
-
+        exchangeRates = new HashMap<>();
         LOGGER.trace("Completed submission of giftcodes to workers.");
     }
 
@@ -195,9 +204,16 @@ public class MoneyTransferManager {
      * @param giftCodes all giftcodes
      * @return returns the list of the chosen giftcodes
      */
-    private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
+    private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) throws MoneyTransferException {
 
         LOGGER.trace("Started to choose the giftcodes worker " + worker.getIdWorker() + " will receive.");
+
+        int currCodeWorker = platformOperations.getPlatformRecord(worker.getPlatform()).orElseThrow(() -> new MoneyTransferException("Platform of worker " + worker.getIdWorker() + " cannot be found.")).getCurrency();
+
+        for (GiftCodeRecord giftcode : giftCodes) {
+            giftcode.setAmount(exchangeTo(giftcode.getAmount(),giftcode.getCurrency(), currCodeWorker));
+            giftcode.setCurrency(978);
+        }
 
         int creditBalanceAtStart = workerBalanceOperations.getBalance(worker.getIdWorker());
 
@@ -369,11 +385,11 @@ public class MoneyTransferManager {
     }
 
 
-    protected static double getEurUsdExchangeRate() throws MoneyTransferException {
-        LOGGER.trace("Started fetching currency exchange rates from EUR to USD.");
+    protected static BigDecimal getExchangeRate(String sourceCurrency, String destinationCurrency) throws MoneyTransferException {
+        LOGGER.trace("Started fetching currency exchange rates from " + sourceCurrency + " to " + destinationCurrency + ".");
 
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-        HttpGet httpGet = new HttpGet("http://quote.yahoo.com/d/quotes.csv?s=EURUSD=X&f=l1&e=.csv");
+        HttpGet httpGet = new HttpGet("http://quote.yahoo.com/d/quotes.csv?s=" + sourceCurrency + destinationCurrency + "=X&f=l1&e=.csv");
         ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
         String responseBody;
@@ -385,19 +401,40 @@ public class MoneyTransferManager {
             throw new MoneyTransferException(e.getMessage());
         }
 
-        double rate = Double.parseDouble(responseBody);
+        BigDecimal rate = new BigDecimal(responseBody.substring(0, responseBody.length() - 2));
 
-        if (rate > 2) {
-            LOGGER.error("Exchange rate is above 2. The exchange rate must not be above 2.");
-            throw new MoneyTransferException("Exchange rate is above 2. The exchange rate must not be above 2.");
-        } else if (rate < 0.5) {
-            LOGGER.error("Exchange rate is below 0.5. The exchange rate must not be below 0.5.");
-            throw new MoneyTransferException("Exchange rate is below 0.5. The exchange rate must not be below 0.5.");
+        boolean isEurUsdConversion = false;
+        if ((sourceCurrency.equals("EUR") && destinationCurrency.equals("USD")) || (sourceCurrency.equals("USD") && destinationCurrency.equals("EUR"))) {
+            isEurUsdConversion = true;
+        }
+
+        if (rate.compareTo(new BigDecimal(2)) == 1 && isEurUsdConversion) {
+            throw new MoneyTransferException("Exchange rate in an EUR/USD conversion is above 2. The exchange rate must not be above 2.");
+        } else if (rate.compareTo(new BigDecimal("0.5")) == -1 && isEurUsdConversion) {
+            throw new MoneyTransferException("Exchange rate in an EUR/USD conversion is below 0.5. The exchange rate must not be below 0.5.");
         }
 
         LOGGER.trace("Completed fetching currency exchange rates.");
 
         return rate;
+    }
+
+    private int exchangeTo(int amount, int sourceCurrencyCode, int destCurrencyCode) throws MoneyTransferException {
+        CurrencyUnit sourceCurr = CurrencyUnit.ofNumericCode(sourceCurrencyCode);
+        CurrencyUnit destCurr = CurrencyUnit.ofNumericCode(destCurrencyCode);
+
+        Money money = Money.zero(sourceCurr);
+        money = money.plusMinor(amount);
+        BigDecimal exchangeRate;
+        String key = Integer.toString(sourceCurrencyCode) + Integer.toString(destCurrencyCode);
+        if (exchangeRates.containsKey(key)) {
+            exchangeRate = exchangeRates.get(key);
+        } else {
+            exchangeRate = getExchangeRate(sourceCurr.getCurrencyCode(), destCurr.getCurrencyCode());
+            exchangeRates.put(key, exchangeRate);
+        }
+        Money converted = money.convertedTo(destCurr, exchangeRate, RoundingMode.HALF_UP);
+        return converted.getAmountMinorInt();
     }
 
 }

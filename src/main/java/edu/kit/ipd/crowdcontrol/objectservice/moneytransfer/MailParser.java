@@ -69,6 +69,7 @@ public class MailParser {
         GiftCodeRecord rec = new GiftCodeRecord();
         rec.setAmount(Integer.parseInt(amountStr));
         rec.setCode(giftCode);
+        rec.setCurrency(978);
 
         return Optional.of(rec);
     }

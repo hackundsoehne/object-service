@@ -1,7 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
@@ -16,10 +18,7 @@ import javax.mail.Message;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -35,6 +34,7 @@ public class MoneyTransferManagerTest {
     MailFetcher fetcher;
     WorkerBalanceOperations payops;
     WorkerOperations workerops;
+    PlatformOperations platformOperations;
 
     @Before
     public void setUp() throws Exception {
@@ -42,7 +42,8 @@ public class MoneyTransferManagerTest {
         fetcher = mock(MailFetcher.class);
         payops = mock(WorkerBalanceOperations.class);
         workerops = mock(WorkerOperations.class);
-        mng = new MoneyTransferManager(fetcher, sender, payops, workerops, "pseipd@gmail.com", null, 7, 0);
+        platformOperations = mock(PlatformOperations.class);
+        mng = new MoneyTransferManager(fetcher, sender, payops, workerops, platformOperations, "pseipd@gmail.com", null, 7, 0);
     }
 
     @Test
@@ -51,6 +52,11 @@ public class MoneyTransferManagerTest {
         WorkerRecord worker1 = mock(WorkerRecord.class);
         WorkerRecord worker2 = mock(WorkerRecord.class);
 
+        PlatformRecord platformRecord = mock(PlatformRecord.class);
+        Optional<PlatformRecord> platform = Optional.of(platformRecord);
+        doReturn(platform).when(platformOperations).getPlatformRecord("bar-platform");
+        doReturn(978).when(platformRecord).getCurrency();
+
         doReturn("pseipd@gmail.com").when(worker0).getEmail();
         doReturn("pse2016@web.de").when(worker1).getEmail();
         doReturn("pseipd@web.de").when(worker2).getEmail();
@@ -58,6 +64,10 @@ public class MoneyTransferManagerTest {
         doReturn(0).when(worker0).getIdWorker();
         doReturn(1).when(worker1).getIdWorker();
         doReturn(2).when(worker2).getIdWorker();
+
+        doReturn("bar-platform").when(worker0).getPlatform();
+        doReturn("bar-platform").when(worker1).getPlatform();
+        doReturn("bar-platform").when(worker2).getPlatform();
 
         doReturn(30).when(payops).getBalance(anyInt());
 
@@ -93,6 +103,12 @@ public class MoneyTransferManagerTest {
         code2.setIdGiftCode(2);
         code3.setIdGiftCode(3);
         code4.setIdGiftCode(4);
+
+        code0.setCurrency(978);
+        code1.setCurrency(978);
+        code2.setCurrency(978);
+        code3.setCurrency(978);
+        code4.setCurrency(978);
 
         LinkedList<GiftCodeRecord> codeList = new LinkedList<>();
         doReturn(codeList).when(payops).getUnusedGiftCodes();
@@ -172,11 +188,18 @@ public class MoneyTransferManagerTest {
 
     @Test
     public void testNotEnoughGiftCodesInDB() throws Exception {
+        PlatformRecord platformRecord = mock(PlatformRecord.class);
+        Optional<PlatformRecord> platform = Optional.of(platformRecord);
+        doReturn(platform).when(platformOperations).getPlatformRecord("bar-platform");
+        doReturn(978).when(platformRecord).getCurrency();
+
         WorkerRecord worker0 = mock(WorkerRecord.class);
         doReturn("pseipd@gmail.com").when(worker0).getEmail();
         doReturn(0).when(worker0).getIdWorker();
+        doReturn("bar-platform").when(worker0).getPlatform();
 
         doReturn(40).when(payops).getBalance(anyInt());
+
 
         Result<WorkerRecord> workerList = mock(Result.class);
         Iterator<WorkerRecord> it = mock(Iterator.class);
@@ -189,10 +212,9 @@ public class MoneyTransferManagerTest {
         GiftCodeRecord code0 = new GiftCodeRecord();
 
         code0.setCode("QWER-TZUI");
-
         code0.setAmount(15);
-
         code0.setIdGiftCode(0);
+        code0.setCurrency(978);
 
         LinkedList<GiftCodeRecord> codeList = new LinkedList<>();
         doReturn(codeList).when(payops).getUnusedGiftCodes();

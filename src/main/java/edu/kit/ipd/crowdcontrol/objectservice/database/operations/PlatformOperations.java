@@ -42,6 +42,15 @@ public class PlatformOperations extends AbstractOperations {
     }
 
     /**
+     * Returns a singe platform.
+     * @param id ID of the platform
+     * @return the platform
+     */
+    public Optional<PlatformRecord> getPlatformRecord(String id) {
+        return create.fetchOptional(PLATFORM, PLATFORM.ID_PLATFORM.eq(id));
+    }
+
+    /**
      * Returns a single platform.
      *
      * @param id ID of the platform
