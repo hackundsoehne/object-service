@@ -164,7 +164,7 @@ public class ExperimentOperations extends AbstractOperations {
                 || experimentRecord.getBonusAnswer() == null
                 || experimentRecord.getBonusRating() == null
                 || experimentRecord.getWorkerQualityThreshold() == null
-                || experimentRecord.getPaymentQualityThreshold() == null) {
+                || experimentRecord.getResultQualityThreshold() == null) {
             return false;
         }
         int ratings = create.fetchCount(

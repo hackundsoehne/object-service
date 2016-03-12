@@ -68,6 +68,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @param platforms the names of the platforms
      * @param experimentId the primary key of the experiment
      */
+    //TODO why is this method not called?
     public void storePlatforms(List<String> platforms, int experimentId) {
         Set<ExperimentsPlatformRecord> toStore = platforms.stream()
                 .map(platform -> new ExperimentsPlatformRecord(null, experimentId, platform, null, null))
