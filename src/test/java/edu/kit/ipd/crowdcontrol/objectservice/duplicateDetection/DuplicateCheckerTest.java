@@ -97,13 +97,13 @@ public class DuplicateCheckerTest {
 
     @Test
     public void testCheckExperimentForDuplicates() throws Exception {
-        AnswerRecord uniqueAnswer = new AnswerRecord(0, experimentRecord.getIdExperiment(), "A very different answer", new Timestamp(0), 0, 6, false);
+        AnswerRecord uniqueAnswer = new AnswerRecord(0, experimentRecord.getIdExperiment(), "A very different answer", new Timestamp(0), 0,0, 6, false,"",(long)0);
 
-        AnswerRecord originalOne = new AnswerRecord(0, experimentRecord.getIdExperiment(), "This may be a duplicate", new Timestamp(0), 0, 6, false);
-        AnswerRecord duplicateOne = new AnswerRecord(0, experimentRecord.getIdExperiment(), "This MAY be a Duplicate toO", new Timestamp(1), 0, 6, false);
+        AnswerRecord originalOne = new AnswerRecord(0, experimentRecord.getIdExperiment(), "This may be a duplicate", new Timestamp(0), 0, 0,6, false,"",(long)0);
+        AnswerRecord duplicateOne = new AnswerRecord(0, experimentRecord.getIdExperiment(), "This MAY be a Duplicate toO", new Timestamp(1), 0,0, 6, false,"",(long)0);
 
-        AnswerRecord originalTwo = new AnswerRecord(0, experimentRecord.getIdExperiment(), "An answer should not be similar to other answers, else it is a duplicate", new Timestamp(0), 0, 6, false);
-        AnswerRecord duplicateTwo = new AnswerRecord(0, experimentRecord.getIdExperiment(), "an ANSWER shouLd NoT bE similaR to other duplicates, else it is a duplicate", new Timestamp(1), 0, 6, false);
+        AnswerRecord originalTwo = new AnswerRecord(0, experimentRecord.getIdExperiment(), "An answer should not be similar to other answers, else it is a duplicate", new Timestamp(0), 0,0, 6, false,"",(long)0);
+        AnswerRecord duplicateTwo = new AnswerRecord(0, experimentRecord.getIdExperiment(), "an ANSWER shouLd NoT bE similaR to other duplicates, else it is a duplicate", new Timestamp(1), 0,0, 6, false,"",(long)0);
 
         answerRecords.add(uniqueAnswer);
         answerRecords.add(originalOne);
@@ -129,7 +129,7 @@ public class DuplicateCheckerTest {
 
     @Test
     public void testTermination() throws Exception {
-        AnswerRecord uniqueAnswer = new AnswerRecord(0, experimentRecord.getIdExperiment(), "A very different answer", new Timestamp(0), 0, 6, false);
+        AnswerRecord uniqueAnswer = new AnswerRecord(0, experimentRecord.getIdExperiment(), "A very different answer", new Timestamp(0), 0,0, 6, false,"",(long)0);
         answerRecords.add(uniqueAnswer);
         answerRecords.forEach(answerRecord -> answerQualityMap.put(answerRecord, answerRecord.getQuality()));
 
@@ -150,10 +150,10 @@ public class DuplicateCheckerTest {
         experimentRecord.setAnswerType("picture");
 
 
-        AnswerRecord answerRecord1 = new AnswerRecord(0, experimentRecord.getIdExperiment(), "http://www.franz-sales-verlag.de/fsvwiki/uploads/Lexikon/Baum.jpg", new Timestamp(0), 0, 6, false);
-        AnswerRecord answerRecord2 = new AnswerRecord(0, experimentRecord.getIdExperiment(), "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(1), 0, 6, false);
-        AnswerRecord answerRecord2Duplicate = new AnswerRecord(0, experimentRecord.getIdExperiment(), "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(4), 0, 6, false);
-        AnswerRecord answerRecordMalformedURL = new AnswerRecord(0, experimentRecord.getIdExperiment(), "htt214ljbaq    dlkjps://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(1), 0, 6, false);
+        AnswerRecord answerRecord1 = new AnswerRecord(0, experimentRecord.getIdExperiment(), "http://www.franz-sales-verlag.de/fsvwiki/uploads/Lexikon/Baum.jpg", new Timestamp(0), 0,0, 6, false,"",(long)0);
+        AnswerRecord answerRecord2 = new AnswerRecord(0, experimentRecord.getIdExperiment(), "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(1), 0,0, 6, false,"",(long)0);
+        AnswerRecord answerRecord2Duplicate = new AnswerRecord(0, experimentRecord.getIdExperiment(), "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(4), 0,0, 6, false,"",(long)0);
+        AnswerRecord answerRecordMalformedURL = new AnswerRecord(0, experimentRecord.getIdExperiment(), "htt214ljbaq    dlkjps://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(1), 0,0, 6, false,"",(long)0);
 
 
         answerRecords.add(answerRecord1);
