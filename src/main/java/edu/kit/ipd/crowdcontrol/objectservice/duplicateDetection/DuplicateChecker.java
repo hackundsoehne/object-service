@@ -113,18 +113,17 @@ public class DuplicateChecker {
             try {
                 url = new URL(answerRecord.getAnswer());
             } catch (MalformedURLException e) {
-                //TODO  specify reason for zero-quality in response field
+                answerRecord.setSystemResponse("Specified URL is malformed");
                 return Optional.empty();
             }
             try {
                 image = ImageIO.read(url);
             } catch (IOException e) {
-                System.out.println("IO");
-                //TODO  specify reason for zero-quality in response field
+                answerRecord.setSystemResponse("Specified image is not readable");
                 return Optional.empty();
             }
             if (image == null) {
-                //TODO  specify reason for zero-quality in response field
+                answerRecord.setSystemResponse("Specified image was not readable");
                 return Optional.empty();
             }
             return Optional.of(ImageSimilarity.getImageHash(image));
@@ -145,7 +144,17 @@ public class DuplicateChecker {
             mapOfHashes.forEach((answerRecordA, hashA) -> {
                 mapOfHashes.forEach((answerRecordB, hashB) -> {
                     if (!answerRecordA.equals(answerRecordB) && HashSimilarity.getSimilarityFromHash(hashA, hashB) > 0.85 ) {
-                        duplicates.add(answerRecordA.getTimestamp().compareTo(answerRecordB.getTimestamp()) < 0 ? answerRecordB : answerRecordA);
+                        AnswerRecord duplicateAnswer;
+                        AnswerRecord originalAnswer;
+                        if(answerRecordA.getTimestamp().compareTo(answerRecordB.getTimestamp()) > 0){
+                            duplicateAnswer = answerRecordB;
+                            originalAnswer = answerRecordA;
+                        }else {
+                            originalAnswer = answerRecordB;
+                            duplicateAnswer = answerRecordA;
+                        }
+                        answerRatingOperations.setSystemResponseField(duplicateAnswer,"This answer is considered a duplicate with: \""+originalAnswer.getAnswer()+"\"");
+                        duplicates.add(duplicateAnswer);
                     }
                 });
             });
@@ -159,8 +168,18 @@ public class DuplicateChecker {
                 Collections.sort(sortedEntries, (a, b) -> Long.compareUnsigned(a.getValue(), b.getValue()));
                 for (int j = 0; j < sortedEntries.size() - 1; j++) {
                     if (HashSimilarity.getSimilarityFromHash(sortedEntries.get(j).getValue(), sortedEntries.get(j + 1).getValue()) > 0.85) {
-                        duplicates.add(
-                                sortedEntries.get(j).getKey().getTimestamp().compareTo(sortedEntries.get(j + 1).getKey().getTimestamp()) < 0 ? sortedEntries.get(j + 1).getKey() : sortedEntries.get(j).getKey());
+                        AnswerRecord duplicateAnswer;
+                        AnswerRecord originalAnswer;
+                        if(sortedEntries.get(j).getKey().getTimestamp().compareTo(sortedEntries.get(j + 1).getKey().getTimestamp()) < 0){
+                            duplicateAnswer = sortedEntries.get(j + 1).getKey();
+                            originalAnswer = sortedEntries.get(j).getKey();
+                        }else {
+                            duplicateAnswer = sortedEntries.get(j).getKey();
+                            originalAnswer = sortedEntries.get(j + 1).getKey();
+
+                        }
+                        answerRatingOperations.setSystemResponseField(duplicateAnswer,"This answer is considered a duplicate with: \""+originalAnswer.getAnswer()+"\"");  //TODO What do you think about this response?
+                        duplicates.add(duplicateAnswer);
                     }
                 }
                 if (i < 63) {
@@ -217,7 +236,7 @@ public class DuplicateChecker {
 
                     } else {
                         // If optional is empty and thus the hashing failed, the answers quality will be set to zero.
-                        // The reason for the failure is described in the response-field
+                        // The reason for the failure is described in the response-field and set in the getHashFromAnswer-method
                         answerRatingOperations.setQualityToAnswer(answerRecord,0);
                         answerRatingOperations.setAnswerQualityAssured(answerRecord);
                     }
