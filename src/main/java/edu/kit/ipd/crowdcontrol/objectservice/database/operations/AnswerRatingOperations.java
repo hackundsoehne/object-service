@@ -526,4 +526,11 @@ public class AnswerRatingOperations extends AbstractOperations {
                 ))
                 .fetchOptional();
     }
+
+    /**
+     * Sets system-response-field of specified answerRecord
+     */
+    public void setSystemResponseField(AnswerRecord answerRecord, String systemResponse){
+        //TODO
+    }
 }
