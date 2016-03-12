@@ -10,8 +10,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -505,42 +503,6 @@ public class AnswerRatingOperations extends AbstractOperations {
      * Sets system-response-field of specified answerRecord
      */
     public void setSystemResponseField(AnswerRecord answerRecord, String systemResponse){
-        assertHasField(answerRecord, ANSWER.ID_ANSWER);
-        create.update(ANSWER)
-                .set(ANSWER.SYSTEM_RESPONSE, systemResponse)
-                .where(ANSWER.ID_ANSWER.eq(answerRecord.getIdAnswer()))
-                .execute();
-    }
-
-    /**
-     * Updates the Answer-Record in the database
-     * @param answer the answer
-     */
-    public void updateAnswer(AnswerRecord answer){
-        create.executeUpdate(answer);
-    }
-
-    /**
-     * Returns mapping of duplicate-answers to their corresponding original-answers.
-     * <p>
-     * by computing 1.0 - (((double) Long.bitCount(xor) + 1) / (65 - Long.numberOfLeadingZeros(xor))) and comparing
-     * that to the threshold. xor is Answer.Hash.xor(hash).
-     * @param hash the hash-value of the specified answer
-     * @param experiment the primary key of the experiment
-     * @param threshold the threshold
-     * @return mapping of the identified duplicates to their corresponding original answer
-     */
-    public List<AnswerRecord> getDuplicates(long hash, int experiment, double threshold){
-        Field<Long> xor = ANSWER.HASH.bitXor(hash).as("XOR");
-        //bitcount(xor) + 1
-        Field<Integer> dividend = DSL.bitCount(xor);
-        //65 - (63 - floor(log2(xor))) or 65 - numberOfLeadingZeros(xor)
-        Field<Integer> divisor = DSL.val(65).minus(DSL.val(63).minus(DSL.floor(DSL.isnull(DSL.log(xor, 2), BigDecimal.valueOf(1)))));
-        return create.select(ANSWER.fields())
-                .select(xor)
-                .from(ANSWER)
-                .where(ANSWER.EXPERIMENT.eq(experiment))
-                .having(DSL.val(1.0).minus(dividend.divide(divisor)).greaterOrEqual(threshold))
-                .fetchInto(ANSWER);
+        //TODO
     }
 }
