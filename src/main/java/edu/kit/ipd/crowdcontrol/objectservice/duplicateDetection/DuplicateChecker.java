@@ -146,7 +146,7 @@ public class DuplicateChecker {
                     if (!answerRecordA.equals(answerRecordB) && HashSimilarity.getSimilarityFromHash(hashA, hashB) > 0.85 ) {
                         AnswerRecord duplicateAnswer;
                         AnswerRecord originalAnswer;
-                        if(answerRecordA.getTimestamp().compareTo(answerRecordB.getTimestamp()) > 0){
+                        if(answerRecordA.getTimestamp().compareTo(answerRecordB.getTimestamp()) < 0){
                             duplicateAnswer = answerRecordB;
                             originalAnswer = answerRecordA;
                         }else {
