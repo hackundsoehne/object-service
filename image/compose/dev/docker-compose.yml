@@ -9,6 +9,12 @@ services:
     extends:
       file: base.yml
       service: objectservice
+    links:
+       - db:db
+       - workerui:workerui
+    depends_on:
+       - db
+       - workerui
     command:
       - -Dpybossa.disabled=true
 
@@ -16,6 +22,12 @@ services:
     extends:
       file: base.yml
       service: workerservice
+    links:
+       - db:db
+       - objectservice:objectservice
+    depends_on:
+         - db
+         - objectservice
 
 
   workerui:

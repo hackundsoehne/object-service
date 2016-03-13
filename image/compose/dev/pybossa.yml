@@ -10,14 +10,25 @@ services:
       file: base.yml
       service: objectservice
     depends_on:
-       - pybossa
+      - db
+      - workerui
+      - pybossa
     links:
+      - db:db
+      - workerui:workerui
       - pybossa:pybossa
 
   workerservice:
     extends:
       file: base.yml
       service: workerservice
+    links:
+       - db:db
+       - objectservice:objectservice
+    depends_on:
+       - db
+       - objectservice
+
 
 
   workerui:
