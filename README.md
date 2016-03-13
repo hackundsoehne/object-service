@@ -16,6 +16,8 @@ The you can run `docker-compose up` (assuming docker is installed) to start the 
 Please create your own docker-compose file for production with suitable config-files.
 The pybossa account is: `pseipd@gmail.com` with the password `pse`.
 
+For remote-debugging: the object-service port is `54567` and the worker-service port is `53333` (the normal port with a 5 added).
+
 ### Jar:
 
 How to build the object-service is detailed below.
