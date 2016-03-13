@@ -25,4 +25,16 @@ public interface Payment {
      * @return A Completable future which completes once the list of payments is submitted and done
      */
     CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob);
+
+    /**
+     * Indicates which currency is used for payment of the worker
+     *
+     * The paymentjob will get the amount of money in the specified currency
+     *
+     * Code must be ISO 4217 conform.
+     * For more details: https://de.wikipedia.org/wiki/ISO_4217
+     *
+     * @return code of the returned currency
+     */
+    int getCurrency();
 }

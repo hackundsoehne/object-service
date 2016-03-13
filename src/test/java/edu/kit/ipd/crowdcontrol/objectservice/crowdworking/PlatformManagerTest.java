@@ -51,7 +51,17 @@ public class PlatformManagerTest {
 
         manager = new PlatformManager(platforms,
                 platform -> params -> WorkerIdentification.findByIdentification(platform, "42"),
-                (id, data, experiment1, paymentJob) -> CompletableFuture.completedFuture(true),
+                new Payment() {
+                    @Override
+                    public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {
+                        return CompletableFuture.completedFuture(true);
+                    }
+
+                    @Override
+                    public int getCurrency() {
+                        return 0;
+                    }
+                },
                 experimentsPlatformOperations,
                 platformOps,
                 workerOps);
@@ -176,6 +186,11 @@ public class PlatformManagerTest {
         @Override
         public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {
             return CompletableFuture.completedFuture(true);
+        }
+
+        @Override
+        public int getCurrency() {
+            return 0;
         }
     }
 }

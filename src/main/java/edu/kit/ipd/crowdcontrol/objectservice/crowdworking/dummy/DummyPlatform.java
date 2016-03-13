@@ -127,4 +127,9 @@ public class DummyPlatform implements Platform, Payment {
     public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {
         return CompletableFuture.completedFuture(true);
     }
+
+    @Override
+    public int getCurrency() {
+        return 0;
+    }
 }

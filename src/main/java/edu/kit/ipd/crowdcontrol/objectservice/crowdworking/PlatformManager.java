@@ -72,7 +72,7 @@ public class PlatformManager {
                         platform.isCalibrationAllowed(),
                         isNeedemail(platform),
                         false,
-                        -1
+                        platform.getPayment().orElse(fallbackPayment).getCurrency()
                 ))
                 .collect(Collectors.toList());
 

@@ -202,6 +202,12 @@ public class MturkPlatform implements Platform,Payment {
         return flushPayment(experiment, paymentJobs, workerAssignmentId, bonusPayed);
     }
 
+    @Override
+    public int getCurrency() {
+        //USD
+        return 840;
+    }
+
     /**
      * Approve a assignment of a payment job if it is not yet and pay the bonus (or the rest of bonus) which is left
      * @param experiment experiment to pay
