@@ -29,8 +29,6 @@ services:
        - db
        - objectservice
 
-
-
   workerui:
     extends:
       file: base.yml
