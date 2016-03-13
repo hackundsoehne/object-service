@@ -1,0 +1,59 @@
+version: '2'
+services:
+  controlui:
+    extends:
+        file: base.yml
+        service: controlui
+
+  objectservice:
+    extends:
+      file: base.yml
+      service: objectservice
+    depends_on:
+       - pybossa
+    links:
+      - pybossa:pybossa
+
+  workerservice:
+    extends:
+      file: base.yml
+      service: workerservice
+
+
+  workerui:
+    extends:
+      file: base.yml
+      service: workerui
+
+  db:
+     extends:
+        file: base.yml
+        service: db
+
+  pybossa_redis:
+        image: redis
+
+  pybossa_redis_sentinel:
+      image: matthiaswiesner/redis-sentinel
+      links:
+         - pybossa_redis:redis
+      environment:
+          REDIS_PORT_6379_TCP_ADDR: redis
+          REDIS_PORT_6379_TCP_PORT: 6379
+
+  pybossa_postgres:
+          image: coolcrowd/pybossa-postgres
+          environment:
+              POSTGRES_USER: pybossa
+              POSTGRES_PASSWORD: tester
+
+  pybossa:
+          image: coolcrowd/pybossa
+          links:
+              - pybossa_redis_sentinel:dbredissentinel
+              - pybossa_postgres:dbpostgres
+          ports:
+              - "5000:5000"
+          depends_on:
+              - pybossa_postgres
+              - pybossa_redis_sentinel

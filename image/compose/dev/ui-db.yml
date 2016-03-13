@@ -5,19 +5,6 @@ services:
         file: base.yml
         service: controlui
 
-  objectservice:
-    extends:
-      file: base.yml
-      service: objectservice
-    command:
-      - -Dpybossa.disabled=true
-
-  workerservice:
-    extends:
-      file: base.yml
-      service: workerservice
-
-
   workerui:
     extends:
       file: base.yml
