@@ -36,6 +36,8 @@ services:
       image: coolcrowd/worker-ui:latest
       ports:
         - "8080:80"
+      environment:
+       - WS_URL=http://${DOCKERIP}:3333/
 
   db:
     image: mysql:latest
