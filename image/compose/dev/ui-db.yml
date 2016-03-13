@@ -1,0 +1,16 @@
+version: '2'
+services:
+  controlui:
+    extends:
+        file: base.yml
+        service: controlui
+
+  workerui:
+    extends:
+      file: base.yml
+      service: workerui
+
+  db:
+     extends:
+        file: base.yml
+        service: db

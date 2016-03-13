@@ -1,61 +1,41 @@
 version: '2'
 services:
   controlui:
-    image: coolcrowd/control-ui:latest
-    ports:
-       - "8000:80"
-    environment:
-       - API_URL=http://${DOCKERIP}:4567/
-       - API_AUTH=false
+    extends:
+        file: base.yml
+        service: controlui
 
   objectservice:
-    image: coolcrowd/object-service:latest
-    ports:
-     - "4567:4567"
-     - "54567:5005"
-    depends_on:
-     - db
-     - workerui
+    extends:
+      file: base.yml
+      service: objectservice
     links:
-     - db:db
-     - workerui:workerui
+       - db:db
+       - workerui:workerui
+    depends_on:
+       - db
+       - workerui
     command:
-      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
-      - -Dworkerservice.url=http://${DOCKERIP}:3333
-      - -Dworkeruipublic.url=http://${DOCKERIP}:8080
       - -Dpybossa.disabled=true
 
   workerservice:
-    image: coolcrowd/worker-service:latest
-    ports:
-      - "3333:4567"
-      - "53333:5005"
+    extends:
+      file: base.yml
+      service: workerservice
+    links:
+       - db:db
+       - objectservice:objectservice
     depends_on:
          - db
          - objectservice
-    links:
-         - db:db
-         - objectservice:objectservice
-    command:
-      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
-      - -Ddatabase.url=jdbc:mysql://db
-      - -Ddatabase.username=root
-      - -Ddatabase.password=root
-      - -Dos.url=http://objectservice:4567
+
 
   workerui:
-      image: coolcrowd/worker-ui:latest
-      ports:
-        - "8080:80"
+    extends:
+      file: base.yml
+      service: workerui
 
   db:
-    image: mysql:latest
-    environment:
-      MYSQL_DATABASE: crowdcontrol
-      MYSQL_USER: user
-      MYSQL_PASSWORD: 123456
-      MYSQL_ROOT_PASSWORD: root
-    command:
-        - --character-set-server=utf8mb4
-    ports:
-         - "3306:3306"
+     extends:
+        file: base.yml
+        service: db
