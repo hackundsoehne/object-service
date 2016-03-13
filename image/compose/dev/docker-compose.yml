@@ -12,6 +12,7 @@ services:
     image: coolcrowd/object-service:latest
     ports:
      - "4567:4567"
+     - "54567:5005"
     depends_on:
      - db
      - workerui
@@ -19,6 +20,7 @@ services:
      - db:db
      - workerui:workerui
     command:
+      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
       - -Dworkerservice.url=http://${DOCKERIP}:3333
       - -Dworkeruipublic.url=http://${DOCKERIP}:8080
       - -Dpybossa.disabled=true
@@ -27,6 +29,7 @@ services:
     image: coolcrowd/worker-service:latest
     ports:
       - "3333:4567"
+      - "53333:5005"
     depends_on:
          - db
          - objectservice
@@ -34,10 +37,11 @@ services:
          - db:db
          - objectservice:objectservice
     command:
-            - -Ddatabase.url=jdbc:mysql://db
-            - -Ddatabase.username=root
-            - -Ddatabase.password=root
-            - -Dos.url=http://objectservice:4567
+      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+      - -Ddatabase.url=jdbc:mysql://db
+      - -Ddatabase.username=root
+      - -Ddatabase.password=root
+      - -Dos.url=http://objectservice:4567
 
   workerui:
       image: coolcrowd/worker-ui:latest
