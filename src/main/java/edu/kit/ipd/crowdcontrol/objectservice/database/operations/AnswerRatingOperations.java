@@ -509,4 +509,24 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .where(ANSWER.ID_ANSWER.eq(answerRecord.getIdAnswer()))
                 .execute();
     }
+
+    /**
+     * Sets hash to specified answer.
+     * @param answerRecord answerRecord
+     * @param hash hash-value of the answerRecord's answer-field
+     */
+    public void setHashToAnswer(AnswerRecord answerRecord, Long hash){
+        //TODO
+    }
+
+
+    /**
+     * Returns mapping of duplicate-answers to their corresponding original-answers
+     * @param expId identification-number of the experiment
+     * @return mapping of the identified duplicates to their corresponding original answer
+     */
+    public Map<AnswerRecord,AnswerRecord> getDuplicates(int expId){
+        //TODO
+        return null;
+    }
 }
