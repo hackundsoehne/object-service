@@ -32,6 +32,9 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class DuplicateChecker {
 
+    static final String IMAGE_NOT_READABLE_RESPONSE = "Specified image is not readable";
+    static final String URL_MALFORMED_RESPONSE = "Specified URL is malformed or not readable";
+
     private final Logger logger = LogManager.getLogger(DuplicateChecker.class);
     private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
@@ -62,6 +65,7 @@ public class DuplicateChecker {
         thread.start();
     }
 
+
      /**
      * Terminates the running duplicateDetector
      */
@@ -75,21 +79,21 @@ public class DuplicateChecker {
     /**
      * Checks all answers of an experiment for duplicates.
      * If duplicates are found their quality is set to 0 and their quality_assured bit is set.
+     * In Addition to that, the duplicates system-response field
      * The original answer keeps its quality.
      *
-     * @param mapOfHashes mapping of answers to their corresponding hashes
+     * @param expID id of the experiment
      */
-    public void checkExperimentForDuplicates(Map<AnswerRecord, Long> mapOfHashes) {
-        //get duplicates
-        Set<AnswerRecord> duplicates = new HashSet<>();
-        if (mapOfHashes.size() > 1) {
-            duplicates.addAll(getDuplicatesFromHash(mapOfHashes));
-            duplicates.forEach(answerRecord -> {
-                answerRatingOperations.setQualityToAnswer(answerRecord, 0);
-                answerRatingOperations.setAnswerQualityAssured(answerRecord);
+    public void processDuplicatesOfExperiment(int expID) {
+
+        Map<AnswerRecord,AnswerRecord> mapOfDuplicatesToOriginals = answerRatingOperations.getDuplicates(expID);
+        mapOfDuplicatesToOriginals.forEach((duplicate,original) -> {
+            answerRatingOperations.setSystemResponseField(duplicate,"This answer is considered a duplicate with: \""+ original.getAnswer()+"\"");
+            answerRatingOperations.setQualityToAnswer(duplicate,0);
+            answerRatingOperations.setAnswerQualityAssured(duplicate);
             });
         }
-    }
+
 
 
     /**
@@ -113,17 +117,17 @@ public class DuplicateChecker {
             try {
                 url = new URL(answerRecord.getAnswer());
             } catch (MalformedURLException e) {
-                answerRecord.setSystemResponse("Specified URL is malformed");
+                answerRatingOperations.setSystemResponseField(answerRecord,URL_MALFORMED_RESPONSE);
                 return Optional.empty();
             }
             try {
                 image = ImageIO.read(url);
             } catch (IOException e) {
-                answerRecord.setSystemResponse("Specified image is not readable");
+                answerRatingOperations.setSystemResponseField(answerRecord,IMAGE_NOT_READABLE_RESPONSE);
                 return Optional.empty();
             }
             if (image == null) {
-                answerRecord.setSystemResponse("Specified image was not readable");
+                answerRatingOperations.setSystemResponseField(answerRecord,IMAGE_NOT_READABLE_RESPONSE);
                 return Optional.empty();
             }
             return Optional.of(ImageSimilarity.getImageHash(image));
@@ -131,6 +135,55 @@ public class DuplicateChecker {
     }
 
 
+
+    private class DuplicateWatcherThread extends Thread
+    {
+        /**
+         * While running, the DuplicateChecker hashes the answers in the queue and checks them for duplicates.
+         */
+        public void run() {
+            threadRunning = true;
+            while (threadRunning) {
+                AnswerRecord answerRecord;
+                try {
+                    answerRecord = queue.take();
+                } catch (InterruptedException e) {
+                    logger.info("DuplicateChecker terminated!!");
+                    return;
+                }
+                if (answerRecord != null) {
+                    //trying to acquire answer-hash
+                    Optional<Long> answerHash = getHashFromAnswer(answerRecord, experimentOperations.getExperiment(answerRecord.getExperiment())
+                            .orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID!")).getAnswerType());
+                    if (answerHash.isPresent()) {
+                        answerRatingOperations.setHashToAnswer(answerRecord,answerHash.get());
+                        processDuplicatesOfExperiment(answerRecord.getExperiment());
+                    } else {
+                        // If optional is empty and thus the hashing failed, the answers quality will be set to zero.
+                        // The reason for the failure is described in the response-field and set in the getHashFromAnswer-method
+                        answerRatingOperations.setQualityToAnswer(answerRecord,0);
+                        answerRatingOperations.setAnswerQualityAssured(answerRecord);
+                    }
+                }
+            }
+            logger.info("DuplicateChecker terminated!");
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @Deprecated //because duplicate-detection is done in the db now
     /**
      * Identifies duplicates of the given answer-hash-mapping.
      * Different algorithms are used based on the number of answers
@@ -158,7 +211,6 @@ public class DuplicateChecker {
                     }
                 });
             });
-
             //Comparison for larger numbers of answers
         } else {
             List<Map.Entry<AnswerRecord, Long>> sortedEntries = new ArrayList<>(mapOfHashes.entrySet());
@@ -176,9 +228,8 @@ public class DuplicateChecker {
                         }else {
                             duplicateAnswer = sortedEntries.get(j).getKey();
                             originalAnswer = sortedEntries.get(j + 1).getKey();
-
                         }
-                        answerRatingOperations.setSystemResponseField(duplicateAnswer,"This answer is considered a duplicate with: \""+originalAnswer.getAnswer()+"\"");  //TODO What do you think about this response?
+                        answerRatingOperations.setSystemResponseField(duplicateAnswer,"This answer is considered a duplicate with: \""+originalAnswer.getAnswer()+"\"");
                         duplicates.add(duplicateAnswer);
                     }
                 }
@@ -192,7 +243,7 @@ public class DuplicateChecker {
     }
 
 
-    @Deprecated
+    @Deprecated //Deprecated because image-similarity is identified by the image's hash-values now
     private Set<AnswerRecord> getImageDuplicatesFromSignatures(Map<AnswerRecord, Color[][]> mapOfSignatures) {
         Set<AnswerRecord> duplicates = new HashSet<>();
         mapOfSignatures.forEach((answerRecordA, signatureA) -> {
@@ -208,41 +259,4 @@ public class DuplicateChecker {
     }
 
 
-    private class DuplicateWatcherThread extends Thread
-    {
-        /**
-         * While running, the DuplicateChecker hashes the answers in the queue and checks them for duplicates.
-         */
-        public void run() {
-            threadRunning = true;
-            while (threadRunning) {
-                AnswerRecord answerRecord;
-                try {
-                    answerRecord = queue.take();
-
-                } catch (InterruptedException e) {
-                    logger.info("DuplicateChecker terminated!!");
-                    return;
-
-                }
-                if (answerRecord != null) {
-                    //trying to acquire answer-hash
-                    Optional<Long> answerHash = getHashFromAnswer(answerRecord, experimentOperations.getExperiment(answerRecord.getExperiment())
-                            .orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID!")).getAnswerType());
-                    if (answerHash.isPresent()) {
-                        Map<AnswerRecord, Long> mapOfHashes = answerRatingOperations.getMapOfHashesOfNonDuplicateAnswers(answerRecord.getExperiment());
-                        mapOfHashes.put(answerRecord, answerHash.get());
-                        checkExperimentForDuplicates(mapOfHashes);
-
-                    } else {
-                        // If optional is empty and thus the hashing failed, the answers quality will be set to zero.
-                        // The reason for the failure is described in the response-field and set in the getHashFromAnswer-method
-                        answerRatingOperations.setQualityToAnswer(answerRecord,0);
-                        answerRatingOperations.setAnswerQualityAssured(answerRecord);
-                    }
-                }
-            }
-            logger.info("DuplicateChecker terminated!");
-        }
-    }
 }
