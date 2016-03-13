@@ -36,7 +36,9 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @throws IllegalArgumentException if the platform is already existing
      */
     public void insertPlatform(String platform, int experimentId, ExperimentsPlatformModeMode mode) throws IllegalArgumentException {
-        ExperimentsPlatformRecord record = new ExperimentsPlatformRecord(null, experimentId, platform, null, null);
+        ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
+        record.setExperiment(experimentId);
+        record.setPlatform(platform);
         ExperimentsPlatformRecord inserted = create.transactionResult(conf -> {
             boolean exists = DSL.using(conf).fetchExists(
                     DSL.selectFrom(EXPERIMENTS_PLATFORM)

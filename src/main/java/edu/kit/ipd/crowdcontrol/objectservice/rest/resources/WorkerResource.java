@@ -52,7 +52,9 @@ public class WorkerResource {
                 worker = optionalRecord.get();
             } else if (!manager.getNeedemail(platform) || (request.queryParams("email") != null && !request.queryParams("email").isEmpty())){
                 JsonElement data = workerIdentification.getWorkerData();
-                WorkerRecord workerRecord = new WorkerRecord(null, data, platform, null, null, null);
+                WorkerRecord workerRecord = new WorkerRecord();
+                workerRecord.setPlatformData(data);
+                workerRecord.setPlatform(platform);
                 worker = operations.insertWorker(workerRecord);
             } else {
                 throw new NotFoundException();

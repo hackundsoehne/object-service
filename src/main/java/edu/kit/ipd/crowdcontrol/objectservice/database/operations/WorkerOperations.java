@@ -103,11 +103,15 @@ public class WorkerOperations extends AbstractOperations {
                         .where(Tables.WORKER.PLATFORM.eq(toAnonymize.getPlatform()))
                         .and(Tables.WORKER.IDENTIFICATION.eq("Anonymous Worker"))
                         .fetchOptional()
-                        .orElseGet(() ->
-                                DSL.using(configuration).insertInto(Tables.WORKER)
-                                        .set(new WorkerRecord(null, new JsonPrimitive("Anonymous Worker"), toAnonymize.getPlatform(), null, null, null))
-                                        .returning()
-                                        .fetchOne()));
+                        .orElseGet(() -> {
+                            WorkerRecord record = new WorkerRecord();
+                            record.setPlatformData(new JsonPrimitive("Anonymous Worker"));
+                            record.setPlatform(toAnonymize.getPlatform());
+                            return DSL.using(configuration).insertInto(Tables.WORKER)
+                                    .set(record)
+                                    .returning()
+                                    .fetchOne();
+                        }));
         create.transaction(conf -> {
             DSL.using(conf).deleteFrom(Tables.CALIBRATION_RESULT)
                     .where(Tables.CALIBRATION_RESULT.WORKER.eq(toAnonymize.getIdWorker()))
