@@ -29,8 +29,6 @@ public interface Payment {
     /**
      * Indicates which currency is used for payment of the worker
      *
-     * The paymentjob will get the amount of money in the specified currency
-     *
      * Code must be ISO 4217 conform.
      * For more details: https://de.wikipedia.org/wiki/ISO_4217
      *
