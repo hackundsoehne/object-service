@@ -177,7 +177,7 @@ public class DuplicateCheckerTest {
         } catch (Exception e) {
             return;
         }
-        mapOfNonDuplicateAnswers.put(answerRecord1, ImageSimilarity.getImageHash(image));
+        mapOfNonDuplicateAnswers.put(answerRecord1, ImageSimilarity.getImageHashFromGreyScaleDeviation(image));
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2, new ArrayList<>()));
         try {
 
@@ -187,7 +187,7 @@ public class DuplicateCheckerTest {
         } catch (Exception e) {
             return;
         }
-        mapOfNonDuplicateAnswers.put(answerRecord2, ImageSimilarity.getImageHash(image));
+        mapOfNonDuplicateAnswers.put(answerRecord2, ImageSimilarity.getImageHashFromGreyScaleDeviation(image));
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2Duplicate, new ArrayList<>()));
 
 

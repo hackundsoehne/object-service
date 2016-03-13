@@ -130,7 +130,7 @@ public class DuplicateChecker {
                 answerRatingOperations.setSystemResponseField(answerRecord,IMAGE_NOT_READABLE_RESPONSE);
                 return Optional.empty();
             }
-            return Optional.of(ImageSimilarity.getImageHash(image));
+            return Optional.of(ImageSimilarity.getImageHashFromGreyScaleDeviation(image));
         }
     }
 
