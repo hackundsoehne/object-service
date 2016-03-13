@@ -71,6 +71,9 @@ public class TemplateTransformer extends AbstractTransformer {
         RatingOptionTemplateRecord optionRecord = new RatingOptionTemplateRecord();
         optionRecord.setTemplate(templateId);
 
+        // Set 0 as default, because it's never called in merge if set to 0
+        optionRecord.setValue(0);
+
         return merge(optionRecord, ratingOption, (fieldNumber, record) -> {
             switch (fieldNumber) {
                 case Template.RatingOption.NAME_FIELD_NUMBER:
