@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -55,14 +57,14 @@ public class PyBossaPlatformTest {
 
     @Test
     public void testPublishTask() throws Exception {
-        String publishedId = pybossa.publishTask(experiment).get();
+        JsonElement publishedId = pybossa.publishTask(experiment).get();
 
         // get task with id = publishedid
         HttpResponse<JsonNode> response;
         try {
             response = Unirest.get(TASK_URL + "/{id}")
                     .queryString("api_key", API_KEY)
-                    .routeParam("id", publishedId)
+                    .routeParam("id", publishedId.getAsJsonObject().get("identification").getAsString())
                     .asJson();
         } catch (UnirestException e) {
             throw new PyBossaRequestException(e);
@@ -76,7 +78,7 @@ public class PyBossaPlatformTest {
         // get first available task
         JSONArray tasks = requests.getAllTasks();
         String taskId = String.valueOf(tasks.optJSONObject(0).getInt("id"));
-        CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(taskId);
+        CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(new JsonPrimitive(taskId));
         assertTrue(booleanCompletableFuture.get());
     }
 

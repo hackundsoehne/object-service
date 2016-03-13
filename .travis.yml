@@ -15,7 +15,8 @@ cache:
   - "$HOME/.gradle/wrapper/"
 
 before_script:
-- mysql -u "root" < src/main/resources/db.sql
+# disabled because last travis mysql was 2015-04-09 (and this was rolled back i think), and we require mysql 5.7, which was released in october
+#- mysql -u "root" < src/main/resources/db.sql
 - cp src/main/resources/config.travis.yml src/main/resources/config.yml
 
 env:
@@ -31,8 +32,8 @@ install: echo "skip './gradlew assemble' step"
 script:
 - "./gradlew assemble $TASK --continue"
 
-services:
-- mysql
+#services:
+#- mysql
 
 notifications:
   email: false

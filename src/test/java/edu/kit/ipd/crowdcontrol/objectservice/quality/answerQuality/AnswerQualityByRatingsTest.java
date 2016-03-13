@@ -43,7 +43,7 @@ public class AnswerQualityByRatingsTest {
         DSLContext create = DSL.using(SQLDialect.MYSQL);
         ratings = create.newResult(Tables.RATING);
         identifier = new AnswerQualityByRatings();
-        answer = new AnswerRecord(1, 0, null, null, 0, -1, false);
+        answer = new AnswerRecord(1, 0, null, null, 0, -1, 0, false, "", 13L);
         params = new HashMap<>();
         params.put(new AlgorithmAnswerQualityParamRecord(null, AnswerQualityByRatings.PARAM_DESCRIPTION, AnswerQualityByRatings.REGEX, AnswerQualityByRatings.algorithmName, AnswerQualityByRatings.PARAMETER_ID), String.valueOf(ratingThreshold));
         ratingThreshold = 6;
@@ -66,7 +66,7 @@ public class AnswerQualityByRatingsTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void throwExceptionIllegalRating() {
-        ratings.add(new RatingRecord(0, 0, 0, null, -1, "", 0, 0));
+        ratings.add(new RatingRecord(0, 0, 0, null, -1, 0, "", 0, 0));
         identifier.identifyAnswerQuality(answerRatingOperations, answer, params, maxQuality, minQuality);
     }
 
@@ -76,10 +76,10 @@ public class AnswerQualityByRatingsTest {
     @Test
     public void answerQualityIsAverageOfRatings() {
 
-        ratings.add(new RatingRecord(0, 0, 0, null, 0, "", 0, ratingThreshold + 1));
-        ratings.add(new RatingRecord(0, 0, 0, null, 2, "", 0, ratingThreshold + 1));
-        ratings.add(new RatingRecord(0, 0, 0, null, 8, "", 0, ratingThreshold + 1));
-        ratings.add(new RatingRecord(0, 0, 0, null, 6, "", 0, ratingThreshold + 1));
+        ratings.add(new RatingRecord(0, 0, 0, null, 0, 0, "", 0, ratingThreshold + 1));
+        ratings.add(new RatingRecord(0, 0, 0, null, 2, 0, "", 0, ratingThreshold + 1));
+        ratings.add(new RatingRecord(0, 0, 0, null, 8, 0, "", 0, ratingThreshold + 1));
+        ratings.add(new RatingRecord(0, 0, 0, null, 6, 0, "", 0, ratingThreshold + 1));
 
         int answerQuality = identifier.identifyAnswerQuality(answerRatingOperations, answer, params, maxQuality, minQuality).get(AnswerQualityStrategy.QUALITY);
         assertEquals(ratings.size(), (int) identifier.identifyAnswerQuality(answerRatingOperations, answer, params, maxQuality, minQuality).get(AnswerQualityStrategy.NUM_OF_RATINGS));
@@ -97,7 +97,7 @@ public class AnswerQualityByRatingsTest {
         for (int j = 1; j < 30; j++) {
             ratings.clear();
             for (int i = 0; i < j; i++) {
-                ratings.add(new RatingRecord(0, 0, 0, null, rand.nextInt(9), "", 0, ratingThreshold + 1));
+                ratings.add(new RatingRecord(0, 0, 0, null, rand.nextInt(9), 0, "", 0, ratingThreshold + 1));
             }
 
 
@@ -121,8 +121,8 @@ public class AnswerQualityByRatingsTest {
      */
     @Test
     public void testZeroQualityRating() {
-        ratings.add(new RatingRecord(0, 0, 0, null, 0, "", 0, ratingThreshold + 1));
-        ratings.add(new RatingRecord(0, 0, 0, null, 0, "", 0, ratingThreshold + 1));
+        ratings.add(new RatingRecord(0, 0, 0, null, 0, 0, "", 0, ratingThreshold + 1));
+        ratings.add(new RatingRecord(0, 0, 0, null, 0, 0, "", 0, ratingThreshold + 1));
 
         assertEquals(0, (int) identifier.identifyAnswerQuality(answerRatingOperations, answer, params, maxQuality, minQuality).get(AnswerQualityStrategy.QUALITY));
     }

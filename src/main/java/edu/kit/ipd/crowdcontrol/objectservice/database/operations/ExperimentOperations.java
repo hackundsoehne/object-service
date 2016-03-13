@@ -70,6 +70,10 @@ public class ExperimentOperations extends AbstractOperations {
      */
     public boolean deleteExperiment(int id) throws IllegalStateException {
         return doIfNotRunning(id, trans -> {
+            DSL.using(trans).deleteFrom(EXPERIMENTS_PLATFORM)
+                    .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(id))
+                    .execute();
+
             int deleted = DSL.using(trans)
                     .deleteFrom(EXPERIMENT)
                     .where(EXPERIMENT.ID_EXPERIMENT.eq(id))
@@ -97,7 +101,9 @@ public class ExperimentOperations extends AbstractOperations {
             return Experiment.State.DRAFT;
         } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)) {
             return Experiment.State.PUBLISHED;
-        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.stopping)) {
+        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
+            return Experiment.State.PUBLISHED; //TODO: maybe more options?
+        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.creative_stopping)) {
             return Experiment.State.CREATIVE_STOPPED;
         } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.stopped)) {
             return Experiment.State.STOPPED;
@@ -162,7 +168,7 @@ public class ExperimentOperations extends AbstractOperations {
                 || experimentRecord.getBonusAnswer() == null
                 || experimentRecord.getBonusRating() == null
                 || experimentRecord.getWorkerQualityThreshold() == null
-                || experimentRecord.getPaymentQualityThreshold() == null) {
+                || experimentRecord.getResultQualityThreshold() == null) {
             return false;
         }
         int ratings = create.fetchCount(
@@ -270,7 +276,12 @@ public class ExperimentOperations extends AbstractOperations {
 
             List<ExperimentsPlatformRecord> toInsert = platforms.stream()
                     .filter(platform -> !existing.contains(platform))
-                    .map(platform -> new ExperimentsPlatformRecord(null, experimentId, platform, null))
+                    .map(platform -> {
+                        ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
+                        record.setExperiment(experimentId);
+                        record.setPlatform(platform);
+                        return record;
+                    })
                     .collect(Collectors.toList());
 
             DSL.using(conf).batchInsert(toInsert).execute();

@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
@@ -47,24 +49,24 @@ public class MturkPlatformTest {
 
     @Test
     public void testPlatform() throws Exception {
-        String id = platform.publishTask(experiment).join();
+        JsonElement data = platform.publishTask(experiment).join();
 
-        platform.unpublishTask(id).join();
+        platform.unpublishTask(data).join();
 
         //shound not fail
-        platform.payExperiment(id, experiment, Collections.emptyList()).join();
+        platform.payExperiment(0, data, experiment, Collections.emptyList()).join();
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFailure() throws Exception {
-        String id = platform.publishTask(experiment).join();
+        JsonElement id = platform.publishTask(experiment).join();
 
         platform.unpublishTask(id).join();
 
         //shound not fail
         List<PaymentJob> paymentJobs = new ArrayList<>();
-        paymentJobs.add(new PaymentJob(new WorkerRecord(0,"testworker","MTurk","",0),20, ""));
-        platform.payExperiment(id, experiment, paymentJobs).join();
+        paymentJobs.add(new PaymentJob(new WorkerRecord(0,new JsonPrimitive("testworker"),"MTurk","",0, null),20, ""));
+        platform.payExperiment(0, id, experiment, paymentJobs).join();
     }
 }

@@ -39,10 +39,7 @@ import javax.mail.PasswordAuthentication;
 import javax.naming.NamingException;
 import java.io.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -208,7 +205,7 @@ public class Main {
                 new SQLEmailNotificationPolicy(mailSender, notificationRestOperations));
         notificationController.init();
 
-        Payment payment = (id, experiment, paymentJob) -> {
+        Payment payment = (id, data, experiment, paymentJob) -> {
             for (PaymentJob job : paymentJob) {
                 mng.addMoneyTransfer(job.getWorkerRecord().getIdWorker(), job.getAmount(), experiment.getId());
             }

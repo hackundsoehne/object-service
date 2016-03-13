@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
@@ -12,6 +13,8 @@ import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -140,8 +143,8 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .select(count)
                 .from(WORKER)
                 .rightJoin(RATING).onKey()
-                .where(ANSWER.EXPERIMENT.eq(expID))
-                .and(ANSWER.QUALITY.greaterOrEqual(threshold))
+                .where(RATING.EXPERIMENT.eq(expID))
+                .and(RATING.QUALITY.greaterOrEqual(threshold))
                 .groupBy(WORKER.fields())
                 .fetchMap(WORKER, record -> record.getValue(count));
     }
@@ -210,13 +213,25 @@ public class AnswerRatingOperations extends AbstractOperations {
             );
         }
 
-        AnswerRecord result = doIfRunning(answerRecord.getExperiment(), conf ->
-                        DSL.using(conf)
-                                .insertInto(ANSWER)
-                                .set(answerRecord)
-                                .returning()
-                                .fetchOne()
-        );
+        AnswerRecord result = doIfRunning(answerRecord.getExperiment(), conf -> {
+            AnswerReservationRecord reservation = DSL.using(conf).selectFrom(ANSWER_RESERVATION)
+                    .where(ANSWER_RESERVATION.IDANSWER_RESERVATION.eq(answerRecord.getReservation()))
+                    .fetchOne();
+
+            if (reservation.getUsed()) {
+                throw new IllegalStateException(String.format("Reservation %d is already in use", answerRecord.getReservation()));
+            }
+
+            reservation.setUsed(true);
+
+            DSL.using(conf).executeUpdate(reservation);
+
+            return DSL.using(conf)
+                    .insertInto(ANSWER)
+                    .set(answerRecord)
+                    .returning()
+                    .fetchOne();
+        });
         addToExperimentCalibration(answerRecord.getWorkerId(), answerRecord.getExperiment());
         return result;
     }
@@ -263,18 +278,8 @@ public class AnswerRatingOperations extends AbstractOperations {
      *                                  existing
      * @throws IllegalStateException    if the worker is not allowed to submit more ratings
      */
-    public Rating updateRating(Rating rating) throws IllegalArgumentException, IllegalStateException {
-        assertHasField(rating, Rating.RATING_ID_FIELD_NUMBER);
-
-        boolean isReserved = create.fetchExists(
-                DSL.selectFrom(RATING)
-                        .where(RATING.ID_RATING.eq(rating.getRatingId()))
-                        .and(RATING.WORKER_ID.eq(rating.getWorker()))
-        );
-
-        if (!isReserved) {
-            throw new IllegalStateException(String.format("Rating %d is not reserved for worker %d", rating.getRatingId(), rating.getWorker()));
-        }
+    public Rating insertRating(Rating rating) throws IllegalArgumentException, IllegalStateException {
+        assertHasField(rating, Rating.RESERVATION_FIELD_NUMBER);
 
         String feedback = null;
 
@@ -282,18 +287,47 @@ public class AnswerRatingOperations extends AbstractOperations {
             feedback = rating.getFeedback();
         }
 
-        create.update(RATING)
-                .set(RATING.RATING_, rating.getRating())
-                .set(RATING.FEEDBACK, feedback)
-                .where(RATING.ID_RATING.eq(rating.getRatingId()))
-                .execute();
+        RatingReservationRecord ratingReservationRecord = create.selectFrom(RATING_RESERVATION)
+                .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
+                .fetchOptional()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Reservation %d is not existing", rating.getReservation())));
 
-        RatingRecord ratingRecord = create.fetchOne(RATING, RATING.ID_RATING.eq(rating.getRatingId()));
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+        RatingRecord ratingRecord = new RatingRecord(
+                null,
+                rating.getExperimentId(),
+                ratingReservationRecord.getAnswer(),
+                timestamp,
+                rating.getRating(),
+                rating.getReservation(),
+                feedback,
+                rating.getWorker(),
+                null
+                );
+
+        RatingRecord result = doIfRunning(rating.getExperimentId(), conf -> {
+            RatingReservationRecord reservation = DSL.using(conf).selectFrom(RATING_RESERVATION)
+                    .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
+                    .fetchOne();
+
+            if (reservation.getUsed()) {
+                throw new IllegalStateException(String.format("Reservation %d is already in use", rating.getReservation()));
+            }
+
+            reservation.setUsed(true);
+
+            DSL.using(conf).executeUpdate(ratingRecord);
+
+            return create.insertInto(RATING)
+                    .set(ratingRecord)
+                    .returning()
+                    .fetchOne();
+        });
 
         List<RatingConstraintRecord> toInsert = rating.getViolatedConstraintsList().stream()
                 .map(constraint -> {
                     RatingConstraintRecord constraintRecord = new RatingConstraintRecord();
-                    constraintRecord.setRefRating(ratingRecord.getIdRating());
+                    constraintRecord.setRefRating(result.getIdRating());
                     constraintRecord.setOffConstraint(constraint.getId());
                     return constraintRecord;
                 })
@@ -301,7 +335,7 @@ public class AnswerRatingOperations extends AbstractOperations {
 
         create.batchInsert(toInsert).execute();
 
-        addToExperimentCalibration(ratingRecord.getWorkerId(), ratingRecord.getExperiment());
+        addToExperimentCalibration(result.getWorkerId(), result.getExperiment());
 
         Result<RatingConstraintRecord> ratingConstraints = create.selectFrom(RATING_CONSTRAINT)
                 .where(RATING_CONSTRAINT.REF_RATING.eq(ratingRecord.getIdRating()))
@@ -401,7 +435,6 @@ public class AnswerRatingOperations extends AbstractOperations {
         return ratingRecords.stream().map((ratingRecord) -> {
             Result<RatingConstraintRecord> ratingConstraints = create.selectFrom(RATING_CONSTRAINT)
                     .where(RATING_CONSTRAINT.REF_RATING.eq(ratingRecord.getIdRating()))
-                    .and(RATING.RATING_.isNotNull())
                     .fetch();
 
             Result<ConstraintRecord> constraints = create.selectFrom(CONSTRAINT)
@@ -421,12 +454,13 @@ public class AnswerRatingOperations extends AbstractOperations {
     public int getNumberOfFinalGoodAnswers(int idExperiment) {
         return create.fetchCount(
                 DSL.selectFrom(ANSWER)
-                    .where(ANSWER.EXPERIMENT.eq(idExperiment))
-                    .and(ANSWER.QUALITY.greaterOrEqual(
-                            DSL.select(EXPERIMENT.PAYMENT_QUALITY_THRESHOLD)
-                                .from(EXPERIMENT)
-                                .where(EXPERIMENT.ID_EXPERIMENT.eq(idExperiment))
-                    ))
+                        .where(ANSWER.EXPERIMENT.eq(idExperiment))
+                        .and(ANSWER.QUALITY_ASSURED.eq(true).and(Tables.ANSWER.QUALITY.greaterThan(
+                                DSL.select(EXPERIMENT.RESULT_QUALITY_THRESHOLD)
+                                        .from(EXPERIMENT)
+                                        .where(EXPERIMENT.ID_EXPERIMENT.eq(idExperiment)))
+                        ))
+                        .or(DSL.condition(true))
         );
     }
 }

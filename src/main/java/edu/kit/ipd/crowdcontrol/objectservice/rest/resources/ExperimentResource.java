@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PreActionException;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeStopgap;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
@@ -229,7 +229,7 @@ public class ExperimentResource {
                 storeCalibrations.accept(population.getPlatformId(), population.getCalibrationsList()));
     }
 
-    private void insertPopulation(int experimentID, Experiment.Population population, ExperimentsPlatformModeStopgap mode) {
+    private void insertPopulation(int experimentID, Experiment.Population population, ExperimentsPlatformModeMode mode) {
         experimentsPlatformOperations.insertPlatform(population.getPlatformId(), experimentID, mode);
 
         List<Integer> answerIDs = population.getCalibrationsList().stream()
@@ -400,7 +400,7 @@ public class ExperimentResource {
                 .map(population -> {
                     try {
                         //insert the population into the databae
-                        insertPopulation(id, population, ExperimentsPlatformModeStopgap.disabled);
+                        insertPopulation(id, population, ExperimentsPlatformModeMode.normal);
 
                         PlatformPopulation platformPopulation = new PlatformPopulation();
                         platformPopulation.job = platformManager.publishTask(population.getPlatformId(), old);
@@ -580,7 +580,7 @@ public class ExperimentResource {
             if (answersCount != 0) {
                 experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {
                     experimentsPlatformOperations.setPlatformStatus(record.getIdexperimentsPlatforms(),
-                            ExperimentsPlatformStatusPlatformStatus.stopping);
+                            ExperimentsPlatformStatusPlatformStatus.shutdown);
                 });
             } else {
                 experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {

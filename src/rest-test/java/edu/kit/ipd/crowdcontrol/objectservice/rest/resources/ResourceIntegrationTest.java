@@ -9,6 +9,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigException;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import spark.Spark;
 
@@ -19,6 +20,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class ResourceIntegrationTest {
     protected static final String ORIGIN = "http://localhost:4567";
 

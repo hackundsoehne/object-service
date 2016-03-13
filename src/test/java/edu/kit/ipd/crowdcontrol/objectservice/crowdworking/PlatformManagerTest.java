@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
@@ -49,7 +51,7 @@ public class PlatformManagerTest {
 
         manager = new PlatformManager(platforms,
                 platform -> params -> WorkerIdentification.findByIdentification(platform, "42"),
-                (id, experiment1, paymentJob) -> CompletableFuture.completedFuture(true),
+                (id, data, experiment1, paymentJob) -> CompletableFuture.completedFuture(true),
                 experimentsPlatformOperations,
                 platformOps,
                 workerOps);
@@ -62,7 +64,7 @@ public class PlatformManagerTest {
             record.setExperiment(42);
             record.setIdexperimentsPlatforms(platform.hashCode());
             record.setPlatform(platform.getID());
-            record.setPlatformData(42 + "");
+            record.setPlatformData(new JsonPrimitive(42));
 
             when(experimentsPlatformOperations.getExperimentsPlatform(record.getPlatform(), experiment.getId()))
                     .thenReturn(Optional.of(record));
@@ -88,7 +90,7 @@ public class PlatformManagerTest {
             record.setExperiment(42);
             record.setPlatform(platform.getID());
             record.setIdexperimentsPlatforms(platform.hashCode());
-            record.setPlatformData(42+"");
+            record.setPlatformData(new JsonPrimitive(42));
 
             when(experimentsPlatformOperations.getExperimentsPlatform(platform.getID(),experiment.getId())).thenReturn(Optional.of(record));
             try {
@@ -157,12 +159,12 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public CompletableFuture<String> publishTask(Experiment experiment) {
-            return CompletableFuture.completedFuture(experiment.getId()+"");
+        public CompletableFuture<JsonElement> publishTask(Experiment experiment) {
+            return CompletableFuture.completedFuture(new JsonPrimitive(experiment.getId()));
         }
 
         @Override
-        public CompletableFuture<Boolean> unpublishTask(String id) {
+        public CompletableFuture<Boolean> unpublishTask(JsonElement data) {
             return CompletableFuture.completedFuture(true);
         }
 
@@ -172,7 +174,7 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public CompletableFuture<Boolean> payExperiment(String id, Experiment experiment, List<PaymentJob> paymentJob) {
+        public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {
             return CompletableFuture.completedFuture(true);
         }
     }

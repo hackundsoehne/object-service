@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
+import com.google.gson.JsonElement;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentificationComputation;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
@@ -88,9 +89,9 @@ public class PyBossaPlatformUnitTest {
         params.put("code", new String[]{code});
 
         //try to get worker
-        String verifiedWorkerId = workerIdentification.get().getWorker(params).getWorkerData();
+        JsonElement verifiedWorkerId = workerIdentification.get().getWorker(params).getWorkerData();
 
-        assertEquals(WORKER_ID, verifiedWorkerId);
+        assertEquals(WORKER_ID, verifiedWorkerId.getAsString());
     }
 
     private static JSONArray getAllTasksDummy(int idTaskCount, int experimentTaskCount) {

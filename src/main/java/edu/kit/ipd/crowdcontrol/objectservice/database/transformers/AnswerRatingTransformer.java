@@ -32,6 +32,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
     public static Answer toAnswerProto(AnswerRecord answerRecord, List<Rating> ratings) {
         return builder(Answer.newBuilder())
                 .set(answerRecord.getQuality(), Answer.Builder::setQuality)
+                .set(answerRecord.getSystemResponse(), Answer.Builder::setSystemresponse)
                 .getBuilder()
                 .setExperimentId(answerRecord.getExperiment())
                 .setContent(answerRecord.getAnswer())
@@ -39,6 +40,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                 //divide by 1000 because java uses milliseconds and proto expects seconds
                 .setTime(answerRecord.getTimestamp().getTime() / 1000L)
                 .setWorker(answerRecord.getWorkerId())
+                .setReservation(answerRecord.getReservation())
                 .addAllRatings(ratings)
                 .build();
     }
@@ -64,7 +66,12 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                 case Answer.WORKER_FIELD_NUMBER:
                     record.setWorkerId(answer.getWorker());
                     break;
-
+                case Answer.RESERVATION_FIELD_NUMBER:
+                    record.setReservation(answer.getReservation());
+                    break;
+                case Answer.SYSTEMRESPONSE_FIELD_NUMBER:
+                    record.setSystemResponse(answer.getSystemresponse());
+                    break;
             }
         });
     }
@@ -87,6 +94,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                 //divide by 1000 because java uses milliseconds and proto expects seconds
                 .setTime(ratingRecord.getTimestamp().getTime() / 1000L)
                 .setWorker(ratingRecord.getWorkerId())
+                .setReservation(ratingRecord.getReservation())
                 .addAllViolatedConstraints(constraints.stream().map(mapper).collect(Collectors.toList()))
                 .build();
     }
@@ -117,6 +125,9 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                     break;
                 case Rating.WORKER_FIELD_NUMBER:
                     record.setWorkerId(rating.getWorker());
+                    break;
+                case Rating.RESERVATION_FIELD_NUMBER:
+                    record.setReservation(rating.getReservation());
                     break;
             }
         });

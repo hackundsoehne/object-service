@@ -5,6 +5,9 @@ import com.amazonaws.mturk.requester.doc._2014_08_15.AssignmentStatus;
 import com.amazonaws.mturk.requester.doc._2014_08_15.BonusPayment;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
@@ -106,7 +109,7 @@ public class MturkPlatform implements Platform,Payment {
     }
 
     @Override
-    public CompletableFuture<String> publishTask(Experiment experiment) {
+    public CompletableFuture<JsonElement> publishTask(Experiment experiment) {
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
         String jsContent = loadFiles("/mturk/worker-ui/mturk.js");
         String htmlContent = loadFiles("/mturk/worker-ui/MturkContent.html");
@@ -128,12 +131,17 @@ public class MturkPlatform implements Platform,Payment {
                 experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
                 2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
                 "",
-                content);
+                content)
+                .thenApply(id -> {
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.add("identification", new JsonPrimitive(id));
+                    return jsonObject;
+                });
     }
 
     @Override
-    public CompletableFuture<Boolean> unpublishTask(String id) {
-        return new UnpublishHIT(connection, id);
+    public CompletableFuture<Boolean> unpublishTask(JsonElement data) {
+        return new UnpublishHIT(connection, data.getAsJsonObject().get("identification").getAsString());
     }
 
     /**
@@ -158,13 +166,13 @@ public class MturkPlatform implements Platform,Payment {
     }
 
     @Override
-    public CompletableFuture<Boolean> payExperiment(String id, Experiment experiment, List<PaymentJob> paymentJobs) {
+    public CompletableFuture<Boolean> payExperiment(int dbId, JsonElement data, Experiment experiment, List<PaymentJob> paymentJobs) {
         /**
          * this code works under the assumation that basepayment is part of the amout!!!!!!
          */
         Map<String, Assignment> workerAssignmentId = new HashMap<>();
         Map<String, BigDecimal> bonusPayed = new HashMap<>();
-
+        String id = data.getAsJsonObject().get("identification").getAsString();
         try {
             // get all assignments from the project and sort them to the function
             getFullList(1, index -> new GetAssignments(connection, id, index))

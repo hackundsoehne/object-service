@@ -1,6 +1,10 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
+import com.google.common.base.Supplier;
 import com.google.common.primitives.Ints;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.json.JSONArray;
@@ -126,28 +130,32 @@ public class PyBossaPlatform implements Platform {
     }
 
     @Override
-    public CompletableFuture<String> publishTask(Experiment experiment) {
-        return CompletableFuture.supplyAsync(() -> String.valueOf(requests.postTask(new JSONObject()
-                .put("project_id", projectID)
-                .put("info", new JSONObject()
-                        .put("url", workerServiceUrl)
-                        .put("expID", experiment.getId())
-                        .put("platform", getID())
-                        .put("idTasks", new JSONArray(idTasks))
-                        .put("type", "experiment")
-                        .put("paymentBase", experiment.getPaymentBase().getValue())
-                        .put("paymentRating", experiment.getPaymentRating().getValue())
-                        .put("paymentAnswer", experiment.getPaymentAnswer().getValue())
-                        //pybossa doesn't support tags
-                )
-                .put("priority_0", 1)
-                .put("n_answers", experiment.getNeededAnswers().getValue())))
-        );
+    public CompletableFuture<JsonElement> publishTask(Experiment experiment) {
+        return CompletableFuture.supplyAsync(() -> {
+            int task = requests.postTask(new JSONObject()
+                            .put("project_id", projectID)
+                            .put("info", new JSONObject()
+                                            .put("url", workerServiceUrl)
+                                            .put("expID", experiment.getId())
+                                            .put("platform", getID())
+                                            .put("idTasks", new JSONArray(idTasks))
+                                            .put("type", "experiment")
+                                            .put("paymentBase", experiment.getPaymentBase().getValue())
+                                            .put("paymentRating", experiment.getPaymentRating().getValue())
+                                            .put("paymentAnswer", experiment.getPaymentAnswer().getValue())
+                                    //pybossa doesn't support tags
+                            )
+                            .put("priority_0", 1)
+                            .put("n_answers", experiment.getNeededAnswers().getValue()));
+            JsonObject json = new JsonObject();
+            json.add("identification", new JsonPrimitive(task));
+            return json;
+        });
     }
 
     @Override
-    public CompletableFuture<Boolean> unpublishTask(String id) {
-        return CompletableFuture.supplyAsync(() -> requests.deleteTask(id));
+    public CompletableFuture<Boolean> unpublishTask(JsonElement data) {
+        return CompletableFuture.supplyAsync(() -> requests.deleteTask(data.getAsJsonObject().get("identification").getAsString()));
     }
 
     /**
