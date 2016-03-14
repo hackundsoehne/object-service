@@ -28,7 +28,6 @@ import spark.Response;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,11 +48,13 @@ public class ExperimentResource {
     private final AlgorithmOperations algorithmsOperations;
     private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final PlatformManager platformManager;
+    private final ExperimentOperator experimentOperator;
     private static final Logger log = LogManager.getLogger("ExperimentResource");
 
     public ExperimentResource(AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
                               TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmsOperations,
-                              ExperimentsPlatformOperations experimentsPlatformOperations, PlatformManager platformManager) {
+                              ExperimentsPlatformOperations experimentsPlatformOperations, PlatformManager platformManager, ExperimentOperator experimentOperator) {
+        this.experimentOperator = experimentOperator;
         this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.calibrationOperations = calibrationOperations;
@@ -75,49 +76,7 @@ public class ExperimentResource {
         return c.orElseThrow(NotFoundException::new);
     }
 
-    private void startExperiment(Experiment experiment) {
-        List<Experiment.Population> successfulOps = new LinkedList<>();
-        for (Experiment.Population population :
-                experiment.getPopulationsList()) {
-            try {
-                platformManager.publishTask(population.getPlatformId(), experiment).join();
-                successfulOps.add(population);
 
-            } catch (PreActionException | CompletionException e) {
-                log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e);
-            }
-        }
-
-        if (successfulOps.size() != experiment.getPopulationsList().size()) {
-            for (Experiment.Population population :
-                    successfulOps) {
-                try {
-                    platformManager.unpublishTask(population.getPlatformId(), experiment).join();
-                } catch (PreActionException | CompletionException e) {
-                    log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e);
-                }
-            }
-        }
-    }
-
-    public void endExperiment(Experiment experiment) {
-        for (Experiment.Population population :
-                experiment.getPopulationsList()) {
-            try {
-                platformManager.unpublishTask(population.getPlatformId(), experiment).join();
-            } catch (PreActionException | CompletionException e) {
-                log.fatal("Failed to publish experiment " + experiment + " on platform " + population.getPlatformId(), e);
-            }
-        }
-
-        try { //TODO Introduce a more elaborate solution - W. Churchill
-            TimeUnit.HOURS.sleep(2);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        EventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experiment.toBuilder().setState(Experiment.State.STOPPED).build()));
-    }
 
     /**
      * List all experiments
@@ -569,7 +528,7 @@ public class ExperimentResource {
 
         //we are here if the state has changed and changed from draft to published
         if (experiment.getState() == Experiment.State.PUBLISHED) {
-            startExperiment(old);
+            experimentOperator.startExperiment(old);
         }
 
         //check if we are not creative Stopped

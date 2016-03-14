@@ -70,32 +70,23 @@ public class Main {
 
         PlatformManager platformManager = initPlatformManager(operationCarrier, platforms, moneyTransfer);
 
-        //FIXME this should NEVER be here, we have to find a better way on doing this
-        ExperimentResource experimentResource = new ExperimentResource(
-                operationCarrier.answerRatingOperations,
-                operationCarrier.experimentOperations,
-                operationCarrier.calibrationOperations,
-                operationCarrier.tagConstraintsOperations,
-                operationCarrier.algorithmsOperations,
-                operationCarrier.experimentsPlatformOperations,
-                platformManager);
+        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager);
 
-
-        initEventHandler(operationCarrier, platformManager, experimentResource);
-        initRouter(config, operationCarrier, platformManager, experimentResource);
+        initEventHandler(operationCarrier, platformManager, experimentOperator);
+        initRouter(config, operationCarrier, platformManager, experimentOperator);
     }
 
     /**
      * Load all modules which are subscribing on events
      * @param operationCarrier Databaseoperations to use
      * @param platformManager PlatformManager to use
-     * @param experimentResource ExperimentResources to use FIXME see upper commit should be removed
+     * @param experimentOperator the operations to use for starting stopping experiments
      */
-    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentResource experimentResource) {
+    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator) {
         new QualityIdentificator(
                 operationCarrier.algorithmsOperations,
                 operationCarrier.answerRatingOperations,
-                operationCarrier.experimentOperations, experimentResource);
+                operationCarrier.experimentOperations, experimentOperator);
 
         new PaymentDispatcher(
                 platformManager,
@@ -108,16 +99,17 @@ public class Main {
      * @param config config to use
      * @param operationCarrier database operations to use
      * @param platformManager the platforManager to run the platformoperations on
-     * @param experimentResource the experimentsResource FIXME see upper commit should be removed
+     * @param experimentOperator experimentOperations to use
      */
-    private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentResource experimentResource) {
+    private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator) {
         new Router(
                 new TemplateResource(operationCarrier.templateOperations),
                 new NotificationResource(operationCarrier.notificationRestOperations),
                 new PlatformResource(operationCarrier.platformOperations),
                 new WorkerResource(operationCarrier.workerOperations, platformManager),
                 new CalibrationResource(operationCarrier.calibrationOperations),
-                experimentResource, new AlgorithmResources(operationCarrier.algorithmsOperations),
+                new ExperimentResource(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.experimentsPlatformOperations, platformManager, experimentOperator),
+                new AlgorithmResources(operationCarrier.algorithmsOperations),
                 new AnswerRatingResource(operationCarrier.experimentOperations, operationCarrier.answerRatingOperations, operationCarrier.workerOperations),
                 new WorkerCalibrationResource(operationCarrier.workerCalibrationOperations),
                 config.deployment.origin,

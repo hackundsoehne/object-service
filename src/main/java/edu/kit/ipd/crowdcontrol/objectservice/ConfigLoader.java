@@ -18,7 +18,7 @@ import java.util.Arrays;
  *
  * @author Marcel Hollerbach
  */
-class ConfigLoader {
+public class ConfigLoader {
     private static final Logger LOGGER = LogManager.getLogger("Config");
     private final Config config;
 
