@@ -46,7 +46,8 @@ public class MailHandlerTest {
                 config.mail.moneyReceiver.auth.credentials.user,
                 config.mail.moneyReceiver.auth.credentials.password,
                 config.mail.moneyReceiver.auth.server,
-                config.mail.moneyReceiver.auth.port);
+                config.mail.moneyReceiver.auth.port,
+                config.mail.moneyReceiver.inbox);
     }
 
     @Test

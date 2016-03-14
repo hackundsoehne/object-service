@@ -39,4 +39,10 @@ public interface MailFetcher {
      * @throws MessagingException throws a MessagingException, if there are any problems with the message
      */
     void deleteMails(Message message) throws MessagingException;
+
+    /**
+     * Get all unseen mail from the default location
+     * @return A array of unseen mails
+     */
+    Message[] fetchUnseen() throws MessagingException;
 }

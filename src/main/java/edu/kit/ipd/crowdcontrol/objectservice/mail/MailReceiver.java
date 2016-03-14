@@ -22,6 +22,7 @@ public class MailReceiver implements MailFetcher {
     private final String password;
     private final String host;
     private final int port;
+    private final String defaultInbox;
     private Properties props;
 
 
@@ -29,12 +30,13 @@ public class MailReceiver implements MailFetcher {
      * A Mailhandler object to send and fetch emails.
      *
      */
-    public MailReceiver(Protocol protocol, String user, String password, String host, int port) {
+    public MailReceiver(Protocol protocol, String user, String password, String host, int port, String defaultInbox) {
         this.protocol = protocol;
         this.user = user;
         this.password = password;
         this.host = host;
         this.port = port;
+        this.defaultInbox = defaultInbox;
 
         props = new Properties();
         props.setProperty("mail."+protocol+".ssl.checkserveridentity", "true");
@@ -119,6 +121,11 @@ public class MailReceiver implements MailFetcher {
         if (wasOpen) {
             folder.open(mode);
         }
+    }
+
+    @Override
+    public Message[] fetchUnseen() throws MessagingException {
+        return fetchUnseen(defaultInbox);
     }
 
     /**

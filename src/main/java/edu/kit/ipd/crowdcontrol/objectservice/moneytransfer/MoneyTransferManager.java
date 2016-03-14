@@ -156,7 +156,7 @@ public class MoneyTransferManager {
 
         //fetch new mails
         try {
-            messages = mailFetcher.fetchUnseen("inbox");
+            messages = mailFetcher.fetchUnseen();
         } catch (MessagingException e) {
             throw new MoneyTransferException("The MailHandler couldn't fetch new giftcodes from the mailserver. " +
                     "It seems, that there is either a problem with the server or with the properties file.");
