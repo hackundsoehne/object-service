@@ -463,4 +463,14 @@ public class AnswerRatingOperations extends AbstractOperations {
                         .or(DSL.condition(true))
         );
     }
+
+    /**
+     * Get all answers of the specified experiment for which at least one rating is present.
+     * @param expID id of the experiment
+     * @return all answers of the experiment with one or more ratings
+     */
+    public Result<AnswerRecord> getAnswersWithRatingsOfExperiment(int expID){
+        //TODO
+        return null;
+    }
 }

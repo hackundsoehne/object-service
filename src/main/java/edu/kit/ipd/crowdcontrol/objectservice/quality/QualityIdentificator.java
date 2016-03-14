@@ -7,6 +7,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOper
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityByRatings;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityStrategy;
@@ -154,7 +155,7 @@ public class QualityIdentificator {
      * @param experiment to be checked
      */
     private void checkExpStatus(ExperimentRecord experiment) {
-        if (experiment.getNeededAnswers() == answerOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())) {
+        if (experiment.getNeededAnswers() <= answerOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())) {
             experimentResource.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
         }
 
@@ -169,7 +170,7 @@ public class QualityIdentificator {
      */
     private void rateQualityOfRatings(ExperimentRecord experimentRecord, Map<AlgorithmRatingQualityParamRecord, String> params) {
 
-        List<AnswerRecord> answers = answerOperations.getAnswersOfExperiment(experimentRecord.getIdExperiment());
+        List<AnswerRecord> answers = answerOperations.getAnswersWithRatingsOfExperiment(experimentRecord.getIdExperiment());
 
         for (AnswerRecord answer : answers) {
             List<RatingRecord> records = answerOperations.getRatingsOfAnswer(answer);
@@ -191,7 +192,7 @@ public class QualityIdentificator {
      */
     private void rateQualityOfAnswers(ExperimentRecord experimentRecord, Map<AlgorithmAnswerQualityParamRecord, String> params) {
 
-        List<AnswerRecord> answers = answerOperations.getAnswersOfExperiment(experimentRecord.getIdExperiment());
+        List<AnswerRecord> answers = answerOperations.getAnswersWithRatingsOfExperiment(experimentRecord.getIdExperiment());
         Map<String, Integer> result;
         for (AnswerRecord answer : answers) {
             result = answerIdentifier.identifyAnswerQuality(answerOperations, answer, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
