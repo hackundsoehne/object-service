@@ -96,6 +96,15 @@ mail:
             credentials:
                 user: maxMusterMannSSl
                 password: SuperSecretStuff
+    moneyReceiver:
+        protocol: imaps
+        inbox: INBOX
+        auth:
+            server: imap.example.com
+            port: 996
+            credentials:
+                user: maxUserName
+                password: secretpw
 
 moneytransfer:
     # Minimum amount of money in US cent a worker has to earn before he gets paid off

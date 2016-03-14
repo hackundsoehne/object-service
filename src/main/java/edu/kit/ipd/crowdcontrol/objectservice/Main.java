@@ -189,8 +189,7 @@ public class Main {
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
 
-        //FIXME for now
-        MailFetcher mailFetcher = getMailFetcher(mailDisabled, "");
+        MailFetcher mailFetcher = getMailFetcher(mailDisabled, getConfig().mail.moneyReceiver);
 
         MailSender mailSenderMoneyTransfer = getMailSender(mailDisabled, getConfig().mail.moneytransfer);
         MoneyTransferManager mng = new MoneyTransferManager(mailFetcher, mailSenderMoneyTransfer, workerBalanceOperations, workerOperations, getConfig().mail.moneytransfer.from, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
@@ -241,11 +240,15 @@ public class Main {
         ).init();
     }
 
-    private static MailFetcher getMailFetcher(boolean mailDisabled, String sendMailAddress) throws MessagingException {
+    private static MailFetcher getMailFetcher(boolean mailDisabled, MailReceiver receiver) throws MessagingException {
         if (mailDisabled) {
             return new CommandLineMailHandler();
         }
-        return getMailHandler(sendMailAddress);
+        return new MailHandler(MailHandler.Protocol.valueOf(receiver.protocol),
+                receiver.auth.credentials.user,
+                receiver.auth.credentials.password,
+                receiver.auth.server,
+                receiver.auth.port);
     }
 
     private static MailSender getMailSender(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailSender sender) {
@@ -257,55 +260,5 @@ public class Main {
                 sender.auth.credentials.password, "",
                 sender.auth.server,
                 sender.auth.port);
-    }
-
-    private static MailHandler getMailHandler(String sendMailAddress) throws MessagingException {
-        Properties properties = new Properties();
-        String mailPropertiesPath;
-        if (System.getProperty("objectservice.config.mail") != null) {
-            mailPropertiesPath = System.getProperty("objectservice.config.mail");
-        } else {
-            mailPropertiesPath = "src/main/resources/mailConfig.properties";
-        }
-
-        String sender = sendMailAddress;
-        try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(mailPropertiesPath))) {
-            properties.load(stream);
-        } catch (IOException e) {
-            LOGGER.warn(mailPropertiesPath + " not found, falling back to environment variables for Travis …");
-
-            if (System.getenv("MAIL_USERNAME") == null) {
-                LOGGER.error("MAIL_USERNAME not set …");
-                System.exit(-2);
-            }
-
-            if (System.getenv("MAIL_PASSWORD") == null) {
-                LOGGER.error("MAIL_PASSWORD not set …");
-                System.exit(-2);
-            }
-
-            properties.setProperty("username", System.getenv("MAIL_USERNAME"));
-            properties.setProperty("password", System.getenv("MAIL_PASSWORD"));
-            properties.setProperty("mail.smtp.host", "smtp.gmail.com");
-            properties.setProperty("mail.smtp.auth", "true");
-            properties.setProperty("mail.smtp.starttls.enable", "true");
-            properties.setProperty("mail.smtp.tls", "true");
-            properties.setProperty("mail.smtp.ssl.checkserveridentity", "true");
-            properties.setProperty("mail.store.protocol", "imap");
-            properties.setProperty("mail.imap.host", "imap.gmail.com");
-            properties.setProperty("mail.imap.port", "993");
-            properties.setProperty("mail.imap.ssl", "true");
-            properties.setProperty("mail.imap.ssl.enable", "true");
-            properties.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-
-            sender = System.getenv("MAIL_USERNAME");
-        }
-
-        return new MailHandler(properties, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
-            }
-        }, sender);
     }
 }

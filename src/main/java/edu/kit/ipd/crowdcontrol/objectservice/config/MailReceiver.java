@@ -5,5 +5,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.config;
  */
 public class MailReceiver {
     public String protocol;
+    public String inbox;
     public MailCredentials auth;
 }

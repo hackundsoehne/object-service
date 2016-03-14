@@ -14,4 +14,6 @@ public class Mail {
     public boolean disabled;
 
     public MailSender notifications, moneytransfer;
+
+    public MailReceiver moneyReceiver;
 }

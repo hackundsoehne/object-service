@@ -40,7 +40,7 @@ public class MoneyTransferManagerTest {
         handler = mock(MailHandler.class);
         payops = mock(WorkerBalanceOperations.class);
         workerops = mock(WorkerOperations.class);
-        mng = new MoneyTransferManager(handler, handler, payops, workerops, "pseipd@gmail.com", null, 7, 0);
+        mng = new MoneyTransferManager(handler, null, payops, workerops, "pseipd@gmail.com", null, 7, 0);
     }
 
     @Test
