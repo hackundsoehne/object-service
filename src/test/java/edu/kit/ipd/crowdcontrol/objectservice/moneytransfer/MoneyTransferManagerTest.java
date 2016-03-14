@@ -4,7 +4,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Gift
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.jooq.Result;
 import org.junit.Before;
@@ -30,17 +32,18 @@ import static org.mockito.Mockito.*;
 public class MoneyTransferManagerTest {
 
     MoneyTransferManager mng;
-    MailHandler handler;
+    MailSender sender;
+    MailFetcher fetcher;
     WorkerBalanceOperations payops;
     WorkerOperations workerops;
 
     @Before
     public void setUp() throws Exception {
-
-        handler = mock(MailHandler.class);
+        sender = mock(MailSender.class);
+        fetcher = mock(MailFetcher.class);
         payops = mock(WorkerBalanceOperations.class);
         workerops = mock(WorkerOperations.class);
-        mng = new MoneyTransferManager(handler, null, payops, workerops, "pseipd@gmail.com", null, 7, 0);
+        mng = new MoneyTransferManager(fetcher, sender, payops, workerops, "pseipd@gmail.com", null, 7, 0);
     }
 
     @Test
@@ -126,7 +129,7 @@ public class MoneyTransferManagerTest {
             return true;
         };
 
-        doReturn(new Message[0]).when(handler).fetchUnseen(any());
+        doReturn(new Message[0]).when(fetcher).fetchUnseen(any());
 
         doAnswer(answer0).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
         doAnswer(answer1).when(payops).addDebit(anyInt(), anyInt(), eq(code1.getIdGiftCode()));
@@ -163,9 +166,9 @@ public class MoneyTransferManagerTest {
 
         mng.submitGiftCodes();
 
-        verify(handler).sendMail("pseipd@gmail.com", "Your payment for your Crowdworking", codesWorker1);
-        verify(handler).sendMail("pse2016@web.de", "Your payment for your Crowdworking", codesWorker2);
-        verify(handler).sendMail("pseipd@web.de", "Your payment for your Crowdworking", codesWorker3);
+        verify(sender).sendMail("pseipd@gmail.com", "Your payment for your Crowdworking", codesWorker1);
+        verify(sender).sendMail("pse2016@web.de", "Your payment for your Crowdworking", codesWorker2);
+        verify(sender).sendMail("pseipd@web.de", "Your payment for your Crowdworking", codesWorker3);
     }
 
     @Test
@@ -202,7 +205,7 @@ public class MoneyTransferManagerTest {
             return true;
         };
 
-        doReturn(new Message[0]).when(handler).fetchUnseen(any());
+        doReturn(new Message[0]).when(fetcher).fetchUnseen(any());
 
         doAnswer(answer0).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
 
@@ -219,6 +222,6 @@ public class MoneyTransferManagerTest {
         }
 
         message = message.append("A worker has pending Payments in the amount of 25ct. Please add giftcodes, so the payment of the worker can be continued.").append(System.getProperty("line.separator"));
-        verify(handler).sendMail("pseipd@gmail.com", "Payment Notification", message.toString());
+        verify(sender).sendMail("pseipd@gmail.com", "Payment Notification", message.toString());
     }
 }
