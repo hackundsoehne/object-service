@@ -171,7 +171,7 @@ public class MoneyTransferManager {
             messages = mailFetcher.fetchUnseen();
         } catch (MessagingException e) {
             throw new MoneyTransferException("The MailHandler couldn't fetch new giftcodes from the mailserver. " +
-                    "It seems, that there is either a problem with the server or with the properties file.");
+                    "It seems, that there is either a problem with the server or with the properties file.", e);
         }
 
         int giftCodesCount = 0;
@@ -189,8 +189,8 @@ public class MoneyTransferManager {
                     throw new MoneyTransferException(e.getMessage());
                 } catch (MessagingException f) {
 
-                    throw new MoneyTransferException(e.getMessage() + System.getProperty("line.separator") + "The MailHandler was unable to revert all changes and mark the read mails as unseen." +
-                            "It seems, that there is either a problem with the server or with the properties file.");
+                    throw new MoneyTransferException("The MailHandler was unable to revert all changes and mark the read mails as unseen." +
+                            "It seems, that there is either a problem with the server or with the properties file.", e);
                 }
             }
         }
@@ -294,7 +294,7 @@ public class MoneyTransferManager {
             }
             LOGGER.trace("Completed sending of " + giftCodes.size() + " giftcodes to worker" + worker.getIdWorker() + ".");
         } catch (MessagingException e) {
-            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE);
+            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE, e);
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Sending of " + giftCodes.size() + " gift codes to worker" + worker.getIdWorker() + " failed.", e);
         }
@@ -323,7 +323,7 @@ public class MoneyTransferManager {
                 LOGGER.trace("Completed sending a notification about problems with submission of giftcodes.");
             }
         } catch (MessagingException e) {
-            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE);
+            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE, e);
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("", e);
         }
@@ -376,9 +376,9 @@ public class MoneyTransferManager {
                 content.append(System.getProperty("line.separator"));
             }
         } catch (FileNotFoundException e) {
-            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.");
+            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.", e);
         } catch (IOException e) {
-            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
+            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt", e);
         }
 
         return content.toString();
@@ -398,7 +398,7 @@ public class MoneyTransferManager {
             httpclient.close();
         } catch (IOException e) {
             LOGGER.error("Fetching currency exchange rates failed.");
-            throw new MoneyTransferException(e.getMessage());
+            throw new MoneyTransferException("There was an error while getting exchange rates from " + sourceCurrency + " to " + destinationCurrency + ".", e);
         }
 
         BigDecimal rate = new BigDecimal(responseBody.substring(0, responseBody.length() - 2));

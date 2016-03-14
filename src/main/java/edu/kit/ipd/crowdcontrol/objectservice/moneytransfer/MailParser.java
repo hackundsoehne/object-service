@@ -42,7 +42,7 @@ public class MailParser {
             BodyPart textBody = innerMsg.getBodyPart(0);
             message = textBody.getContent().toString();
         } catch (ClassCastException | MessagingException | IOException e) {
-            throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.");
+            throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.", e);
         }
         //Parse Message
         String messageStr = message.replaceAll(" ", "");
