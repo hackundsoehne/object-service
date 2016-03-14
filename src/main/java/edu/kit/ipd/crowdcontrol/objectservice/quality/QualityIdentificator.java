@@ -169,7 +169,9 @@ public class QualityIdentificator {
      * @param params Mapping of parameter-records to the user specified parameters represented as a string
      */
     private void rateQualityOfRatings(Rating rating, Map<AlgorithmRatingQualityParamRecord, String> params) {
-            List<RatingRecord> records = answerRatingOperations.getRatingsOfAnswerOfRating(rating);
+            AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating)
+                    .orElseThrow(()->new IllegalArgumentException("Error, cant find find answer of given rating of expID: "+rating.getExperimentId()));
+            List<RatingRecord> records = answerRatingOperations.getRelatedRatings(answerRecord.getIdAnswer());
             Map<RatingRecord, Integer> map = ratingIdentifier.identifyRatingQuality(records, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
             answerRatingOperations.setQualityToRatings(map);
     }
@@ -187,7 +189,9 @@ public class QualityIdentificator {
      */
     private void rateQualityOfAnswers(Rating rating, Map<AlgorithmAnswerQualityParamRecord, String> params) {
 
-        AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating);
+        AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating)
+                .orElseThrow(()->new IllegalArgumentException("Error, cant find find answer of given rating of expID: "+rating.getExperimentId()));
+
         Map<String, Integer> result;
         result = answerIdentifier.identifyAnswerQuality(answerRatingOperations, answerRecord, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
         answerRatingOperations.setQualityToAnswer(answerRecord, result.get(AnswerQualityStrategy.QUALITY));
