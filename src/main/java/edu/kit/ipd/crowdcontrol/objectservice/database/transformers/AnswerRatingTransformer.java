@@ -114,6 +114,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
         ratingRecord.setAnswerR(answerId);
         ratingRecord.setExperiment(experimentId);
         ratingRecord.setTimestamp(Timestamp.from(Instant.now()));
+        ratingRecord.setRating(0); // in case the rating is 0, the merge doesn't call the setter
 
         return merge(ratingRecord, rating, (field, record) -> {
             switch (field) {
