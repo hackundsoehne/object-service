@@ -14,16 +14,27 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by marcel on 14.03.16.
+ * Presents starting and stopping experiment operations on populations
+ *
+ * @author Lucas Krauß
+ * @author Marcel Hollerbach
  */
 public class ExperimentOperator {
     private static final Logger log = LogManager.getLogger("ExperimentOperator");
     private final PlatformManager platformManager;
 
+    /**
+     * Create a new operator class
+     * @param platformManager
+     */
     public ExperimentOperator(PlatformManager platformManager) {
         this.platformManager = platformManager;
     }
 
+    /**
+     * start a experiment on the configured platforms
+     * @param experiment experiment to publish
+     */
     public void startExperiment(Experiment experiment) {
         List<Experiment.Population> successfulOps = new LinkedList<>();
         for (Experiment.Population population :
@@ -49,6 +60,11 @@ public class ExperimentOperator {
         }
     }
 
+    /**
+     * End a given experiment
+     *
+     * @param experiment the experiment to end
+     */
     public void endExperiment(Experiment experiment) {
         for (Experiment.Population population :
                 experiment.getPopulationsList()) {
