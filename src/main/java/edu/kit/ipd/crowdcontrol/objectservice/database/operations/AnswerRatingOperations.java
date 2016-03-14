@@ -482,7 +482,8 @@ public class AnswerRatingOperations extends AbstractOperations {
         return create.selectFrom(ANSWER)
                 .where(ANSWER.ID_ANSWER.eq(
                         DSL.select(RATING_RESERVATION.ANSWER)
-                            .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
+                                .from(RATING_RESERVATION)
+                                .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
                 ))
                 .fetchOptional();
     }
