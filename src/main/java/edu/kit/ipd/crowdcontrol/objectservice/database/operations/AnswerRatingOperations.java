@@ -472,39 +472,18 @@ public class AnswerRatingOperations extends AbstractOperations {
                     .fetch();
     }
 
-    /**
-     * Get all answers of the specified experiment for which at least one rating is present.
-     * @param expID id of the experiment
-     * @return all answers of the experiment with one or more ratings
-     */
-    public List<AnswerRecord> getAnswersWithRatingsOfExperiment(int expID){
-        Field<Integer> count = DSL.count(RATING.ID_RATING).as("count");
-        return create.select(ANSWER.fields())
-                .select(count)
-                .from(ANSWER)
-                .join(RATING).onKey()
-                .where(ANSWER.EXPERIMENT.eq(expID))
-                .groupBy(ANSWER.fields())
-                .having(count.greaterThan(0))
-                .fetch(record -> record.into(ANSWER));
-    }
-
-    /**
-     * Gets all RatingRecords of the answer belonging to specified rating.
-     * @param rating belonging of the answer
-     * @return List of all ratingRecords of the answer specified via the given rating
-     */
-    public List<RatingRecord> getRatingsOfAnswerOfRating(Rating rating){
-        return null; //TODO
-    }
-
 
     /**
      * Gets the AnswerRecord belonging to the specified rating
      * @param rating of the answerRecord
      * @return AnswerRecord of specified rating
      */
-    public AnswerRecord getAnswerFromRating(Rating rating){
-        return null; //TODO
+    public Optional<AnswerRecord> getAnswerFromRating(Rating rating){
+        return create.selectFrom(ANSWER)
+                .where(ANSWER.ID_ANSWER.eq(
+                        DSL.select(RATING_RESERVATION.ANSWER)
+                            .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
+                ))
+                .fetchOptional();
     }
 }

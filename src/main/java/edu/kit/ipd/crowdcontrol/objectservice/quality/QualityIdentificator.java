@@ -189,14 +189,14 @@ public class QualityIdentificator {
 
         AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating);
         Map<String, Integer> result;
-            result = answerIdentifier.identifyAnswerQuality(answerRatingOperations, answerRecord, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
-            answerRatingOperations.setQualityToAnswer(answerRecord, result.get(AnswerQualityStrategy.QUALITY));
+        result = answerIdentifier.identifyAnswerQuality(answerRatingOperations, answerRecord, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
+        answerRatingOperations.setQualityToAnswer(answerRecord, result.get(AnswerQualityStrategy.QUALITY));
 
-            // Checks if quality_assured bit can be set.
-            if ((((double) result.get(AnswerQualityStrategy.NUM_OF_RATINGS) / (double) experimentOperations.getExperiment(answerRecord.getExperiment())
-                    .orElseThrow(() -> new IllegalArgumentException("Error, can't find experiment of given experiment-ID: "+answerRecord.getExperiment())).getRatingsPerAnswer()) >= 0.8)) {
-                answerRatingOperations.setAnswerQualityAssured(answerRecord);
-            }
+        // Checks if quality_assured bit can be set.
+        if ((((double) result.get(AnswerQualityStrategy.NUM_OF_RATINGS) / (double) experimentOperations.getExperiment(answerRecord.getExperiment())
+                .orElseThrow(() -> new IllegalArgumentException("Error, can't find experiment of given experiment-ID: "+answerRecord.getExperiment())).getRatingsPerAnswer()) >= 0.8)) {
+            answerRatingOperations.setAnswerQualityAssured(answerRecord);
+        }
 
     }
 }
