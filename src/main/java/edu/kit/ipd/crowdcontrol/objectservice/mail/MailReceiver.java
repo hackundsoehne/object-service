@@ -37,15 +37,14 @@ public class MailReceiver implements MailFetcher {
         this.port = port;
 
         props = new Properties();
-        props.setProperty("mail.debug", true+"");
-        props.setProperty("mail"+protocol+"ssl.checkserveridentity", "true");
+        props.setProperty("mail."+protocol+".ssl.checkserveridentity", "true");
     }
 
     @Override
     public Message[] fetchUnseen(String name) throws MessagingException {
         Store store = connect();
 
-        Message[] messages = new Message[0];
+        Message[] messages;
 
         Folder folder = store.getFolder(name);
         folder.open(Folder.READ_WRITE);
