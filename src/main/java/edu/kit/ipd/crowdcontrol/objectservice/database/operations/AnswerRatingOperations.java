@@ -477,4 +477,23 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .having(count.greaterThan(0))
                 .fetch(record -> record.into(ANSWER));
     }
+
+    /**
+     * Gets all RatingRecords of the answer belonging to specified rating.
+     * @param rating belonging of the answer
+     * @return List of all ratingRecords of the answer specified via the given rating
+     */
+    public List<RatingRecord> getRatingsOfAnswerOfRating(Rating rating){
+        return null; //TODO
+    }
+
+
+    /**
+     * Gets the AnswerRecord belonging to the specified rating
+     * @param rating of the answerRecord
+     * @return AnswerRecord of specified rating
+     */
+    public AnswerRecord getAnswerFromRating(Rating rating){
+        return null; //TODO
+    }
 }

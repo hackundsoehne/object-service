@@ -7,7 +7,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOper
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityByRatings;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityStrategy;
@@ -39,7 +38,7 @@ public class QualityIdentificator {
     private final Logger log = LogManager.getLogger(QualityIdentificator.class);
     private final Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
     private final ExperimentResource experimentResource;
-    private final AnswerRatingOperations answerOperations;
+    private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final AlgorithmOperations algorithmOperations;
     private final Set<AnswerQualityStrategy> answerAlgorithms;
@@ -58,7 +57,7 @@ public class QualityIdentificator {
     public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentResource experimentResource) {
 
         this.experimentResource = experimentResource;
-        this.answerOperations = answerRatingOperations;
+        this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.algorithmOperations = algorithmOperations;
         this.answerAlgorithms = new HashSet<>();
@@ -106,8 +105,8 @@ public class QualityIdentificator {
             return new AnswerQualityByRatings();
         });
 
-        rateQualityOfRatings(exp, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
-        rateQualityOfAnswers(exp, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        rateQualityOfRatings(rating, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        rateQualityOfAnswers(rating, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
 
         checkExpStatus(exp);
 
@@ -155,7 +154,7 @@ public class QualityIdentificator {
      * @param experiment to be checked
      */
     private void checkExpStatus(ExperimentRecord experiment) {
-        if (experiment.getNeededAnswers() <= answerOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())) {
+        if (experiment.getNeededAnswers() <= answerRatingOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())) {
             experimentResource.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
         }
 
@@ -166,43 +165,39 @@ public class QualityIdentificator {
      * Rates and sets quality of all ratings of specified experiment.
      * Ratings to the same answer are grouped and rated together.
      *
-     * @param experimentRecord whose ratings' qualities are going to be estimated
+     * @param rating whose ratings' qualities are going to be estimated
+     * @param params Mapping of parameter-records to the user specified parameters represented as a string
      */
-    private void rateQualityOfRatings(ExperimentRecord experimentRecord, Map<AlgorithmRatingQualityParamRecord, String> params) {
-
-        List<AnswerRecord> answers = answerOperations.getAnswersWithRatingsOfExperiment(experimentRecord.getIdExperiment());
-
-        for (AnswerRecord answer : answers) {
-            List<RatingRecord> records = answerOperations.getRatingsOfAnswer(answer);
+    private void rateQualityOfRatings(Rating rating, Map<AlgorithmRatingQualityParamRecord, String> params) {
+            List<RatingRecord> records = answerRatingOperations.getRatingsOfAnswerOfRating(rating);
             Map<RatingRecord, Integer> map = ratingIdentifier.identifyRatingQuality(records, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
-            answerOperations.setQualityToRatings(map);
-        }
-
+            answerRatingOperations.setQualityToRatings(map);
     }
 
 
     /**
      * Rates and sets quality of all answers of specified experiment.
-     * Only uses ratings of a specified quality (@ratingQualityThreshold)
+     * Only uses ratings of a specified quality
      * Furthermore checks if a specified amount of ratings is present for that answer
      * and it thus the answer's quality is unlikely to change. In that case the corresponding
      * quality-assured-bit is set in the database.
      *
-     * @param experimentRecord the experiment whose answers are going to be rated
+     * @param rating the rating wof the answer which is going to be rated
+     * @param params Mapping of parameter-records to the user specified parameters represented as a string
      */
-    private void rateQualityOfAnswers(ExperimentRecord experimentRecord, Map<AlgorithmAnswerQualityParamRecord, String> params) {
+    private void rateQualityOfAnswers(Rating rating, Map<AlgorithmAnswerQualityParamRecord, String> params) {
 
-        List<AnswerRecord> answers = answerOperations.getAnswersWithRatingsOfExperiment(experimentRecord.getIdExperiment());
+        AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating);
         Map<String, Integer> result;
-        for (AnswerRecord answer : answers) {
-            result = answerIdentifier.identifyAnswerQuality(answerOperations, answer, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
-            answerOperations.setQualityToAnswer(answer, result.get(AnswerQualityStrategy.QUALITY));
+            result = answerIdentifier.identifyAnswerQuality(answerRatingOperations, answerRecord, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
+            answerRatingOperations.setQualityToAnswer(answerRecord, result.get(AnswerQualityStrategy.QUALITY));
 
             // Checks if quality_assured bit can be set.
-            if ((((double) result.get(AnswerQualityStrategy.NUM_OF_RATINGS) / (double) experimentRecord.getRatingsPerAnswer()) >= 0.8)) {
-                answerOperations.setAnswerQualityAssured(answer);
+            if ((((double) result.get(AnswerQualityStrategy.NUM_OF_RATINGS) / (double) experimentOperations.getExperiment(answerRecord.getExperiment())
+                    .orElseThrow(() -> new IllegalArgumentException("Error, can't find experiment of given experiment-ID: "+answerRecord.getExperiment())).getRatingsPerAnswer()) >= 0.8)) {
+                answerRatingOperations.setAnswerQualityAssured(answerRecord);
             }
-        }
+
     }
 }
 
