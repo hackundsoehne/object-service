@@ -1,5 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
@@ -10,6 +13,7 @@ import org.jooq.impl.TableRecordImpl;
 
 import java.util.*;
 import java.util.Comparator;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -120,6 +124,33 @@ public abstract class AbstractOperations {
                 throw new IllegalStateException("Experiment is running: " + experimentID);
             }
         });
+    }
+
+    /**
+     * creates a cache that has a maximum capacity of 1000 values and expires after 5 minutes when caching is enabled,
+     * otherwise just loads every time.
+     * @param cacheLoader the cacheLoader
+     * @param <K> the type of the key
+     * @param <V> the type of the value
+     * @return a LoadingCache
+     */
+    protected <K, V> LoadingCache<K, V> createCache(CacheLoaderInterface<K, V> cacheLoader) {
+        return CacheBuilder.newBuilder()
+                .maximumSize(100)
+                .refreshAfterWrite(5, TimeUnit.MINUTES)
+                .expireAfterAccess(30, TimeUnit.MINUTES)
+                .build(new CacheLoader<K, V>() {
+                    @Override
+                    public V load(K key) throws Exception {
+                        return cacheLoader.load(key);
+                    }
+                });
+    }
+
+    // functionalInterface leads to cleaner code with createCache
+    @FunctionalInterface
+    protected interface CacheLoaderInterface<K, V> {
+        V load(K key) throws Exception;
     }
 
     /**

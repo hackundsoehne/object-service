@@ -202,13 +202,6 @@ public class AnswerRatingOperations extends AbstractOperations {
      */
     public AnswerRecord insertNewAnswer(AnswerRecord answerRecord) throws IllegalArgumentException, IllegalStateException {
         answerRecord.setIdAnswer(null);
-        ExperimentRecord experimentRecord = experimentOperations.getExperiment(answerRecord.getExperiment())
-                .orElseThrow(() -> new IllegalArgumentException("Illegal experiment-value in answer record."));
-        if (getAnswerCount(answerRecord.getWorkerId(), experimentRecord.getIdExperiment()) >= experimentRecord.getAnwersPerWorker()) {
-            throw new IllegalStateException(
-                    String.format("Worker %d already submitted the maximum of allowed answers", answerRecord.getWorkerId())
-            );
-        }
 
         AnswerRecord result = doIfRunning(answerRecord.getExperiment(), conf -> {
             AnswerReservationRecord reservation = DSL.using(conf).selectFrom(ANSWER_RESERVATION)

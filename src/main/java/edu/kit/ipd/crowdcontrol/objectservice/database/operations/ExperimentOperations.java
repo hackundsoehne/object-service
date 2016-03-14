@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.common.cache.LoadingCache;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
@@ -10,10 +11,12 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
@@ -24,6 +27,10 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
  * @author Niklas Keller
  */
 public class ExperimentOperations extends AbstractOperations {
+    private LoadingCache<Integer, ExperimentRecord> experimentCache = createCache(
+            key -> getExperimentFromDB(key).orElseThrow(() -> new SQLException("Experiment not found"))
+    );
+
     public ExperimentOperations(DSLContext create) {
         super(create);
     }
@@ -42,10 +49,27 @@ public class ExperimentOperations extends AbstractOperations {
 
     /**
      * returns the experiment corresponding to the id
+     * <p>
+     * this method is cached
      * @param id the id
      * @return the optional experiment
      */
     public Optional<ExperimentRecord> getExperiment(int id) {
+        try {
+            return Optional.of(experimentCache.get(id));
+        } catch (ExecutionException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * returns the experiment corresponding to the id
+     * <p>
+     * this method calls the db
+     * @param id the id
+     * @return the optional experiment
+     */
+    private Optional<ExperimentRecord> getExperimentFromDB(int id) {
         return create.selectFrom(EXPERIMENT)
                 .where(EXPERIMENT.ID_EXPERIMENT.eq(id))
                 .fetchOptional();
@@ -58,8 +82,10 @@ public class ExperimentOperations extends AbstractOperations {
      * @throws IllegalStateException if the experiment is running
      */
     public boolean updateExperiment(ExperimentRecord experimentRecord) throws IllegalStateException {
-        return doIfDraft(experimentRecord.getIdExperiment(), trans ->
+        Boolean result = doIfDraft(experimentRecord.getIdExperiment(), trans ->
                 DSL.using(trans).executeUpdate(experimentRecord) == 1);
+        experimentCache.invalidate(experimentRecord.key());
+        return result;
     }
 
     /**
@@ -69,7 +95,7 @@ public class ExperimentOperations extends AbstractOperations {
      * @throws IllegalStateException if the experiment is running
      */
     public boolean deleteExperiment(int id) throws IllegalStateException {
-        return doIfNotRunning(id, trans -> {
+        Boolean result = doIfNotRunning(id, trans -> {
             DSL.using(trans).deleteFrom(EXPERIMENTS_PLATFORM)
                     .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(id))
                     .execute();
@@ -80,6 +106,8 @@ public class ExperimentOperations extends AbstractOperations {
                     .execute();
             return deleted == 1;
         });
+        experimentCache.invalidate(id);
+        return result;
     }
 
     /**
