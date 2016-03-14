@@ -48,9 +48,9 @@ public class FeedbackCreator {
                 content.append(System.getProperty("line.separator"));
             }
         } catch (FileNotFoundException e) {
-            throw new FeedbackException("Sending of Feedback failed: The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.");
+            throw new FeedbackException("Sending of Feedback failed: The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.", e);
         } catch (IOException e) {
-            throw new FeedbackException("Sending of Feedback failed: The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
+            throw new FeedbackException("Sending of Feedback failed: The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt", e);
         }
         return content.toString();
     }
