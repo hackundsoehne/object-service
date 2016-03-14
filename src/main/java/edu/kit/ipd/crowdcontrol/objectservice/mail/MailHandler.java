@@ -15,7 +15,7 @@ import java.util.Properties;
  * @author Felix Rittler
  * @author Niklas Keller
  */
-public class MailHandler implements MailFetcher, MailSender {
+public class MailHandler implements MailFetcher {
     private String sender;
     private Properties props;
     private Authenticator auth;
@@ -73,20 +73,6 @@ public class MailHandler implements MailFetcher, MailSender {
 
         folder.open(Folder.READ_ONLY);
         return messages;
-    }
-
-    @Override
-    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException {
-        Session session = Session.getInstance(props, auth);
-
-        MimeMessage msg = new MimeMessage(session);
-        msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientMail, recipientMail));
-        msg.setFrom(new InternetAddress(sender, "CrowdControl"));
-        msg.setContent(message, "text/html; charset=utf-8");
-        msg.setSubject(subject);
-        msg.setText(message);
-
-        Transport.send(msg);
     }
 
     @Override
