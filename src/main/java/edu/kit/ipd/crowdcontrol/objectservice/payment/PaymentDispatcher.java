@@ -71,7 +71,7 @@ public class PaymentDispatcher  {
                                 try {
                                     message = feedbackCreator.getFeedback(exp.getId(), workerRecordIntegerEntry.getKey().getIdWorker());
                                 } catch (FeedbackException e) {
-                                    log.fatal("Creating feedback message of experiment " + exp.getTitle() + " could not take place!", e.getCause());
+                                    log.fatal("Creating feedback message of experiment " + exp.getTitle() + " could not take place!", e);
                                 }
                                 return new PaymentJob(workerRecordIntegerEntry.getKey(), workerRecordIntegerEntry.getValue(), message);
                             }
