@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
+import edu.kit.ipd.crowdcontrol.objectservice.ConfigLoader;
 import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
 import org.junit.Before;
@@ -26,7 +27,8 @@ public class MailHandlerTest {
 
     @Before
     public void setUp() throws Exception {
-        Config config = Main.getConfig();
+        ConfigLoader configLoader = new ConfigLoader();
+        Config config = configLoader.getConfig();
 
         folder = config.mail.moneyReceiver.inbox;
 

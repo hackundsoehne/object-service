@@ -18,7 +18,7 @@ import java.util.Arrays;
  *
  * @author Marcel Hollerbach
  */
-class ConfigLoader {
+public class ConfigLoader {
     private static final Logger LOGGER = LogManager.getLogger("Config");
     private final Config config;
 
@@ -62,8 +62,8 @@ class ConfigLoader {
      * @param val the value to check
      * @return true if the value is not null and not empty
      */
-    private boolean notNullOrEmpty(String val) {
-        return val != null && !val.isEmpty();
+    private boolean NullOrEmpty(String val) {
+        return !(val != null && !val.isEmpty());
     }
 
     /**
@@ -74,19 +74,19 @@ class ConfigLoader {
     private void configValidate(Config config) throws ConfigException {
         if (config.database.maintainInterval < 0)
             throw new ConfigException("negative maintainInterval of database is not valid");
-        if (notNullOrEmpty(config.database.dialect) || SQLDialect.valueOf(config.database.dialect) == null)
+        if (NullOrEmpty(config.database.dialect) || SQLDialect.valueOf(config.database.dialect) == null)
             throw new ConfigException("Dialect does not exist");
         if ((config.database.writing == null ||
                 config.database.readonly == null) &&
-                notNullOrEmpty(config.database.databasepool))
+                NullOrEmpty(config.database.databasepool))
             throw new ConfigException("Database users have to be set!");
-        if (notNullOrEmpty(config.database.url))
+        if (NullOrEmpty(config.database.url))
             throw new ConfigException("Database url is not present!");
-        if (notNullOrEmpty(config.deployment.workerService))
+        if (NullOrEmpty(config.deployment.workerService))
             throw new ConfigException("WorkerService is not found");
-        if (notNullOrEmpty(config.deployment.workerUILocal) && config.deployment.workerUIPublic == null)
+        if (NullOrEmpty(config.deployment.workerUILocal) && config.deployment.workerUIPublic == null)
             throw new ConfigException("WorkerUi urls are not found!");
-        if (notNullOrEmpty(config.moneytransfer.notificationMailAddress))
+        if (NullOrEmpty(config.moneytransfer.notificationMailAddress))
             throw new ConfigException("Notification mail adress is empty");
     }
 
