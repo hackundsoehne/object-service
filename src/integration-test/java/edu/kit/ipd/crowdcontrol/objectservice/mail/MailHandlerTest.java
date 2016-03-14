@@ -31,7 +31,7 @@ public class MailHandlerTest {
         folder = config.mail.moneyReceiver.inbox;
 
         MailSend.Protocol sendProtocol = MailSend.Protocol.valueOf(config.mail.notifications.protocol);
-        MailHandler.Protocol fetchProtocol = MailHandler.Protocol.valueOf(config.mail.moneyReceiver.protocol);
+        MailReceiver.Protocol fetchProtocol = MailReceiver.Protocol.valueOf(config.mail.moneyReceiver.protocol);
 
         sender = new MailSend(sendProtocol,
                 config.mail.notifications.auth.credentials.user,
@@ -42,7 +42,7 @@ public class MailHandlerTest {
 
         receiver = config.mail.notifications.from;
 
-        fetcher = new MailHandler(fetchProtocol,
+        fetcher = new MailReceiver(fetchProtocol,
                 config.mail.moneyReceiver.auth.credentials.user,
                 config.mail.moneyReceiver.auth.credentials.password,
                 config.mail.moneyReceiver.auth.server,

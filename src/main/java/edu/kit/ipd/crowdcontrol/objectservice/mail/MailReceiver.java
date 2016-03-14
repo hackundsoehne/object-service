@@ -11,7 +11,7 @@ import java.util.Properties;
  * @author Niklas Keller
  * @author Marcel Hollerbach
  */
-public class MailHandler implements MailFetcher {
+public class MailReceiver implements MailFetcher {
     public enum Protocol {
         imap, imaps,
         pop3, pop3s
@@ -29,7 +29,7 @@ public class MailHandler implements MailFetcher {
      * A Mailhandler object to send and fetch emails.
      *
      */
-    public MailHandler(Protocol protocol, String user, String password, String host, int port) {
+    public MailReceiver(Protocol protocol, String user, String password, String host, int port) {
         this.protocol = protocol;
         this.user = user;
         this.password = password;

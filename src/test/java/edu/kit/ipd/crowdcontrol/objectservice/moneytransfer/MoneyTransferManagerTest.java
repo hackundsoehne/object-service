@@ -5,7 +5,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Work
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.jooq.Result;

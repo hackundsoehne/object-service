@@ -14,6 +14,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailReceiver;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
@@ -30,9 +31,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.ho.yaml.Yaml;
 import org.jooq.SQLDialect;
 
-import javax.mail.Authenticator;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
 import javax.naming.NamingException;
 import java.io.*;
 import java.sql.SQLException;
@@ -240,11 +239,11 @@ public class Main {
         ).init();
     }
 
-    private static MailFetcher getMailFetcher(boolean mailDisabled, MailReceiver receiver) throws MessagingException {
+    private static MailFetcher getMailFetcher(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailReceiver receiver) throws MessagingException {
         if (mailDisabled) {
             return new CommandLineMailHandler();
         }
-        return new MailHandler(MailHandler.Protocol.valueOf(receiver.protocol),
+        return new MailReceiver(MailReceiver.Protocol.valueOf(receiver.protocol),
                 receiver.auth.credentials.user,
                 receiver.auth.credentials.password,
                 receiver.auth.server,
