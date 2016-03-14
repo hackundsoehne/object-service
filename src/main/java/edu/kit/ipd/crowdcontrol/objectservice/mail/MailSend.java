@@ -31,9 +31,9 @@ public class MailSend implements MailSender {
      * @param protocol the protocol to use
      * @param user user to authorize with the service
      * @param password password to use for authorize
-     * @param from the senders email adress
+     * @param from the senders email address
      * @param host host to use as send service
-     * @param port serverport to connect to
+     * @param port server port to connect to
      */
     public MailSend(Protocol protocol, String user, String password, String from, String host, int port) {
         this.user = user;
@@ -45,7 +45,11 @@ public class MailSend implements MailSender {
 
         properties = new Properties();
 
-        properties.setProperty("mail"+protocol+"ssl.checkserveridentity", "true");
+        if (port == 587 && protocol == Protocol.smtp) {
+            properties.setProperty("mail.smtp.starttls.enable", "true");
+        }
+
+        properties.setProperty("mail." + protocol + ".ssl.checkserveridentity", "true");
     }
 
     @Override
@@ -53,7 +57,7 @@ public class MailSend implements MailSender {
         Session session = Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(properties.getProperty("mail.user"), properties.getProperty("mail.password"));
+                return new PasswordAuthentication(user, password);
             }
         });
 
