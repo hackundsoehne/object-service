@@ -12,7 +12,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailReceiver;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
@@ -28,10 +27,8 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.ho.yaml.Yaml;
 import org.jooq.SQLDialect;
 
-import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import java.io.*;
 import java.sql.SQLException;
@@ -50,23 +47,196 @@ public class Main {
         System.setProperty("org.jooq.no-logo", "true");
     }
 
-    public static void main(String[] args) throws IOException, ConfigException {
+    public static void main(String[] args) throws IOException, ConfigException, SQLException {
         LOGGER.trace("Entering application.");
 
-        Config config = getConfig();
+        ConfigLoader configLoader = new ConfigLoader();
+        Config config = configLoader.getConfig();
 
-        config.log.forEach((key, value) -> {
-            Configurator.setLevel(key, Level.getLevel(value));
-        });
+        initLogLevel(config);
 
-        if (config.database.maintainInterval == 0)
-            config.database.maintainInterval = 24;
-        else if (config.database.maintainInterval < 0)
-            throw new ConfigException("negative maintainInterval of database is not valid");
+        List<Platform> platforms = getPlatforms(config);
 
+        DatabaseManager databaseManager = initDatabase(config);
+
+        OperationCarrier operationCarrier = new OperationCarrier(config, databaseManager);
+
+        MailSender moneyTransferSender = getMailSender(config.mail.disabled, config.mail.moneytransfer, config.mail.debug);
+        MailFetcher moneyTransferFetcher = getMailFetcher(config.mail.disabled, config.mail.moneyReceiver, config.mail.debug);
+        MoneyTransferManager moneyTransfer = initMoneyTransfer(config, operationCarrier, moneyTransferFetcher, moneyTransferSender);
+
+        MailSender notificationSender = getMailSender(config.mail.disabled, config.mail.notifications, config.mail.debug);
+        NotificationController notificationController = initNotificationController(operationCarrier, notificationSender);
+
+        PlatformManager platformManager = initPlatformManager(operationCarrier, platforms, moneyTransfer);
+
+        //FIXME this should NEVER be here, we have to find a better way on doing this
+        ExperimentResource experimentResource = new ExperimentResource(
+                operationCarrier.answerRatingOperations,
+                operationCarrier.experimentOperations,
+                operationCarrier.calibrationOperations,
+                operationCarrier.tagConstraintsOperations,
+                operationCarrier.algorithmsOperations,
+                operationCarrier.experimentsPlatformOperations,
+                platformManager);
+
+
+        initEventHandler(operationCarrier, platformManager, experimentResource);
+        initRouter(config, operationCarrier, platformManager, experimentResource);
+    }
+
+    /**
+     * Load all modules which are subscribing on events
+     * @param operationCarrier Databaseoperations to use
+     * @param platformManager PlatformManager to use
+     * @param experimentResource ExperimentResources to use FIXME see upper commit should be removed
+     */
+    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentResource experimentResource) {
+        new QualityIdentificator(
+                operationCarrier.algorithmsOperations,
+                operationCarrier.answerRatingOperations,
+                operationCarrier.experimentOperations, experimentResource);
+
+        new PaymentDispatcher(
+                platformManager,
+                operationCarrier.answerRatingOperations,
+                operationCarrier.workerOperations);
+    }
+
+    /**
+     * Load and run the Router
+     * @param config config to use
+     * @param operationCarrier database operations to use
+     * @param platformManager the platforManager to run the platformoperations on
+     * @param experimentResource the experimentsResource FIXME see upper commit should be removed
+     */
+    private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentResource experimentResource) {
+        new Router(
+                new TemplateResource(operationCarrier.templateOperations),
+                new NotificationResource(operationCarrier.notificationRestOperations),
+                new PlatformResource(operationCarrier.platformOperations),
+                new WorkerResource(operationCarrier.workerOperations, platformManager),
+                new CalibrationResource(operationCarrier.calibrationOperations),
+                experimentResource, new AlgorithmResources(operationCarrier.algorithmsOperations),
+                new AnswerRatingResource(operationCarrier.experimentOperations, operationCarrier.answerRatingOperations, operationCarrier.workerOperations),
+                new WorkerCalibrationResource(operationCarrier.workerCalibrationOperations),
+                config.deployment.origin,
+                config.deployment.port
+        ).init();
+    }
+
+    /**
+     * Load all configured Platforms into the manager object
+     * @param operationCarrier database operations to use
+     * @param platforms the platforms to run
+     * @param moneyTransferManager the moneytranfermanager to use as fallback payservice
+     * @return a running PlatformManager
+     */
+    private static PlatformManager initPlatformManager(OperationCarrier operationCarrier, List<Platform> platforms, MoneyTransferManager moneyTransferManager) {
+        Payment payment = new Payment() {
+            @Override
+            public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {
+                for (PaymentJob job : paymentJob) {
+                    moneyTransferManager.addMoneyTransfer(job.getWorkerRecord().getIdWorker(), job.getAmount(), experiment.getId());
+                }
+                CompletableFuture<Boolean> future = new CompletableFuture<>();
+                future.complete(Boolean.TRUE);
+                return future;
+            }
+
+            @Override
+            public int getCurrency() {
+                //EUR
+                return 978;
+            }
+        };
+
+        return new PlatformManager(platforms, new FallbackWorker(), payment,
+                operationCarrier.experimentsPlatformOperations,
+                operationCarrier.platformOperations,
+                operationCarrier.workerOperations);
+    }
+
+    /**
+     * InitNotifications
+     * @param carrier DatabaseOperations to use
+     * @param notificationSender the sender to send the notifications
+     * @return A running notification contoller
+     */
+    private static NotificationController initNotificationController(OperationCarrier carrier, MailSender notificationSender) {
+        // notifications might as well use another sendMail instance
+        NotificationController notificationController = new NotificationController(carrier.notificationRestOperations,
+                new SQLEmailNotificationPolicy(notificationSender, carrier.notificationRestOperations));
+        notificationController.init();
+
+        return notificationController;
+    }
+
+    /**
+     * Load moneyTransferManager
+     * @param config config to use
+     * @param operationCarrier database operations to use
+     * @param mailFetcher the fetcher to get the giftcodes
+     * @param mailSender the sender to send messages with
+     *
+     * @return running MoneytransferManager
+     */
+    private static MoneyTransferManager initMoneyTransfer(Config config, OperationCarrier operationCarrier, MailFetcher mailFetcher, MailSender mailSender) {
+        MoneyTransferManager mng = new MoneyTransferManager(mailFetcher,
+                mailSender,
+                operationCarrier.workerBalanceOperations,
+                operationCarrier.workerOperations,
+                config.moneytransfer.notificationMailAddress,
+                config.moneytransfer.parsingPassword,
+                config.moneytransfer.scheduleInterval,
+                config.moneytransfer.payOffThreshold);
+        mng.start();
+
+        return mng;
+    }
+
+    /**
+     * Load Database related stuff and create manager
+     *
+     * @param config config to use
+     * @return
+     */
+    private static DatabaseManager initDatabase(Config config) {
         SQLDialect dialect = SQLDialect.valueOf(config.database.dialect);
-        DatabaseManager databaseManager;
+        DatabaseManager databaseManager = null;
+        try {
+            databaseManager = new DatabaseManager(
+                    config.database.writing.user,
+                    config.database.writing.password,
+                    config.database.url,
+                    config.database.databasepool,
+                    dialect);
+            databaseManager.initDatabase();
 
+            DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), config.database.maintainInterval);
+            maintainer.start();
+        } catch (NamingException | SQLException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        return databaseManager;
+    }
+
+    /**
+     * flush log lvls into the logger
+     * @param config config to use
+     */
+    private static void initLogLevel(Config config) {
+        config.log.forEach((key, value) -> Configurator.setLevel(key, Level.getLevel(value)));
+    }
+
+    /**
+     * Load all platforms from the config
+     * @param config the config to use to load
+     * @return A list of configured and initialized platforms
+     * @throws ConfigException if the config contains invalid values.
+     */
+    private static List<Platform> getPlatforms(Config config) throws ConfigException {
         List<Platform> platforms = new ArrayList<>();
 
         for (ConfigPlatform platform : config.platforms) {
@@ -105,144 +275,18 @@ public class Main {
             }
             platforms.add(platformInstance);
         }
-
-        boolean disabledMail = false;
-
-        if (config.mail != null) {
-            disabledMail = config.mail.disabled;
-        }
-
-        try {
-            databaseManager = new DatabaseManager(
-                    config.database.writing.user,
-                    config.database.writing.password,
-                    config.database.url,
-                    config.database.databasepool,
-                    dialect);
-
-            databaseManager.initDatabase();
-
-            boot(
-                    databaseManager, platforms,
-                    config.database.readonly,
-                    config.database.maintainInterval,
-                    config.deployment.origin,
-                    config.moneytransfer.parsingPassword,
-                    config.moneytransfer.scheduleInterval,
-                    config.moneytransfer.payOffThreshold,
-                    disabledMail,
-                    config.deployment.port
-            );
-        } catch (NamingException | SQLException e) {
-            System.err.println("Unable to establish database connection.");
-            e.printStackTrace();
-            System.exit(-1);
-        } catch (IOException | MessagingException e) {
-            System.err.println("Unable to configure the mailhandler.");
-            e.printStackTrace();
-            System.exit(-1);
-        }
+        return platforms;
     }
 
-    public static Config getConfig() throws FileNotFoundException {
-        InputStream configStream;
-        if (System.getProperty("objectservice.config") != null) {
-            LOGGER.debug("loading configuration from location: {}", System.getProperty("objectservice.config"));
-            configStream = new FileInputStream(System.getProperty("objectservice.config"));
-        } else {
-            configStream = Main.class.getResourceAsStream("/config.yml");
-        }
-        Config config = Yaml.loadType(configStream, Config.class);
-        if (System.getProperty("workerservice.url") != null) {
-            config.deployment.workerService = System.getProperty("workerservice.url");
-        }
-        if (System.getProperty("origin.url") != null) {
-            config.deployment.origin = System.getProperty("origin.url");
-        }
-        if (System.getProperty("workeruipublic.url") != null) {
-            config.deployment.workerUIPublic = System.getProperty("workeruipublic.url");
-        }
-        if (System.getProperty("workeruilocal.url") != null) {
-            config.deployment.workerUILocal = System.getProperty("workeruilocal.url");
-        }
-        config.platforms = Arrays.stream(config.platforms)
-                .filter(platform -> !Boolean.getBoolean(platform.name+".disabled"))
-                .toArray(ConfigPlatform[]::new);
-        return config;
-    }
-
-    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold, boolean mailDisabled, int port) throws SQLException, IOException, MessagingException {
-        TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
-        NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnly.user, readOnly.password);
-        PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
-        WorkerOperations workerOperations = new WorkerOperations(databaseManager.getContext());
-        CalibrationOperations calibrationOperations = new CalibrationOperations(databaseManager.getContext());
-        ExperimentOperations experimentOperations = new ExperimentOperations(databaseManager.getContext());
-        TagConstraintsOperations tagConstraintsOperations = new TagConstraintsOperations(databaseManager.getContext());
-        AlgorithmOperations algorithmsOperations = new AlgorithmOperations(databaseManager.getContext());
-        WorkerCalibrationOperations workerCalibrationOperations = new WorkerCalibrationOperations(databaseManager.getContext());
-        AnswerRatingOperations answerRatingOperations = new AnswerRatingOperations(databaseManager.getContext(), calibrationOperations, workerCalibrationOperations, experimentOperations);
-        ExperimentsPlatformOperations experimentsPlatformOperations = new ExperimentsPlatformOperations(databaseManager.getContext());
-        WorkerBalanceOperations workerBalanceOperations = new WorkerBalanceOperations(databaseManager.getContext());
-
-        DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
-        maintainer.start();
-
-        MailFetcher mailFetcher = getMailFetcher(mailDisabled,getConfig().mail != null ? getConfig().mail.moneyReceiver : null);
-
-        String from = "";
-        if (getConfig().mail != null && getConfig().mail.moneytransfer != null)
-            from = getConfig().mail.moneytransfer.from;
-        MailSender mailSenderMoneyTransfer = getMailSender(mailDisabled, getConfig().mail != null ? getConfig().mail.moneytransfer : null);
-        MoneyTransferManager mng = new MoneyTransferManager(mailFetcher, mailSenderMoneyTransfer, workerBalanceOperations, workerOperations, from, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
-        mng.start();
-
-        // notifications might as well use another sendMail instance
-        MailSender mailSenderNotification = getMailSender(mailDisabled, getConfig().mail != null ? getConfig().mail.notifications : null);
-        NotificationController notificationController = new NotificationController(notificationRestOperations,
-                new SQLEmailNotificationPolicy(mailSenderNotification, notificationRestOperations));
-        notificationController.init();
-
-        Payment payment = new Payment() {
-            @Override
-            public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {
-                for (PaymentJob job : paymentJob) {
-                    mng.addMoneyTransfer(job.getWorkerRecord().getIdWorker(), job.getAmount(), experiment.getId());
-                }
-                CompletableFuture<Boolean> future = new CompletableFuture<>();
-                future.complete(Boolean.TRUE);
-                return future;
-            }
-
-            @Override
-            public int getCurrency() {
-                //EUR
-                return 978;
-            }
-        };
-
-        PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, experimentsPlatformOperations, platformOperations,
-                workerOperations);
-        ExperimentResource experimentResource = new ExperimentResource(answerRatingOperations, experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmsOperations, experimentsPlatformOperations, platformManager);
-
-        QualityIdentificator qualityIdentificator = new QualityIdentificator(algorithmsOperations, answerRatingOperations, experimentOperations, experimentResource);
-        PaymentDispatcher paymentDispatcher = new PaymentDispatcher(platformManager, answerRatingOperations, workerOperations);
-
-        new Router(
-                new TemplateResource(templateOperations),
-                new NotificationResource(notificationRestOperations),
-                new PlatformResource(platformOperations),
-                new WorkerResource(workerOperations, platformManager),
-                new CalibrationResource(calibrationOperations),
-                experimentResource, new AlgorithmResources(algorithmsOperations),
-                new AnswerRatingResource(experimentOperations, answerRatingOperations, workerOperations),
-                new WorkerCalibrationResource(workerCalibrationOperations),
-                origin,
-                port
-        ).init();
-    }
-
-    private static MailFetcher getMailFetcher(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailReceiver receiver) throws MessagingException {
+    /**
+     * Get a MailFetcher instance for the passed config
+     * @param mailDisabled if the mail is dissabled
+     * @param receiver config to use
+     * @param debug if you want to debug your connection
+     *
+     * @return A MailFetcher instance
+     */
+    private static MailFetcher getMailFetcher(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailReceiver receiver, boolean debug) {
         if (mailDisabled || receiver == null) {
             return new CommandLineMailHandler();
         }
@@ -250,10 +294,19 @@ public class Main {
                 receiver.auth.credentials.user,
                 receiver.auth.credentials.password,
                 receiver.auth.server,
-                receiver.auth.port);
+                receiver.auth.port,
+                receiver.inbox,
+                debug);
     }
 
-    private static MailSender getMailSender(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailSender sender) {
+    /**
+     * Get a MailSender instance for the passed config
+     * @param mailDisabled if the mail is dissabled
+     * @param sender config to use
+     * @param debug if you want to debug your connection
+     * @return a Mailsender instance to use
+     */
+    private static MailSender getMailSender(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailSender sender, boolean debug) {
         if (mailDisabled || sender == null) {
             return new CommandLineMailHandler();
         }
@@ -261,6 +314,7 @@ public class Main {
                 sender.auth.credentials.user,
                 sender.auth.credentials.password, "",
                 sender.auth.server,
-                sender.auth.port);
+                sender.auth.port,
+                debug);
     }
 }

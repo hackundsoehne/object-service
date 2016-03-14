@@ -35,7 +35,7 @@ public class MailSend implements MailSender {
      * @param host host to use as send service
      * @param port server port to connect to
      */
-    public MailSend(Protocol protocol, String user, String password, String from, String host, int port) {
+    public MailSend(Protocol protocol, String user, String password, String from, String host, int port, boolean debug) {
         this.user = user;
         this.password = password;
         this.host = host;
@@ -45,10 +45,11 @@ public class MailSend implements MailSender {
 
         properties = new Properties();
 
-        if (port == 587 && protocol == Protocol.smtp) {
-            properties.setProperty("mail.smtp.starttls.enable", "true");
-        }
+        //we can always send starttls as this will ask to server if he supports it
+        properties.setProperty("mail.smtp.starttls.enable", "true");
 
+        if (debug)
+            properties.setProperty("mail.debug", true+"");
         properties.setProperty("mail." + protocol + ".ssl.checkserveridentity", "true");
     }
 

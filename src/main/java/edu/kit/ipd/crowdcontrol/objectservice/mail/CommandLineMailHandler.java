@@ -64,6 +64,11 @@ public class CommandLineMailHandler implements MailSender, MailFetcher {
         LOGGER.debug("call to deleteMails with message: {}", message);
     }
 
+    @Override
+    public Message[] fetchUnseen() throws MessagingException {
+        return new Message[0];
+    }
+
     /**
      * Sends mails to another mail address.
      *

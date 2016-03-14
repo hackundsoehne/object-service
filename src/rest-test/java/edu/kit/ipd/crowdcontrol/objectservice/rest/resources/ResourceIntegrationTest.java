@@ -16,6 +16,7 @@ import spark.Spark;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class ResourceIntegrationTest {
     protected static final String ORIGIN = "http://localhost:4567";
 
     @BeforeClass
-    public static void setUp() throws IOException, ConfigException {
+    public static void setUp() throws IOException, ConfigException, SQLException {
         Main.main(null);
     }
 

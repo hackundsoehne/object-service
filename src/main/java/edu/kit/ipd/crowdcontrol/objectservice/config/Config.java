@@ -13,12 +13,12 @@ public class Config {
     /**
      * Database configuration
      */
-    public Database database;
+    public Database database = new Database();
 
     /**
      * Deployment configuration
      */
-    public Deployment deployment;
+    public Deployment deployment = new Deployment();
 
     /**
      * Platform configurations
@@ -28,12 +28,12 @@ public class Config {
     /**
      * Money transfer configuration
      */
-    public MoneyTransfer moneytransfer;
+    public MoneyTransfer moneytransfer = new MoneyTransfer();
 
     /**
      * Mail configuration
      */
-    public Mail mail;
+    public Mail mail = new Mail();
 
     /**
      * Log level configuration

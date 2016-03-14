@@ -7,7 +7,7 @@ public class Database {
     /**
      * how many hours have to went by before the database maintains itself (cleanup etc.)
      */
-    public int maintainInterval;
+    public int maintainInterval = 24;
 
     /**
      * URL of the db to use
