@@ -215,9 +215,29 @@ public class Main {
         return databaseManager;
     }
 
+    private static boolean notNullOrEmpty(String val) {
+        if (val == null)
+            return false;
+        return !val.isEmpty();
+    }
+
     private static void configValidate(Config config) throws ConfigException {
         if (config.database.maintainInterval < 0)
             throw new ConfigException("negative maintainInterval of database is not valid");
+        if (notNullOrEmpty(config.database.dialect) || SQLDialect.valueOf(config.database.dialect) == null)
+            throw new ConfigException("Dialect does not exist");
+        if ((config.database.writing == null ||
+                config.database.readonly == null) &&
+                notNullOrEmpty(config.database.databasepool))
+            throw new ConfigException("Database users have to be set!");
+        if (notNullOrEmpty(config.database.url))
+            throw new ConfigException("Database url is not present!");
+        if (notNullOrEmpty(config.deployment.workerService))
+            throw new ConfigException("WorkerService is not found");
+        if (notNullOrEmpty(config.deployment.workerUILocal) && config.deployment.workerUIPublic == null)
+            throw new ConfigException("WorkerUi urls are not found!");
+        if (notNullOrEmpty(config.moneytransfer.notificationMailAddress))
+            throw new ConfigException("Notification mail adress is empty");
     }
 
     private static void initLogLevel(Config config) {
