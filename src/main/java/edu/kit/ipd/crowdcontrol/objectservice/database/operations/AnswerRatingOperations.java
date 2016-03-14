@@ -510,22 +510,16 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .execute();
     }
 
-    /**
-     * Sets hash to specified answer.
-     * @param answerRecord answerRecord
-     * @param hash hash-value of the answerRecord's answer-field
-     */
-    public void setHashToAnswer(AnswerRecord answerRecord, Long hash){
-        //TODO
-    }
 
 
     /**
      * Returns mapping of duplicate-answers to their corresponding original-answers
-     * @param expId identification-number of the experiment
+     * In addition to that, inserts the answers hashing in the db. //TODO
+     * @param answerRecord to be checked for duplicates
+     * @param hash the hash-value of the specified answer
      * @return mapping of the identified duplicates to their corresponding original answer
      */
-    public Map<AnswerRecord,AnswerRecord> getDuplicates(int expId){
+    public Map<AnswerRecord,AnswerRecord> getDuplicates(AnswerRecord answerRecord,long hash){
         //TODO
         return null;
     }
