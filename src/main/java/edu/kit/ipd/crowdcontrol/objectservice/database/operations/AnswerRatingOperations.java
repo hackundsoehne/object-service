@@ -513,14 +513,26 @@ public class AnswerRatingOperations extends AbstractOperations {
 
 
     /**
-     * Returns mapping of duplicate-answers to their corresponding original-answers
-     * In addition to that, inserts the answers hashing in the db. //TODO
-     * @param answerRecord to be checked for duplicates
+     * Returns mapping of duplicate-answers to their corresponding original-answers.
+     * <p>
+     * by computing 1.0 - (((double) Long.bitCount(xor) + 1) / (65 - Long.numberOfLeadingZeros(xor))) and comparing
+     * that to the threshold. xor is Answer.Hash.xor(hash).
      * @param hash the hash-value of the specified answer
+     * @param experiment the primary key of the experiment
+     * @param threshold the threshold
      * @return mapping of the identified duplicates to their corresponding original answer
      */
-    public Map<AnswerRecord,AnswerRecord> getDuplicates(AnswerRecord answerRecord,long hash){
-        //TODO
-        return null;
+    public List<AnswerRecord> getDuplicates(long hash, int experiment, int threshold){
+        Field<Long> xor = ANSWER.HASH.bitXor(hash).as("XOR");
+        //bitcount(xor) + 1
+        Field<Integer> dividend = DSL.bitCount(xor).plus(DSL.val(1));
+        //65 - (63 - floor(log2(xor))) or 65 - numberOfLeadingZeros(xor)
+        Field<Integer> divisor = DSL.val(65).minus(DSL.val(63).minus(DSL.floor(DSL.log(xor, 2))));
+        return create.select(ANSWER.fields())
+                .select(xor)
+                .from(ANSWER)
+                .where(ANSWER.EXPERIMENT.eq(experiment))
+                .and(DSL.val(1.0).minus(dividend.divide(divisor)).cast(Integer.class).greaterOrEqual(threshold))
+                .fetchInto(ANSWER);
     }
 }
