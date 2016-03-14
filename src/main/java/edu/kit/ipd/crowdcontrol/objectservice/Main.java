@@ -12,7 +12,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailReceiver;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
@@ -28,8 +27,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.ho.yaml.Yaml;
-import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 
 import javax.naming.NamingException;
@@ -44,37 +41,6 @@ import java.util.concurrent.CompletableFuture;
 public class Main {
     private static final Logger LOGGER = LogManager.getRootLogger();
 
-    static class OperationCarrier {
-        public final TemplateOperations templateOperations;
-        public final NotificationOperations notificationRestOperations;
-        public final PlatformOperations platformOperations;
-        public final WorkerOperations workerOperations;
-        public final CalibrationOperations calibrationOperations;
-        public final ExperimentOperations experimentOperations;
-        public final TagConstraintsOperations tagConstraintsOperations;
-        public final AlgorithmOperations algorithmsOperations;
-        public final WorkerCalibrationOperations workerCalibrationOperations;
-        public final AnswerRatingOperations answerRatingOperations;
-        public final ExperimentsPlatformOperations experimentsPlatformOperations;
-        public final WorkerBalanceOperations workerBalanceOperations;
-
-        public OperationCarrier(Config config, DatabaseManager manager) throws SQLException {
-            DSLContext ctx = manager.getContext();
-            templateOperations = new TemplateOperations(ctx);
-            notificationRestOperations = new NotificationOperations(manager, config.database.readonly.user, config.database.readonly.password);
-            platformOperations = new PlatformOperations(ctx);
-            workerOperations = new WorkerOperations(ctx);
-            calibrationOperations = new CalibrationOperations(ctx);
-            experimentOperations = new ExperimentOperations(ctx);
-            tagConstraintsOperations = new TagConstraintsOperations(ctx);
-            algorithmsOperations = new AlgorithmOperations(ctx);
-            workerCalibrationOperations = new WorkerCalibrationOperations(ctx);
-            answerRatingOperations = new AnswerRatingOperations(ctx, calibrationOperations, workerCalibrationOperations, experimentOperations);
-            experimentsPlatformOperations = new ExperimentsPlatformOperations(ctx);
-            workerBalanceOperations = new WorkerBalanceOperations(ctx);
-        }
-    }
-
     static {
         // Disable jOOQ's self-advertising
         // http://stackoverflow.com/a/28283538/2373138
@@ -84,11 +50,11 @@ public class Main {
     public static void main(String[] args) throws IOException, ConfigException, SQLException {
         LOGGER.trace("Entering application.");
 
-        Config config = getConfig();
+        ConfigLoader configLoader = new ConfigLoader();
+        Config config = configLoader.getConfig();
 
         initLogLevel(config);
 
-        configValidate(config);
         List<Platform> platforms = getPlatforms(config);
 
         DatabaseManager databaseManager = initDatabase(config);
@@ -119,6 +85,12 @@ public class Main {
         initRouter(config, operationCarrier, platformManager, experimentResource);
     }
 
+    /**
+     * Load all modules which are subscribing on events
+     * @param operationCarrier Databaseoperations to use
+     * @param platformManager PlatformManager to use
+     * @param experimentResource ExperimentResources to use FIXME see upper commit should be removed
+     */
     private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentResource experimentResource) {
         new QualityIdentificator(
                 operationCarrier.algorithmsOperations,
@@ -131,6 +103,13 @@ public class Main {
                 operationCarrier.workerOperations);
     }
 
+    /**
+     * Load and run the Router
+     * @param config config to use
+     * @param operationCarrier database operations to use
+     * @param platformManager the platforManager to run the platformoperations on
+     * @param experimentResource the experimentsResource FIXME see upper commit should be removed
+     */
     private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentResource experimentResource) {
         new Router(
                 new TemplateResource(operationCarrier.templateOperations),
@@ -146,6 +125,13 @@ public class Main {
         ).init();
     }
 
+    /**
+     * Load all configured Platforms into the manager object
+     * @param operationCarrier database operations to use
+     * @param platforms the platforms to run
+     * @param moneyTransferManager the moneytranfermanager to use as fallback payservice
+     * @return a running PlatformManager
+     */
     private static PlatformManager initPlatformManager(OperationCarrier operationCarrier, List<Platform> platforms, MoneyTransferManager moneyTransferManager) {
         Payment payment = new Payment() {
             @Override
@@ -171,6 +157,12 @@ public class Main {
                 operationCarrier.workerOperations);
     }
 
+    /**
+     * InitNotifications
+     * @param carrier DatabaseOperations to use
+     * @param notificationSender the sender to send the notifications
+     * @return A running notification contoller
+     */
     private static NotificationController initNotificationController(OperationCarrier carrier, MailSender notificationSender) {
         // notifications might as well use another sendMail instance
         NotificationController notificationController = new NotificationController(carrier.notificationRestOperations,
@@ -180,6 +172,15 @@ public class Main {
         return notificationController;
     }
 
+    /**
+     * Load moneyTransferManager
+     * @param config config to use
+     * @param operationCarrier database operations to use
+     * @param mailFetcher the fetcher to get the giftcodes
+     * @param mailSender the sender to send messages with
+     *
+     * @return running MoneytransferManager
+     */
     private static MoneyTransferManager initMoneyTransfer(Config config, OperationCarrier operationCarrier, MailFetcher mailFetcher, MailSender mailSender) {
         MoneyTransferManager mng = new MoneyTransferManager(mailFetcher,
                 mailSender,
@@ -194,6 +195,12 @@ public class Main {
         return mng;
     }
 
+    /**
+     * Load Database related stuff and create manager
+     *
+     * @param config config to use
+     * @return
+     */
     private static DatabaseManager initDatabase(Config config) {
         SQLDialect dialect = SQLDialect.valueOf(config.database.dialect);
         DatabaseManager databaseManager = null;
@@ -215,31 +222,10 @@ public class Main {
         return databaseManager;
     }
 
-    private static boolean notNullOrEmpty(String val) {
-        if (val == null)
-            return false;
-        return !val.isEmpty();
-    }
-
-    private static void configValidate(Config config) throws ConfigException {
-        if (config.database.maintainInterval < 0)
-            throw new ConfigException("negative maintainInterval of database is not valid");
-        if (notNullOrEmpty(config.database.dialect) || SQLDialect.valueOf(config.database.dialect) == null)
-            throw new ConfigException("Dialect does not exist");
-        if ((config.database.writing == null ||
-                config.database.readonly == null) &&
-                notNullOrEmpty(config.database.databasepool))
-            throw new ConfigException("Database users have to be set!");
-        if (notNullOrEmpty(config.database.url))
-            throw new ConfigException("Database url is not present!");
-        if (notNullOrEmpty(config.deployment.workerService))
-            throw new ConfigException("WorkerService is not found");
-        if (notNullOrEmpty(config.deployment.workerUILocal) && config.deployment.workerUIPublic == null)
-            throw new ConfigException("WorkerUi urls are not found!");
-        if (notNullOrEmpty(config.moneytransfer.notificationMailAddress))
-            throw new ConfigException("Notification mail adress is empty");
-    }
-
+    /**
+     * flush log lvls into the logger
+     * @param config config to use
+     */
     private static void initLogLevel(Config config) {
         config.log.forEach((key, value) -> Configurator.setLevel(key, Level.getLevel(value)));
     }
@@ -292,33 +278,14 @@ public class Main {
         return platforms;
     }
 
-    public static Config getConfig() throws FileNotFoundException {
-        InputStream configStream;
-        if (System.getProperty("objectservice.config") != null) {
-            LOGGER.debug("loading configuration from location: {}", System.getProperty("objectservice.config"));
-            configStream = new FileInputStream(System.getProperty("objectservice.config"));
-        } else {
-            configStream = Main.class.getResourceAsStream("/config.yml");
-        }
-        Config config = Yaml.loadType(configStream, Config.class);
-        if (System.getProperty("workerservice.url") != null) {
-            config.deployment.workerService = System.getProperty("workerservice.url");
-        }
-        if (System.getProperty("origin.url") != null) {
-            config.deployment.origin = System.getProperty("origin.url");
-        }
-        if (System.getProperty("workeruipublic.url") != null) {
-            config.deployment.workerUIPublic = System.getProperty("workeruipublic.url");
-        }
-        if (System.getProperty("workeruilocal.url") != null) {
-            config.deployment.workerUILocal = System.getProperty("workeruilocal.url");
-        }
-        config.platforms = Arrays.stream(config.platforms)
-                .filter(platform -> !Boolean.getBoolean(platform.name+".disabled"))
-                .toArray(ConfigPlatform[]::new);
-        return config;
-    }
-
+    /**
+     * Get a MailFetcher instance for the passed config
+     * @param mailDisabled if the mail is dissabled
+     * @param receiver config to use
+     * @param debug if you want to debug your connection
+     *
+     * @return A MailFetcher instance
+     */
     private static MailFetcher getMailFetcher(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailReceiver receiver, boolean debug) {
         if (mailDisabled || receiver == null) {
             return new CommandLineMailHandler();
@@ -332,6 +299,13 @@ public class Main {
                 debug);
     }
 
+    /**
+     * Get a MailSender instance for the passed config
+     * @param mailDisabled if the mail is dissabled
+     * @param sender config to use
+     * @param debug if you want to debug your connection
+     * @return a Mailsender instance to use
+     */
     private static MailSender getMailSender(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailSender sender, boolean debug) {
         if (mailDisabled || sender == null) {
             return new CommandLineMailHandler();
