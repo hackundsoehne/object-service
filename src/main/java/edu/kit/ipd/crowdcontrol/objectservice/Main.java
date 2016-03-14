@@ -188,14 +188,14 @@ public class Main {
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
 
-        MailFetcher mailFetcher = getMailFetcher(mailDisabled, getConfig().mail.moneyReceiver);
+        MailFetcher mailFetcher = getMailFetcher(mailDisabled,getConfig().mail != null ? getConfig().mail.moneyReceiver : null);
 
-        MailSender mailSenderMoneyTransfer = getMailSender(mailDisabled, getConfig().mail.moneytransfer);
+        MailSender mailSenderMoneyTransfer = getMailSender(mailDisabled, getConfig().mail != null ? getConfig().mail.moneytransfer : null);
         MoneyTransferManager mng = new MoneyTransferManager(mailFetcher, mailSenderMoneyTransfer, workerBalanceOperations, workerOperations, getConfig().mail.moneytransfer.from, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
         mng.start();
 
         // notifications might as well use another sendMail instance
-        MailSender mailSenderNotification = getMailSender(mailDisabled, getConfig().mail.notifications);
+        MailSender mailSenderNotification = getMailSender(mailDisabled, getConfig().mail != null ? getConfig().mail.notifications : null);
         NotificationController notificationController = new NotificationController(notificationRestOperations,
                 new SQLEmailNotificationPolicy(mailSenderNotification, notificationRestOperations));
         notificationController.init();
@@ -240,7 +240,7 @@ public class Main {
     }
 
     private static MailFetcher getMailFetcher(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailReceiver receiver) throws MessagingException {
-        if (mailDisabled) {
+        if (mailDisabled || receiver == null) {
             return new CommandLineMailHandler();
         }
         return new MailReceiver(MailReceiver.Protocol.valueOf(receiver.protocol),
@@ -251,7 +251,7 @@ public class Main {
     }
 
     private static MailSender getMailSender(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailSender sender) {
-        if (mailDisabled) {
+        if (mailDisabled || sender == null) {
             return new CommandLineMailHandler();
         }
         return new MailSend(MailSend.Protocol.valueOf(sender.protocol),
