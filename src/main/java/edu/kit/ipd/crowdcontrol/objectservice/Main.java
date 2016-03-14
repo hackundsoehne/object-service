@@ -190,8 +190,11 @@ public class Main {
 
         MailFetcher mailFetcher = getMailFetcher(mailDisabled,getConfig().mail != null ? getConfig().mail.moneyReceiver : null);
 
+        String from = "";
+        if (getConfig().mail != null && getConfig().mail.moneytransfer != null)
+            from = getConfig().mail.moneytransfer.from;
         MailSender mailSenderMoneyTransfer = getMailSender(mailDisabled, getConfig().mail != null ? getConfig().mail.moneytransfer : null);
-        MoneyTransferManager mng = new MoneyTransferManager(mailFetcher, mailSenderMoneyTransfer, workerBalanceOperations, workerOperations, getConfig().mail.moneytransfer.from, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
+        MoneyTransferManager mng = new MoneyTransferManager(mailFetcher, mailSenderMoneyTransfer, workerBalanceOperations, workerOperations, from, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
         mng.start();
 
         // notifications might as well use another sendMail instance
