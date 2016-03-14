@@ -462,6 +462,17 @@ public class AnswerRatingOperations extends AbstractOperations {
     }
 
     /**
+     * returns all the ratings pointing to the same answer
+     * @param answersID the answer-ID
+     * @return a list of ratings
+     */
+    public List<RatingRecord> getRelatedRatings(int answersID) {
+        return create.selectFrom(RATING)
+                    .where(RATING.ANSWER_R.eq(answersID))
+                    .fetch();
+    }
+
+    /**
      * Get all answers of the specified experiment for which at least one rating is present.
      * @param expID id of the experiment
      * @return all answers of the experiment with one or more ratings
