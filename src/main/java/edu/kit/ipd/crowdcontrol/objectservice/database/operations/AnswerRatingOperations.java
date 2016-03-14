@@ -7,10 +7,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTr
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Result;
-import org.jooq.SelectConditionStep;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.sql.Timestamp;
@@ -469,8 +466,15 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @param expID id of the experiment
      * @return all answers of the experiment with one or more ratings
      */
-    public Result<AnswerRecord> getAnswersWithRatingsOfExperiment(int expID){
-        //TODO
-        return null;
+    public List<AnswerRecord> getAnswersWithRatingsOfExperiment(int expID){
+        Field<Integer> count = DSL.count(RATING.ID_RATING).as("count");
+        return create.select(ANSWER.fields())
+                .select(count)
+                .from(ANSWER)
+                .join(RATING).onKey()
+                .where(ANSWER.EXPERIMENT.eq(expID))
+                .groupBy(ANSWER.fields())
+                .having(count.greaterThan(0))
+                .fetch(record -> record.into(ANSWER));
     }
 }
