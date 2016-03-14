@@ -117,7 +117,7 @@ public class ImageSimilarityTest {
     @Test
     public void testSimilaritySimpleHashColor() throws Exception{
         if (similar1a != null && similar1b != null && different != null && similar2b != null && similar2a != null) {
-         /*   System.out.println("1a:1b "+HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar1a),ImageSimilarity.getImageHashFromColorDeviation(similar1b)));
+            System.out.println("1a:1b "+HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar1a),ImageSimilarity.getImageHashFromColorDeviation(similar1b)));
             System.out.println("3a:3b "+HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar3a),ImageSimilarity.getImageHashFromColorDeviation(similar3b)));
             System.out.println("2a:2b "+HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar2a),ImageSimilarity.getImageHashFromColorDeviation(similar2b))+"\n");
             System.out.println("1a:2a "+HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar1a),ImageSimilarity.getImageHashFromColorDeviation(similar2a)));
@@ -146,7 +146,7 @@ public class ImageSimilarityTest {
             System.out.println("2b:d "+HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromSignature(similar2b),ImageSimilarity.getImageHashFromSignature(different)));
 
 
-*/
+
 
         }
 

@@ -112,7 +112,7 @@ public class DuplicateCheckerTest {
         answerRecords.forEach(answerRecord -> answerQualityMap.put(answerRecord, answerRecord.getQuality()));
         Map<AnswerRecord, Long> mappingOfAnswersHashes = new HashMap<>();
         answerRecords.forEach(answerRecord -> mappingOfAnswersHashes.put(answerRecord, StringSimilarity.computeSimhashFromShingles(Shingle.getShingle(answerRecord.getAnswer(), 3))));
-        duplicateChecker.processDuplicatesOfExperiment(null,0);
+        duplicateChecker.processDuplicatesOfExperiment(null,null,0);
 
         assertEquals((int) answerQualityMap.get(duplicateOne), 0);
         assertEquals((int) answerQualityMap.get(originalOne), 6);

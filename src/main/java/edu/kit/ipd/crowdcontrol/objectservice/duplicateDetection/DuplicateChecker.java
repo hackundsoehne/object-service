@@ -85,9 +85,9 @@ public class DuplicateChecker {
      * @param answerRecord the be checked for duplicates
      * @param answerHash hashing of the answerRecord
      */
-    public void processDuplicatesOfExperiment(AnswerRecord answerRecord, long answerHash) {
-
-        Map<AnswerRecord,AnswerRecord> mapOfDuplicatesToOriginals = answerRatingOperations.getDuplicates(answerRecord,answerHash);
+    public void processDuplicatesOfExperiment(String answerType,AnswerRecord answerRecord, long answerHash) {
+        double threshold = (answerType == null) ? .80 : .75;
+        Map<AnswerRecord,AnswerRecord> mapOfDuplicatesToOriginals = answerRatingOperations.getDuplicates(answerHash,answerRecord.getExperiment(),threshold);
         mapOfDuplicatesToOriginals.forEach((duplicate,original) -> {
             answerRatingOperations.setSystemResponseField(duplicate,"This answer is considered a duplicate with: \""+ original.getAnswer()+"\"");
             answerRatingOperations.setQualityToAnswer(duplicate,0);
@@ -131,7 +131,7 @@ public class DuplicateChecker {
                 answerRatingOperations.setSystemResponseField(answerRecord,IMAGE_NOT_READABLE_RESPONSE);
                 return Optional.empty();
             }
-            return Optional.of(ImageSimilarity.getImageHashFromGreyScaleDeviation(image));
+            return Optional.of(ImageSimilarity.getImageHashFromSignature(image));
         }
     }
 
@@ -153,11 +153,13 @@ public class DuplicateChecker {
                     return;
                 }
                 if (answerRecord != null) {
+                    String answerType = experimentOperations.getExperiment(answerRecord.getExperiment())
+                            .orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID!")).getAnswerType();
                     //trying to acquire answer-hash
-                    Optional<Long> answerHash = getHashFromAnswer(answerRecord, experimentOperations.getExperiment(answerRecord.getExperiment())
-                            .orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID!")).getAnswerType());
+                    Optional<Long> answerHash = getHashFromAnswer(answerRecord,answerType);
                     if (answerHash.isPresent()) {
-                        processDuplicatesOfExperiment(answerRecord, answerHash.get());
+                        answerRatingOperations.setHashToAnswer(answerRecord,answerHash.get());
+                        processDuplicatesOfExperiment(answerType,answerRecord, answerHash.get());
                     } else {
                         // If optional is empty and thus the hashing failed, the answers quality will be set to zero.
                         // The reason for the failure is described in the response-field and set in the getHashFromAnswer-method
