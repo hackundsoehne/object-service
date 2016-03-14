@@ -46,7 +46,62 @@ platforms :
           calibrationsAllowed: true
 
 moneytransfer:
+    # Minimum amount of money in US cent a worker has to earn before he gets paid off
     payOffThreshold: 0
+
+    # Password used to verify a valid Amazon GiftCode e-mail
+    # enter password as message on the Amazon homepage when buying GiftCodes
     parsingPassword: test
+
+    # E-mail address to send notification mails to
     notificationMailAddress: pseipd@gmail.com
+
+    # Interval in days, when the workers get paid off
     scheduleInterval: 7
+
+# Defined platforms to run
+platforms:
+    # Type to use:
+    # - mturk
+    # - pybossa
+    # - dummy
+    - type: dummy
+
+      # Standard credentials
+      user: samplePlatformUser
+      password: samplePassword
+
+      # Name which is used to display
+      name: Sandbox
+
+      # URL to the platform
+      url: http://example.com/
+
+    - type: pybossa
+
+      # Key to access the PyBossa API
+      apiKey: 8ec92fa1-1bd1-42ad-8524-3d2bab4588b1
+
+      # URL to the PyBossa API
+      url: http://localhost:5000/api
+
+      # Name which is used to display
+      name: Pybossa
+
+      # ID of the PyBossa project to use for all experiments
+      projectId: 1
+
+      # Whether calibrations should be displayed / used on this platform
+      calibrationsAllowed: true
+
+# Map of packages to log levels, e.g.
+# log:
+#    org.package.name: WARN
+log:
+    com.zaxxer.hikari: WARN
+    org.eclipse.jetty: WARN
+    org.jooq.impl.DefaultBinding: WARN
+    org.jooq.impl.DefaultConnectionProvider: WARN
+    org.jooq.tools.StopWatch: WARN
+    spark.webserver.MatcherFilter: WARN
+    spark.Request: WARN
