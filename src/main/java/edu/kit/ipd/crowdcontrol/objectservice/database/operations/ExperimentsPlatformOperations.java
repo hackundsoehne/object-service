@@ -4,9 +4,14 @@ import com.google.common.collect.Sets;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformMode;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.Result;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -251,9 +256,30 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                 .fetch();
     }
 
-    public List<ExperimentsPlatformStatusPlatformStatus> getExperimentsPlatformStatusPlatformStatuses (int experiment) {
-        create.select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS)
+    /**
+     * returns the latest statuses for all platforms
+     * @param experiment the experiment to get the statuses for
+     * @return the statuses
+     */
+    public Set<ExperimentsPlatformStatusPlatformStatus> getExperimentsPlatformStatusPlatformStatuses (int experiment) {
+        Field<Timestamp> maxTimestamp = DSL.max(EXPERIMENTS_PLATFORM_STATUS.TIMESTAMP).as("max");
+        Table<Record3<ExperimentsPlatformStatusPlatformStatus, Integer, Timestamp>> maxTable = DSL
+                .select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM, maxTimestamp)
                 .from(EXPERIMENTS_PLATFORM_STATUS)
-                .where(EXPERIMENTS_PLATFORM_STATUS.P)
+                .groupBy(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM)
+                .asTable("maxTable");
+
+        return create.select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM, maxTable.field(maxTimestamp))
+                .from(
+                        maxTable
+                ).innerJoin(EXPERIMENTS_PLATFORM_STATUS).on(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.eq(maxTable.field(EXPERIMENTS_PLATFORM_STATUS.PLATFORM))
+                        .and(EXPERIMENTS_PLATFORM_STATUS.TIMESTAMP.eq(maxTable.field(maxTimestamp))))
+                .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
+                        DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                                .from(EXPERIMENTS_PLATFORM)
+                                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(1))
+                ))
+                .fetchSet(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS);
+
     }
 }
