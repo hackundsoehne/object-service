@@ -82,11 +82,12 @@ public class DuplicateChecker {
      * In Addition to that, the duplicates system-response field
      * The original answer keeps its quality.
      *
-     * @param expID id of the experiment
+     * @param answerRecord the be checked for duplicates
+     * @param answerHash hashing of the answerRecord
      */
-    public void processDuplicatesOfExperiment(int expID) {
+    public void processDuplicatesOfExperiment(AnswerRecord answerRecord, long answerHash) {
 
-        Map<AnswerRecord,AnswerRecord> mapOfDuplicatesToOriginals = answerRatingOperations.getDuplicates(expID);
+        Map<AnswerRecord,AnswerRecord> mapOfDuplicatesToOriginals = answerRatingOperations.getDuplicates(answerRecord,answerHash);
         mapOfDuplicatesToOriginals.forEach((duplicate,original) -> {
             answerRatingOperations.setSystemResponseField(duplicate,"This answer is considered a duplicate with: \""+ original.getAnswer()+"\"");
             answerRatingOperations.setQualityToAnswer(duplicate,0);
@@ -156,8 +157,7 @@ public class DuplicateChecker {
                     Optional<Long> answerHash = getHashFromAnswer(answerRecord, experimentOperations.getExperiment(answerRecord.getExperiment())
                             .orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID!")).getAnswerType());
                     if (answerHash.isPresent()) {
-                        answerRatingOperations.setHashToAnswer(answerRecord,answerHash.get());
-                        processDuplicatesOfExperiment(answerRecord.getExperiment());
+                        processDuplicatesOfExperiment(answerRecord, answerHash.get());
                     } else {
                         // If optional is empty and thus the hashing failed, the answers quality will be set to zero.
                         // The reason for the failure is described in the response-field and set in the getHashFromAnswer-method
