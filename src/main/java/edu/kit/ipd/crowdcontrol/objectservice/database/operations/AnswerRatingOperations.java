@@ -7,10 +7,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTr
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationAnswer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Result;
-import org.jooq.SelectConditionStep;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.sql.Timestamp;
@@ -462,5 +459,31 @@ public class AnswerRatingOperations extends AbstractOperations {
                         ))
                         .or(DSL.condition(true))
         );
+    }
+
+    /**
+     * returns all the ratings pointing to the same answer
+     * @param answersID the answer-ID
+     * @return a list of ratings
+     */
+    public List<RatingRecord> getRelatedRatings(int answersID) {
+        return create.selectFrom(RATING)
+                    .where(RATING.ANSWER_R.eq(answersID))
+                    .fetch();
+    }
+
+
+    /**
+     * Gets the AnswerRecord belonging to the specified rating
+     * @param rating of the answerRecord
+     * @return AnswerRecord of specified rating
+     */
+    public Optional<AnswerRecord> getAnswerFromRating(Rating rating){
+        return create.selectFrom(ANSWER)
+                .where(ANSWER.ID_ANSWER.eq(
+                        DSL.select(RATING_RESERVATION.ANSWER)
+                            .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
+                ))
+                .fetchOptional();
     }
 }
