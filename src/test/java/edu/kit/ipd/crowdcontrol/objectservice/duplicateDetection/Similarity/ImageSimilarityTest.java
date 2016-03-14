@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -113,7 +114,7 @@ public class ImageSimilarityTest {
 
         }
     }
-
+    @Ignore
     @Test
     public void testSimilaritySimpleHashColor() throws Exception{
         if (similar1a != null && similar1b != null && different != null && similar2b != null && similar2a != null) {
