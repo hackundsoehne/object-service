@@ -145,7 +145,7 @@ public class Main {
         }
     }
 
-    private static Config getConfig() throws FileNotFoundException {
+    public static Config getConfig() throws FileNotFoundException {
         InputStream configStream;
         if (System.getProperty("objectservice.config") != null) {
             LOGGER.debug("loading configuration from location: {}", System.getProperty("objectservice.config"));
