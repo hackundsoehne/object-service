@@ -33,6 +33,7 @@ public class WorkerCalibrationOperations extends AbstractOperations {
                 .from(CALIBRATION_ANSWER_OPTION)
                 .where(CALIBRATION_ANSWER_OPTION.CALIBRATION.eq(
                         DSL.select(CALIBRATION_ANSWER_OPTION.CALIBRATION)
+                                .from(CALIBRATION_ANSWER_OPTION)
                                 .where(CALIBRATION_ANSWER_OPTION.ID_CALIBRATION_ANSWER_OPTION.eq(answerOption))
                 ));
         Boolean answered = create.transactionResult(conf -> {
