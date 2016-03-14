@@ -250,4 +250,10 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                 .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
                 .fetch();
     }
+
+    public List<ExperimentsPlatformStatusPlatformStatus> getExperimentsPlatformStatusPlatformStatuses (int experiment) {
+        create.select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS)
+                .from(EXPERIMENTS_PLATFORM_STATUS)
+                .where(EXPERIMENTS_PLATFORM_STATUS.P)
+    }
 }

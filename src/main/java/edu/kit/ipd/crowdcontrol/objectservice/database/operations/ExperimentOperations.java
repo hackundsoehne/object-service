@@ -287,14 +287,4 @@ public class ExperimentOperations extends AbstractOperations {
             }
         });
     }
-
-    /**
-     * Gets the platform-status of the experiment
-     * @param expID id of the experiment
-     * @return platform-status-enum of the experiment
-     */
-    public ExperimentsPlatformStatusPlatformStatus getExperimentPlatformStatus(int expID){
-        //TODO
-        return null;
-    }
 }
