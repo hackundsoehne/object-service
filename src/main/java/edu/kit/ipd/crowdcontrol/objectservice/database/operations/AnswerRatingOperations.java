@@ -550,7 +550,7 @@ public class AnswerRatingOperations extends AbstractOperations {
      * @param threshold the threshold
      * @return mapping of the identified duplicates to their corresponding original answer
      */
-    public List<AnswerRecord> getDuplicates(long hash, int experiment, int threshold){
+    public List<AnswerRecord> getDuplicates(long hash, int experiment, double threshold){
         Field<Long> xor = ANSWER.HASH.bitXor(hash).as("XOR");
         //bitcount(xor) + 1
         Field<Integer> dividend = DSL.bitCount(xor).plus(DSL.val(1));
@@ -560,7 +560,7 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .select(xor)
                 .from(ANSWER)
                 .where(ANSWER.EXPERIMENT.eq(experiment))
-                .and(DSL.val(1.0).minus(dividend.divide(divisor)).cast(Integer.class).greaterOrEqual(threshold))
+                .and(DSL.val(1.0).minus(dividend.divide(divisor)).greaterOrEqual(threshold))
                 .fetchInto(ANSWER);
     }
 }
