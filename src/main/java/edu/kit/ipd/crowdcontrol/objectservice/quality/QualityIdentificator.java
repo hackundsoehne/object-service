@@ -56,8 +56,8 @@ public class QualityIdentificator {
 
     public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator operator, EventManager eventManager) {
 
-        this.experimentOperator = operator;
-        this.answerRatingOperations = answerRatingOperations;
+        this.experimentResource = experimentResource;
+        this.answerOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.algorithmOperations = algorithmOperations;
         this.answerAlgorithms = new HashSet<>();
@@ -105,11 +105,8 @@ public class QualityIdentificator {
             return new AnswerQualityByRatings();
         });
 
-        AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating)
-                .orElseThrow(()->new IllegalArgumentException("Error, cant find find answer of given rating of expID: "+rating.getExperimentId()));
-
-        rateQualityOfRatings(answerRecord, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
-        rateQualityOfAnswers(answerRecord, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        rateQualityOfRatings(exp, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        rateQualityOfAnswers(exp, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
 
         checkExpStatus(exp);
 
@@ -181,7 +178,7 @@ public class QualityIdentificator {
     /**
      * Rates and sets quality of all answers of specified experiment.
      * Only uses ratings of a specified quality
-     * Furthermore checks if a specified amount of ratings is present for that answer
+     * Furthermore che//   assertEquals((int) sortedResult.get(sortedResult.lastKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerTwo)));cks if a specified amount of ratings is present for that answer
      * and it thus the answer's quality is unlikely to change. In that case the corresponding
      * quality-assured-bit is set in the database.
      *
