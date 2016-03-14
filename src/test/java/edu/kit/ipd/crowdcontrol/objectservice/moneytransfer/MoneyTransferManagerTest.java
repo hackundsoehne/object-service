@@ -128,7 +128,7 @@ public class MoneyTransferManagerTest {
             return true;
         };
 
-        doReturn(new Message[0]).when(fetcher).fetchUnseen(any());
+        doReturn(new Message[0]).when(fetcher).fetchUnseen();
 
         doAnswer(answer0).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
         doAnswer(answer1).when(payops).addDebit(anyInt(), anyInt(), eq(code1.getIdGiftCode()));
@@ -204,7 +204,7 @@ public class MoneyTransferManagerTest {
             return true;
         };
 
-        doReturn(new Message[0]).when(fetcher).fetchUnseen(any());
+        doReturn(new Message[0]).when(fetcher).fetchUnseen();
 
         doAnswer(answer0).when(payops).addDebit(anyInt(), anyInt(), eq(code0.getIdGiftCode()));
 
