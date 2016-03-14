@@ -82,18 +82,25 @@ public class DuplicateChecker {
      * In Addition to that, the duplicates system-response field
      * The original answer keeps its quality.
      *
-     * @param answerRecord the be checked for duplicates
+     * @param submittedAnswer the be checked for duplicates
      * @param answerHash hashing of the answerRecord
      */
-    public void processDuplicatesOfExperiment(String answerType,AnswerRecord answerRecord, long answerHash) {
+    public void processDuplicatesOfExperiment(String answerType,AnswerRecord submittedAnswer, long answerHash) {
         double threshold = (answerType == null) ? .80 : .75;
-        Map<AnswerRecord,AnswerRecord> mapOfDuplicatesToOriginals = answerRatingOperations.getDuplicates(answerHash,answerRecord.getExperiment(),threshold);
-        mapOfDuplicatesToOriginals.forEach((duplicate,original) -> {
-            answerRatingOperations.setSystemResponseField(duplicate,"This answer is considered a duplicate with: \""+ original.getAnswer()+"\"");
+        List<AnswerRecord> listOfDuplicates = answerRatingOperations.getDuplicates(answerHash,submittedAnswer.getExperiment(),threshold);
+        AnswerRecord originalAnswer = submittedAnswer;
+        for (AnswerRecord duplicate : listOfDuplicates ) {
+            if(duplicate.getTimestamp().compareTo(originalAnswer.getTimestamp()) < 0)
+                originalAnswer = duplicate;
+        }
+        listOfDuplicates.remove(originalAnswer);
+        final AnswerRecord finalOriginalAnswer = originalAnswer;
+        listOfDuplicates.forEach((duplicate)-> {
+            answerRatingOperations.setSystemResponseField(duplicate,"This answer is considered a duplicate with: \""+ finalOriginalAnswer.getAnswer()+"\"");
             answerRatingOperations.setQualityToAnswer(duplicate,0);
             answerRatingOperations.setAnswerQualityAssured(duplicate);
-            });
-        }
+        });
+    }
 
 
 
