@@ -48,10 +48,12 @@ public class FeedbackCreatorTest {
         AnswerRecord a1 = new AnswerRecord();
         a1.setWorkerId(0);
         a1.setAnswer("baz1");
+        a1.setSystemResponse("awes0me Message");
 
         AnswerRecord a2 = new AnswerRecord();
         a2.setWorkerId(0);
         a2.setAnswer("baz2");
+        a2.setSystemResponse(null);
 
         WorkerRecord w1 = mock(WorkerRecord.class);
         Optional<WorkerRecord> o1 = Optional.of(w1);

@@ -2,8 +2,6 @@ Dear worker,
 
 here we send you some feedback to the answers you gave, when you worked for us one experiment {{experimentName}}:
 
-{{answers}}
-
-Yours sincerely
+{{answers}}Yours sincerely
 
 The CrowdControl-Team

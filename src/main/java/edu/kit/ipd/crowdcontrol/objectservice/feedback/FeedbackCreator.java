@@ -85,13 +85,21 @@ public class FeedbackCreator {
                 ratingMap.put("quality", rating.getQuality().toString());
                 ratingMap.put("rating", rating.getRating().toString());
 
-                ratingMessage.append(Template.apply(feedbackRating, ratingMap));
+                ratingMessage.append(Template.apply(feedbackRating, ratingMap)).append(System.getProperty("line.separator"));
             }
 
             //Replace placeholders with answer and the ratings
+            String systemFeedback;
+            if (answer.getSystemResponse() == null || answer.getSystemResponse().equals("")) {
+                systemFeedback = "";
+            } else {
+                systemFeedback = "Additional feedback: " + answer.getSystemResponse() + System.getProperty("line.separator");
+            }
+
             Map<String, String> answerMap = new HashMap<>();
             answerMap.put("answer", answer.getAnswer());
             answerMap.put("ratings", ratingMessage.toString());
+            answerMap.put("systemResponse", systemFeedback);
 
             answerMessage.append(Template.apply(feedbackAnswer, answerMap));
         }

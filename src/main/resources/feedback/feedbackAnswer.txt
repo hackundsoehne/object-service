@@ -1,3 +1,4 @@
 Answer:
 {{answer}}
-{{ratings}}
+
+{{ratings}}{{systemResponse}}
