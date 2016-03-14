@@ -95,11 +95,11 @@ public class Main {
 
         OperationCarrier operationCarrier = new OperationCarrier(config, databaseManager);
 
-        MailSender moneyTransferSender = getMailSender(config.mail.disabled, config.mail.moneytransfer);
-        MailFetcher moneyTransferFetcher = getMailFetcher(config.mail.disabled, config.mail.moneyReceiver);
+        MailSender moneyTransferSender = getMailSender(config.mail.disabled, config.mail.moneytransfer, config.mail.debug);
+        MailFetcher moneyTransferFetcher = getMailFetcher(config.mail.disabled, config.mail.moneyReceiver, config.mail.debug);
         MoneyTransferManager moneyTransfer = initMoneyTransfer(config, operationCarrier, moneyTransferFetcher, moneyTransferSender);
 
-        MailSender notificationSender = getMailSender(config.mail.disabled, config.mail.notifications);
+        MailSender notificationSender = getMailSender(config.mail.disabled, config.mail.notifications, config.mail.debug);
         NotificationController notificationController = initNotificationController(operationCarrier, notificationSender);
 
         PlatformManager platformManager = initPlatformManager(operationCarrier, platforms, moneyTransfer);
@@ -299,7 +299,7 @@ public class Main {
         return config;
     }
 
-    private static MailFetcher getMailFetcher(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailReceiver receiver) {
+    private static MailFetcher getMailFetcher(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailReceiver receiver, boolean debug) {
         if (mailDisabled || receiver == null) {
             return new CommandLineMailHandler();
         }
@@ -307,10 +307,12 @@ public class Main {
                 receiver.auth.credentials.user,
                 receiver.auth.credentials.password,
                 receiver.auth.server,
-                receiver.auth.port);
+                receiver.auth.port,
+                receiver.inbox,
+                debug);
     }
 
-    private static MailSender getMailSender(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailSender sender) {
+    private static MailSender getMailSender(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailSender sender, boolean debug) {
         if (mailDisabled || sender == null) {
             return new CommandLineMailHandler();
         }
@@ -318,6 +320,7 @@ public class Main {
                 sender.auth.credentials.user,
                 sender.auth.credentials.password, "",
                 sender.auth.server,
-                sender.auth.port);
+                sender.auth.port,
+                debug);
     }
 }

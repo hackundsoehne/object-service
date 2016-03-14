@@ -38,7 +38,8 @@ public class MailHandlerTest {
                 config.mail.notifications.auth.credentials.password,
                 config.mail.notifications.from,
                 config.mail.notifications.auth.server,
-                config.mail.notifications.auth.port);
+                config.mail.notifications.auth.port,
+                true);
 
         receiver = config.mail.notifications.from;
 
@@ -47,7 +48,8 @@ public class MailHandlerTest {
                 config.mail.moneyReceiver.auth.credentials.password,
                 config.mail.moneyReceiver.auth.server,
                 config.mail.moneyReceiver.auth.port,
-                config.mail.moneyReceiver.inbox);
+                config.mail.moneyReceiver.inbox,
+                true);
     }
 
     @Test

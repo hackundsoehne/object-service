@@ -30,7 +30,7 @@ public class MailReceiver implements MailFetcher {
      * A Mailhandler object to send and fetch emails.
      *
      */
-    public MailReceiver(Protocol protocol, String user, String password, String host, int port, String defaultInbox) {
+    public MailReceiver(Protocol protocol, String user, String password, String host, int port, String defaultInbox, boolean debug) {
         this.protocol = protocol;
         this.user = user;
         this.password = password;
@@ -39,6 +39,14 @@ public class MailReceiver implements MailFetcher {
         this.defaultInbox = defaultInbox;
 
         props = new Properties();
+
+        //we can always send starttls as this will ask to server if he supports it
+        props.setProperty("mail.imap.starttls.enable", "true");
+        props.setProperty("mail.pop3.starttls.enable", "true");
+
+        if (debug)
+          props.setProperty("mail.debug", true+"");
+
         props.setProperty("mail."+protocol+".ssl.checkserveridentity", "true");
     }
 

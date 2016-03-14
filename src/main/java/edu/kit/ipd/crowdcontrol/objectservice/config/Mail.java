@@ -13,6 +13,8 @@ public class Mail {
      */
     public boolean disabled;
 
+    public boolean debug;
+
     public MailSender notifications, moneytransfer;
 
     public MailReceiver moneyReceiver;
