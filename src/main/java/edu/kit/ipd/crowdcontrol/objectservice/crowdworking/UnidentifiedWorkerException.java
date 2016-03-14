@@ -7,8 +7,4 @@ public class UnidentifiedWorkerException extends RuntimeException {
     public UnidentifiedWorkerException(String message) {
         super(message);
     }
-
-    public UnidentifiedWorkerException() {
-        super("Illegal Request");
-    }
 }

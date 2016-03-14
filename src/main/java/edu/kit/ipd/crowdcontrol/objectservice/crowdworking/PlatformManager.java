@@ -34,8 +34,8 @@ public class PlatformManager {
     private final Map<String, Platform> platforms;
     private final Function<String, WorkerIdentificationComputation> fallbackWorker;
     private final Payment fallbackPayment;
-    private ExperimentsPlatformOperations experimentsPlatformOps;
-    private WorkerOperations workerOps;
+    private final ExperimentsPlatformOperations experimentsPlatformOps;
+    private final WorkerOperations workerOps;
 
     /**
      * Create a new manager for platforms. The known platforms in the database will be deleted,
@@ -72,7 +72,7 @@ public class PlatformManager {
                         platform.isCalibrationAllowed(),
                         isNeedemail(platform),
                         false,
-                        -1
+                        platform.getPayment().orElse(fallbackPayment).getCurrency()
                 ))
                 .collect(Collectors.toList());
 
@@ -156,12 +156,6 @@ public class PlatformManager {
 
             //if not rethrow the exception and update the db
             if (throwable != null) {
-                try {
-                    unpublishTask(name, experiment).join();
-                } catch (PreActionException | CompletionException e) {
-                    LOGGER.error("Platform " + name + " does not provide any useful key and has thrown an " +
-                            "exception when tried to unpublish the task", e);
-                }
                 experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
                         ExperimentsPlatformStatusPlatformStatus.failedPublishing);
 
@@ -170,12 +164,6 @@ public class PlatformManager {
 
             //if there is no useful key throw!
             if (s1 == null) {
-                try {
-                    unpublishTask(name, experiment).join();
-                } catch (PreActionException | CompletionException e) {
-                    LOGGER.error("Platform " + name + " does not provide any useful key and has thrown an " +
-                            "exception when tried to unpublish the task", e);
-                }
                 experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
                         ExperimentsPlatformStatusPlatformStatus.failedPublishing);
                 throw new IllegalStateException("Platform " + name + " does not provide any useful key");
@@ -271,7 +259,7 @@ public class PlatformManager {
 
         if (!given.equals(should)) {
             throw new PreActionException(new IllegalWorkerSetException(
-                    "The list of payment Jobs need to have all workers which worked on this experiment on the given platform"));
+            ));
         }
 
         return getPlatformPayment(name).payExperiment(record.getIdexperimentsPlatforms(), record.getPlatformData(), experiment,paymentJobs);

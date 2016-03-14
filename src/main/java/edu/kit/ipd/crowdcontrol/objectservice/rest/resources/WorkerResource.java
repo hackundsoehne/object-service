@@ -61,8 +61,10 @@ public class WorkerResource {
             }
 
             return WorkerTransformer.toProto(worker);
-        } catch (UnidentifiedWorkerException | PreActionException e) {
+        } catch (UnidentifiedWorkerException e) {
             throw new BadRequestException("Could not identify worker. " + e.getMessage(), e);
+        } catch (PreActionException e) {
+            throw new BadRequestException("Could not identify worker. "+ e.getCause().getMessage());
         }
     }
 

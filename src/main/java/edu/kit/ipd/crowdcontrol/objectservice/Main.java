@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
+import com.google.gson.JsonElement;
 import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
 import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigException;
 import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
@@ -23,6 +24,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager
 import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.SQLEmailNotificationPolicy;
 import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
@@ -205,13 +207,22 @@ public class Main {
                 new SQLEmailNotificationPolicy(mailSender, notificationRestOperations));
         notificationController.init();
 
-        Payment payment = (id, data, experiment, paymentJob) -> {
-            for (PaymentJob job : paymentJob) {
-                mng.addMoneyTransfer(job.getWorkerRecord().getIdWorker(), job.getAmount(), experiment.getId());
+        Payment payment = new Payment() {
+            @Override
+            public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {
+                for (PaymentJob job : paymentJob) {
+                    mng.addMoneyTransfer(job.getWorkerRecord().getIdWorker(), job.getAmount(), experiment.getId());
+                }
+                CompletableFuture<Boolean> future = new CompletableFuture<>();
+                future.complete(Boolean.TRUE);
+                return future;
             }
-            CompletableFuture<Boolean> future = new CompletableFuture<>();
-            future.complete(Boolean.TRUE);
-            return future;
+
+            @Override
+            public int getCurrency() {
+                //EUR
+                return 978;
+            }
         };
 
         PlatformManager platformManager = new PlatformManager(platforms, new FallbackWorker(), payment, experimentsPlatformOperations, platformOperations,

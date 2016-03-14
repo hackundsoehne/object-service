@@ -146,15 +146,14 @@ public class MturkPlatform implements Platform,Payment {
 
     /**
      * Returns the full list of a paginated request
-     * @param startIndex the index to start
      * @param producer execute the statement and returns a patial list of the complete
      * @param <A> Type of the list
      * @return The full list of elements
      * @throws ExecutionException If something bad happens while executing
      * @throws InterruptedException the execution was interrupted
      */
-    public <A> List<A> getFullList(int startIndex, Function<Integer, CompletableFuture<List<A>>> producer) throws ExecutionException, InterruptedException {
-        int i = startIndex;
+    public <A> List<A> getFullList(Function<Integer, CompletableFuture<List<A>>> producer) throws ExecutionException, InterruptedException {
+        int i = 1;
         List<A> part = producer.apply(i).get();
         List<A> complete = new ArrayList<>();
         while(part != null && part.size() != 0) {
@@ -175,11 +174,11 @@ public class MturkPlatform implements Platform,Payment {
         String id = data.getAsJsonObject().get("identification").getAsString();
         try {
             // get all assignments from the project and sort them to the function
-            getFullList(1, index -> new GetAssignments(connection, id, index))
+            getFullList( index -> new GetAssignments(connection, id, index))
                     .forEach(assignment -> workerAssignmentId.put(assignment.getWorkerId(), assignment));
 
             //get all done payments
-            getFullList(1, index -> new GetBonusPayments(connection, id, index))
+            getFullList(index -> new GetBonusPayments(connection, id, index))
                     .forEach(bonusPayment -> {
                         BigDecimal bigDecimal = bonusPayed.get(bonusPayment.getWorkerId());
                         if (bigDecimal != null) {
@@ -201,6 +200,12 @@ public class MturkPlatform implements Platform,Payment {
 
         //do the real paying
         return flushPayment(experiment, paymentJobs, workerAssignmentId, bonusPayed);
+    }
+
+    @Override
+    public int getCurrency() {
+        //USD
+        return 840;
     }
 
     /**

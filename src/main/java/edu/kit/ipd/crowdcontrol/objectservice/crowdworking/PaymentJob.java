@@ -31,7 +31,7 @@ public class PaymentJob {
 
     /**
      * Get the amount to pay
-     * @return
+     * @return the amount to pay in USC (means USD-Cents)
      */
     public int getAmount() {
         return amount;

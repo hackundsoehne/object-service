@@ -24,7 +24,7 @@ public class RejectAssignment extends MturkRestCommand<Boolean, RejectAssignment
         super(connection,"RejectAssignment",null,"2014-08-15",
                 RejectAssignmentResponse.class,
                 () -> {
-                    Map<String, Object> values = new HashMap<String, Object>();
+                    Map<String, Object> values = new HashMap<>();
                     values.put("AssignmentId", assignmentId);
                     values.put("RequesterFeedback", message);
                     return values;
