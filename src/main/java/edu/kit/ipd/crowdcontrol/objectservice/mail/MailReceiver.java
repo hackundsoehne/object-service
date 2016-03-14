@@ -27,7 +27,7 @@ public class MailReceiver implements MailFetcher {
 
 
     /**
-     * A Mailhandler object to send and fetch emails.
+     * An e-mail receiver to fetch emails from a server.
      *
      */
     public MailReceiver(Protocol protocol, String user, String password, String host, int port, String defaultInbox, boolean debug) {
@@ -50,6 +50,9 @@ public class MailReceiver implements MailFetcher {
         props.setProperty("mail."+protocol+".ssl.checkserveridentity", "true");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Message[] fetchUnseen(String name) throws MessagingException {
         Store store = connect();
@@ -73,6 +76,9 @@ public class MailReceiver implements MailFetcher {
         return messages;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Message[] fetchFolder(String name) throws MessagingException {
         Store store = connect();
@@ -90,6 +96,9 @@ public class MailReceiver implements MailFetcher {
         return messages;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void markAsUnseen(Message message) throws MessagingException {
         Folder folder = message.getFolder();
@@ -110,6 +119,9 @@ public class MailReceiver implements MailFetcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteMails(Message message) throws MessagingException {
         Folder folder = message.getFolder();

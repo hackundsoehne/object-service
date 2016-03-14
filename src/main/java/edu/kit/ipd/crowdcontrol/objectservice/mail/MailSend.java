@@ -7,7 +7,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 /**
- * Created by marcel on 14.03.16.
+ * Describes a MailSender, which can send mails to other mail addresses.
+ * @author Felix Rittler
+ * @author Marcel Hollerbach
  */
 public class MailSend implements MailSender {
 
