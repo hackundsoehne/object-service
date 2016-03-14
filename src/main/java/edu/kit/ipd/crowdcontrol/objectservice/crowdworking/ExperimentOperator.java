@@ -1,4 +1,4 @@
-package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
+package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PreActionException;

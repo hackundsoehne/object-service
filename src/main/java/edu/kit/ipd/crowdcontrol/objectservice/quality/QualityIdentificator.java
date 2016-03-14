@@ -12,8 +12,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualit
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityStrategy;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.RatingQualityByDistribution;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.ratingQuality.RatingQualityStrategy;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ExperimentOperator;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.ExperimentResource;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.ExperimentOperator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rx.Observable;

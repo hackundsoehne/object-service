@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.ExperimentOperator;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
