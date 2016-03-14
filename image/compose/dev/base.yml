@@ -17,7 +17,6 @@ services:
       - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
       - -Dworkerservice.url=http://${DOCKERIP}:3333
       - -Dworkeruipublic.url=http://${DOCKERIP}:8080
-      - -Dpybossa.disabled=true
 
   workerservice:
     image: coolcrowd/worker-service:latest
