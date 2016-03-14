@@ -1,12 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
-import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
-
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.mail.search.FlagTerm;
-import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 /**
@@ -14,25 +9,36 @@ import java.util.Properties;
  *
  * @author Felix Rittler
  * @author Niklas Keller
+ * @author Marcel Hollerbach
  */
-public class MailHandler implements MailFetcher, MailSender {
-    private String sender;
+public class MailReceiver implements MailFetcher {
+    public enum Protocol {
+        imap, imaps,
+        pop3, pop3s
+    }
+
+    private final Protocol protocol;
+    private final String user;
+    private final String password;
+    private final String host;
+    private final int port;
     private Properties props;
-    private Authenticator auth;
 
 
     /**
      * A Mailhandler object to send and fetch emails.
      *
-     * @param props properties, that describe the connection to the mailserver
-     * @param auth  an authenticator authenticating the user to connect to the account
-     * @throws AuthenticationFailedException Throws this exception, if there is a problem with the authentication
-     * @throws MessagingException            For other problems e.g. with properties object: unvalid domains, ports not valid etc.
      */
-    public MailHandler(Properties props, Authenticator auth, String sender) throws MessagingException {
-        this.sender = sender;
-        this.props = props;
-        this.auth = auth;
+    public MailReceiver(Protocol protocol, String user, String password, String host, int port) {
+        this.protocol = protocol;
+        this.user = user;
+        this.password = password;
+        this.host = host;
+        this.port = port;
+
+        props = new Properties();
+        props.setProperty("mail.debug", true+"");
+        props.setProperty("mail"+protocol+"ssl.checkserveridentity", "true");
     }
 
     @Override
@@ -73,20 +79,6 @@ public class MailHandler implements MailFetcher, MailSender {
 
         folder.open(Folder.READ_ONLY);
         return messages;
-    }
-
-    @Override
-    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException {
-        Session session = Session.getInstance(props, auth);
-
-        MimeMessage msg = new MimeMessage(session);
-        msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientMail, recipientMail));
-        msg.setFrom(new InternetAddress(sender, "CrowdControl"));
-        msg.setContent(message, "text/html; charset=utf-8");
-        msg.setSubject(subject);
-        msg.setText(message);
-
-        Transport.send(msg);
     }
 
     @Override
@@ -147,9 +139,9 @@ public class MailHandler implements MailFetcher, MailSender {
     }
 
     private Store connect() throws MessagingException {
-        Session session = Session.getInstance(props, auth);
-        Store store = session.getStore();
-        store.connect();
+        Session session = Session.getInstance(props);
+        Store store = session.getStore(protocol.toString());
+        store.connect(host, port, user, password);
         return store;
     }
 }

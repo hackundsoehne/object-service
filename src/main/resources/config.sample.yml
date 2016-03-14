@@ -77,8 +77,34 @@ mail:
     # disabled = true will ignore the mail configuration and print to the command line
     disabled : false
 
-    #specifies the mail address, that gets displayed as sender in moneytransfer mails
-    sendsMailsFrom: pseipd@gmail.com
+    moneytransfer:
+        protocol: smtp
+        from: max.example.com
+        auth:
+            server: smtp.example.com
+            port: 456
+            credentials:
+                user: maxMustermann
+                password: SuperSecret
+
+    notifications:
+        protocol: smtps
+        from: max2.example.com
+        auth:
+            server: smtps.example.com
+            port: 567
+            credentials:
+                user: maxMusterMannSSl
+                password: SuperSecretStuff
+    moneyReceiver:
+        protocol: imaps
+        inbox: INBOX
+        auth:
+            server: imap.example.com
+            port: 996
+            credentials:
+                user: maxUserName
+                password: secretpw
 
 moneytransfer:
     # Minimum amount of money in US cent a worker has to earn before he gets paid off

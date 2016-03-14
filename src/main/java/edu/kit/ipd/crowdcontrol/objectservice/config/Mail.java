@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.config;
 
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSend;
+
 /**
  * Mail variables in the config.
  *
@@ -11,10 +13,7 @@ public class Mail {
      */
     public boolean disabled;
 
-    /**
-     * The mail address, that gets displayed as sender in moneytransfer mails.
-     */
-    public String sendsMailsFrom;
+    public MailSender notifications, moneytransfer;
 
-
+    public MailReceiver moneyReceiver;
 }

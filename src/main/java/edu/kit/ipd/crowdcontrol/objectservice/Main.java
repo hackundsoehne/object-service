@@ -1,10 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
 import com.google.gson.JsonElement;
-import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
-import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigException;
-import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
-import edu.kit.ipd.crowdcontrol.objectservice.config.Credentials;
+import edu.kit.ipd.crowdcontrol.objectservice.config.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
@@ -16,9 +13,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatfo
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.CommandLineMailHandler;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailHandler;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
+import edu.kit.ipd.crowdcontrol.objectservice.mail.MailReceiver;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
@@ -35,9 +31,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.ho.yaml.Yaml;
 import org.jooq.SQLDialect;
 
-import javax.mail.Authenticator;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
 import javax.naming.NamingException;
 import java.io.*;
 import java.sql.SQLException;
@@ -133,12 +127,10 @@ public class Main {
                     config.database.readonly,
                     config.database.maintainInterval,
                     config.deployment.origin,
-                    config.moneytransfer.notificationMailAddress,
                     config.moneytransfer.parsingPassword,
                     config.moneytransfer.scheduleInterval,
                     config.moneytransfer.payOffThreshold,
                     disabledMail,
-                    config.mail.sendsMailsFrom,
                     config.deployment.port
             );
         } catch (NamingException | SQLException e) {
@@ -152,7 +144,7 @@ public class Main {
         }
     }
 
-    private static Config getConfig() throws FileNotFoundException {
+    public static Config getConfig() throws FileNotFoundException {
         InputStream configStream;
         if (System.getProperty("objectservice.config") != null) {
             LOGGER.debug("loading configuration from location: {}", System.getProperty("objectservice.config"));
@@ -179,7 +171,7 @@ public class Main {
         return config;
     }
 
-    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferMailAddress, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold, boolean mailDisabled, String sendMail, int port) throws SQLException, IOException, MessagingException {
+    private static void boot(DatabaseManager databaseManager, List<Platform> platforms, Credentials readOnly, int cleanupInterval, String origin, String moneytransferPassword, int moneytransferScheduleIntervalDays, int moneyTransferPayOffThreshold, boolean mailDisabled, int port) throws SQLException, IOException, MessagingException {
         TemplateOperations templateOperations = new TemplateOperations(databaseManager.getContext());
         NotificationOperations notificationRestOperations = new NotificationOperations(databaseManager, readOnly.user, readOnly.password);
         PlatformOperations platformOperations = new PlatformOperations(databaseManager.getContext());
@@ -196,15 +188,19 @@ public class Main {
         DatabaseMaintainer maintainer = new DatabaseMaintainer(databaseManager.getContext(), cleanupInterval);
         maintainer.start();
 
-        MailFetcher mailFetcher = getMailFetcher(mailDisabled, sendMail);
-        MailSender mailSender = getMailSender(mailDisabled, sendMail);
+        MailFetcher mailFetcher = getMailFetcher(mailDisabled,getConfig().mail != null ? getConfig().mail.moneyReceiver : null);
 
-        MoneyTransferManager mng = new MoneyTransferManager(mailFetcher, mailSender, workerBalanceOperations, workerOperations, moneytransferMailAddress, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
+        String from = "";
+        if (getConfig().mail != null && getConfig().mail.moneytransfer != null)
+            from = getConfig().mail.moneytransfer.from;
+        MailSender mailSenderMoneyTransfer = getMailSender(mailDisabled, getConfig().mail != null ? getConfig().mail.moneytransfer : null);
+        MoneyTransferManager mng = new MoneyTransferManager(mailFetcher, mailSenderMoneyTransfer, workerBalanceOperations, workerOperations, from, moneytransferPassword, moneytransferScheduleIntervalDays, moneyTransferPayOffThreshold);
         mng.start();
 
         // notifications might as well use another sendMail instance
+        MailSender mailSenderNotification = getMailSender(mailDisabled, getConfig().mail != null ? getConfig().mail.notifications : null);
         NotificationController notificationController = new NotificationController(notificationRestOperations,
-                new SQLEmailNotificationPolicy(mailSender, notificationRestOperations));
+                new SQLEmailNotificationPolicy(mailSenderNotification, notificationRestOperations));
         notificationController.init();
 
         Payment payment = new Payment() {
@@ -246,67 +242,25 @@ public class Main {
         ).init();
     }
 
-    private static MailSender getMailSender(boolean mailDisabled, String sendMailAddress) throws MessagingException {
-        if (mailDisabled) {
+    private static MailFetcher getMailFetcher(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailReceiver receiver) throws MessagingException {
+        if (mailDisabled || receiver == null) {
             return new CommandLineMailHandler();
         }
-        return getMailHandler(sendMailAddress);
+        return new MailReceiver(MailReceiver.Protocol.valueOf(receiver.protocol),
+                receiver.auth.credentials.user,
+                receiver.auth.credentials.password,
+                receiver.auth.server,
+                receiver.auth.port);
     }
 
-    private static MailFetcher getMailFetcher(boolean mailDisabled, String sendMailAddress) throws MessagingException {
-        if (mailDisabled) {
+    private static MailSender getMailSender(boolean mailDisabled, edu.kit.ipd.crowdcontrol.objectservice.config.MailSender sender) {
+        if (mailDisabled || sender == null) {
             return new CommandLineMailHandler();
         }
-        return getMailHandler(sendMailAddress);
-    }
-
-    private static MailHandler getMailHandler(String sendMailAddress) throws MessagingException {
-        Properties properties = new Properties();
-        String mailPropertiesPath;
-        if (System.getProperty("objectservice.config.mail") != null) {
-            mailPropertiesPath = System.getProperty("objectservice.config.mail");
-        } else {
-            mailPropertiesPath = "src/main/resources/mailConfig.properties";
-        }
-
-        String sender = sendMailAddress;
-        try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(mailPropertiesPath))) {
-            properties.load(stream);
-        } catch (IOException e) {
-            LOGGER.warn(mailPropertiesPath + " not found, falling back to environment variables for Travis …");
-
-            if (System.getenv("MAIL_USERNAME") == null) {
-                LOGGER.error("MAIL_USERNAME not set …");
-                System.exit(-2);
-            }
-
-            if (System.getenv("MAIL_PASSWORD") == null) {
-                LOGGER.error("MAIL_PASSWORD not set …");
-                System.exit(-2);
-            }
-
-            properties.setProperty("username", System.getenv("MAIL_USERNAME"));
-            properties.setProperty("password", System.getenv("MAIL_PASSWORD"));
-            properties.setProperty("mail.smtp.host", "smtp.gmail.com");
-            properties.setProperty("mail.smtp.auth", "true");
-            properties.setProperty("mail.smtp.starttls.enable", "true");
-            properties.setProperty("mail.smtp.tls", "true");
-            properties.setProperty("mail.smtp.ssl.checkserveridentity", "true");
-            properties.setProperty("mail.store.protocol", "imap");
-            properties.setProperty("mail.imap.host", "imap.gmail.com");
-            properties.setProperty("mail.imap.port", "993");
-            properties.setProperty("mail.imap.ssl", "true");
-            properties.setProperty("mail.imap.ssl.enable", "true");
-            properties.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-
-            sender = System.getenv("MAIL_USERNAME");
-        }
-
-        return new MailHandler(properties, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(properties.getProperty("username"), properties.getProperty("password"));
-            }
-        }, sender);
+        return new MailSend(MailSend.Protocol.valueOf(sender.protocol),
+                sender.auth.credentials.user,
+                sender.auth.credentials.password, "",
+                sender.auth.server,
+                sender.auth.port);
     }
 }
