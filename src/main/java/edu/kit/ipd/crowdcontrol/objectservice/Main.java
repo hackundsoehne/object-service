@@ -59,9 +59,7 @@ public class Main {
             Configurator.setLevel(key, Level.getLevel(value));
         });
 
-        if (config.database.maintainInterval == 0)
-            config.database.maintainInterval = 24;
-        else if (config.database.maintainInterval < 0)
+        if (config.database.maintainInterval < 0)
             throw new ConfigException("negative maintainInterval of database is not valid");
 
         SQLDialect dialect = SQLDialect.valueOf(config.database.dialect);
