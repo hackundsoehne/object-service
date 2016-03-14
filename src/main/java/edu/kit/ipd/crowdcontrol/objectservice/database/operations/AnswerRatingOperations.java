@@ -510,7 +510,14 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .execute();
     }
 
-
+    /**
+     * Inserts hash-value of the specified answer in the db
+     * @param answer the answer
+     * @param hash the answers hash-value1
+     */
+    public void setHashToAnswer(AnswerRecord answer, long hash){
+        //TODO
+    }
 
     /**
      * Returns mapping of duplicate-answers to their corresponding original-answers.
