@@ -105,8 +105,11 @@ public class QualityIdentificator {
             return new AnswerQualityByRatings();
         });
 
-        rateQualityOfRatings(rating, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
-        rateQualityOfAnswers(rating, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating)
+                .orElseThrow(()->new IllegalArgumentException("Error, cant find find answer of given rating of expID: "+rating.getExperimentId()));
+
+        rateQualityOfRatings(answerRecord, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        rateQualityOfAnswers(answerRecord, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
 
         checkExpStatus(exp);
 
@@ -165,13 +168,11 @@ public class QualityIdentificator {
      * Rates and sets quality of all ratings of specified experiment.
      * Ratings to the same answer are grouped and rated together.
      *
-     * @param rating whose ratings' qualities are going to be estimated
+     * @param answerRecord whose ratings' qualities are going to be estimated
      * @param params Mapping of parameter-records to the user specified parameters represented as a string
      */
-    private void rateQualityOfRatings(Rating rating, Map<AlgorithmRatingQualityParamRecord, String> params) {
-            AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating)
-                    .orElseThrow(()->new IllegalArgumentException("Error, cant find find answer of given rating of expID: "+rating.getExperimentId()));
-            List<RatingRecord> records = answerRatingOperations.getRelatedRatings(answerRecord.getIdAnswer());
+    private void rateQualityOfRatings(AnswerRecord answerRecord, Map<AlgorithmRatingQualityParamRecord, String> params) {
+           List<RatingRecord> records = answerRatingOperations.getRelatedRatings(answerRecord.getIdAnswer());
             Map<RatingRecord, Integer> map = ratingIdentifier.identifyRatingQuality(records, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
             answerRatingOperations.setQualityToRatings(map);
     }
@@ -184,14 +185,10 @@ public class QualityIdentificator {
      * and it thus the answer's quality is unlikely to change. In that case the corresponding
      * quality-assured-bit is set in the database.
      *
-     * @param rating the rating wof the answer which is going to be rated
+     * @param answerRecord  which is going to be rated
      * @param params Mapping of parameter-records to the user specified parameters represented as a string
      */
-    private void rateQualityOfAnswers(Rating rating, Map<AlgorithmAnswerQualityParamRecord, String> params) {
-
-        AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating)
-                .orElseThrow(()->new IllegalArgumentException("Error, cant find find answer of given rating of expID: "+rating.getExperimentId()));
-
+    private void rateQualityOfAnswers(AnswerRecord answerRecord, Map<AlgorithmAnswerQualityParamRecord, String> params) {
         Map<String, Integer> result;
         result = answerIdentifier.identifyAnswerQuality(answerRatingOperations, answerRecord, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
         answerRatingOperations.setQualityToAnswer(answerRecord, result.get(AnswerQualityStrategy.QUALITY));
