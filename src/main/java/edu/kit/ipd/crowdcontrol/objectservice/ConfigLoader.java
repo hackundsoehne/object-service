@@ -51,7 +51,7 @@ public class ConfigLoader {
         }
 
         config.platforms = Arrays.stream(config.platforms)
-                .filter(platform -> !Boolean.getBoolean(platform.name + ".disabled"))
+                .filter(platform -> !Boolean.getBoolean(platform.name.toLowerCase() + ".disabled"))
                 .toArray(ConfigPlatform[]::new);
 
         configValidate(config);
