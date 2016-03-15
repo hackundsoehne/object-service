@@ -14,7 +14,6 @@ import org.ho.yaml.Yaml;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -29,7 +28,6 @@ import static org.junit.Assert.assertTrue;
  * @author Simon Korz
  * @version 1.0
  */
-@Ignore
 public class PyBossaPlatformTest {
     private static String workerServiceUrl;
     private static String workerUiUrl;
