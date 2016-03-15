@@ -463,12 +463,13 @@ public class AnswerRatingOperations extends AbstractOperations {
         return create.fetchCount(
                 DSL.selectFrom(ANSWER)
                         .where(ANSWER.EXPERIMENT.eq(idExperiment))
-                        .and(ANSWER.QUALITY_ASSURED.eq(true).and(Tables.ANSWER.QUALITY.greaterThan(
+                        .and(
+                                ANSWER.QUALITY_ASSURED.eq(true).and(Tables.ANSWER.QUALITY.greaterThan(
                                 DSL.select(EXPERIMENT.RESULT_QUALITY_THRESHOLD)
                                         .from(EXPERIMENT)
                                         .where(EXPERIMENT.ID_EXPERIMENT.eq(idExperiment)))
-                        ))
-                        .or(DSL.condition(true))
+                                ).or(DSL.condition(true))
+                        )
         );
     }
 
