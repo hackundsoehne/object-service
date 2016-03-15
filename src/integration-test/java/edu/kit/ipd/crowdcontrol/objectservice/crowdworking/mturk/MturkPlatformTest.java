@@ -4,6 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.GrantBonus;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.NotifyWorker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
@@ -30,6 +32,8 @@ public class MturkPlatformTest {
             .setRatingsPerAnswer(Integer.newBuilder().setValue(5).build())
             .build();
     private MTurkConnection connection;
+    private String workerId;
+
     @Before
     public void setUp() throws Exception {
         Properties properties = new Properties();
@@ -45,6 +49,18 @@ public class MturkPlatformTest {
                 properties.getProperty("User"),
                 properties.getProperty("Password"),
                 "https://mechanicalturk.sandbox.amazonaws.com/");
+
+        workerId = properties.getProperty("workerId");
+    }
+
+    @Test
+    public void testNotify() throws Exception {
+        new NotifyWorker(connection, workerId, "---", "testnotify").join();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGrandBonus() throws Exception {
+        new GrantBonus(connection, "---", workerId, 0.1, "Test Bonus").join();
     }
 
     @Test

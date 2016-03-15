@@ -95,7 +95,6 @@ public class DummyPlatform implements Platform, Payment {
     /**
      * Unpublish the given id from the platform, after this call no worker should be able access the before published experiment.
      *
-     * @param id The id of the before published experiment
      * @return true on success, false or a exception if it failed
      */
     @Override
