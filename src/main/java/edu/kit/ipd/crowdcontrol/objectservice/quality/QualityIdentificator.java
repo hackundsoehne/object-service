@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
@@ -36,9 +37,10 @@ public class QualityIdentificator {
     final static int MINIMUM_QUALITY = 0;
 
     private final Logger log = LogManager.getLogger(QualityIdentificator.class);
-    private final Observable<Event<Rating>> ratingObservable;
+    private final Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
+    private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final ExperimentOperator experimentOperator;
-    private final AnswerRatingOperations answerRatingOperations;
+    private final AnswerRatingOperations answerOperations;
     private final ExperimentOperations experimentOperations;
     private final AlgorithmOperations algorithmOperations;
     private final Set<AnswerQualityStrategy> answerAlgorithms;
@@ -54,9 +56,9 @@ public class QualityIdentificator {
      * Might be set to allow more flexibility and more good answers
      */
 
-    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator operator, EventManager eventManager) {
-
-        this.experimentResource = experimentResource;
+    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator experimentOperator,ExperimentsPlatformOperations experimentsPlatformOperations) {
+        this.experimentsPlatformOperations = experimentsPlatformOperations;
+        this.experimentOperator = experimentOperator;
         this.answerOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.algorithmOperations = algorithmOperations;

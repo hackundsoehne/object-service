@@ -12,6 +12,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Result;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -190,7 +191,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
         create.executeInsert(toInsert);
     }
 
-    /**
+     /**
      * Updates a ExperimentsPlatform.
      * @param platformRecord the update
      * @return whether the update was successful
@@ -281,5 +282,25 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                 ))
                 .fetchSet(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS);
 
+    }
+
+    /**
+     * Updates the status of all platforms of specified experiment to given status
+     * @param experiment the experiment whose platforms will be updated
+     * @param globalPlatformStatus the new platform-status
+     */
+    public void setGlobalPlatformStatus(Experiment experiment,ExperimentsPlatformStatusPlatformStatus globalPlatformStatus){
+        //TODO
+    }
+
+    /**
+     * Retrieves the ExperimentsPlatformStatusRecord of specified experiment which contains information about the
+     * current status of the platforms and the timestamp of the last change
+     * @param experimentID the experiment
+     * @return ExperimentsPlatformStatusRecord, containing information about status and status-change-time
+     */
+    public ExperimentsPlatformStatusRecord getExperimentsPlatformStatusRecord(int experimentID){
+        return null;
+                //TODO
     }
 }
