@@ -53,7 +53,18 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .fetch();
     }
 
-
+    /**
+     * Returns the answers of a worker to a certain experiment
+     * @param expID the id of the experiment
+     * @param workerID the id of the worker
+     * @return list of all answers from a worker to an experiment
+     */
+    public Result<AnswerRecord> getAnswersOfWorkerFromExperiment(int expID, int workerID) {
+        return create.selectFrom(ANSWER)
+                .where(ANSWER.WORKER_ID.eq(workerID))
+                .and(ANSWER.EXPERIMENT.eq(expID))
+                .fetch();
+    }
 
     /**
      * Get all answers of the experiment specified by given ID

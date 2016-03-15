@@ -1,7 +1,9 @@
 package edu.kit.ipd.crowdcontrol.objectservice;
 
 import com.google.gson.JsonElement;
-import edu.kit.ipd.crowdcontrol.objectservice.config.*;
+import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
+import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigException;
+import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
@@ -9,9 +11,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
+import edu.kit.ipd.crowdcontrol.objectservice.feedback.FeedbackCreator;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailReceiver;
-import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.SQLEmailNotificationPolicy;
@@ -27,9 +28,10 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.jooq.SQLDialect;
 
 import javax.naming.NamingException;
-import java.io.*;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -80,12 +82,14 @@ public class Main {
      * @param experimentOperator the operations to use for starting stopping experiments
      */
     private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator) {
+        FeedbackCreator feedbackCreator = new FeedbackCreator(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.workerOperations);
         new QualityIdentificator(
                 operationCarrier.algorithmsOperations,
                 operationCarrier.answerRatingOperations,
                 operationCarrier.experimentOperations, experimentOperator);
 
         new PaymentDispatcher(
+                feedbackCreator,
                 platformManager,
                 operationCarrier.answerRatingOperations,
                 operationCarrier.workerOperations);
@@ -185,10 +189,10 @@ public class Main {
     }
 
     /**
-     * Load Database related stuff and create manager
+     * Load Database related stuff and create manager.
      *
      * @param config config to use
-     * @return
+     * @return initialized database manager
      */
     private static DatabaseManager initDatabase(Config config) {
         SQLDialect dialect = SQLDialect.valueOf(config.database.dialect);
@@ -265,11 +269,13 @@ public class Main {
             platforms.add(platformInstance);
         }
         return platforms;
+
+
     }
 
     /**
      * Get a MailFetcher instance for the passed config
-     * @param mailDisabled if the mail is dissabled
+     * @param mailDisabled if the mail is disabled
      * @param receiver config to use
      * @param debug if you want to debug your connection
      *

@@ -1,0 +1,40 @@
+Dear worker,
+
+here we send you some feedback to the answers you gave, when you worked for us one experiment foobarExperiment:
+
+Answer:
+baz1
+
+Rating:
+
+Feedback: Foobar1
+Quality: 1
+Rating: 1
+
+Rating:
+
+Feedback: Foobar2
+Quality: 2
+Rating: 2
+
+Additional feedback: awes0me Message
+
+Answer:
+baz2
+
+Rating:
+
+Feedback: Foobar3
+Quality: 3
+Rating: 3
+
+Rating:
+
+Feedback: Foobar4
+Quality: 4
+Rating: 4
+
+
+Yours sincerely
+
+The CrowdControl-Team

@@ -96,9 +96,14 @@ gradle-app.setting
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 
+#mail properties
+mailConfig.properties
+
 #integration-test properties
 gmailTest.properties
 webTest.properties
+
+#unit test properties
 
 #mail properties
 mailConfig.properties
