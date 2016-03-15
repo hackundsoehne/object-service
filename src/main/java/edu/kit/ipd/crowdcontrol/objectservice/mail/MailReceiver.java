@@ -31,12 +31,12 @@ public class MailReceiver implements MailFetcher {
 
 
     /**
-     *
-     * @param protocol
-     * @param user
-     * @param password
-     * @param host
-     * @param port
+     * Creates a new mail receiver, which can fetch mails from a mailbox.
+     * @param protocol protocol to receive mails (e.g. imap)
+     * @param user username on the mailserver
+     * @param password password on the mailserver
+     * @param host address of the server host
+     * @param port port, the mail receiver should access the server
      */
     public MailReceiver(Protocol protocol, String user, String password, String host, int port, String defaultInbox, boolean debug) {
         this.protocol = protocol;

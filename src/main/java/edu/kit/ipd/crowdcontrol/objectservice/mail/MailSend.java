@@ -55,6 +55,9 @@ public class MailSend implements MailSender {
         properties.setProperty("mail." + protocol + ".ssl.checkserveridentity", "true");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException {
         Session session = Session.getInstance(properties, new Authenticator() {
