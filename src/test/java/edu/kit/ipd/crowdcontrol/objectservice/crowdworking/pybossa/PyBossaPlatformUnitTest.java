@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
 import com.google.gson.JsonElement;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.UnidentifiedWorkerException;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentificationComputation;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +59,8 @@ public class PyBossaPlatformUnitTest {
     private static PyBossaPlatform pybossa = new PyBossaPlatform(WORKER_SERVICE_URL, WORKER_UI_URL, API_KEY, API_URL, NAME,
             String.valueOf(PROJECT_ID), true);
 
+    Optional<WorkerIdentificationComputation> workerIdentification;
+
     @Before
     public void setUp() throws Exception {
         messageDigest = MessageDigest.getInstance("SHA-256");
@@ -67,15 +71,14 @@ public class PyBossaPlatformUnitTest {
         when(requests.existsUrl(anyString())).thenReturn(true);
         when(requests.getProject()).thenReturn(new JSONObject().put("short_name", "test"));
         pybossa.init();
+        workerIdentification = pybossa.getWorker();
     }
 
     @Test
     public void testGetWorker() throws Exception {
-        Optional<WorkerIdentificationComputation> workerIdentification = pybossa.getWorker();
-
         String code = "super code";
         String hashedEncodedCode = Base64.getUrlEncoder().encodeToString(messageDigest.digest(code.getBytes()));
-        // create a tusk run with the hashed code
+        // create a task run with the hashed code
         JSONArray taskRun = new JSONArray().put(new JSONObject()
                 .put("id", 2)
                 .put("user_id", WORKER_ID)
@@ -93,6 +96,59 @@ public class PyBossaPlatformUnitTest {
 
         assertEquals(WORKER_ID, verifiedWorkerId.getAsString());
     }
+
+    @Test(expected = UnidentifiedWorkerException.class)
+    public void testWrongParams() throws Exception {
+        String code = "Jd24nw32";
+        String hashedEncodedCode = Base64.getUrlEncoder().encodeToString(messageDigest.digest(code.getBytes()));
+        // create a task run with the hashed code
+        JSONArray taskRun = new JSONArray().put(new JSONObject()
+                .put("id", 2)
+                .put("user_id", WORKER_ID)
+                .put("info", new JSONObject()
+                        .put("code", hashedEncodedCode)));
+        when(requests.getTaskRuns(idTask, WORKER_ID)).thenReturn(taskRun);
+        // simulate params that would be passed by the worker-ui
+        HashMap<String, String[]> params = new HashMap<>();
+        params.put("idTask", new String[]{idTask});
+        params.put("workerId", new String[]{WORKER_ID});
+        params.put("code", new String[]{"basdk145"});
+
+        workerIdentification.get().getWorker(params).getWorkerData();
+    }
+
+    @Test(expected = UnidentifiedWorkerException.class)
+    public void testIncompleteParams() throws Exception {
+        HashMap<String, String[]> params = new HashMap<>();
+        params.put("idTask", new String[]{idTask});
+        params.put("workerId", new String[]{WORKER_ID});
+        workerIdentification.get().getWorker(params).getWorkerData();
+    }
+
+    @Test(expected = UnidentifiedWorkerException.class)
+    public void testNullParams() throws Exception {
+        workerIdentification.get().getWorker(null).getWorkerData();
+    }
+
+    @Test(expected = UnidentifiedWorkerException.class)
+    public void testNoTaskRun() throws Exception {
+        String code = "super code";
+        when(requests.getTaskRuns(idTask, WORKER_ID)).thenReturn(new JSONArray());
+        // simulate params that would be passed by the worker-ui
+        HashMap<String, String[]> params = new HashMap<>();
+        params.put("idTask", new String[]{idTask});
+        params.put("workerId", new String[]{WORKER_ID});
+        params.put("code", new String[]{code});
+
+        workerIdentification.get().getWorker(params).getWorkerData();
+    }
+
+    @Test
+    public void testPublishTask() throws Exception {
+        when(requests.postTask(any())).thenReturn(5);
+        assertEquals("5", pybossa.publishTask(experiment).get());
+    }
+
 
     private static JSONArray getAllTasksDummy(int idTaskCount, int experimentTaskCount) {
         JSONArray tasks = new JSONArray();
