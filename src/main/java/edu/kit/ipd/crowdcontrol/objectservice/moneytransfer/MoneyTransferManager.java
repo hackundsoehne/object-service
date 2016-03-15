@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
-import edu.kit.ipd.crowdcontrol.objectservice.config.MoneyTransfer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
