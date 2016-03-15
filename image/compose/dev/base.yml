@@ -30,6 +30,7 @@ services:
       - -Ddatabase.username=root
       - -Ddatabase.password=root
       - -Dos.url=http://objectservice:4567
+      - -Dlogback.configurationFile=/conf/logging_trace.xml
 
   workerui:
       image: coolcrowd/worker-ui:latest
