@@ -56,13 +56,13 @@ public  final class Experiment extends
             break;
           }
           case 18: {
-            java.lang.String s = input.readStringRequireUtf8();
+            String s = input.readStringRequireUtf8();
 
             title_ = s;
             break;
           }
           case 26: {
-            java.lang.String s = input.readStringRequireUtf8();
+            String s = input.readStringRequireUtf8();
 
             description_ = s;
             break;
@@ -495,6 +495,15 @@ public  final class Experiment extends
      */
     edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationOrBuilder getCalibrationsOrBuilder(
         int index);
+
+    /**
+     * <code>optional .crowdcontrol.Experiment.Population.Task task = 3;</code>
+     */
+    int getTaskValue();
+    /**
+     * <code>optional .crowdcontrol.Experiment.Population.Task task = 3;</code>
+     */
+    edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task getTask();
   }
   /**
    * Protobuf type {@code crowdcontrol.Experiment.Population}
@@ -510,6 +519,7 @@ public  final class Experiment extends
     private Population() {
       platformId_ = "";
       calibrations_ = java.util.Collections.emptyList();
+      task_ = 0;
     }
 
     @java.lang.Override
@@ -537,7 +547,7 @@ public  final class Experiment extends
               break;
             }
             case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
+              String s = input.readStringRequireUtf8();
 
               platformId_ = s;
               break;
@@ -548,6 +558,12 @@ public  final class Experiment extends
                 mutable_bitField0_ |= 0x00000002;
               }
               calibrations_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration.parser(), extensionRegistry));
+              break;
+            }
+            case 24: {
+              int rawValue = input.readEnum();
+
+              task_ = rawValue;
               break;
             }
           }
@@ -575,6 +591,116 @@ public  final class Experiment extends
       return edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentOuterClass.internal_static_crowdcontrol_Experiment_Population_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.class, edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Builder.class);
+    }
+
+    /**
+     * Protobuf enum {@code crowdcontrol.Experiment.Population.Task}
+     */
+    public enum Task
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>INVALID = 0;</code>
+       */
+      INVALID(0, 0),
+      /**
+       * <code>BOTH = 1;</code>
+       */
+      BOTH(1, 1),
+      /**
+       * <code>ANSWER = 2;</code>
+       */
+      ANSWER(2, 2),
+      /**
+       * <code>RATING = 3;</code>
+       */
+      RATING(3, 3),
+      UNRECOGNIZED(-1, -1),
+      ;
+
+      /**
+       * <code>INVALID = 0;</code>
+       */
+      public static final int INVALID_VALUE = 0;
+      /**
+       * <code>BOTH = 1;</code>
+       */
+      public static final int BOTH_VALUE = 1;
+      /**
+       * <code>ANSWER = 2;</code>
+       */
+      public static final int ANSWER_VALUE = 2;
+      /**
+       * <code>RATING = 3;</code>
+       */
+      public static final int RATING_VALUE = 3;
+
+
+      public final int getNumber() {
+        if (index == -1) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      public static Task valueOf(int value) {
+        switch (value) {
+          case 0: return INVALID;
+          case 1: return BOTH;
+          case 2: return ANSWER;
+          case 3: return RATING;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Task>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          Task> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Task>() {
+              public Task findValueByNumber(int number) {
+                return Task.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Task[] VALUES = values();
+
+      public static Task valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private Task(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:crowdcontrol.Experiment.Population.Task)
     }
 
     private int bitField0_;
@@ -647,6 +773,22 @@ public  final class Experiment extends
       return calibrations_.get(index);
     }
 
+    public static final int TASK_FIELD_NUMBER = 3;
+    private int task_;
+    /**
+     * <code>optional .crowdcontrol.Experiment.Population.Task task = 3;</code>
+     */
+    public int getTaskValue() {
+      return task_;
+    }
+    /**
+     * <code>optional .crowdcontrol.Experiment.Population.Task task = 3;</code>
+     */
+    public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task getTask() {
+      edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task result = edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task.valueOf(task_);
+      return result == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -665,6 +807,9 @@ public  final class Experiment extends
       for (int i = 0; i < calibrations_.size(); i++) {
         output.writeMessage(2, calibrations_.get(i));
       }
+      if (task_ != edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task.INVALID.getNumber()) {
+        output.writeEnum(3, task_);
+      }
     }
 
     public int getSerializedSize() {
@@ -678,6 +823,10 @@ public  final class Experiment extends
       for (int i = 0; i < calibrations_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, calibrations_.get(i));
+      }
+      if (task_ != edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task.INVALID.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(3, task_);
       }
       memoizedSize = size;
       return size;
@@ -799,6 +948,8 @@ public  final class Experiment extends
         } else {
           calibrationsBuilder_.clear();
         }
+        task_ = 0;
+
         return this;
       }
 
@@ -833,6 +984,7 @@ public  final class Experiment extends
         } else {
           result.calibrations_ = calibrationsBuilder_.build();
         }
+        result.task_ = task_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -878,6 +1030,9 @@ public  final class Experiment extends
               calibrationsBuilder_.addAllMessages(other.calibrations_);
             }
           }
+        }
+        if (other.task_ != 0) {
+          setTaskValue(other.getTaskValue());
         }
         onChanged();
         return this;
@@ -1214,6 +1369,50 @@ public  final class Experiment extends
         }
         return calibrationsBuilder_;
       }
+
+      private int task_ = 0;
+      /**
+       * <code>optional .crowdcontrol.Experiment.Population.Task task = 3;</code>
+       */
+      public int getTaskValue() {
+        return task_;
+      }
+      /**
+       * <code>optional .crowdcontrol.Experiment.Population.Task task = 3;</code>
+       */
+      public Builder setTaskValue(int value) {
+        task_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .crowdcontrol.Experiment.Population.Task task = 3;</code>
+       */
+      public edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task getTask() {
+        edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task result = edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task.valueOf(task_);
+        return result == null ? edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>optional .crowdcontrol.Experiment.Population.Task task = 3;</code>
+       */
+      public Builder setTask(edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment.Population.Task value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        task_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .crowdcontrol.Experiment.Population.Task task = 3;</code>
+       */
+      public Builder clearTask() {
+        
+        task_ = 0;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -1332,7 +1531,7 @@ public  final class Experiment extends
               break;
             }
             case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
+              String s = input.readStringRequireUtf8();
 
               name_ = s;
               break;
