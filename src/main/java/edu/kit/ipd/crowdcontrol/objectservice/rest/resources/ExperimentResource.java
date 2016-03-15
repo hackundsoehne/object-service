@@ -3,22 +3,20 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.ExperimentOperator;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PreActionException;
+import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
+import edu.kit.ipd.crowdcontrol.objectservice.database.PopulationsHelper;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
-import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstraintTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Calibration;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
-import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.apache.logging.log4j.LogManager;
@@ -29,8 +27,6 @@ import spark.Response;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
@@ -42,6 +38,7 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
  * @author Marcel Hollerbach
  */
 public class ExperimentResource {
+    private static final Logger log = LogManager.getLogger("ExperimentResource");
     private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final CalibrationOperations calibrationOperations;
@@ -50,11 +47,12 @@ public class ExperimentResource {
     private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final PlatformManager platformManager;
     private final ExperimentOperator experimentOperator;
-    private static final Logger log = LogManager.getLogger("ExperimentResource");
+    private final ExperimentFetcher experimentFetcher;
+    private final PopulationsHelper populationsHelper;
 
     public ExperimentResource(AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
                               TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmsOperations,
-                              ExperimentsPlatformOperations experimentsPlatformOperations, PlatformManager platformManager, ExperimentOperator experimentOperator) {
+                              ExperimentsPlatformOperations experimentsPlatformOperations, PlatformManager platformManager, ExperimentOperator experimentOperator, ExperimentFetcher experimentFetcher, PopulationsHelper populationsHelper) {
         this.experimentOperator = experimentOperator;
         this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
@@ -63,7 +61,9 @@ public class ExperimentResource {
         this.algorithmsOperations = algorithmsOperations;
         this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.platformManager = platformManager;
+        this.experimentFetcher = experimentFetcher;
 
+        this.populationsHelper = populationsHelper;
     }
 
     /**
@@ -92,7 +92,7 @@ public class ExperimentResource {
 
         // TODO: (low priority) Optimize fetchExperiment for multiple experiments
         return experimentOperations.getExperimentsFrom(from, asc, 20)
-                .map(experimentRecord -> fetchExperiment(experimentRecord.getIdExperiment()))
+                .map(experimentRecord -> experimentFetcher.fetchExperiment(experimentRecord.getIdExperiment()))
                 .constructPaginated(ExperimentList.newBuilder(), ExperimentList.Builder::addAllItems);
     }
 
@@ -138,7 +138,7 @@ public class ExperimentResource {
 
         experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
 
-        storePopulations(id, experiment.getPopulationsList());
+        populationsHelper.storePopulations(id, experiment.getPopulationsList());
 
         experiment.getAlgorithmTaskChooser()
                 .getParametersList().forEach(param ->
@@ -153,7 +153,7 @@ public class ExperimentResource {
                 .getParametersList().forEach(param ->
                 algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue())
         );
-        Experiment exp = fetchExperiment(id);
+        Experiment exp = experimentFetcher.fetchExperiment(id);
 
         response.status(201);
         response.header("Location", "/experiments/" + id);
@@ -161,75 +161,6 @@ public class ExperimentResource {
         EventManager.EXPERIMENT_CREATE.emit(exp);
 
         return exp;
-    }
-
-    private void storePopulations(int experimentId, List<Experiment.Population> populations) {
-        if (populations.isEmpty())
-            return;
-
-        List<Experiment.Population> toStore = populations.stream()
-                .filter(population -> !population.getPlatformId().isEmpty())
-                .collect(Collectors.toList());
-
-        List<String> platformsToStore = toStore.stream()
-                .map(Experiment.Population::getPlatformId)
-                .collect(Collectors.toList());
-        experimentOperations.storeExperimentsPlatforms(platformsToStore, experimentId);
-
-        BiConsumer<String, List<Calibration>> storeCalibrations = (platform, calibrations) -> {
-            List<Integer> answerIDs = calibrations.stream()
-                    .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
-                    .map(Calibration.Answer::getId)
-                    .collect(Collectors.toList());
-
-            calibrationOperations.storeExperimentCalibrations(platform, answerIDs, experimentId);
-        };
-
-        toStore.forEach(population ->
-                storeCalibrations.accept(population.getPlatformId(), population.getCalibrationsList()));
-    }
-
-    private void insertPopulation(int experimentID, Experiment.Population population, ExperimentsPlatformModeMode mode) {
-        experimentsPlatformOperations.insertPlatform(population.getPlatformId(), experimentID, mode);
-
-        List<Integer> answerIDs = population.getCalibrationsList().stream()
-                .flatMap(calibration -> calibration.getAcceptedAnswersList().stream())
-                .map(Calibration.Answer::getId)
-                .collect(Collectors.toList());
-
-        calibrationOperations.storeExperimentCalibrations(population.getPlatformId(), answerIDs, experimentID);
-    }
-
-    private Experiment fetchExperiment(int id) {
-        ExperimentRecord experimentRecord = getOrThrow(experimentOperations.getExperiment(id));
-        Experiment.State state = experimentOperations.getExperimentState(id);
-        List<RatingOptionExperimentRecord> ratingOptions = experimentOperations.getRatingOptions(id);
-        List<TagRecord> tagRecords = tagConstraintsOperations.getTags(id);
-        List<ConstraintRecord> constraintRecords = tagConstraintsOperations.getConstraints(id);
-        List<Experiment.Population> populations = getPopulations(id);
-        AlgorithmOption taskChooser = algorithmsOperations.getTaskChooser(experimentRecord.getAlgorithmTaskChooser())
-                .map(record -> AlgorithmsTransformer.toTaskChooserProto(record, algorithmsOperations.getTaskChooserParams(
-                        experimentRecord.getAlgorithmTaskChooser(), experimentRecord.getIdExperiment())))
-                .orElse(null);
-        AlgorithmOption answerQuality = algorithmsOperations.getAnswerQualityRecord(experimentRecord.getAlgorithmQualityAnswer())
-                .map(record -> AlgorithmsTransformer.toAnswerQualityProto(record, algorithmsOperations.getAnswerQualityParams(
-                        experimentRecord.getAlgorithmQualityAnswer(), experimentRecord.getIdExperiment())))
-                .orElse(null);
-
-        AlgorithmOption ratingQuality = algorithmsOperations.getRatingQualityRecord(experimentRecord.getAlgorithmQualityRating())
-                .map(record -> AlgorithmsTransformer.toRatingQualityProto(record, algorithmsOperations.getRatingQualityParams(
-                        experimentRecord.getAlgorithmQualityRating(), experimentRecord.getIdExperiment())))
-                .orElse(null);
-
-        return ExperimentTransformer.toProto(experimentRecord,
-                state,
-                constraintRecords,
-                populations,
-                tagRecords,
-                ratingOptions,
-                taskChooser,
-                answerQuality,
-                ratingQuality);
     }
 
     /**
@@ -242,68 +173,7 @@ public class ExperimentResource {
     public Experiment get(Request request, Response response) {
         int id = getParamInt(request, "id");
 
-        return fetchExperiment(id);
-    }
-
-    /**
-     * Will take the id of an experiment and return the platform tree with
-     * all published platforms with the according calibrations
-     *
-     * @param id the id of the experiment
-     * @return returns a list of populations with a platform
-     */
-    private List<Experiment.Population> getPopulations(int id) {
-        Function<ExperimentsCalibrationRecord, Calibration.Builder> toCalibration = record -> {
-            CalibrationAnswerOptionRecord acceptedAnswer = calibrationOperations.getCalibrationAnswerOption(record.getAnswer())
-                    .orElseThrow(() -> new InternalServerErrorException(String.format("CalibrationAnswerOption: %s not found", record.getAnswer())));
-
-            Calibration.Answer answer = Calibration.Answer.newBuilder()
-                    .setAnswer(acceptedAnswer.getAnswer())
-                    .setId(acceptedAnswer.getIdCalibrationAnswerOption())
-                    .build();
-
-            return calibrationOperations.getCalibration(acceptedAnswer.getCalibration())
-                    .map(calibration -> calibration.toBuilder().addAcceptedAnswers(answer))
-                    .orElseThrow(() -> new InternalServerErrorException(String.format("Calibration: %d not found", acceptedAnswer.getCalibration())));
-        };
-
-        Function<Map.Entry<String, List<Calibration.Builder>>, Experiment.Population> toPopulation = entry -> {
-            //normalize, multiple chosen answers from the same Calibration were multiple objects
-            List<Calibration> calibrations = entry.getValue().stream()
-                    .collect(Collectors.groupingBy(
-                            Calibration.Builder::getId,
-                            Collectors.toList())
-                    ).values().stream()
-                    .map(list -> list.stream().reduce((o1, o2) -> o1.addAllAcceptedAnswers(o2.getAcceptedAnswersList())))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .map(Calibration.Builder::build)
-                    .collect(Collectors.toList());
-
-            return Experiment.Population.newBuilder()
-                    .setPlatformId(entry.getKey())
-                    .addAllCalibrations(calibrations)
-                    .build();
-        };
-
-
-        Map<String, List<Calibration.Builder>> populations = experimentOperations.getCalibrations(id).entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> entry.getKey().getPlatform(),
-                        entry -> entry.getValue().stream().map(toCalibration).collect(Collectors.toList())
-                ));
-
-        experimentOperations.getActivePlatforms(id)
-                .forEach(platform -> {
-                    if (!populations.containsKey(platform)) {
-                        populations.put(platform, Collections.emptyList());
-                    }
-                });
-
-        return populations
-                .entrySet().stream()
-                .map(toPopulation)
-                .collect(Collectors.toList());
+        return experimentFetcher.fetchExperiment(id);
     }
 
     /**
@@ -316,7 +186,7 @@ public class ExperimentResource {
     public Experiment patch(Request request, Response response) {
         int id = getParamInt(request, "id");
         Experiment experiment = request.attribute("input");
-        Experiment old = fetchExperiment(id);
+        Experiment old = experimentFetcher.fetchExperiment(id);
         ExperimentRecord original = getOrThrow(experimentOperations.getExperiment(id));
         Experiment resulting;
 
@@ -360,7 +230,7 @@ public class ExperimentResource {
                 .map(population -> {
                     try {
                         //insert the population into the databae
-                        insertPopulation(id, population, ExperimentsPlatformModeMode.normal);
+                        populationsHelper.insertPopulation(id, population, ExperimentsPlatformModeMode.normal);
 
                         PlatformPopulation platformPopulation = new PlatformPopulation();
                         platformPopulation.job = platformManager.publishTask(population.getPlatformId(), old);
@@ -396,7 +266,7 @@ public class ExperimentResource {
 
         });*/
 
-        return fetchExperiment(id);
+        return experimentFetcher.fetchExperiment(id);
     }
 
     /**
@@ -409,8 +279,6 @@ public class ExperimentResource {
      * @return the resulting experiment
      */
     private Experiment updateExperimentInfoDraftState(int id, Experiment experiment, Experiment old, ExperimentRecord oldRecord) {
-        Experiment resulting;
-
         if (!old.getState().equals(Experiment.State.DRAFT)) {
             throw new IllegalStateException("When an experiment is running, only the state is allowed to be changed.");
         }
@@ -458,7 +326,7 @@ public class ExperimentResource {
                     .forEach(tagConstraintsOperations::insertConstraint);
         }
 
-        storePopulations(id, experiment.getPopulationsList());
+        populationsHelper.storePopulations(id, experiment.getPopulationsList());
 
         if (!Objects.equals(old.getAlgorithmTaskChooser().getName(), experimentRecord.getAlgorithmTaskChooser())) {
             algorithmsOperations.deleteChosenTaskChooserParams(id);
@@ -485,8 +353,7 @@ public class ExperimentResource {
         //update the experiment itself
         experimentOperations.updateExperiment(experimentRecord);
 
-        resulting = fetchExperiment(id);
-        return resulting;
+        return experimentFetcher.fetchExperiment(id);
     }
 
     /**
@@ -498,8 +365,6 @@ public class ExperimentResource {
      * @return the resulting experiment with the new data
      */
     private Experiment updateExperimentState(int id, Experiment experiment, Experiment old) {
-        Experiment resulting;
-
         //validate the only two possible changes
         if (!experiment.getState().equals(Experiment.State.PUBLISHED)
                 && !experiment.getState().equals(Experiment.State.CREATIVE_STOPPED))
@@ -550,8 +415,7 @@ public class ExperimentResource {
             }
         }
 
-        resulting = fetchExperiment(id);
-        return resulting;
+        return experimentFetcher.fetchExperiment(id);
     }
 
     /**
@@ -563,7 +427,7 @@ public class ExperimentResource {
      */
     public Experiment delete(Request request, Response response) {
         int id = getParamInt(request, "id");
-        Experiment experiment = fetchExperiment(id);
+        Experiment experiment = experimentFetcher.fetchExperiment(id);
 
         try {
             if (!experimentOperations.deleteExperiment(id)) {
