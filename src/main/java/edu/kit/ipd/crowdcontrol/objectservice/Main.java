@@ -11,6 +11,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
+import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
+import edu.kit.ipd.crowdcontrol.objectservice.database.PopulationsHelper;
 import edu.kit.ipd.crowdcontrol.objectservice.feedback.FeedbackCreator;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
@@ -70,9 +72,11 @@ public class Main {
         PlatformManager platformManager = initPlatformManager(operationCarrier, platforms, moneyTransfer);
 
         ExperimentOperator experimentOperator = new ExperimentOperator(platformManager);
+        ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
+        PopulationsHelper populationsHelper = new PopulationsHelper(operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
         initEventHandler(operationCarrier, platformManager, experimentOperator);
-        initRouter(config, operationCarrier, platformManager, experimentOperator);
+        initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper);
     }
 
     /**
@@ -101,8 +105,10 @@ public class Main {
      * @param operationCarrier database operations to use
      * @param platformManager the platforManager to run the platformoperations on
      * @param experimentOperator experimentOperations to use
+     * @param experimentFetcher
+     * @param populationsHelper
      */
-    private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator) {
+    private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, ExperimentFetcher experimentFetcher, PopulationsHelper populationsHelper) {
         new Router(
                 new TemplateResource(operationCarrier.templateOperations),
                 new NotificationResource(operationCarrier.notificationRestOperations),
