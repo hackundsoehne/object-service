@@ -12,6 +12,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
 import org.ho.yaml.Yaml;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -103,6 +104,22 @@ public class PyBossaPlatformTest {
         CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(new JsonPrimitive(taskId));
         assertTrue(booleanCompletableFuture.get());
     }
+
+    @Test
+    public void testSetTaskPresenter() throws Exception {
+        String html = "<html></html>";
+        requests.setTaskPresenter(html);
+        JSONObject project = requests.getProject();
+
+        assertEquals(project.getJSONObject("info").getString("task_presenter"), html);
+    }
+
+    @Test
+    public void testUpdateTask() throws Exception {
+        requests.postTask(new JSONObject())
+    }
+
+
 
     private static void deleteAllTasks(String TASK_URL, String apiKey, int projectId) {
         JSONArray tasks = requests.getAllTasks();

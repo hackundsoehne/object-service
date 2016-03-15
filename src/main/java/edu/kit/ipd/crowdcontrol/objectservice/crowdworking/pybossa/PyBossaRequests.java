@@ -169,31 +169,6 @@ public class PyBossaRequests {
         return new JSONArray();
     }
 
-    private void deleteAllTaskRunsForTask(String task) {
-        HttpResponse<JsonNode> response;
-        try {
-            response = Unirest.get(apiUrl + "/taskrun")
-                    .queryString("api_key", apiKey)
-                    .queryString("task_id", task)
-
-                    .asJson();
-        } catch (UnirestException e) {
-            throw new PyBossaRequestException(e);
-        }
-        JSONArray taskRuns = response.getBody().getArray();
-
-        for (int i = 0; i < taskRuns.length() - 1; i++) {
-            try {
-                Unirest.delete(apiUrl + "/taskrun/{id}")
-                        .queryString("api_key", apiKey)
-                        .routeParam("id", Integer.toString(taskRuns.getJSONObject(i).getInt("id")))
-                        .asJson();
-            } catch (UnirestException e) {
-                throw new PyBossaRequestException(e);
-            }
-        }
-    }
-
     public void deleteTaskRun(int taskRunId) {
         deleteTaskRun(String.valueOf(taskRunId));
     }
