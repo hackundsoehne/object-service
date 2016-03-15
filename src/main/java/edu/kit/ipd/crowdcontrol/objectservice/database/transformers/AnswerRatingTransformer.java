@@ -57,7 +57,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
         AnswerRecord answerRecord = new AnswerRecord();
         answerRecord.setTimestamp(Timestamp.from(Instant.now()));
         answerRecord.setExperiment(experimentId);
-
+        answerRecord.setIdAnswer(answer.getId());
         return merge(answerRecord, answer, (field, record) -> {
             switch (field) {
                 case Answer.CONTENT_FIELD_NUMBER:
