@@ -260,7 +260,9 @@ public class PyBossaPlatform implements Platform {
                 .put("project_id", projectID)
                 .put("priority_0", 0)
                 .put("info", new JSONObject()
-                        .put("type", "idTask"));
+                        .put("type", "idTask"))
+                //max int
+                .put("n_answers", 2147483647);
         return requests.postTask(jsonTask);
     }
 }
