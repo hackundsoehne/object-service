@@ -10,6 +10,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -72,10 +74,6 @@ public class ExperimentOperator {
         }
     }
 
-    private void recoverExperimentShutdown(int experimentID){
-        Experiment experiment = experimentFetcher.fetchExperiment(experimentID);
-        ExperimentsPlatformStatusRecord experimentsPlatformStatusRecord = experimentsPlatformOperations.getExperimentsPlatformStatusRecord(experimentID);
-    }
 
     /**
      * End a given experiment
@@ -84,7 +82,7 @@ public class ExperimentOperator {
 
      */
     public void endExperiment(Experiment experiment) {
-        boolean isRunning = true;
+        boolean isRunning = false;
         boolean isShuttingDown = false;
 
         for( ExperimentsPlatformStatusPlatformStatus status :experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId())){
@@ -95,25 +93,6 @@ public class ExperimentOperator {
             }
         }
         if(isRunning  && !isShuttingDown) {
-            experimentsPlatformOperations.setGlobalPlatformStatus(experiment, ExperimentsPlatformStatusPlatformStatus.shutdown);
-            ShutdownRunner runner = new ShutdownRunner(experiment);
-            runner.run();
-        }else{
-            log.info("Experiment "+experiment.getId()+" is already shutting down");
-        }
-    }
-
-
-
-    private class ShutdownRunner extends Thread{
-        private Experiment experiment;
-        private int minutesToShutdown = 120;
-
-        public ShutdownRunner(Experiment experiment){
-            this.experiment = experiment;
-        }
-
-        public void run(){
 
             for (Experiment.Population population :
                     experiment.getPopulationsList()) {
@@ -124,6 +103,48 @@ public class ExperimentOperator {
                 }
             }
 
+            experimentsPlatformOperations.setGlobalPlatformStatus(experiment, ExperimentsPlatformStatusPlatformStatus.shutdown);
+            ShutdownRunner runner = new ShutdownRunner(experiment);
+            runner.run();
+        }else if(!isRunning){
+            log.info("Experiment "+experiment.getId()+" is not running ");
+        }else {
+            log.info("Experiment "+experiment.getId()+" is already shutting down");
+
+        }
+    }
+
+    private void recoverExperimentShutdown(int experimentID){
+        Experiment experiment = experimentFetcher.fetchExperiment(experimentID);
+        ExperimentsPlatformStatusRecord experimentsPlatformStatusRecord = experimentsPlatformOperations.getExperimentsPlatformStatusRecord(experimentID);
+        long passedTime = Timestamp.valueOf(LocalDateTime.now()).getTime()-experimentsPlatformStatusRecord.getTimestamp().getTime();
+        long passedMins = TimeUnit.MILLISECONDS.toMinutes(passedTime);
+
+        ShutdownRunner runner = new ShutdownRunner(experiment);
+        if(passedMins >= 120){
+            runner.runRemaining(1);
+        }else {
+            runner.runRemaining(120 - (int)passedMins);
+        }
+
+    }
+
+
+    /**
+     * Private class for non-blocking shutdown-process
+     */
+    private class ShutdownRunner extends Thread{
+        private Experiment experiment;
+        private int minutesToShutdown = 120;
+
+        public ShutdownRunner(Experiment experiment){
+            this.experiment = experiment;
+        }
+
+        /**
+         * Waits a specified amount of time until stopping the experiment and setting its state accordingly
+         */
+        public void run(){
             try {
                 TimeUnit.MINUTES.sleep(minutesToShutdown);
             } catch (InterruptedException e) {
@@ -132,7 +153,12 @@ public class ExperimentOperator {
             experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.stopped);
             EventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
         }
-
-        eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experiment.toBuilder().setState(Experiment.State.STOPPED).build()));
+        /**
+        * Waits the remaining time of the shutdown process until stopping the experiment and setting its state accordingly
+        */
+         public void runRemaining(int minutesToShutdown){ //Used by a recover-method
+            this.minutesToShutdown = minutesToShutdown;
+            run();
+        }
     }
 }

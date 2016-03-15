@@ -157,7 +157,7 @@ public class QualityIdentificator {
      */
     private void checkExpStatus(ExperimentRecord experiment) {
         if (experiment.getNeededAnswers() <= answerOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())){
-            boolean isRunning = true;
+            boolean isRunning = false;
             boolean isShuttingDown = false;
 
             for( ExperimentsPlatformStatusPlatformStatus status :experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment())){

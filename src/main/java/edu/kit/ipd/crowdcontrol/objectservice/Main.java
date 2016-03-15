@@ -78,6 +78,9 @@ public class Main {
         ExperimentOperator experimentOperator = new ExperimentOperator(platformManager, eventManager);
         ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.experimentsPlatformOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
         PopulationsHelper populationsHelper = new PopulationsHelper(operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
+        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager);
+        ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
+        PopulationsHelper populationsHelper = new PopulationsHelper(operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
         initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager);
         initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper, eventManager);

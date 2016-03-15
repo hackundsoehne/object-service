@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.junit.Before;
@@ -7,6 +9,7 @@ import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,11 +21,15 @@ public class ExperimentOperatorTest {
     private ExperimentOperator experimentOperator;
     private PlatformManager platformManager;
     private Experiment experiment;
+    private ExperimentFetcher experimentFetcher;
+    private ExperimentsPlatformOperations experimentsPlatformOperations;
 
     @Before
     public void setUp() throws Exception {
+        experimentFetcher = mock(ExperimentFetcher.class);
+        experimentsPlatformOperations = mock(ExperimentsPlatformOperations.class);
         platformManager = mock(PlatformManager.class);
-        experimentOperator = new ExperimentOperator(platformManager, new EventManager());
+        experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,experimentsPlatformOperations);
         experiment  = Experiment.newBuilder()
                         .addPopulations(Experiment.Population.newBuilder().setPlatformId("Good"))
                         .addPopulations(Experiment.Population.newBuilder().setPlatformId("Bad"))
