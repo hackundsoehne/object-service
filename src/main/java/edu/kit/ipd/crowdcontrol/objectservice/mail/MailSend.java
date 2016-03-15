@@ -7,7 +7,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 /**
- * Created by marcel on 14.03.16.
+ * Describes a MailSender, which can send mails to other mail addresses.
+ * @author Felix Rittler
+ * @author Marcel Hollerbach
  */
 public class MailSend implements MailSender {
 
@@ -53,6 +55,9 @@ public class MailSend implements MailSender {
         properties.setProperty("mail." + protocol + ".ssl.checkserveridentity", "true");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException {
         Session session = Session.getInstance(properties, new Authenticator() {

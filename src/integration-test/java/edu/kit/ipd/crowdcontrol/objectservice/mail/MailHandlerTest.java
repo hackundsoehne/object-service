@@ -1,7 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
 import edu.kit.ipd.crowdcontrol.objectservice.ConfigLoader;
-import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +20,6 @@ import static org.junit.Assert.assertTrue;
 public class MailHandlerTest {
     protected MailSender sender;
     protected MailFetcher fetcher;
-    protected String mail;
     protected String receiver;
     protected String folder;
 

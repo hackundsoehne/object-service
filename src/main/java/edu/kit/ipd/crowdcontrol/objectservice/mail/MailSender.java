@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
  *
  * @author Felix Rittler
  */
-
 public interface MailSender {
 
     /**
@@ -18,5 +17,5 @@ public interface MailSender {
      * @param subject       the subject of the mail
      * @param message       the content of the mail
      */
-    public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException;
+    void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException;
 }

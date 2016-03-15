@@ -1,5 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.mail.*;
 import javax.mail.search.FlagTerm;
 import java.util.Properties;
@@ -24,11 +27,16 @@ public class MailReceiver implements MailFetcher {
     private final int port;
     private final String defaultInbox;
     private Properties props;
+    private static final Logger LOGGER = LogManager.getLogger(MailReceiver.class);
 
 
     /**
-     * A Mailhandler object to send and fetch emails.
-     *
+     * Creates a new mail receiver, which can fetch mails from a mailbox.
+     * @param protocol protocol to receive mails (e.g. imap)
+     * @param user username on the mailserver
+     * @param password password on the mailserver
+     * @param host address of the server host
+     * @param port port, the mail receiver should access the server
      */
     public MailReceiver(Protocol protocol, String user, String password, String host, int port, String defaultInbox, boolean debug) {
         this.protocol = protocol;
@@ -50,8 +58,12 @@ public class MailReceiver implements MailFetcher {
         props.setProperty("mail."+protocol+".ssl.checkserveridentity", "true");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Message[] fetchUnseen(String name) throws MessagingException {
+        LOGGER.trace("Started fetching unseen mails from folder " + name + ".");
         Store store = connect();
 
         Message[] messages;
@@ -70,11 +82,16 @@ public class MailReceiver implements MailFetcher {
 
         folder.open(Folder.READ_ONLY);
 
+        LOGGER.trace("Successfully completed fetching " + messages.length + " unseen mails from folder" + name + ".");
         return messages;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Message[] fetchFolder(String name) throws MessagingException {
+        LOGGER.trace("Started fetching mails from folder " + name + ".");
         Store store = connect();
 
         Folder folder = store.getFolder(name);
@@ -87,11 +104,17 @@ public class MailReceiver implements MailFetcher {
         folder.close(true);
 
         folder.open(Folder.READ_ONLY);
+
+        LOGGER.trace("Successfully completed fetching " + messages.length + " mails from folder" + name + ".");
         return messages;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void markAsUnseen(Message message) throws MessagingException {
+        LOGGER.trace("Started marking message with subject \"" + message.getSubject() + "\" as unseen.");
         Folder folder = message.getFolder();
         boolean wasOpen = false;
         int mode = 0;
@@ -108,10 +131,16 @@ public class MailReceiver implements MailFetcher {
         if (wasOpen) {
             folder.open(mode);
         }
+        LOGGER.trace("Successfully completed marking message with subject \"" + message.getSubject() + "\" as unseen.");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteMails(Message message) throws MessagingException {
+        LOGGER.trace("Started deleting message with subject \"" + message.getSubject() + "\".");
+
         Folder folder = message.getFolder();
         boolean wasOpen = false;
         int mode = 0;
@@ -129,6 +158,7 @@ public class MailReceiver implements MailFetcher {
         if (wasOpen) {
             folder.open(mode);
         }
+        LOGGER.trace("Successfully completed deleting message with subject \"" + message.getSubject() + "\".");
     }
 
     @Override
@@ -138,10 +168,11 @@ public class MailReceiver implements MailFetcher {
 
     /**
      * Closes the folder and the store of the messages.
-     * @param messages the messages their resources become closed
+     * @param messages the messages their resources become closed (have to be in the same folder)
      * @throws MessagingException in case of problems with closing
      */
     public void close(Message[] messages) throws MessagingException {
+        LOGGER.trace("Started closing folder of " + messages.length + " messages.");
         if (messages.length > 0) {
             if (messages[0].getFolder().isOpen()) {
                 messages[0].getFolder().close(true);
@@ -150,6 +181,7 @@ public class MailReceiver implements MailFetcher {
                 messages[0].getFolder().getStore().close();
             }
         }
+        LOGGER.trace("Successfully completed closing folder of " + messages.length + " messages.");
     }
 
     private Store connect() throws MessagingException {

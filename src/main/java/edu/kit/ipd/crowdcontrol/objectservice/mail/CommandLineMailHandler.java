@@ -3,20 +3,18 @@ package edu.kit.ipd.crowdcontrol.objectservice.mail;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
+
 import java.io.UnsupportedEncodingException;
-import java.util.Properties;
 
 /**
- * A Mailhandler that prints to the command-line, used for running the Object-Service in an development-environment.
+ * A mail handler that prints to the command-line, used for running the Object-Service in an development-environment.
  * @author LeanderK
  * @version 1.0
  */
 public class CommandLineMailHandler implements MailSender, MailFetcher {
-    private static final Logger LOGGER = LogManager.getRootLogger();
+    private static final Logger LOGGER = LogManager.getLogger(CommandLineMailHandler.class);
 
     /**
      * Fetches all unseen mails in a certain folder and marks them as seen.
