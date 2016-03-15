@@ -15,7 +15,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
@@ -48,6 +50,9 @@ public class PyBossaPlatformTest {
 
     private static PyBossaRequests requests;
     private static PyBossaPlatform pybossa;
+
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -99,8 +104,8 @@ public class PyBossaPlatformTest {
     @Test
     public void testUnpublishTask() throws Exception {
         // get first available task
-        JSONArray tasks = requests.getAllTasks();
-        String taskId = String.valueOf(tasks.optJSONObject(0).getInt("id"));
+        String taskId = String.valueOf(requests.getAllTasks().optJSONObject(0).getInt("id"));
+
         CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(new JsonPrimitive(taskId));
         assertTrue(booleanCompletableFuture.get());
     }
@@ -115,9 +120,37 @@ public class PyBossaPlatformTest {
     }
 
     @Test
-    public void testUpdateTask() throws Exception {
-        requests.postTask(new JSONObject())
+    public void testDeleteTask() throws Exception {
+        // get first available task
+        String taskId = String.valueOf(requests.getAllTasks().optJSONObject(0).getInt("id"));
+        assertTrue(requests.deleteTask(taskId));
     }
+
+    @Test
+    public void testGetTaskRuns() throws Exception {
+        // get first available task
+        String taskId = String.valueOf(requests.getAllTasks().optJSONObject(0).getInt("id"));
+        // don't expect user to exist on test platform
+        JSONArray taskRuns = requests.getTaskRuns(taskId, "2147483647");
+
+        assertTrue(taskRuns.length() == 0);
+    }
+
+
+    @Test
+    public void testDeleteTaskRun() throws Exception {
+        // get first available task
+        String taskId = String.valueOf(requests.getAllTasks().optJSONObject(0).getInt("id"));
+        // hope that user 1 has submitted a taskrun for task our task. Unfortunately this is to complex to automate.
+        JSONArray taskRuns = requests.getTaskRuns(taskId, "1");
+        JSONObject taskRun = taskRuns.optJSONObject(0);
+        if (taskRun != null) {
+            requests.deleteTaskRun(taskRun.getInt("id"));
+            thrown.expect(PyBossaRequestException.class);
+            requests.deleteTaskRun(taskRun.getInt("id"));
+        }
+    }
+
 
 
 

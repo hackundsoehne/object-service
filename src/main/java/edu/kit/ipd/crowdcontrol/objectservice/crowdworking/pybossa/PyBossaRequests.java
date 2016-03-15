@@ -36,7 +36,8 @@ public class PyBossaRequests {
     /**
      * Gets all tasks from the platform
      *
-     * @return all tasks in the project. Might be empty.
+     * @return all tasks in the project. Might be empty
+     * @throws PyBossaRequestException if the tasks cannot be fetched
      */
     public JSONArray getAllTasks() {
         HttpResponse<JsonNode> response;
@@ -61,6 +62,7 @@ public class PyBossaRequests {
      *
      * @param task the task to post
      * @return the task id
+     * @throws PyBossaRequestException if the task cannot be posted
      */
     public int postTask(JSONObject task) {
         JsonNode jsonNode = new JsonNode(task.toString());
@@ -84,38 +86,13 @@ public class PyBossaRequests {
         }
     }
 
-    /**
-     * Updates a given task.
-     *
-     * @param jsonTask the task to update
-     * @return the updated task
-     */
-    public JSONObject updateTask(JSONObject jsonTask) {
-        HttpResponse<JsonNode> response;
-        try {
-            response = Unirest.put(taskUrl + "/{taskId}")
-                    .header("Content-Type", "application/json")
-                    .routeParam("taskId", String.valueOf(jsonTask.getInt("id")))
-                    .queryString("api_key", apiKey)
-                    .body(jsonTask)
-                    .asJson();
-        } catch (UnirestException e) {
-            throw new PyBossaRequestException(e);
-        }
-        if (response.getStatus() == 200) {
-            return response.getBody().getObject();
-        } else {
-            throw new PyBossaRequestException(response.getBody().getObject()
-                    .optString("exception_msg", "Updating task failed"));
-        }
-    }
-
 
     /**
      * Deletes a task from the platform
      *
      * @param id the task to delete
      * @return true if successful, else false
+     * @throws PyBossaRequestException if the connection to the platform fails
      */
     public boolean deleteTask(String id) {
         HttpResponse<JsonNode> response;
@@ -137,6 +114,7 @@ public class PyBossaRequests {
      *
      * @param id the task to delete
      * @return true if successful, else false
+     * @throws PyBossaRequestException if the connection to the platform fails
      */
     public boolean deleteTask(int id) {
         return deleteTask(String.valueOf(id));
@@ -148,6 +126,7 @@ public class PyBossaRequests {
      * @param taskId the taskId
      * @param userId the userId
      * @return all taskRuns, might be empty
+     * @throws PyBossaRequestException if the task runs cannot be fetched
      */
     public JSONArray getTaskRuns(String taskId, String userId) {
         HttpResponse<JsonNode> response;
@@ -169,10 +148,23 @@ public class PyBossaRequests {
         return new JSONArray();
     }
 
+
+    /**
+     * Deletes a task run from the platform.
+     *
+     * @param taskRunId the id of the task run
+     * @throws PyBossaRequestException if task run cannot be deleted
+     */
     public void deleteTaskRun(int taskRunId) {
         deleteTaskRun(String.valueOf(taskRunId));
     }
 
+    /**
+     * Deletes a task run from the platform.
+     *
+     * @param taskRunId the id of the task run
+     * @throws PyBossaRequestException if task run cannot be deleted
+     */
     public void deleteTaskRun(String taskRunId) {
         HttpResponse<JsonNode> response;
         try {
@@ -184,7 +176,7 @@ public class PyBossaRequests {
             throw new PyBossaRequestException(e);
         }
         if (response.getStatus() != 204) {
-            throw new PyBossaRequestException(String.format("Taskrun with id %s could not be deleted", taskRunId));
+            throw new PyBossaRequestException(String.format("Task run with id %s could not be deleted", taskRunId));
         }
     }
 
