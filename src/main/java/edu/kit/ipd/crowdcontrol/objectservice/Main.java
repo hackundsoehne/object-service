@@ -109,7 +109,7 @@ public class Main {
                 new PlatformResource(operationCarrier.platformOperations),
                 new WorkerResource(operationCarrier.workerOperations, platformManager),
                 new CalibrationResource(operationCarrier.calibrationOperations),
-                new ExperimentResource(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.experimentsPlatformOperations, platformManager, experimentOperator),
+                new ExperimentResource(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.experimentsPlatformOperations, platformManager, experimentOperator, experimentFetcher, populationsHelper),
                 new AlgorithmResources(operationCarrier.algorithmsOperations),
                 new AnswerRatingResource(operationCarrier.experimentOperations, operationCarrier.answerRatingOperations, operationCarrier.workerOperations),
                 new WorkerCalibrationResource(operationCarrier.workerCalibrationOperations),

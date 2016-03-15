@@ -52,7 +52,7 @@ public class ExperimentResourceTest {
         experimentOperator = mock(ExperimentOperator.class);
         platformManager = mock(PlatformManager.class);
 
-        resource = new ExperimentResource(answerRatingOperations, experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations, experimentsPlatformOperations,  platformManager, experimentOperator);
+        resource = new ExperimentResource(answerRatingOperations, experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations, experimentsPlatformOperations,  platformManager, experimentOperator, experimentFetcher, populationsHelper);
     }
 
     /**
