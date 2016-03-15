@@ -36,19 +36,21 @@ public class ExperimentOperator {
      * @param experiment experiment to publish
      */
     public void startExperiment(Experiment experiment) {
+        List<Experiment.Population> populations = experiment.getPopulationsList();
         List<Experiment.Population> successfulOps = new LinkedList<>();
-        for (Experiment.Population population :
-                experiment.getPopulationsList()) {
+        for (Experiment.Population population : populations) {
             try {
-                platformManager.publishTask(population.getPlatformId(), experiment).join();
-                successfulOps.add(population);
-
+                if (!platformManager.publishTask(population.getPlatformId(), experiment).join()) {
+                    break;
+                }
             } catch (PreActionException | CompletionException e) {
                 log.fatal("Failed to publish experiment "+experiment+" on platform "+population.getPlatformId(), e);
+                break;
             }
+            successfulOps.add(population);
         }
 
-        if (successfulOps.size() != experiment.getPopulationsList().size()) {
+        if (successfulOps.size() != populations.size()) {
             for (Experiment.Population population :
                     successfulOps) {
                 try {
