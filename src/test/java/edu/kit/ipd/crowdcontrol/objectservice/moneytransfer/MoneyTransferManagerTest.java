@@ -43,7 +43,7 @@ public class MoneyTransferManagerTest {
         payops = mock(WorkerBalanceOperations.class);
         workerops = mock(WorkerOperations.class);
         platformOperations = mock(PlatformOperations.class);
-        mng = new MoneyTransferManager(fetcher, sender, payops, workerops, platformOperations, "pseipd@gmail.com", null, 7, 0);
+        mng = new MoneyTransferManager(fetcher, sender, payops, workerops, platformOperations, null, null, 7, 0);
     }
 
     @Test
@@ -243,6 +243,6 @@ public class MoneyTransferManagerTest {
         }
 
         message = message.append("A worker has pending Payments in the amount of 25ct. Please add giftcodes, so the payment of the worker can be continued.").append(System.getProperty("line.separator"));
-        verify(sender).sendMail("pseipd@gmail.com", "Payment Notification", message.toString());
+        verify(sender).sendMail(null, "Payment Notification", message.toString());
     }
 }

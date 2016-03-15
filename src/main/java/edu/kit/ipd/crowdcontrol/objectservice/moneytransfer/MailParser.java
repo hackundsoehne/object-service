@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  */
 public class MailParser {
 
-    private static final int currencyCode = 978;
+    private static final int CURRENCY_CODE_EUR = 978;
 
     /**
      * Extracts a giftcode out of a message.
@@ -71,7 +71,7 @@ public class MailParser {
         GiftCodeRecord rec = new GiftCodeRecord();
         rec.setAmount(Integer.parseInt(amountStr));
         rec.setCode(giftCode);
-        rec.setCurrency(currencyCode);
+        rec.setCurrency(CURRENCY_CODE_EUR);
 
         return Optional.of(rec);
     }
