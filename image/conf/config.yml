@@ -59,41 +59,6 @@ moneytransfer:
     # Interval in days, when the workers get paid off
     scheduleInterval: 7
 
-# Defined platforms to run
-platforms:
-    # Type to use:
-    # - mturk
-    # - pybossa
-    # - dummy
-    - type: dummy
-
-      # Standard credentials
-      user: samplePlatformUser
-      password: samplePassword
-
-      # Name which is used to display
-      name: Sandbox
-
-      # URL to the platform
-      url: http://example.com/
-
-    - type: pybossa
-
-      # Key to access the PyBossa API
-      apiKey: 8ec92fa1-1bd1-42ad-8524-3d2bab4588b1
-
-      # URL to the PyBossa API
-      url: http://localhost:5000/api
-
-      # Name which is used to display
-      name: Pybossa
-
-      # ID of the PyBossa project to use for all experiments
-      projectId: 1
-
-      # Whether calibrations should be displayed / used on this platform
-      calibrationsAllowed: true
-
 # Map of packages to log levels, e.g.
 # log:
 #    org.package.name: WARN
