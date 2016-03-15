@@ -129,6 +129,9 @@ public class MoneyTransferManager {
      * @throws MoneyTransferException gets thrown, if an error occurred
      */
     protected void submitGiftCodes() throws MoneyTransferException {
+        //reset all exchange rates
+        exchangeRates = new HashMap<>();
+
         fetchNewGiftCodes();
 
         int threshold;
@@ -152,7 +155,6 @@ public class MoneyTransferManager {
 
         //sends a notification about problems with submission of giftcodes
         sendNotification(notificationText.toString());
-        exchangeRates = new HashMap<>();
         LOGGER.trace("Completed submission of giftcodes to workers.");
     }
 
