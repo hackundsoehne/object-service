@@ -154,8 +154,21 @@ public class QualityIdentificator {
      * @param experiment to be checked
      */
     private void checkExpStatus(ExperimentRecord experiment) {
-        if (experiment.getNeededAnswers() <= answerRatingOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())) {
-            experimentOperator.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
+        if (experiment.getNeededAnswers() <= answerOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())){
+            boolean isRunning = true;
+            boolean isShuttingDown = false;
+
+            for( ExperimentsPlatformStatusPlatformStatus status :experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment())){
+                if(status.equals(ExperimentsPlatformStatusPlatformStatus.shutdown)){
+                    isShuttingDown = true;
+                }else if(status.equals(ExperimentsPlatformStatusPlatformStatus.running)){
+                    isRunning = true;
+                }
+            }
+
+            if(isRunning  && !isShuttingDown){ //Only shut down if running and not already shutting down
+                experimentResource.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
+            }
         }
 
     }
