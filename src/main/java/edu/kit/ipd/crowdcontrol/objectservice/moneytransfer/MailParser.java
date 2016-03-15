@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
  */
 public class MailParser {
 
+    private static final int CURRENCY_CODE_EUR = 978;
+
     /**
      * Extracts a giftcode out of a message.
      *
@@ -40,7 +42,7 @@ public class MailParser {
             BodyPart textBody = innerMsg.getBodyPart(0);
             message = textBody.getContent().toString();
         } catch (ClassCastException | MessagingException | IOException e) {
-            throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.");
+            throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.", e);
         }
         //Parse Message
         String messageStr = message.replaceAll(" ", "");
@@ -69,6 +71,7 @@ public class MailParser {
         GiftCodeRecord rec = new GiftCodeRecord();
         rec.setAmount(Integer.parseInt(amountStr));
         rec.setCode(giftCode);
+        rec.setCurrency(CURRENCY_CODE_EUR);
 
         return Optional.of(rec);
     }

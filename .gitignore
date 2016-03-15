@@ -102,6 +102,8 @@ mailConfig.properties
 #integration-test properties
 gmailTest.properties
 webTest.properties
+#unit test properties
+gmailLogin.properties
 
 #unit test properties
 

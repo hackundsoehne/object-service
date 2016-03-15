@@ -179,6 +179,7 @@ public class Main {
                 mailSender,
                 operationCarrier.workerBalanceOperations,
                 operationCarrier.workerOperations,
+                operationCarrier.platformOperations,
                 config.moneytransfer.notificationMailAddress,
                 config.moneytransfer.parsingPassword,
                 config.moneytransfer.scheduleInterval,

@@ -2,18 +2,28 @@ package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerBalanceOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.jooq.Result;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,22 +38,22 @@ import java.util.concurrent.TimeUnit;
 public class MoneyTransferManager {
 
     private static final Logger LOGGER = LogManager.getLogger(MoneyTransferManager.class);
+    private static final String MAIL_FAILURE_MESSAGE = "The MailHandler was not able to send mails." +
+            "It seems, that there is either a problem with the server or with the properties file.";
     private final MailSender mailSender;
     private final MailFetcher mailFetcher;
     private final WorkerBalanceOperations workerBalanceOperations;
     private final WorkerOperations workerOperations;
+    private final PlatformOperations platformOperations;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private ScheduledFuture<?> schedule = null;
-
-    private StringBuilder notificationText;
-    private static final String MAIL_FAILURE_MESSAGE = "The MailHandler was not able to send mails." +
-            "It seems, that there is either a problem with the server or with the properties file.";
-
     //config-file data
     private final int payOffThreshold;
     private final String parsingPassword;
     private final String notificationMailAddress;
     private final int scheduleIntervalDays;
+    private ScheduledFuture<?> schedule = null;
+    private StringBuilder notificationText;
+    private Map<String, BigDecimal> exchangeRates;
 
     /**
      * Creates a new instance of the MoneyTransferManager
@@ -54,16 +64,18 @@ public class MoneyTransferManager {
      * @param workerOperations        the workerOperations, used to do operations on workers
      * @param notificationMailAddress the mail address to send notifications
      */
-    public MoneyTransferManager(MailFetcher mailFetcher, MailSender mailSender, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, String notificationMailAddress, String parsingPassword, int scheduleIntervalDays, int payOffThreshold) {
+    public MoneyTransferManager(MailFetcher mailFetcher, MailSender mailSender, WorkerBalanceOperations workerBalanceOperations, WorkerOperations workerOperations, PlatformOperations platformOperations, String notificationMailAddress, String parsingPassword, int scheduleIntervalDays, int payOffThreshold) {
         this.mailFetcher = mailFetcher;
         this.mailSender = mailSender;
         this.workerOperations = workerOperations;
         this.workerBalanceOperations = workerBalanceOperations;
+        this.platformOperations = platformOperations;
         this.payOffThreshold = payOffThreshold;
         this.notificationMailAddress = notificationMailAddress;
         this.notificationText = new StringBuilder();
         this.parsingPassword = parsingPassword;
         this.scheduleIntervalDays = scheduleIntervalDays;
+        this.exchangeRates = new HashMap<>();
     }
 
     /**
@@ -117,6 +129,9 @@ public class MoneyTransferManager {
      * @throws MoneyTransferException gets thrown, if an error occurred
      */
     protected void submitGiftCodes() throws MoneyTransferException {
+        //reset all exchange rates
+        exchangeRates = new HashMap<>();
+
         fetchNewGiftCodes();
 
         int threshold;
@@ -140,7 +155,6 @@ public class MoneyTransferManager {
 
         //sends a notification about problems with submission of giftcodes
         sendNotification(notificationText.toString());
-
         LOGGER.trace("Completed submission of giftcodes to workers.");
     }
 
@@ -159,7 +173,7 @@ public class MoneyTransferManager {
             messages = mailFetcher.fetchUnseen();
         } catch (MessagingException e) {
             throw new MoneyTransferException("The MailHandler couldn't fetch new giftcodes from the mailserver. " +
-                    "It seems, that there is either a problem with the server or with the properties file.");
+                    "It seems, that there is either a problem with the server or with the properties file.", e);
         }
 
         int giftCodesCount = 0;
@@ -177,8 +191,8 @@ public class MoneyTransferManager {
                     throw new MoneyTransferException(e.getMessage());
                 } catch (MessagingException f) {
 
-                    throw new MoneyTransferException(e.getMessage() + System.getProperty("line.separator") + "The MailHandler was unable to revert all changes and mark the read mails as unseen." +
-                            "It seems, that there is either a problem with the server or with the properties file.");
+                    throw new MoneyTransferException("The MailHandler was unable to revert all changes and mark the read mails as unseen." +
+                            "It seems, that there is either a problem with the server or with the properties file.", e);
                 }
             }
         }
@@ -192,22 +206,28 @@ public class MoneyTransferManager {
      * @param giftCodes all giftcodes
      * @return returns the list of the chosen giftcodes
      */
-    private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) {
+    private List<GiftCodeRecord> chooseGiftCodes(WorkerRecord worker, List<GiftCodeRecord> giftCodes) throws MoneyTransferException {
 
         LOGGER.trace("Started to choose the giftcodes worker " + worker.getIdWorker() + " will receive.");
+
+        int currCodeWorker = platformOperations.getPlatformRecord(worker.getPlatform()).orElseThrow(() -> new MoneyTransferException("Platform of worker " + worker.getIdWorker() + " cannot be found.")).getCurrency();
+
+        for (GiftCodeRecord giftcode : giftCodes) {
+            giftcode.setAmount(exchangeTo(giftcode.getAmount(),giftcode.getCurrency(), currCodeWorker));
+            giftcode.setCurrency(978);
+        }
 
         int creditBalanceAtStart = workerBalanceOperations.getBalance(worker.getIdWorker());
 
         int[] weights = new int[creditBalanceAtStart + 1];
         boolean[][] decision = new boolean[giftCodes.size()][creditBalanceAtStart + 1];
 
-
         for (int i = 0; i < giftCodes.size(); i++) {
             int weight = giftCodes.get(i).getAmount();
 
-            for(int j = creditBalanceAtStart; j >= weight; j--) {
+            for (int j = creditBalanceAtStart; j >= weight; j--) {
 
-                if (weights[j-weight] + weight > weights[j]) {
+                if (weights[j - weight] + weight > weights[j]) {
                     weights[j] = weights[j - weight] + weight;
                     decision[i][j] = true;
                 }
@@ -276,7 +296,7 @@ public class MoneyTransferManager {
             }
             LOGGER.trace("Completed sending of " + giftCodes.size() + " giftcodes to worker" + worker.getIdWorker() + ".");
         } catch (MessagingException e) {
-            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE);
+            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE, e);
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Sending of " + giftCodes.size() + " gift codes to worker" + worker.getIdWorker() + " failed.", e);
         }
@@ -305,7 +325,7 @@ public class MoneyTransferManager {
                 LOGGER.trace("Completed sending a notification about problems with submission of giftcodes.");
             }
         } catch (MessagingException e) {
-            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE);
+            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE, e);
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("", e);
         }
@@ -358,11 +378,65 @@ public class MoneyTransferManager {
                 content.append(System.getProperty("line.separator"));
             }
         } catch (FileNotFoundException e) {
-            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.");
+            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.", e);
         } catch (IOException e) {
-            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt");
+            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt", e);
         }
 
         return content.toString();
     }
+
+
+    protected static BigDecimal getExchangeRate(String sourceCurrency, String destinationCurrency) throws MoneyTransferException {
+        LOGGER.trace("Started fetching currency exchange rates from " + sourceCurrency + " to " + destinationCurrency + ".");
+
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        HttpGet httpGet = new HttpGet("http://quote.yahoo.com/d/quotes.csv?s=" + sourceCurrency + destinationCurrency + "=X&f=l1&e=.csv");
+        ResponseHandler<String> responseHandler = new BasicResponseHandler();
+
+        String responseBody;
+        try {
+            responseBody = httpclient.execute(httpGet, responseHandler);
+            httpclient.close();
+        } catch (IOException e) {
+            LOGGER.error("Fetching currency exchange rates failed.");
+            throw new MoneyTransferException("There was an error while getting exchange rates from " + sourceCurrency + " to " + destinationCurrency + ".", e);
+        }
+
+        BigDecimal rate = new BigDecimal(responseBody.substring(0, responseBody.length() - 2));
+
+        boolean isEurUsdConversion = false;
+        if ((sourceCurrency.equals("EUR") && destinationCurrency.equals("USD")) || (sourceCurrency.equals("USD") && destinationCurrency.equals("EUR"))) {
+            isEurUsdConversion = true;
+        }
+
+        if (rate.compareTo(new BigDecimal(2)) == 1 && isEurUsdConversion) {
+            throw new MoneyTransferException("Exchange rate in an EUR/USD conversion is above 2. The exchange rate must not be above 2.");
+        } else if (rate.compareTo(new BigDecimal("0.5")) == -1 && isEurUsdConversion) {
+            throw new MoneyTransferException("Exchange rate in an EUR/USD conversion is below 0.5. The exchange rate must not be below 0.5.");
+        }
+
+        LOGGER.trace("Completed fetching currency exchange rates.");
+
+        return rate;
+    }
+
+    private int exchangeTo(int amount, int sourceCurrencyCode, int destCurrencyCode) throws MoneyTransferException {
+        CurrencyUnit sourceCurr = CurrencyUnit.ofNumericCode(sourceCurrencyCode);
+        CurrencyUnit destCurr = CurrencyUnit.ofNumericCode(destCurrencyCode);
+
+        Money money = Money.zero(sourceCurr);
+        money = money.plusMinor(amount);
+        BigDecimal exchangeRate;
+        String key = Integer.toString(sourceCurrencyCode) + Integer.toString(destCurrencyCode);
+        if (exchangeRates.containsKey(key)) {
+            exchangeRate = exchangeRates.get(key);
+        } else {
+            exchangeRate = getExchangeRate(sourceCurr.getCurrencyCode(), destCurr.getCurrencyCode());
+            exchangeRates.put(key, exchangeRate);
+        }
+        Money converted = money.convertedTo(destCurr, exchangeRate, RoundingMode.HALF_UP);
+        return converted.getAmountMinorInt();
+    }
+
 }

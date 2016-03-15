@@ -59,6 +59,7 @@ dependencies {
     compile ('com.sparkjava:spark-core:2.3') {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
+    compile 'org.joda:joda-money:0.11'
     testCompile 'org.mockito:mockito-core:1.+'
     testCompile 'junit:junit:4.12'
     runtime 'mysql:mysql-connector-java:5.+'

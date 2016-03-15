@@ -14,4 +14,13 @@ public class MoneyTransferException extends Exception {
     public MoneyTransferException(String message) {
         super(message);
     }
+
+
+    /**
+     * Creates a new MoneyTransferException
+     * @param message the message of the exception
+     */
+    public MoneyTransferException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 }
