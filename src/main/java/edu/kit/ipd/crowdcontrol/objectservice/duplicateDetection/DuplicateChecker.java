@@ -36,6 +36,8 @@ public class DuplicateChecker {
 
     static final String IMAGE_NOT_READABLE_RESPONSE = "Specified image is not readable";
     static final String URL_MALFORMED_RESPONSE = "Specified URL is malformed or not readable";
+    static final String DUPLICATE_RESPONSE = "Your answer is very similar to an existing answer for that task " +
+            "and thus considered a duplicate!";
 
     private final Logger logger = LogManager.getLogger(DuplicateChecker.class);
     private final AnswerRatingOperations answerRatingOperations;
@@ -104,7 +106,7 @@ public class DuplicateChecker {
         final AnswerRecord finalOriginalAnswer = originalAnswer;
         listOfDuplicates.removeIf(record -> record.getIdAnswer().equals(finalOriginalAnswer.getIdAnswer()));
         listOfDuplicates.forEach((duplicate)-> {
-            answerRatingOperations.setSystemResponseField(duplicate,"This answer is considered a duplicate with: \""+ finalOriginalAnswer.getAnswer()+"\"");
+            answerRatingOperations.setSystemResponseField(duplicate,DUPLICATE_RESPONSE);
             answerRatingOperations.setQualityToAnswer(duplicate,0);
             answerRatingOperations.setAnswerQualityAssured(duplicate);
         });
@@ -242,7 +244,7 @@ public class DuplicateChecker {
                             originalAnswer = answerRecordB;
                             duplicateAnswer = answerRecordA;
                         }
-                        answerRatingOperations.setSystemResponseField(duplicateAnswer,"This answer is considered a duplicate with: \""+originalAnswer.getAnswer()+"\"");
+                        answerRatingOperations.setSystemResponseField(duplicateAnswer,DUPLICATE_RESPONSE);
                         duplicates.add(duplicateAnswer);
                     }
                 });
@@ -265,7 +267,7 @@ public class DuplicateChecker {
                             duplicateAnswer = sortedEntries.get(j).getKey();
                             originalAnswer = sortedEntries.get(j + 1).getKey();
                         }
-                        answerRatingOperations.setSystemResponseField(duplicateAnswer,"This answer is considered a duplicate with: \""+originalAnswer.getAnswer()+"\"");
+                        answerRatingOperations.setSystemResponseField(duplicateAnswer,DUPLICATE_RESPONSE);
                         duplicates.add(duplicateAnswer);
                     }
                 }

@@ -1,7 +1,12 @@
 package edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity;
 
 /**
- * Created by lckr on 06/03/16.
+ * Created by lucaskrauss on 06/03/16.
+ * @author lucaskrauss
+ *
+ *  This class provides the utilities to identify similar hashes. It supports:
+ *   - percentual similarity identification
+ *   - hamming distance
  */
 public class HashSimilarity {
 
