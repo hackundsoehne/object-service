@@ -290,8 +290,16 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @param experiment the experiment whose platforms will be updated
      * @param globalPlatformStatus the new platform-status
      */
-    public void setGlobalPlatformStatus(Experiment experiment,ExperimentsPlatformStatusPlatformStatus globalPlatformStatus){
-        //TODO
+    public void setGlobalPlatformStatus(Experiment experiment, ExperimentsPlatformStatusPlatformStatus globalPlatformStatus) {
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+
+        List<ExperimentsPlatformStatusRecord> toInsert = create.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                .from(EXPERIMENTS_PLATFORM)
+                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experiment.getId()))
+                .fetch()
+                .map(record -> new ExperimentsPlatformStatusRecord(null, globalPlatformStatus, timestamp, record.value1()));
+
+        create.batchInsert(toInsert).execute();
     }
 
     /**
@@ -300,9 +308,14 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @param experimentID the experiment
      * @return ExperimentsPlatformStatusRecord, containing information about status and status-change-time
      */
-    public ExperimentsPlatformStatusRecord getExperimentsPlatformStatusRecord(int experimentID){
-        return null;
-                //TODO
+    public List<ExperimentsPlatformStatusRecord> getExperimentsPlatformStatusRecord(int experimentID) {
+        return create.selectFrom(EXPERIMENTS_PLATFORM_STATUS)
+                .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
+                        DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                            .from(EXPERIMENTS_PLATFORM)
+                            .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
+                ))
+                .fetch();
     }
 
 
@@ -311,8 +324,32 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * reach the state-stopped yet.
      * @return list of experiments to recover
      */
-    public List<ExperimentRecord> getExperimentsFailedDuringShutdown(){
-        return null;
-        //TODO
+    public List<ExperimentRecord> getExperimentsFailedDuringShutdown() {
+        Field<Timestamp> maxTimestamp = DSL.max(EXPERIMENTS_PLATFORM_STATUS.TIMESTAMP).as("max");
+        Table<Record3<ExperimentsPlatformStatusPlatformStatus, Integer, Timestamp>> maxTable = DSL
+                .select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM, maxTimestamp)
+                .from(EXPERIMENTS_PLATFORM_STATUS)
+                .groupBy(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM)
+                .asTable("maxTable");
+
+        Set<Integer> shutdownPlatforms = create.select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM, maxTable.field(maxTimestamp))
+                .from(
+                        maxTable
+                ).innerJoin(EXPERIMENTS_PLATFORM_STATUS).on(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.eq(maxTable.field(EXPERIMENTS_PLATFORM_STATUS.PLATFORM))
+                        .and(EXPERIMENTS_PLATFORM_STATUS.TIMESTAMP.eq(maxTable.field(maxTimestamp))))
+                .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
+                        DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                                .from(EXPERIMENTS_PLATFORM)
+                ))
+                .having(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS.eq(ExperimentsPlatformStatusPlatformStatus.shutdown))
+                .fetchSet(EXPERIMENTS_PLATFORM_STATUS.PLATFORM);
+
+        return create.select(EXPERIMENT.fields())
+                .from(EXPERIMENT)
+                .innerJoin(EXPERIMENTS_PLATFORM).on(
+                        EXPERIMENT.ID_EXPERIMENT.eq(EXPERIMENTS_PLATFORM.EXPERIMENT)
+                                .and(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.in(shutdownPlatforms))
+                )
+                .fetchInto(EXPERIMENT);
     }
 }
