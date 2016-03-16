@@ -76,6 +76,20 @@ public class ExperimentOperations extends AbstractOperations {
                     .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(id))
                     .execute();
 
+            DSL.using(trans).deleteFrom(CHOSEN_ANSWER_QUALITY_PARAM)
+                    .where(CHOSEN_ANSWER_QUALITY_PARAM.EXPERIMENT.eq(id))
+                    .execute();
+
+            DSL.using(trans).delete(CHOSEN_TASK_CHOOSER_PARAM)
+                    .where(CHOSEN_TASK_CHOOSER_PARAM.EXPERIMENT.eq(id))
+                    .execute();
+
+            DSL.using(trans).delete(CHOSEN_RATING_QUALITY_PARAM)
+                    .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(id))
+                    .execute();
+
+            //TODO: delete Rating/Answer, advance doIfNotRunning
+
             int deleted = DSL.using(trans)
                     .deleteFrom(EXPERIMENT)
                     .where(EXPERIMENT.ID_EXPERIMENT.eq(id))
