@@ -78,17 +78,17 @@ public class Router implements SparkApplication {
             LOGGER.error("an unknown exception occurred", exception);
 
             response.status(500);
-            response.body(error(request, response, "internalServerError", exception.getMessage()));
+            OutputTransformer.writeResponse(response, error(request, response, "internalServerError", exception.getMessage()));
         });
 
         exception(BadRequestException.class, (exception, request, response) -> {
             response.status(400);
-            response.body(error(request, response, "badRequest", exception.getMessage()));
+            OutputTransformer.writeResponse(response, error(request, response, "badRequest", exception.getMessage()));
         });
 
         exception(NotFoundException.class, (exception, request, response) -> {
             response.status(404);
-            response.body(error(request, response, "notFound", exception.getMessage()));
+            OutputTransformer.writeResponse(response, error(request, response, "notFound", exception.getMessage()));
         });
 
         exception(NotAcceptableException.class, (exception, request, response) -> {
@@ -106,14 +106,14 @@ public class Router implements SparkApplication {
 
             response.status(415);
             response.header("accept", accept);
-            response.body(error(request, response, "unsupportedMediaType", exception.getMessage()));
+            OutputTransformer.writeResponse(response, error(request, response, "unsupportedMediaType", exception.getMessage()));
         });
 
         exception(InternalServerErrorException.class, (exception, request, response) -> {
             LOGGER.error("an internal server error occurred", exception);
 
             response.status(500);
-            response.body(error(request, response, "internalServerError", exception.getMessage()));
+            OutputTransformer.writeResponse(response, error(request, response, "internalServerError", exception.getMessage()));
         });
 
         before((request, response) -> {
@@ -247,7 +247,7 @@ public class Router implements SparkApplication {
      *
      * @return Encoded message.
      */
-    private String error(Request request, Response response, String code, String detail) {
+    private Object error(Request request, Response response, String code, String detail) {
         if (code == null) {
             code = "";
         }

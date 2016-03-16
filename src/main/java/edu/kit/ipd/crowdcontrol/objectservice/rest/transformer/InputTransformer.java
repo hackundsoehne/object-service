@@ -48,7 +48,6 @@ public class InputTransformer implements Route {
      * @return Returns the result of the {@code next} route.
      */
     public Object handle(Request request, Response response) throws Exception {
-        String body = request.body();
         String contentType = request.contentType();
 
         if (contentType == null) {
@@ -61,19 +60,21 @@ public class InputTransformer implements Route {
         try {
             switch (contentType) {
                 case "application/json":
-                    LOGGER.trace("Parsing request body as application/json.");
-                    PARSER.merge(body, builder);
+                    String json = request.body();
+                    LOGGER.trace("Parsing request body as application/json ({} bytes).", json.length());
+                    PARSER.merge(json, builder);
                     break;
                 // https://tools.ietf.org/html/draft-rfernando-protocol-buffers-00
                 case "application/protobuf":
-                    LOGGER.trace("Parsing request body as application/protobuf.");
-                    builder.mergeFrom(body.getBytes());
+                    byte[] bytes = request.bodyAsBytes();
+                    LOGGER.trace("Parsing request body as application/protobuf ({} bytes).", bytes.length);
+                    builder.mergeFrom(bytes);
                     break;
                 default:
                     throw new UnsupportedMediaTypeException(contentType, "application/json", "application/protobuf");
             }
         } catch (InvalidProtocolBufferException e) {
-            throw new BadRequestException("Invalid protocol buffer.");
+            throw new BadRequestException("Invalid protocol buffer: " + e.getMessage());
         }
 
         request.attribute("input", builder.build());

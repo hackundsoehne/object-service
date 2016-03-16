@@ -29,7 +29,7 @@ public class OutputTransformerTest {
         when(request.headers("accept")).thenReturn("application/json");
 
         ErrorResponse error = ErrorResponse.newBuilder().setCode("OK").build();
-        String output = OutputTransformer.transform(request, response, error);
+        String output = (String) OutputTransformer.transform(request, response, error);
 
         verify(response).type("application/json");
         assertEquals("{\n  \"code\": \"OK\",\n  \"detail\": \"\"\n}", output);
@@ -40,10 +40,10 @@ public class OutputTransformerTest {
         when(request.headers("accept")).thenReturn("application/protobuf");
 
         ErrorResponse error = ErrorResponse.newBuilder().setCode("OK").build();
-        String output = OutputTransformer.transform(request, response, error);
+        byte[] output = (byte[]) OutputTransformer.transform(request, response, error);
 
         verify(response).type("application/protobuf");
-        assertEquals(new String(error.toByteArray()), output);
+        assertEquals(error.toByteArray(), output);
     }
 
     @Test (expected = NotAcceptableException.class)
@@ -59,7 +59,7 @@ public class OutputTransformerTest {
         when(request.headers("accept")).thenReturn("*/*");
 
         ErrorResponse error = ErrorResponse.newBuilder().setCode("OK").build();
-        String output = OutputTransformer.transform(request, response, error);
+        String output = (String) OutputTransformer.transform(request, response, error);
 
         verify(response).type("application/json");
         assertEquals("{\n  \"code\": \"OK\",\n  \"detail\": \"\"\n}", output);
@@ -70,7 +70,7 @@ public class OutputTransformerTest {
         when(route.handle(request, response)).thenReturn(null);
 
         OutputTransformer transformer = new OutputTransformer(route);
-        String output = transformer.handle(request, response);
+        String output = (String) transformer.handle(request, response);
 
         assertEquals("", output);
         verify(response).status(204);
@@ -82,7 +82,7 @@ public class OutputTransformerTest {
         when(route.handle(request, response)).thenReturn(ErrorResponse.newBuilder().build());
 
         OutputTransformer transformer = new OutputTransformer(route);
-        String output = transformer.handle(request, response);
+        String output = (String) transformer.handle(request, response);
 
         assertEquals("{\n  \"code\": \"\",\n  \"detail\": \"\"\n}", output);
     }

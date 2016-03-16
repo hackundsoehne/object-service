@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.jooq.SQLDialect;
+import spark.Spark;
 
 import javax.naming.NamingException;
 import java.io.IOException;
@@ -79,6 +80,8 @@ public class Main {
 
         initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager);
         initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper, eventManager);
+
+        Spark.awaitInitialization();
     }
 
     /**

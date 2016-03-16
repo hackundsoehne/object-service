@@ -10,6 +10,8 @@ database:
 
 deployment:
     origin: http://localhost:3000
+    workerService: http://worker.example.com
+    workerUIPublic: http://worker.example.com
 
 platforms :
     - type: dummy
