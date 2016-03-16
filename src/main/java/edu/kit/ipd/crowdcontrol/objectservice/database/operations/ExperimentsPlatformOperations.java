@@ -106,6 +106,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      */
     public void storeExperimentsModes(Map<String, ExperimentsPlatformModeMode> statuses, int experiment) {
         Map<String, Integer> platfromIDMap = create.select(EXPERIMENTS_PLATFORM.PLATFORM, EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                .from(EXPERIMENTS_PLATFORM)
                 .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experiment))
                 .fetchMap(EXPERIMENTS_PLATFORM.PLATFORM, EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS);
 

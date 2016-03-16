@@ -295,28 +295,15 @@ public class AnswerRatingOperations extends AbstractOperations {
             feedback = rating.getFeedback();
         }
 
-        RatingReservationRecord ratingReservationRecord = create.selectFrom(RATING_RESERVATION)
-                .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
-                .fetchOptional()
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Reservation %d is not existing", rating.getReservation())));
+        String finalFeedback = feedback;
 
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
-        RatingRecord ratingRecord = new RatingRecord(
-                null,
-                rating.getExperimentId(),
-                ratingReservationRecord.getAnswer(),
-                timestamp,
-                rating.getRating(),
-                rating.getReservation(),
-                feedback,
-                rating.getWorker(),
-                null
-                );
 
         RatingRecord result = doIfRunning(rating.getExperimentId(), conf -> {
             RatingReservationRecord reservation = DSL.using(conf).selectFrom(RATING_RESERVATION)
                     .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
-                    .fetchOne();
+                    .fetchOptional()
+                    .orElseThrow(() -> new IllegalArgumentException(String.format("Reservation %d is not existing", rating.getReservation())));
 
             if (reservation.getUsed()) {
                 throw new IllegalStateException(String.format("Reservation %d is already in use", rating.getReservation()));
@@ -324,9 +311,21 @@ public class AnswerRatingOperations extends AbstractOperations {
 
             reservation.setUsed(true);
 
-            DSL.using(conf).executeUpdate(ratingRecord);
+            DSL.using(conf).executeUpdate(reservation);
 
-            return create.insertInto(RATING)
+            RatingRecord ratingRecord = new RatingRecord(
+                    null,
+                    rating.getExperimentId(),
+                    reservation.getAnswer(),
+                    timestamp,
+                    rating.getRating(),
+                    rating.getReservation(),
+                    finalFeedback,
+                    rating.getWorker(),
+                    null
+            );
+
+            return DSL.using(conf).insertInto(RATING)
                     .set(ratingRecord)
                     .returning()
                     .fetchOne();
@@ -346,14 +345,14 @@ public class AnswerRatingOperations extends AbstractOperations {
         addToExperimentCalibration(result.getWorkerId(), result.getExperiment());
 
         Result<RatingConstraintRecord> ratingConstraints = create.selectFrom(RATING_CONSTRAINT)
-                .where(RATING_CONSTRAINT.REF_RATING.eq(ratingRecord.getIdRating()))
+                .where(RATING_CONSTRAINT.REF_RATING.eq(result.getIdRating()))
                 .fetch();
 
         Result<ConstraintRecord> constraints = create.selectFrom(CONSTRAINT)
                 .where(CONSTRAINT.ID_CONSTRAINT.in(ratingConstraints.map(RatingConstraintRecord::getOffConstraint)))
                 .fetch();
 
-        return AnswerRatingTransformer.toRatingProto(ratingRecord, constraints);
+        return AnswerRatingTransformer.toRatingProto(result, constraints);
     }
 
     /**
