@@ -94,7 +94,7 @@ public class PyBossaPlatformUnitTest {
         //try to get worker
         JsonElement verifiedWorkerId = workerIdentification.get().getWorker(params).getWorkerData();
 
-        assertEquals(WORKER_ID, verifiedWorkerId.getAsString());
+        assertEquals(WORKER_ID, verifiedWorkerId.getAsJsonObject().get("identification").getAsString());
     }
 
     @Test(expected = UnidentifiedWorkerException.class)
