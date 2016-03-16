@@ -64,7 +64,6 @@ public class PlatformManager {
                 .collect(Collectors.toMap(Platform::getID, Function.identity()));
 
         //update database
-        //TODO @Marcel add currency!
         List<PlatformRecord> records = platforms.values().stream()
                 .map(platform -> new PlatformRecord(
                         platform.getID(),
@@ -258,8 +257,7 @@ public class PlatformManager {
         Set<String> should = workerRecords.stream().map(WorkerRecord::getIdentification).collect(Collectors.toSet());
 
         if (!given.equals(should)) {
-            throw new PreActionException(new IllegalWorkerSetException(
-            ));
+            throw new PreActionException(new IllegalWorkerSetException());
         }
 
         return getPlatformPayment(name).payExperiment(record.getIdexperimentsPlatforms(), record.getPlatformData(), experiment,paymentJobs);
