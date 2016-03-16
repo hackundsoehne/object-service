@@ -157,19 +157,9 @@ public class QualityIdentificator {
      */
     private void checkExpStatus(ExperimentRecord experiment) {
         if (experiment.getNeededAnswers() <= answerOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())){
-            boolean isRunning = false;
-            boolean isShuttingDown = false;
-
-            for( ExperimentsPlatformStatusPlatformStatus status :experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment())){
-                if(status.equals(ExperimentsPlatformStatusPlatformStatus.shutdown)){
-                    isShuttingDown = true;
-                }else if(status.equals(ExperimentsPlatformStatusPlatformStatus.running)){
-                    isRunning = true;
-                }
-            }
-
-            if(isRunning  && !isShuttingDown){ //Only shut down if running and not already shutting down
-                experimentResource.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
+            Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment());
+            if(statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)  && !statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)){ //Only shut down if running and not already shutting down
+                experimentOperator.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
             }
         }
 

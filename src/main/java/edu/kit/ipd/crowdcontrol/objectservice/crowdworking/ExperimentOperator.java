@@ -78,21 +78,13 @@ public class ExperimentOperator {
     /**
      * End a given experiment
      *
-     * @param experiment the experiment to end{
+     * @param experiment the experiment to end
 
      */
     public void endExperiment(Experiment experiment) {
-        boolean isRunning = false;
-        boolean isShuttingDown = false;
 
-        for( ExperimentsPlatformStatusPlatformStatus status :experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId())){
-            if(status.equals(ExperimentsPlatformStatusPlatformStatus.shutdown)){
-                isShuttingDown = true;
-            }else if(status.equals(ExperimentsPlatformStatusPlatformStatus.running)){
-                isRunning = true;
-            }
-        }
-        if(isRunning  && !isShuttingDown) {
+        Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId());
+         if(statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)  && !statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
 
             for (Experiment.Population population :
                     experiment.getPopulationsList()) {
@@ -106,12 +98,18 @@ public class ExperimentOperator {
             experimentsPlatformOperations.setGlobalPlatformStatus(experiment, ExperimentsPlatformStatusPlatformStatus.shutdown);
             ShutdownRunner runner = new ShutdownRunner(experiment);
             runner.run();
-        }else if(!isRunning){
+        }else if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)){
             log.info("Experiment "+experiment.getId()+" is not running ");
         }else {
             log.info("Experiment "+experiment.getId()+" is already shutting down");
 
         }
+    }
+
+
+    public void recoverExperiments(){
+
+
     }
 
     private void recoverExperimentShutdown(int experimentID){
@@ -144,7 +142,7 @@ public class ExperimentOperator {
         /**
          * Waits a specified amount of time until stopping the experiment and setting its state accordingly
          */
-        public void run(){
+        public void start(){
             try {
                 TimeUnit.MINUTES.sleep(minutesToShutdown);
             } catch (InterruptedException e) {
@@ -158,7 +156,7 @@ public class ExperimentOperator {
         */
          public void runRemaining(int minutesToShutdown){ //Used by a recover-method
             this.minutesToShutdown = minutesToShutdown;
-            run();
+            start();
         }
     }
 }
