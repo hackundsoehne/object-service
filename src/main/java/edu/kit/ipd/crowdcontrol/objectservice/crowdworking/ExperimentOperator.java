@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Presents starting and stopping experiment operations on populations
@@ -29,6 +28,8 @@ public class ExperimentOperator {
     private final PlatformManager platformManager;
     private final ExperimentFetcher experimentFetcher;
     private final ExperimentsPlatformOperations experimentsPlatformOperations;
+    private final ScheduledExecutorService scheduledExecutorService;
+
 
     private final EventManager eventManager;
     /**
@@ -38,6 +39,7 @@ public class ExperimentOperator {
      */
     public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations,EventManager eventManager) {
         this.platformManager = platformManager;
+        this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
         this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.experimentFetcher = experimentFetcher;
         this.eventManager = eventManager;
@@ -96,8 +98,7 @@ public class ExperimentOperator {
             }
 
             experimentsPlatformOperations.setGlobalPlatformStatus(experiment, ExperimentsPlatformStatusPlatformStatus.shutdown);
-            ShutdownRunner runner = new ShutdownRunner(experiment);
-            runner.run();
+            shutdownExperiment(experiment);
         }else if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)){
             log.info("Experiment "+experiment.getId()+" is not running ");
         }else {
@@ -123,19 +124,32 @@ public class ExperimentOperator {
         long passedTime = Timestamp.valueOf(LocalDateTime.now()).getTime()-experimentsPlatformStatusRecord.getTimestamp().getTime();
         long passedMins = TimeUnit.MILLISECONDS.toMinutes(passedTime);
 
-        ShutdownRunner runner = new ShutdownRunner(experiment);
+
         if(passedMins >= 120){
-            runner.runRemaining(1);
+           resumeShutdownExperiment(experiment,-1);
         }else {
-            runner.runRemaining(120 - (int)passedMins);
+           resumeShutdownExperiment(experiment,120-(int)passedMins);
         }
 
     }
 
+    private void shutdownExperiment(Experiment experiment){
+        resumeShutdownExperiment(experiment,120);
+    }
 
-    /**
+    private void resumeShutdownExperiment(Experiment experiment, int remainingMins){
+        ScheduledFuture scheduledFuture= scheduledExecutorService.schedule(new Runnable() {
+            @Override
+            public void run() {
+                experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.stopped);
+                eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
+            }
+        },remainingMins,TimeUnit.MINUTES);
+    }
+
+ /*   /**
      * Private class for non-blocking shutdown-process
-     */
+
     private class ShutdownRunner extends Thread{
         private Experiment experiment;
         private int minutesToShutdown = 120;
@@ -146,7 +160,7 @@ public class ExperimentOperator {
 
         /**
          * Waits a specified amount of time until stopping the experiment and setting its state accordingly
-         */
+
         public void start(){
             try {
                 TimeUnit.MINUTES.sleep(minutesToShutdown);
@@ -158,10 +172,10 @@ public class ExperimentOperator {
         }
         /**
         * Waits the remaining time of the shutdown process until stopping the experiment and setting its state accordingly
-        */
+
          public void runRemaining(int minutesToShutdown){ //Used by a recover-method
             this.minutesToShutdown = minutesToShutdown;
             start();
         }
-    }
+    } */
 }
