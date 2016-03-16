@@ -571,4 +571,14 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .having(DSL.val(1.0).minus(dividend.divide(divisor)).greaterOrEqual(threshold))
                 .fetchInto(ANSWER);
     }
+
+
+    /**
+     * Retrieves all answers which were not checked by the duplicate-checker before
+     * @return list of all unchecked answers
+     */
+    public List<AnswerRecord> getUncheckedAnswers(int expID){
+        //TODO
+        return null;
+    }
 }
