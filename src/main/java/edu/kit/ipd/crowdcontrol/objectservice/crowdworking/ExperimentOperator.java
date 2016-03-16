@@ -36,7 +36,7 @@ public class ExperimentOperator {
      * @param platformManager
      * @param eventManager
      */
-    public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations) {
+    public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations,EventManager eventManager) {
         this.platformManager = platformManager;
         this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.experimentFetcher = experimentFetcher;
@@ -154,7 +154,7 @@ public class ExperimentOperator {
                 e.printStackTrace();
             }
             experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.stopped);
-            EventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
+            eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
         }
         /**
         * Waits the remaining time of the shutdown process until stopping the experiment and setting its state accordingly

@@ -29,7 +29,7 @@ public class ExperimentOperatorTest {
         experimentFetcher = mock(ExperimentFetcher.class);
         experimentsPlatformOperations = mock(ExperimentsPlatformOperations.class);
         platformManager = mock(PlatformManager.class);
-        experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,experimentsPlatformOperations);
+        experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,experimentsPlatformOperations,new EventManager());
         experiment  = Experiment.newBuilder()
                         .addPopulations(Experiment.Population.newBuilder().setPlatformId("Good"))
                         .addPopulations(Experiment.Population.newBuilder().setPlatformId("Bad"))

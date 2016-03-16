@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
@@ -37,10 +38,10 @@ public class QualityIdentificator {
     final static int MINIMUM_QUALITY = 0;
 
     private final Logger log = LogManager.getLogger(QualityIdentificator.class);
-    private final Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
+    private final Observable<Event<Rating>> ratingObservable;
     private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final ExperimentOperator experimentOperator;
-    private final AnswerRatingOperations answerOperations;
+    private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final AlgorithmOperations algorithmOperations;
     private final Set<AnswerQualityStrategy> answerAlgorithms;
@@ -56,10 +57,10 @@ public class QualityIdentificator {
      * Might be set to allow more flexibility and more good answers
      */
 
-    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator experimentOperator,ExperimentsPlatformOperations experimentsPlatformOperations) {
+    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator experimentOperator,ExperimentsPlatformOperations experimentsPlatformOperations, EventManager eventManager) {
         this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.experimentOperator = experimentOperator;
-        this.answerOperations = answerRatingOperations;
+        this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.algorithmOperations = algorithmOperations;
         this.answerAlgorithms = new HashSet<>();
@@ -107,8 +108,9 @@ public class QualityIdentificator {
             return new AnswerQualityByRatings();
         });
 
-        rateQualityOfRatings(exp, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
-        rateQualityOfAnswers(exp, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating).orElseThrow(IllegalArgumentException::new);
+        rateQualityOfRatings(answerRecord, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        rateQualityOfAnswers(answerRecord, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
 
         checkExpStatus(exp);
 
@@ -156,7 +158,7 @@ public class QualityIdentificator {
      * @param experiment to be checked
      */
     private void checkExpStatus(ExperimentRecord experiment) {
-        if (experiment.getNeededAnswers() <= answerOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())){
+        if (experiment.getNeededAnswers() <= answerRatingOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())){
             Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment());
             if(statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)  && !statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)){ //Only shut down if running and not already shutting down
                 experimentOperator.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
