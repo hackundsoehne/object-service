@@ -23,7 +23,7 @@ public class AnswerRatingTransformerTest {
         AnswerRecord record = AnswerRatingTransformer.toAnswerRecord(proto, 17);
 
         // ID gets ignored
-        assertSame(null, record.getIdAnswer());
+        assertSame(3, record.getIdAnswer());
 
         // Explicitly use passed experiment ID
         assertSame(17, record.getExperiment());
