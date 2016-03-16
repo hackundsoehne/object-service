@@ -41,8 +41,6 @@ public class DuplicateCheckerTest {
     private DuplicateChecker duplicateChecker;
 
 
-
-
     private Map<Integer, Integer> answerQualityMap; //Maps answerID to answerQuality
     private Map<AnswerRecord,   Long> answerHashMap;
     private Map<Integer, String> answerResponseMap; //Maps answerID to answerResponse
@@ -51,13 +49,9 @@ public class DuplicateCheckerTest {
     public void setUp() throws Exception {
         answerQualityMap = new HashMap<>();
         answerResponseMap = new HashMap<>();
-        answerResponseMap = new HashMap<>();
         answerWithQualityAssuredList = new ArrayList<>();
 
         DSLContext create = DSL.using(SQLDialect.MYSQL);
-
-
-
         answerHashMap = new HashMap<>();
 
         experimentRecord = create.newRecord(Tables.EXPERIMENT);
@@ -74,7 +68,6 @@ public class DuplicateCheckerTest {
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-
                 return getDuplicate((long)invocation.getArguments()[0],(double)invocation.getArguments()[2]);
             }
         }).when(answerRatingOperations).getDuplicates(anyLong(),anyInt(),anyDouble());
@@ -116,9 +109,6 @@ public class DuplicateCheckerTest {
         }).when(answerRatingOperations).setHashToAnswer(any(AnswerRecord.class),anyLong());
         //----------------------------------------------------------------------------
 
-
-
-
         duplicateChecker = new DuplicateChecker(answerRatingOperations, experimentOperations);
 
 
@@ -136,7 +126,6 @@ public class DuplicateCheckerTest {
 
     }
 
-    @Ignore
     @Test
     public void testCheckExperimentForDuplicates() throws Exception {
         AnswerRecord uniqueAnswer = new AnswerRecord(0, experimentRecord.getIdExperiment(), "A very different answer", new Timestamp(0), 0,0, 6, false,"",(long)0);
@@ -154,9 +143,9 @@ public class DuplicateCheckerTest {
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(sim2B,new ArrayList<>()));
 
 
-        Thread.sleep(5000);
+        Thread.sleep(500);
         assertTrue(answerHashMap.size() == 5);
-
+        assertEquals((int)answerWithQualityAssuredList.size(),2);
         int idDuplicateSim1 = (answerQualityMap.get(sim1A.getIdAnswer()) == null) ? sim1B.getIdAnswer() : sim1A.getIdAnswer(); //Find out duplicate ID
         int idDuplicateSim2 = (answerQualityMap.get(sim2A.getIdAnswer()) == null) ? sim2B.getIdAnswer() : sim2A.getIdAnswer();
 
@@ -168,82 +157,43 @@ public class DuplicateCheckerTest {
 
     }
 
-    @Ignore
+
     @Test
-    public void testTermination() throws Exception {
+    public void testTermination() throws Exception {      answerResponseMap = new HashMap<>();
+        answerQualityMap = new HashMap<>();
+
+
         AnswerRecord uniqueAnswer = new AnswerRecord(0, experimentRecord.getIdExperiment(), "A very different answer", new Timestamp(0), 0,0, 6, false,"",(long)0);
 
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer, new ArrayList<>()));
-        Thread.sleep(500);
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer, new ArrayList<>()));
         Thread.sleep(1000);
-
+        assertEquals((int)answerHashMap.size(),1);
         assertTrue(duplicateChecker.terminate());
-
     }
 
     @Ignore
     @Test
     public void testImageDuplicateDetection() throws Exception {
 
-        Map<AnswerRecord, Long> mapOfNonDuplicateAnswers = new HashMap<>();
-        when(answerRatingOperations.getMapOfHashesOfNonDuplicateAnswers(experimentRecord.getIdExperiment())).thenReturn(mapOfNonDuplicateAnswers);
         experimentRecord.setAnswerType("picture");
-
-
         AnswerRecord answerRecord1 = new AnswerRecord(0, experimentRecord.getIdExperiment(), "http://www.franz-sales-verlag.de/fsvwiki/uploads/Lexikon/Baum.jpg", new Timestamp(0), 0,0, 6, false,"",(long)0);
-        AnswerRecord answerRecord2 = new AnswerRecord(0, experimentRecord.getIdExperiment(), "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(1), 0,0, 6, false,"",(long)0);
-        AnswerRecord answerRecord2Duplicate = new AnswerRecord(0, experimentRecord.getIdExperiment(), "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(4), 0,0, 6, false,"",(long)0);
-        AnswerRecord answerRecordMalformedURL = new AnswerRecord(0, experimentRecord.getIdExperiment(), "htt214ljbaq    dlkjps://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(1), 0,0, 6, false,"",(long)0);
-
-
+        AnswerRecord answerRecord2 = new AnswerRecord(1, experimentRecord.getIdExperiment(), "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(1), 0,0, 6, false,"",(long)0);
+        AnswerRecord answerRecord2Duplicate = new AnswerRecord(2, experimentRecord.getIdExperiment(), "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(4), 0,0, 6, false,"",(long)0);
+        AnswerRecord answerRecordMalformedURL = new AnswerRecord(3, experimentRecord.getIdExperiment(), "htt214ljbaq    dlkjps://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(1), 0,0, 6, false,"",(long)0);
 
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecordMalformedURL, new ArrayList<>()));
-
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord1, new ArrayList<>()));
-
-        BufferedImage image;
-        URL url;
-        try {
-
-
-            url = new URL(answerRecord1.getAnswer());
-            image = ImageIO.read(url);
-        } catch (Exception e) {
-            return;
-        }
-        mapOfNonDuplicateAnswers.put(answerRecord1, ImageSimilarity.getImageHashFromGreyScaleDeviation(image));
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2, new ArrayList<>()));
-        try {
-
-
-            url = new URL(answerRecord2.getAnswer());
-            image = ImageIO.read(url);
-        } catch (Exception e) {
-            return;
-        }
-        mapOfNonDuplicateAnswers.put(answerRecord2, ImageSimilarity.getImageHashFromGreyScaleDeviation(image));
         EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2Duplicate, new ArrayList<>()));
 
 
         // assertEquals((int)answerQualityMap.get(answerRecordMalformedURL),0);  Cannot test that, because the AnswerRatingTransform creates a different object
-        assertEquals(answerQualityMap.get(answerRecord1), answerRecord1.getQuality());
-        assertEquals(answerQualityMap.get(answerRecord2), answerRecord2.getQuality());
+        assertEquals(answerQualityMap.get(answerRecord1.getIdAnswer()), answerRecord1.getQuality());
+        assertEquals(answerQualityMap.get(answerRecord2.getIdAnswer()), answerRecord2.getQuality());
         //assertEquals((int)answerQualityMap.get(answerRecord2Duplicate), 0);  Cannot test that, because the AnswerRatingTransform creates a different object
 
-        duplicateChecker.terminate();
 
     }
-
-    private AnswerRecord getAnswer(int id){
-        for (Map.Entry<AnswerRecord,Long> entry: answerHashMap.entrySet()  ) {
-            if(entry.getKey().getIdAnswer() == id){
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
 
     private List<AnswerRecord> getDuplicate(long hash, double threshold){
         List<AnswerRecord> duplicates = new ArrayList<>();
