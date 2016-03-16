@@ -107,8 +107,13 @@ public class ExperimentOperator {
     }
 
 
+    /**
+     * Recovers experiments from shutdown-failure
+     */
     public void recoverExperiments(){
-
+        experimentsPlatformOperations.getExperimentsFailedDuringShutdown().forEach(
+                (exp) -> recoverExperimentShutdown(exp.getIdExperiment())
+        );
 
     }
 

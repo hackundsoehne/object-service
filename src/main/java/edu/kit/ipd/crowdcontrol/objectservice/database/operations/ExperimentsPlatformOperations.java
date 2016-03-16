@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPl
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord;
@@ -302,5 +303,16 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
     public ExperimentsPlatformStatusRecord getExperimentsPlatformStatusRecord(int experimentID){
         return null;
                 //TODO
+    }
+
+
+    /**
+     * Retrieves a list of all experiments containing the shutdown-state and which didn't
+     * reach the state-stopped yet.
+     * @return list of experiments to recover
+     */
+    public List<ExperimentRecord> getExperimentsFailedDuringShutdown(){
+        return null;
+        //TODO
     }
 }

@@ -80,6 +80,8 @@ public class Main {
         PopulationsHelper populationsHelper = new PopulationsHelper(operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
         ExperimentOperator experimentOperator = new ExperimentOperator(platformManager);
         ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
+        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations);
+        experimentOperator.recoverExperiments();
         PopulationsHelper populationsHelper = new PopulationsHelper(operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
         initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager);
