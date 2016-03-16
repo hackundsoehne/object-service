@@ -250,7 +250,7 @@ public class PlatformManager {
      */
     public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws PreActionException {
         ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
-                orElseThrow(() -> new PreActionException(new TaskOperationException("Platform is not activated for experiment "+experiment)));
+                orElseThrow(() -> new PreActionException(new IllegalStateException("Platform is not activated for experiment "+experiment)));
         List<WorkerRecord> workerRecords = workerOps.getWorkerWithWork(experiment.getId(), name);
 
         Set<String> given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toSet());
