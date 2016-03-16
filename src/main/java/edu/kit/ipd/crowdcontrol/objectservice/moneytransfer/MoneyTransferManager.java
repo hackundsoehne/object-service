@@ -179,21 +179,15 @@ public class MoneyTransferManager {
         int giftCodesCount = 0;
         //extract giftcodes and save them to the database
         for (Message message : messages) {
+            Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(message, parsingPassword);
+            if (rec.isPresent()) {
+                workerBalanceOperations.addGiftCode(rec.get().getCode(), rec.get().getAmount());
+                giftCodesCount++;
+            }
             try {
-                Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(message, parsingPassword);
-                if (rec.isPresent()) {
-                    workerBalanceOperations.addGiftCode(rec.get().getCode(), rec.get().getAmount());
-                    giftCodesCount++;
-                }
-            } catch (MoneyTransferException e) {
-                try {
-                    mailFetcher.markAsUnseen(message);
-                    throw new MoneyTransferException(e.getMessage());
-                } catch (MessagingException f) {
-
-                    throw new MoneyTransferException("The MailHandler was unable to revert all changes and mark the read mails as unseen." +
-                            "It seems, that there is either a problem with the server or with the properties file.", e);
-                }
+                mailFetcher.markAsSeen(message);
+            } catch (MessagingException e) {
+                throw new MoneyTransferException("The mail fetcher could not mark a mail as seen after extracting giftcode and addition to database", e);
             }
         }
         LOGGER.trace("Completed fetching " + giftCodesCount + " new giftcodes.");

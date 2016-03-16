@@ -69,18 +69,11 @@ public class MailReceiver implements MailFetcher {
         Message[] messages;
 
         Folder folder = store.getFolder(name);
-        folder.open(Folder.READ_WRITE);
+        folder.open(Folder.READ_ONLY);
 
         Flags seen = new Flags(Flags.Flag.SEEN);
         FlagTerm unseenFlagTerm = new FlagTerm(seen, false);
         messages = folder.search(unseenFlagTerm);
-
-        for (Message msg : messages) {
-            msg.setFlag(Flags.Flag.SEEN, true);
-        }
-        folder.close(true);
-
-        folder.open(Folder.READ_ONLY);
 
         LOGGER.trace("Successfully completed fetching " + messages.length + " unseen mails from folder" + name + ".");
         return messages;
@@ -95,15 +88,9 @@ public class MailReceiver implements MailFetcher {
         Store store = connect();
 
         Folder folder = store.getFolder(name);
-        folder.open(Folder.READ_WRITE);
-        Message[] messages = folder.getMessages();
-
-        for (Message msg : messages) {
-            msg.setFlag(Flags.Flag.SEEN, true);
-        }
-        folder.close(true);
-
         folder.open(Folder.READ_ONLY);
+
+        Message[] messages = folder.getMessages();
 
         LOGGER.trace("Successfully completed fetching " + messages.length + " mails from folder" + name + ".");
         return messages;
@@ -115,23 +102,18 @@ public class MailReceiver implements MailFetcher {
     @Override
     public void markAsUnseen(Message message) throws MessagingException {
         LOGGER.trace("Started marking message with subject \"" + message.getSubject() + "\" as unseen.");
-        Folder folder = message.getFolder();
-        boolean wasOpen = false;
-        int mode = 0;
-        if (folder.isOpen()) {
-            wasOpen = true;
-            mode = folder.getMode();
-            folder.close(true);
-        }
-        folder.open(Folder.READ_WRITE);
-
-        message.setFlag(Flags.Flag.SEEN, false);
-
-        folder.close(true);
-        if (wasOpen) {
-            folder.open(mode);
-        }
+        markAs(Flags.Flag.SEEN, false, message);
         LOGGER.trace("Successfully completed marking message with subject \"" + message.getSubject() + "\" as unseen.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void markAsSeen(Message message) throws MessagingException {
+        LOGGER.trace("Started marking message with subject \"" + message.getSubject() + "\" as seen.");
+        markAs(Flags.Flag.SEEN, true, message);
+        LOGGER.trace("Successfully completed marking message with subject \"" + message.getSubject() + "\" as seen.");
     }
 
     /**
@@ -140,24 +122,7 @@ public class MailReceiver implements MailFetcher {
     @Override
     public void deleteMails(Message message) throws MessagingException {
         LOGGER.trace("Started deleting message with subject \"" + message.getSubject() + "\".");
-
-        Folder folder = message.getFolder();
-        boolean wasOpen = false;
-        int mode = 0;
-        if (folder.isOpen()) {
-            wasOpen = true;
-            mode = folder.getMode();
-            folder.close(true);
-        }
-        folder.open(Folder.READ_WRITE);
-
-        message.setFlag(Flags.Flag.DELETED, true);
-
-        folder.close(true);
-
-        if (wasOpen) {
-            folder.open(mode);
-        }
+        markAs(Flags.Flag.DELETED, true, message);
         LOGGER.trace("Successfully completed deleting message with subject \"" + message.getSubject() + "\".");
     }
 
@@ -184,6 +149,26 @@ public class MailReceiver implements MailFetcher {
 
         LOGGER.trace("Successfully completed closing folder " + folder.getFullName() + ".");
     }
+
+    private void markAs(Flags.Flag flag, boolean value, Message message) throws MessagingException {
+        Folder folder = message.getFolder();
+        boolean wasOpen = false;
+        int mode = 0;
+        if (folder.isOpen()) {
+            wasOpen = true;
+            mode = folder.getMode();
+            folder.close(true);
+        }
+        folder.open(Folder.READ_WRITE);
+
+        message.setFlag(flag, value);
+
+        folder.close(true);
+        if (wasOpen) {
+            folder.open(mode);
+        }
+    }
+
 
     private Store connect() throws MessagingException {
         Session session = Session.getInstance(props);

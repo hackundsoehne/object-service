@@ -23,7 +23,7 @@ public class CommandLineMailHandler implements MailSender, MailFetcher {
      */
     @Override
     public Message[] fetchUnseen(String name) throws MessagingException {
-        LOGGER.debug("call to fetchUnseen");
+        LOGGER.debug("call to fetchUnseen with folder: {}", name);
         return new Message[0];
     }
 
@@ -33,7 +33,7 @@ public class CommandLineMailHandler implements MailSender, MailFetcher {
      */
     @Override
     public Message[] fetchFolder(String name) throws MessagingException {
-        LOGGER.debug("call to fetchUnseen");
+        LOGGER.debug("call to fetchFolder with folder: {}", name);
         return new Message[0];
     }
 
@@ -44,6 +44,14 @@ public class CommandLineMailHandler implements MailSender, MailFetcher {
     @Override
     public void markAsUnseen(Message message) throws MessagingException {
         LOGGER.debug("call to markAsUnseen with message: {}", message);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void markAsSeen(Message message) throws MessagingException {
+        LOGGER.debug("call to markAsSeen with message: {}", message);
     }
 
 

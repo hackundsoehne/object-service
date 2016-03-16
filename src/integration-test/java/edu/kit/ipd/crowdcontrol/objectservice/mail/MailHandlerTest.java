@@ -108,6 +108,7 @@ public class MailHandlerTest {
             if (message.getSubject().equals(subject)) {
                 found = true;
                 testMessage = message;
+                fetcher.markAsSeen(message);
                 break;
             }
         }
