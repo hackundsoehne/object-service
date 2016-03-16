@@ -549,8 +549,10 @@ public class AnswerRatingOperations extends AbstractOperations {
      * Retrieves all answers which were not checked by the duplicate-checker before
      * @return list of all unchecked answers
      */
-    public List<AnswerRecord> getUncheckedAnswers(int expID){
-        //TODO
-        return null;
+    public List<AnswerRecord> getAnswersWithoutHash(int expID) {
+        return create.selectFrom(ANSWER)
+                .where(ANSWER.HASH.isNull())
+                .and(ANSWER.EXPERIMENT.eq(expID))
+                .fetch();
     }
 }
