@@ -156,7 +156,7 @@ public class DuplicateChecker {
                 try {
                     answerRecord = queue.take();
                 } catch (InterruptedException e) {
-                    logger.info("DuplicateChecker terminated!!");
+                    logger.info("DuplicateChecker terminated!");
                     return;
                 }
                 if (answerRecord != null) {
