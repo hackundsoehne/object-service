@@ -93,8 +93,8 @@ public class DuplicateChecker {
             if(duplicate.getTimestamp().compareTo(originalAnswer.getTimestamp()) < 0)
                 originalAnswer = duplicate;
         }
-        listOfDuplicates.remove(originalAnswer);
         final AnswerRecord finalOriginalAnswer = originalAnswer;
+        listOfDuplicates.removeIf(record -> record.getIdAnswer().equals(finalOriginalAnswer.getIdAnswer()));
         listOfDuplicates.forEach((duplicate)-> {
             answerRatingOperations.setSystemResponseField(duplicate,"This answer is considered a duplicate with: \""+ finalOriginalAnswer.getAnswer()+"\"");
             answerRatingOperations.setQualityToAnswer(duplicate,0);
@@ -165,7 +165,8 @@ public class DuplicateChecker {
                     //trying to acquire answer-hash
                     Optional<Long> answerHash = getHashFromAnswer(answerRecord,answerType);
                     if (answerHash.isPresent()) {
-                        answerRatingOperations.setHashToAnswer(answerRecord,answerHash.get());
+                        answerRecord.setHash(answerHash.get());
+                        answerRatingOperations.updateAnswer(answerRecord);
                         processDuplicatesOfExperiment(answerType,answerRecord, answerHash.get());
                     } else {
                         // If optional is empty and thus the hashing failed, the answers quality will be set to zero.
