@@ -156,7 +156,7 @@ public class DuplicateChecker {
      * queue
      */
     public void rescheduleAnswersForDuplicateDetection(int expID){ //TODO add to expOperator
-        List<AnswerRecord> unratedAnswers = answerRatingOperations.getUncheckedAnswers(expID);
+        List<AnswerRecord> unratedAnswers = answerRatingOperations.getAnswersWithoutHash(expID);
         unratedAnswers.forEach((answerRecord -> {
             try {
                 queue.put(answerRecord);
