@@ -149,8 +149,8 @@ public class DuplicateCheckerTest {
         assertEquals((int) answerQualityMap.get(idDuplicateSim1),0);
         assertEquals((int) answerQualityMap.get(idDuplicateSim2),0);
 
-        assertTrue(answerResponseMap.get(idDuplicateSim1).startsWith("This answer is considered a duplicate with:"));
-        assertTrue(answerResponseMap.get(idDuplicateSim2).startsWith("This answer is considered a duplicate with:"));
+        assertTrue(answerResponseMap.get(idDuplicateSim1).startsWith(DuplicateChecker.DUPLICATE_RESPONSE));
+        assertTrue(answerResponseMap.get(idDuplicateSim2).startsWith(DuplicateChecker.DUPLICATE_RESPONSE));
 
     }
 
