@@ -42,7 +42,7 @@ public interface MailFetcher {
     void deleteMails(Message message) throws MessagingException;
 
     /**
-     * Get all unseen mail from the default location
+     * Get all unseen mail from the default location and marks them as seen.
      * @return A array of unseen mails
      */
     Message[] fetchUnseen() throws MessagingException;
