@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
@@ -36,7 +37,9 @@ public interface WorkerIdentification {
         return new WorkerIdentification() {
             @Override
             public JsonElement getWorkerData() throws UnidentifiedWorkerException {
-                return new JsonPrimitive(identification);
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.add("identification", new JsonPrimitive(identification));
+                return jsonObject;
             }
 
             @Override
