@@ -279,7 +279,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                 .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
                         DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
                                 .from(EXPERIMENTS_PLATFORM)
-                                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(1))
+                                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experiment))
                 ))
                 .fetchSet(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS);
 
