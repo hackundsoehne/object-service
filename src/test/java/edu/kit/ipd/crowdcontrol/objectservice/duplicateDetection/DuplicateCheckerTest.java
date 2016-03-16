@@ -98,10 +98,10 @@ public class DuplicateCheckerTest {
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                answerHashMap.put((AnswerRecord)invocation.getArguments()[0], (long) invocation.getArguments()[1]);
+                AnswerRecord answerRecord = (AnswerRecord) invocation.getArguments()[0];
+                answerHashMap.put(answerRecord,answerRecord.getHash());
                 return null;
             }
-            //TODO lucas review
         }).when(answerRatingOperations).updateAnswer(any(AnswerRecord.class));
         //----------------------------------------------------------------------------
 
