@@ -41,7 +41,7 @@ public class PaymentCalculator {
      * @return a mapping of workers to their salary
      */
     public Map<WorkerRecord, Integer> estimatePayment(Experiment experiment)throws IllegalArgumentException {
-        Map<WorkerRecord, Integer> WorkerSalaryMap = new HashMap<>();
+        Map<WorkerRecord, Integer> workerSalaryMap = new HashMap<>();
         int paymentBase = experiment.getPaymentBase().getValue();
         int paymentAnswer = experiment.getPaymentAnswer().getValue();
         int paymentRating = experiment.getPaymentRating().getValue();
@@ -56,7 +56,7 @@ public class PaymentCalculator {
 
         //For all good answers of the worker, his salary get increased by the payment for an answer
         for (Map.Entry<WorkerRecord,Integer> entry :workerAnswerMap.entrySet()) {
-            WorkerSalaryMap.put(entry.getKey(), (entry.getValue()* paymentAnswer));
+            workerSalaryMap.put(entry.getKey(), (entry.getValue()* paymentAnswer));
 
         }
 
@@ -65,21 +65,21 @@ public class PaymentCalculator {
         //For all good ratings of the worker, his salary get increased by the payment for a rating
         for (Map.Entry<WorkerRecord, Integer> entry : workerRatingMap.entrySet()) {
 
-            int currentSalaryOfWorker = (WorkerSalaryMap.get(entry.getKey()) == null ? 0 : WorkerSalaryMap.get(entry.getKey()));
+            int currentSalaryOfWorker = (workerSalaryMap.get(entry.getKey()) == null ? 0 : workerSalaryMap.get(entry.getKey()));
 
-            WorkerSalaryMap.put(entry.getKey(),  currentSalaryOfWorker + (entry.getValue() * paymentRating));
+            workerSalaryMap.put(entry.getKey(),  currentSalaryOfWorker + (entry.getValue() * paymentRating));
         }
 
         //Now all workers participating in the experiment are present in the map and the base-payment can be added to their salary
-        WorkerSalaryMap.replaceAll((workerRecord, payment) -> payment + paymentBase);
+        workerSalaryMap.replaceAll((workerRecord, payment) -> payment + paymentBase);
 
         //Add all workers of the experiment without valid answers or ratings
         workerOperations.getWorkersOfExp(experiment.getId()).forEach((workerRecord -> {
-            if(!WorkerSalaryMap.containsKey(workerRecord)){
-                WorkerSalaryMap.put(workerRecord,-1);
+            if(!workerSalaryMap.containsKey(workerRecord)){
+                workerSalaryMap.put(workerRecord,-1);
             }
         }));
 
-        return WorkerSalaryMap;
+        return workerSalaryMap;
     }
 }
