@@ -1,10 +1,8 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.CalibrationOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
-import edu.kit.ipd.crowdcontrol.objectservice.database.operations.TagConstraintsOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AlgorithmsTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.AlgorithmOption;
@@ -17,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,20 +27,22 @@ import java.util.stream.Collectors;
  */
 public class ExperimentFetcher {
     private final ExperimentOperations experimentOperations;
+    private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final TagConstraintsOperations tagConstraintsOperations;
     private final AlgorithmOperations algorithmOperations;
     private final CalibrationOperations calibrationOperations;
 
     /**
      * Create a new Experiment Fetcher
-     *
-     * @param experimentOperations Operations to use
+     *  @param experimentOperations Operations to use
+     * @param experimentsPlatformOperations Operations to use
      * @param tagConstraintsOperations Operations to use
      * @param algorithmOperations Operations to use
      * @param calibrationOperations Operations to use
      */
-    public ExperimentFetcher(ExperimentOperations experimentOperations, TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmOperations, CalibrationOperations calibrationOperations) {
+    public ExperimentFetcher(ExperimentOperations experimentOperations, ExperimentsPlatformOperations experimentsPlatformOperations, TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmOperations, CalibrationOperations calibrationOperations) {
         this.experimentOperations = experimentOperations;
+        this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.tagConstraintsOperations = tagConstraintsOperations;
         this.algorithmOperations = algorithmOperations;
         this.calibrationOperations = calibrationOperations;
@@ -69,9 +70,9 @@ public class ExperimentFetcher {
                     .orElseThrow(() -> new InternalServerErrorException(String.format("Calibration: %d not found", acceptedAnswer.getCalibration())));
         };
 
-        Function<Map.Entry<String, List<Calibration.Builder>>, Experiment.Population> toPopulation = entry -> {
+        BiFunction<String, List<Calibration.Builder>, Experiment.Population.Builder> toPopulation = (name , calibrationsBuilders) -> {
             //normalize, multiple chosen answers from the same Calibration were multiple objects
-            List<Calibration> calibrations = entry.getValue().stream()
+            List<Calibration> calibrations = calibrationsBuilders.stream()
                     .collect(Collectors.groupingBy(
                             Calibration.Builder::getId,
                             Collectors.toList())
@@ -83,28 +84,34 @@ public class ExperimentFetcher {
                     .collect(Collectors.toList());
 
             return Experiment.Population.newBuilder()
-                    .setPlatformId(entry.getKey())
-                    .addAllCalibrations(calibrations)
-                    .build();
+                    .setPlatformId(name)
+                    .addAllCalibrations(calibrations);
         };
 
+        Map<String, Experiment.Population.Builder> populations = experimentOperations.getCalibrations(id).entrySet().stream()
+                .map(entry -> toPopulation.apply(entry.getKey().getPlatform(), entry.getValue().stream().map(toCalibration).collect(Collectors.toList())))
+                .collect(Collectors.toMap(Experiment.Population.Builder::getPlatformId, Function.identity()));
 
-        Map<String, List<Calibration.Builder>> populations = experimentOperations.getCalibrations(id).entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> entry.getKey().getPlatform(),
-                        entry -> entry.getValue().stream().map(toCalibration).collect(Collectors.toList())
-                ));
+        Function<ExperimentsPlatformModeMode, Experiment.Population.Task> mapModeTask = mode -> {
+            switch (mode) {
+                case normal: return Experiment.Population.Task.BOTH;
+                case answer: return Experiment.Population.Task.ANSWER;
+                case rating: return Experiment.Population.Task.RATING;
+            }
+            return Experiment.Population.Task.BOTH;
+        };
 
-        experimentOperations.getActivePlatforms(id)
-                .forEach(platform -> {
-                    if (!populations.containsKey(platform)) {
-                        populations.put(platform, Collections.emptyList());
+        experimentsPlatformOperations.getActivePlatforms(id).entrySet()
+                .forEach(entry -> {
+                    if (!populations.containsKey(entry.getKey())) {
+                        populations.put(entry.getKey(), Experiment.Population.newBuilder().setPlatformId(entry.getKey()));
                     }
+                    populations.get(entry.getKey()).setTask(mapModeTask.apply(entry.getValue()));
                 });
 
         return populations
                 .entrySet().stream()
-                .map(toPopulation)
+                .map(entry  -> entry.getValue().build())
                 .collect(Collectors.toList());
     }
 
