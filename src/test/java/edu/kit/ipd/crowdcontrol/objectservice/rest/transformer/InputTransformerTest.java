@@ -58,7 +58,7 @@ public class InputTransformerTest {
     @Test
     public void transformInvalidProto() throws Exception {
         expectedException.expect(BadRequestException.class);
-        expectedException.expectMessage("Invalid protocol buffer.");
+        expectedException.expectMessage("Invalid protocol buffer: Protocol message contained an invalid tag (zero).");
 
         InputTransformer transformer = new InputTransformer(route, ErrorResponse.class);
 
