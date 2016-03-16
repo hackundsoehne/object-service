@@ -232,7 +232,7 @@ public class ExperimentResource {
                 .map(population -> {
                     try {
                         //insert the population into the databae
-                        populationsHelper.insertPopulation(id, population, ExperimentsPlatformModeMode.normal);
+                        populationsHelper.insertPopulation(id, population);
 
                         PlatformPopulation platformPopulation = new PlatformPopulation();
                         platformPopulation.job = platformManager.publishTask(population.getPlatformId(), old);
