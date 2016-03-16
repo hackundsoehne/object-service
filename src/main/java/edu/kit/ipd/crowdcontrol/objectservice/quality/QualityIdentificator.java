@@ -36,7 +36,7 @@ public class QualityIdentificator {
     final static int MINIMUM_QUALITY = 0;
 
     private final Logger log = LogManager.getLogger(QualityIdentificator.class);
-    private final Observable<Event<Rating>> ratingObservable = EventManager.RATINGS_CREATE.getObservable();
+    private final Observable<Event<Rating>> ratingObservable;
     private final ExperimentOperator experimentOperator;
     private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
@@ -54,7 +54,7 @@ public class QualityIdentificator {
      * Might be set to allow more flexibility and more good answers
      */
 
-    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator operator) {
+    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator operator, EventManager eventManager) {
 
         this.experimentOperator = operator;
         this.answerRatingOperations = answerRatingOperations;
@@ -62,7 +62,7 @@ public class QualityIdentificator {
         this.algorithmOperations = algorithmOperations;
         this.answerAlgorithms = new HashSet<>();
         this.ratingAlgorithms = new HashSet<>();
-
+        this.ratingObservable = eventManager.RATINGS_CREATE.getObservable();
         // Reflection isn't used, that's why algorithms need to be added manually
         //------------------------------------------------------
         //

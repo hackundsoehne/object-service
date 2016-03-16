@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationTokenRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -52,7 +53,7 @@ public class SQLEmailNotificationPolicyTest {
     public static void setUp() throws Exception {
         mailSender = Mockito.mock(MailSender.class);
         notificationOperations = Mockito.mock(NotificationOperations.class);
-        policy = new SQLEmailNotificationPolicy(mailSender, notificationOperations);
+        policy = new SQLEmailNotificationPolicy(mailSender, notificationOperations, new EventManager());
         create = DSL.using(SQLDialect.MYSQL);
         // this could be any record from the db
         notification = new Notification(5, "Test Notification",

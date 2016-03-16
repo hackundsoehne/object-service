@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.database.PopulationsHelper;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
 import org.junit.Before;
@@ -58,7 +59,7 @@ public class ExperimentResourceTest {
         experimentFetcher = mock(ExperimentFetcher.class);
         populationsHelper = mock(PopulationsHelper.class);
 
-        resource = new ExperimentResource(answerRatingOperations, experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations, experimentsPlatformOperations,  platformManager, experimentOperator, experimentFetcher, populationsHelper);
+        resource = new ExperimentResource(answerRatingOperations, experimentOperations, calibrationOperations, tagConstraintsOperations, algorithmOperations, experimentsPlatformOperations,  platformManager, experimentOperator, experimentFetcher, populationsHelper, new EventManager());
     }
 
     /**

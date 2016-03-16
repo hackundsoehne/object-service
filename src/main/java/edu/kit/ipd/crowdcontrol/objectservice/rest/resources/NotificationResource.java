@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Notification;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.NotificationList;
@@ -24,9 +25,11 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
  */
 public class NotificationResource {
     private NotificationOperations operations;
+    private final EventManager eventManager;
 
-    public NotificationResource(NotificationOperations operations) {
+    public NotificationResource(NotificationOperations operations, EventManager eventManager) {
         this.operations = operations;
+        this.eventManager = eventManager;
     }
 
     /**
@@ -73,7 +76,7 @@ public class NotificationResource {
             throw new BadRequestException(e.getMessage());
         }
 
-        EventManager.NOTIFICATION_CREATE.emit(notification);
+        eventManager.NOTIFICATION_CREATE.emit(notification);
 
         response.status(201);
         response.header("Location", "/notifications/" + notification.getId());
@@ -95,7 +98,7 @@ public class NotificationResource {
             Notification oldNotification = operations.getNotification(id).orElseThrow(NotFoundException::new);
             Notification newNotification = operations.updateNotification(id, patch);
 
-            EventManager.NOTIFICATION_UPDATE.emit(new ChangeEvent<>(oldNotification, newNotification));
+            eventManager.NOTIFICATION_UPDATE.emit(new ChangeEvent<>(oldNotification, newNotification));
 
             return newNotification;
         } catch (IllegalArgumentException e) {
@@ -113,7 +116,7 @@ public class NotificationResource {
         int id = getParamInt(request, "id");
 
         Optional<Notification> notification = operations.getNotification(id);
-        notification.map(EventManager.NOTIFICATION_DELETE::emit);
+        notification.map(eventManager.NOTIFICATION_DELETE::emit);
 
         boolean existed = operations.deleteNotification(id);
 

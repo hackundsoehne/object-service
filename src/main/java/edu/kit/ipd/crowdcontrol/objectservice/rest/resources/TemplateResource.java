@@ -24,9 +24,11 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
  */
 public class TemplateResource {
     private TemplateOperations operations;
+    private final EventManager eventManager;
 
-    public TemplateResource(TemplateOperations operations) {
+    public TemplateResource(TemplateOperations operations, EventManager eventManager) {
         this.operations = operations;
+        this.eventManager = eventManager;
     }
 
     /**
@@ -73,7 +75,7 @@ public class TemplateResource {
             throw new BadRequestException(e.getMessage());
         }
 
-        EventManager.TEMPLATE_CREATE.emit(template);
+        eventManager.TEMPLATE_CREATE.emit(template);
 
         response.status(201);
         response.header("Location", "/templates/" + template.getId());
@@ -94,7 +96,7 @@ public class TemplateResource {
         Template oldTemplate = operations.getTemplate(id).orElseThrow(NotFoundException::new);
         Template newTemplate = operations.updateTemplate(id, patch);
 
-        EventManager.TEMPLATE_UPDATE.emit(new ChangeEvent<>(oldTemplate, newTemplate));
+        eventManager.TEMPLATE_UPDATE.emit(new ChangeEvent<>(oldTemplate, newTemplate));
 
         return newTemplate;
     }
@@ -109,7 +111,7 @@ public class TemplateResource {
         int id = getParamInt(request, "id");
 
         Optional<Template> template = operations.getTemplate(id);
-        template.map(EventManager.TEMPLATE_DELETE::emit);
+        template.map(eventManager.TEMPLATE_DELETE::emit);
 
         boolean existed = operations.deleteTemplate(id);
 

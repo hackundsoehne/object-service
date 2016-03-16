@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.rest.resources;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.CalibrationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.Range;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.CalibrationList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class CalibrationResourceTest {
         CalibrationOperations calibrationOperations = mock(CalibrationOperations.class);
         when(calibrationOperations.getCalibrationsFrom(0, true, 20)).thenReturn(Range.of(new ArrayList<>(), null, null, false, false));
 
-        CalibrationResource resource = new CalibrationResource(calibrationOperations);
+        CalibrationResource resource = new CalibrationResource(calibrationOperations, new EventManager());
         Paginated<Integer> paginated = resource.all(request, response);
 
         assertEquals(paginated.getMessage(), CalibrationList.newBuilder().build());

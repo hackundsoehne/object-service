@@ -14,6 +14,7 @@ import java.util.Collection;
 
 public abstract class NotificationPolicy<T extends Collection<?>> {
     private final NotificationOperations operations;
+    private final EventManager eventManager;
 
     /**
      * Checks a notification's condition and sends the notification if the condition is met
@@ -28,13 +29,14 @@ public abstract class NotificationPolicy<T extends Collection<?>> {
                 if (notification.isSendOnce()) {
                     operations.deleteNotification(notification.getId());
                     // will cause the notification to be removed from the scheduler
-                    EventManager.NOTIFICATION_DELETE.emit(notification.toProtobuf());
+                    eventManager.NOTIFICATION_DELETE.emit(notification.toProtobuf());
                 }
             }
     }
 
-    public NotificationPolicy(NotificationOperations operations) {
+    public NotificationPolicy(NotificationOperations operations, EventManager eventManager) {
         this.operations = operations;
+        this.eventManager = eventManager;
     }
 
     /**

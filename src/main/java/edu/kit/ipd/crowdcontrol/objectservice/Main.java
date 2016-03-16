@@ -13,6 +13,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseManager;
 import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.database.PopulationsHelper;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.feedback.FeedbackCreator;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
@@ -59,6 +60,7 @@ public class Main {
         List<Platform> platforms = getPlatforms(config);
 
         DatabaseManager databaseManager = initDatabase(config);
+        EventManager eventManager = new EventManager();
 
         OperationCarrier operationCarrier = new OperationCarrier(config, databaseManager);
 
@@ -67,16 +69,16 @@ public class Main {
         MoneyTransferManager moneyTransfer = initMoneyTransfer(config, operationCarrier, moneyTransferFetcher, moneyTransferSender);
 
         MailSender notificationSender = getMailSender(config.mail.disabled, config.mail.notifications, config.mail.debug);
-        NotificationController notificationController = initNotificationController(operationCarrier, notificationSender);
+        NotificationController notificationController = initNotificationController(operationCarrier, notificationSender, eventManager);
 
         PlatformManager platformManager = initPlatformManager(operationCarrier, platforms, moneyTransfer);
 
-        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager);
+        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager, eventManager);
         ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
         PopulationsHelper populationsHelper = new PopulationsHelper(operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
-        initEventHandler(operationCarrier, platformManager, experimentOperator);
-        initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper);
+        initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager);
+        initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper, eventManager);
     }
 
     /**
@@ -84,19 +86,23 @@ public class Main {
      * @param operationCarrier Databaseoperations to use
      * @param platformManager PlatformManager to use
      * @param experimentOperator the operations to use for starting stopping experiments
+     * @param eventManager
      */
-    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator) {
+    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, EventManager eventManager) {
         FeedbackCreator feedbackCreator = new FeedbackCreator(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.workerOperations);
         new QualityIdentificator(
                 operationCarrier.algorithmsOperations,
                 operationCarrier.answerRatingOperations,
-                operationCarrier.experimentOperations, experimentOperator);
+                operationCarrier.experimentOperations,
+                experimentOperator,
+                eventManager);
 
         new PaymentDispatcher(
                 feedbackCreator,
                 platformManager,
                 operationCarrier.answerRatingOperations,
-                operationCarrier.workerOperations);
+                operationCarrier.workerOperations,
+                eventManager);
     }
 
     /**
@@ -107,18 +113,19 @@ public class Main {
      * @param experimentOperator experimentOperations to use
      * @param experimentFetcher
      * @param populationsHelper
+     * @param eventManager
      */
-    private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, ExperimentFetcher experimentFetcher, PopulationsHelper populationsHelper) {
+    private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, ExperimentFetcher experimentFetcher, PopulationsHelper populationsHelper, EventManager eventManager) {
         new Router(
-                new TemplateResource(operationCarrier.templateOperations),
-                new NotificationResource(operationCarrier.notificationRestOperations),
+                new TemplateResource(operationCarrier.templateOperations, eventManager),
+                new NotificationResource(operationCarrier.notificationRestOperations, eventManager),
                 new PlatformResource(operationCarrier.platformOperations),
-                new WorkerResource(operationCarrier.workerOperations, platformManager),
-                new CalibrationResource(operationCarrier.calibrationOperations),
-                new ExperimentResource(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.experimentsPlatformOperations, platformManager, experimentOperator, experimentFetcher, populationsHelper),
+                new WorkerResource(operationCarrier.workerOperations, platformManager, eventManager),
+                new CalibrationResource(operationCarrier.calibrationOperations, eventManager),
+                new ExperimentResource(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.experimentsPlatformOperations, platformManager, experimentOperator, experimentFetcher, populationsHelper, eventManager),
                 new AlgorithmResources(operationCarrier.algorithmsOperations),
-                new AnswerRatingResource(operationCarrier.experimentOperations, operationCarrier.answerRatingOperations, operationCarrier.workerOperations),
-                new WorkerCalibrationResource(operationCarrier.workerCalibrationOperations),
+                new AnswerRatingResource(operationCarrier.experimentOperations, operationCarrier.answerRatingOperations, operationCarrier.workerOperations, eventManager),
+                new WorkerCalibrationResource(operationCarrier.workerCalibrationOperations, eventManager),
                 config.deployment.origin,
                 config.deployment.port
         ).init();
@@ -162,10 +169,10 @@ public class Main {
      * @param notificationSender the sender to send the notifications
      * @return A running notification contoller
      */
-    private static NotificationController initNotificationController(OperationCarrier carrier, MailSender notificationSender) {
+    private static NotificationController initNotificationController(OperationCarrier carrier, MailSender notificationSender, EventManager eventManager) {
         // notifications might as well use another sendMail instance
         NotificationController notificationController = new NotificationController(carrier.notificationRestOperations,
-                new SQLEmailNotificationPolicy(notificationSender, carrier.notificationRestOperations));
+                new SQLEmailNotificationPolicy(notificationSender, carrier.notificationRestOperations, eventManager), eventManager);
         notificationController.init();
 
         return notificationController;

@@ -22,9 +22,11 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
  */
 public class CalibrationResource {
     private CalibrationOperations operations;
+    private final EventManager eventManager;
 
-    public CalibrationResource(CalibrationOperations operations) {
+    public CalibrationResource(CalibrationOperations operations, EventManager eventManager) {
         this.operations = operations;
+        this.eventManager = eventManager;
     }
 
     /**
@@ -70,7 +72,7 @@ public class CalibrationResource {
             throw new BadRequestException(e.getMessage());
         }
 
-        EventManager.CALIBRATION_CREATE.emit(calibration);
+        eventManager.CALIBRATION_CREATE.emit(calibration);
 
         response.status(201);
         response.header("Location", "/calibrations/" + calibration.getId());
@@ -89,7 +91,7 @@ public class CalibrationResource {
 
         try {
             Optional<Calibration> calibration = operations.getCalibration(id);
-            calibration.map(EventManager.CALIBRATION_DELETE::emit);
+            calibration.map(eventManager.CALIBRATION_DELETE::emit);
 
             boolean existed = operations.deleteCalibration(id);
 
