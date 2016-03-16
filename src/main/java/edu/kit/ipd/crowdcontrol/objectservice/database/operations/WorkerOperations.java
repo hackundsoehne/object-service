@@ -173,7 +173,7 @@ public class WorkerOperations extends AbstractOperations {
         return create.select(WORKER.fields())
                 .select(rating.ID_RATING)
                 .select(answer.ID_ANSWER)
-                .from(ANSWER)
+                .from(WORKER)
                 .rightJoin(rating).on(
                         WORKER.ID_WORKER.eq(rating.WORKER_ID)
                                 .and(rating.EXPERIMENT.eq(expId))
