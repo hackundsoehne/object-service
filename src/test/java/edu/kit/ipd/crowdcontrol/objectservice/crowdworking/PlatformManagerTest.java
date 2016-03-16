@@ -13,12 +13,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-
 /**
  * Created by marcel on 22.01.16.
  */
@@ -39,6 +40,7 @@ public class PlatformManagerTest {
         platforms.add( new PlatformTest("test2", "test 2", false, true, false, true));
         platforms.add( new PlatformTest("test3", "test 3", true, false, true, true));
     }
+
     @Before
     public void prepare() {
         experimentsPlatformOperations = mock(ExperimentsPlatformOperations.class);
@@ -65,6 +67,13 @@ public class PlatformManagerTest {
                 experimentsPlatformOperations,
                 platformOps,
                 workerOps);
+    }
+
+    @Test
+    public void testEmail() throws Exception {
+       assertTrue(manager.getNeedemail("test1"));
+       assertFalse(manager.getNeedemail("test2"));
+       assertTrue(manager.getNeedemail("test3"));
     }
 
     @Test
@@ -113,6 +122,8 @@ public class PlatformManagerTest {
                     ExperimentsPlatformStatusPlatformStatus.finished);
         });
     }
+
+
 
     static class PlatformTest implements Platform, Payment {
         private boolean needEmail;

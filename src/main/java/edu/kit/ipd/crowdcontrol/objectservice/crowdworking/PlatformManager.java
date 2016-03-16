@@ -64,7 +64,6 @@ public class PlatformManager {
                 .collect(Collectors.toMap(Platform::getID, Function.identity()));
 
         //update database
-        //TODO @Marcel add currency!
         List<PlatformRecord> records = platforms.values().stream()
                 .map(platform -> new PlatformRecord(
                         platform.getID(),
@@ -251,15 +250,14 @@ public class PlatformManager {
      */
     public CompletableFuture<Boolean> payExperiment(String name, Experiment experiment, List<PaymentJob> paymentJobs) throws PreActionException {
         ExperimentsPlatformRecord record = experimentsPlatformOps.getExperimentsPlatform(name, experiment.getId()).
-                orElseThrow(() -> new PreActionException(new TaskOperationException("Platform is not activated for experiment "+experiment)));
+                orElseThrow(() -> new PreActionException(new IllegalStateException("Platform is not activated for experiment "+experiment)));
         List<WorkerRecord> workerRecords = workerOps.getWorkerWithWork(experiment.getId(), name);
 
         Set<String> given = paymentJobs.stream().map(paymentJob -> paymentJob.getWorkerRecord().getIdentification()).collect(Collectors.toSet());
         Set<String> should = workerRecords.stream().map(WorkerRecord::getIdentification).collect(Collectors.toSet());
 
         if (!given.equals(should)) {
-            throw new PreActionException(new IllegalWorkerSetException(
-            ));
+            throw new PreActionException(new IllegalWorkerSetException());
         }
 
         return getPlatformPayment(name).payExperiment(record.getIdexperimentsPlatforms(), record.getPlatformData(), experiment,paymentJobs);

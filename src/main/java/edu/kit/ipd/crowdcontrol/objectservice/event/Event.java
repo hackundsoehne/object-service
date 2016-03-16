@@ -35,4 +35,13 @@ public class Event<T> {
     public T getData() {
         return data;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Event)) return false;
+
+        Event e = (Event) o;
+
+        return e.data == data;
+    }
 }
