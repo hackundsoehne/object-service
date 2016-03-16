@@ -6,6 +6,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import edu.kit.ipd.crowdcontrol.objectservice.ConfigLoader;
 import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
 import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
@@ -20,6 +21,7 @@ import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Exchanger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -55,12 +57,16 @@ public class PyBossaPlatformTest {
     @BeforeClass
     public static void setUp() throws Exception {
         // load config
-        File configFile = new File("src/integration-test/resources/config.yml");
-        Config config = Yaml.loadType(configFile, Config.class);
+        ConfigLoader configLoader = new ConfigLoader();
+        Config config = configLoader.getConfig();
+        boolean found = false;
+
         workerServiceUrl = config.deployment.workerService;
         workerUiUrl = config.deployment.workerUIPublic;
+
         for (ConfigPlatform platform : config.platforms) {
             if (platform.type.toLowerCase().equals("pybossa")) {
+                found = true;
                 if (config.deployment.workerUILocal == null) {
                     config.deployment.workerUILocal = config.deployment.workerUIPublic;
                 }
@@ -70,6 +76,8 @@ public class PyBossaPlatformTest {
                 projectId = java.lang.Integer.valueOf(platform.projectId);
             }
         }
+        if (!found) throw new Exception("Pybossa is not configured.");
+
         taskUrl = apiUrl + "/task";
         requests = new PyBossaRequests(apiUrl, projectId, apiKey);
 
