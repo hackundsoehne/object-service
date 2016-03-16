@@ -207,6 +207,29 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
     }
 
     /**
+     * gets all the active platform for the experiment
+     * @param experimentId the primary key of the experiment
+     * @return a list of platforms
+     */
+    public Map<String, ExperimentsPlatformModeMode> getActivePlatforms(int experimentId) {
+        ExperimentsPlatformMode mode2 = EXPERIMENTS_PLATFORM_MODE.as("mode2");
+        ExperimentsPlatformMode mode1 = EXPERIMENTS_PLATFORM_MODE.as("mode1");
+        return create.select(EXPERIMENTS_PLATFORM.PLATFORM, EXPERIMENTS_PLATFORM_MODE.MODE)
+                .from(EXPERIMENTS_PLATFORM)
+                .join(mode1).onKey()
+                .leftOuterJoin(mode2).on(
+                    EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.eq(mode2.field(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM))
+                    .and(mode1.field(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP).lessThan(mode2.field(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP)))
+                    .or(mode1.field(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP).eq(mode2.field(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP))
+                        .and(mode1.field(EXPERIMENTS_PLATFORM_MODE.IDEXPERIMENTS_PLATFORM_STOPGAP)
+                                .lessThan(mode2.field(EXPERIMENTS_PLATFORM_MODE.IDEXPERIMENTS_PLATFORM_STOPGAP)))
+                    )
+                )
+                .fetchMap(EXPERIMENTS_PLATFORM.PLATFORM, EXPERIMENTS_PLATFORM_MODE.MODE);
+
+    }
+
+    /**
      * Deletes a TaskRecord matching the primary key of the passed TaskRecord
      * @param experimentsPlatform the primary key of the ExperimentsPlatform to delete
      */
