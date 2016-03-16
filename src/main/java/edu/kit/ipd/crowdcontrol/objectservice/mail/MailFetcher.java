@@ -45,4 +45,11 @@ public interface MailFetcher {
      * @return A array of unseen mails
      */
     Message[] fetchUnseen() throws MessagingException;
+
+    /**
+     * Closes the folder and the store of the messages.
+     * @param messages the messages their resources become closed (have to be in the same folder)
+     * @throws MessagingException in case of problems with closing
+     */
+    void close(Message[] messages) throws MessagingException;
 }

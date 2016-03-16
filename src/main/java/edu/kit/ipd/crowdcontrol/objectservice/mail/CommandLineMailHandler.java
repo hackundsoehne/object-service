@@ -16,11 +16,9 @@ import java.io.UnsupportedEncodingException;
 public class CommandLineMailHandler implements MailSender, MailFetcher {
     private static final Logger LOGGER = LogManager.getLogger(CommandLineMailHandler.class);
 
+
     /**
-     * Fetches all unseen mails in a certain folder and marks them as seen.
-     *
-     * @param name the name of the folder
-     * @return fetched mails
+     * {@inheritDoc}
      */
     @Override
     public Message[] fetchUnseen(String name) throws MessagingException {
@@ -28,11 +26,9 @@ public class CommandLineMailHandler implements MailSender, MailFetcher {
         return new Message[0];
     }
 
+
     /**
-     * Fetches all mails in a folder and marks them as seen.
-     *
-     * @param name the name of the folder
-     * @return fetched mails
+     * {@inheritDoc}
      */
     @Override
     public Message[] fetchFolder(String name) throws MessagingException {
@@ -40,43 +36,48 @@ public class CommandLineMailHandler implements MailSender, MailFetcher {
         return new Message[0];
     }
 
+
     /**
-     * Marks a message in a certain folder as unseen.
-     *
-     * @param message the message to mark
-     * @throws MessagingException throws a MessagingException, if there are any problems with the message
+     * {@inheritDoc}
      */
     @Override
     public void markAsUnseen(Message message) throws MessagingException {
         LOGGER.debug("call to markAsUnseen with message: {}", message);
     }
 
+
     /**
-     * Deletes a message from the folder.
-     *
-     * @param message the message to delete
-     * @throws MessagingException throws a MessagingException, if there are any problems with the message
+     * {@inheritDoc}
      */
     @Override
     public void deleteMails(Message message) throws MessagingException {
         LOGGER.debug("call to deleteMails with message: {}", message);
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Message[] fetchUnseen() throws MessagingException {
         return new Message[0];
     }
 
+
     /**
-     * Sends mails to another mail address.
-     *
-     * @param recipientMail the mail address, the mail gets sent
-     * @param subject       the subject of the mail
-     * @param message       the content of the mail
+     * {@inheritDoc}
      */
     @Override
     public void sendMail(String recipientMail, String subject, String message) throws MessagingException, UnsupportedEncodingException {
         LOGGER.info("call to sendMail, parameters recipientMail : {}, subject : {}, message: {}",
                 recipientMail, subject, message);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void close(Message[] messages) {
+        LOGGER.info("call to close with messages{}", messages);
     }
 }

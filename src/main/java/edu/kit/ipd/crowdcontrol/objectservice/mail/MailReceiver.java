@@ -161,16 +161,18 @@ public class MailReceiver implements MailFetcher {
         LOGGER.trace("Successfully completed deleting message with subject \"" + message.getSubject() + "\".");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Message[] fetchUnseen() throws MessagingException {
         return fetchUnseen(defaultInbox);
     }
 
     /**
-     * Closes the folder and the store of the messages.
-     * @param messages the messages their resources become closed (have to be in the same folder)
-     * @throws MessagingException in case of problems with closing
+     * {@inheritDoc}
      */
+    @Override
     public void close(Message[] messages) throws MessagingException {
         LOGGER.trace("Started closing folder of " + messages.length + " messages.");
         if (messages.length > 0) {
