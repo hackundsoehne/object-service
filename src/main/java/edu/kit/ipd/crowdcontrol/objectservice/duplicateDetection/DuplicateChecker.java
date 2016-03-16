@@ -47,13 +47,13 @@ public class DuplicateChecker {
      * @param answerRatingOperations used to set quality and quality-assured bit to duplicates
      * @param experimentOperations db-operations used to determine the answer-type of an experiment
      */
-    public DuplicateChecker(AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations) {
+    public DuplicateChecker(AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations,EventManager eventManager) {
 
         this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.thread = new DuplicateWatcherThread();
 
-        EventManager.ANSWER_CREATE.getObservable().subscribe(answerEvent -> {
+        eventManager.ANSWER_CREATE.getObservable().subscribe(answerEvent -> {
             try {
                 queue.put(AnswerRatingTransformer.toAnswerRecord(answerEvent.getData(), answerEvent.getData().getExperimentId()));
             } catch (InterruptedException e) {

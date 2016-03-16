@@ -39,6 +39,7 @@ public class DuplicateCheckerTest {
     private ExperimentOperations experimentOperations;
     private ExperimentRecord experimentRecord;
     private DuplicateChecker duplicateChecker;
+    private EventManager eventManager;
 
 
     private Map<Integer, Integer> answerQualityMap; //Maps answerID to answerQuality
@@ -47,6 +48,7 @@ public class DuplicateCheckerTest {
     private List<Integer> answerWithQualityAssuredList;
     @Before
     public void setUp() throws Exception {
+        eventManager = new EventManager();
         answerQualityMap = new HashMap<>();
         answerResponseMap = new HashMap<>();
         answerWithQualityAssuredList = new ArrayList<>();
@@ -109,7 +111,7 @@ public class DuplicateCheckerTest {
         }).when(answerRatingOperations).setHashToAnswer(any(AnswerRecord.class),anyLong());
         //----------------------------------------------------------------------------
 
-        duplicateChecker = new DuplicateChecker(answerRatingOperations, experimentOperations);
+        duplicateChecker = new DuplicateChecker(answerRatingOperations, experimentOperations,eventManager);
 
 
     }
@@ -136,11 +138,11 @@ public class DuplicateCheckerTest {
         AnswerRecord sim2A = new AnswerRecord(3, experimentRecord.getIdExperiment(), "An answer should not be similar to other answers, else it is a duplicate", new Timestamp(0), 0,0, 6, false,"",(long)0);
         AnswerRecord sim2B = new AnswerRecord(4, experimentRecord.getIdExperiment(), "an ANSWER shouLd NoT bE similaR to other duplicates, else it is a duplicate", new Timestamp(1), 0,0, 6, false,"",(long)0);
 
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer,new ArrayList<>()));
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(sim1A,new ArrayList<>()));
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(sim1B,new ArrayList<>()));
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(sim2A,new ArrayList<>()));
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(sim2B,new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer,new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(sim1A,new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(sim1B,new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(sim2A,new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(sim2B,new ArrayList<>()));
 
 
         Thread.sleep(500);
@@ -165,7 +167,7 @@ public class DuplicateCheckerTest {
 
         AnswerRecord uniqueAnswer = new AnswerRecord(0, experimentRecord.getIdExperiment(), "A very different answer", new Timestamp(0), 0,0, 6, false,"",(long)0);
 
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer, new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(uniqueAnswer, new ArrayList<>()));
         Thread.sleep(1000);
         assertEquals((int)answerHashMap.size(),1);
         assertTrue(duplicateChecker.terminate());
@@ -181,10 +183,10 @@ public class DuplicateCheckerTest {
         AnswerRecord answerRecord2Duplicate = new AnswerRecord(2, experimentRecord.getIdExperiment(), "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(4), 0,0, 6, false,"",(long)0);
         AnswerRecord answerRecordMalformedURL = new AnswerRecord(3, experimentRecord.getIdExperiment(), "htt214ljbaq    dlkjps://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg/450px-Sequoiadendron_giganteum_at_Kenilworth_Castle.jpg", new Timestamp(1), 0,0, 6, false,"",(long)0);
 
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecordMalformedURL, new ArrayList<>()));
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord1, new ArrayList<>()));
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2, new ArrayList<>()));
-        EventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2Duplicate, new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecordMalformedURL, new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord1, new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2, new ArrayList<>()));
+        eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2Duplicate, new ArrayList<>()));
 
 
         // assertEquals((int)answerQualityMap.get(answerRecordMalformedURL),0);  Cannot test that, because the AnswerRatingTransform creates a different object
