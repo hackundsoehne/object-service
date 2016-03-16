@@ -7,22 +7,16 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOp
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.AnswerRatingTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.HashSimilarity;
-import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.Similarity.ImageSimilarity;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import org.jooq.DSLContext;
-import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.net.URL;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -107,7 +101,8 @@ public class DuplicateCheckerTest {
                 answerHashMap.put((AnswerRecord)invocation.getArguments()[0], (long) invocation.getArguments()[1]);
                 return null;
             }
-        }).when(answerRatingOperations).setHashToAnswer(any(AnswerRecord.class),anyLong());
+            //TODO lucas review
+        }).when(answerRatingOperations).updateAnswer(any(AnswerRecord.class));
         //----------------------------------------------------------------------------
 
         duplicateChecker = new DuplicateChecker(answerRatingOperations, experimentOperations,eventManager);
