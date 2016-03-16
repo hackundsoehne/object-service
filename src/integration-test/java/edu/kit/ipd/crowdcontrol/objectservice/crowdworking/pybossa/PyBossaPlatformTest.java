@@ -1,17 +1,23 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import edu.kit.ipd.crowdcontrol.objectservice.ConfigLoader;
+import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
+import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -22,16 +28,14 @@ import static org.junit.Assert.assertTrue;
  * @author Simon Korz
  * @version 1.0
  */
-@Ignore
 public class PyBossaPlatformTest {
-    // TODO read settings from config
-    private static final String WORKER_SERVICE_URL = "http://localhost:8080";
-    private static final String WORKER_UI_URL = "http://localhost:3000";
-    private static final String API_KEY = "8ec92fa1-1bd1-42ad-8524-3d2bab4588b1";
-    private static final String API_URL = "http://localhost:5000/api";
-    private static final String TASK_URL = API_URL + "/task";
-    private static final String NAME = "pybossa";
-    private static final int PROJECT_ID = 1;
+    private static String workerServiceUrl;
+    private static String workerUiUrl;
+    private static String apiKey;
+    private static String apiUrl;
+    private static String taskUrl;
+    private static String name;
+    private static int projectId = 1;
 
     private static Experiment experiment = Experiment.newBuilder()
             .setId(1)
@@ -42,14 +46,42 @@ public class PyBossaPlatformTest {
             .setRatingsPerAnswer(Integer.newBuilder().setValue(5).build())
             .build();
 
-    private static PyBossaRequests requests = new PyBossaRequests(API_URL, PROJECT_ID, API_KEY);
+    private static PyBossaRequests requests;
     private static PyBossaPlatform pybossa;
+
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
 
     @BeforeClass
     public static void setUp() throws Exception {
-        deleteAllTasks(TASK_URL, API_KEY, PROJECT_ID);
-        pybossa = new PyBossaPlatform(WORKER_SERVICE_URL, WORKER_UI_URL, API_KEY,
-                API_URL, NAME, String.valueOf(PROJECT_ID), true);
+        // load config
+        ConfigLoader configLoader = new ConfigLoader();
+        Config config = configLoader.getConfig();
+        boolean found = false;
+
+        workerServiceUrl = config.deployment.workerService;
+        workerUiUrl = config.deployment.workerUIPublic;
+
+        for (ConfigPlatform platform : config.platforms) {
+            if (platform.type.toLowerCase().equals("pybossa")) {
+                found = true;
+                if (config.deployment.workerUILocal == null) {
+                    config.deployment.workerUILocal = config.deployment.workerUIPublic;
+                }
+                apiKey = platform.apiKey;
+                apiUrl = platform.url;
+                name = platform.name;
+                projectId = java.lang.Integer.valueOf(platform.projectId);
+            }
+        }
+        if (!found) throw new Exception("Pybossa is not configured.");
+
+        taskUrl = apiUrl + "/task";
+        requests = new PyBossaRequests(apiUrl, projectId, apiKey);
+
+        deleteAllTasks(taskUrl, apiKey, projectId);
+        pybossa = new PyBossaPlatform(workerServiceUrl, workerUiUrl, apiKey,
+                apiUrl, name, String.valueOf(projectId), true);
         pybossa.init();
     }
 
@@ -62,8 +94,8 @@ public class PyBossaPlatformTest {
         // get task with id = publishedid
         HttpResponse<JsonNode> response;
         try {
-            response = Unirest.get(TASK_URL + "/{id}")
-                    .queryString("api_key", API_KEY)
+            response = Unirest.get(taskUrl + "/{id}")
+                    .queryString("api_key", apiKey)
                     .routeParam("id", publishedId.getAsJsonObject().get("identification").getAsString())
                     .asJson();
         } catch (UnirestException e) {
@@ -76,11 +108,55 @@ public class PyBossaPlatformTest {
     @Test
     public void testUnpublishTask() throws Exception {
         // get first available task
-        JSONArray tasks = requests.getAllTasks();
-        String taskId = String.valueOf(tasks.optJSONObject(0).getInt("id"));
-        CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(new JsonPrimitive(taskId));
+        String taskId = String.valueOf(requests.getAllTasks().optJSONObject(0).getInt("id"));
+
+        JsonObject taskJson = new JsonObject();
+        taskJson.add("identification", new JsonPrimitive(taskId));
+        CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(taskJson);
         assertTrue(booleanCompletableFuture.get());
     }
+
+    @Test
+    public void testSetTaskPresenter() throws Exception {
+        String html = "<html></html>";
+        requests.setTaskPresenter(html);
+        JSONObject project = requests.getProject();
+
+        assertEquals(project.getJSONObject("info").getString("task_presenter"), html);
+    }
+
+    @Test
+    public void testDeleteTask() throws Exception {
+        // get first available task
+        String taskId = String.valueOf(requests.getAllTasks().optJSONObject(0).getInt("id"));
+        assertTrue(requests.deleteTask(taskId));
+    }
+
+    @Test
+    public void testGetTaskRuns() throws Exception {
+        // get first available task
+        String taskId = String.valueOf(requests.getAllTasks().optJSONObject(0).getInt("id"));
+        // don't expect user to exist on test platform
+        JSONArray taskRuns = requests.getTaskRuns(taskId, "2147483647");
+
+        assertTrue(taskRuns.length() == 0);
+    }
+
+
+    @Test
+    public void testDeleteTaskRun() throws Exception {
+        // get first available task
+        String taskId = String.valueOf(requests.getAllTasks().optJSONObject(0).getInt("id"));
+        // hope that user 1 has submitted a taskrun for task our task. Unfortunately this is to complex to automate.
+        JSONArray taskRuns = requests.getTaskRuns(taskId, "1");
+        JSONObject taskRun = taskRuns.optJSONObject(0);
+        if (taskRun != null) {
+            requests.deleteTaskRun(taskRun.getInt("id"));
+            thrown.expect(PyBossaRequestException.class);
+            requests.deleteTaskRun(taskRun.getInt("id"));
+        }
+    }
+
 
     private static void deleteAllTasks(String TASK_URL, String apiKey, int projectId) {
         JSONArray tasks = requests.getAllTasks();
