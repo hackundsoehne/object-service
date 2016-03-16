@@ -146,7 +146,7 @@ public class PyBossaPlatformUnitTest {
     @Test
     public void testPublishTask() throws Exception {
         when(requests.postTask(any())).thenReturn(5);
-        assertEquals("5", pybossa.publishTask(experiment).get());
+        assertEquals("5", pybossa.publishTask(experiment).get().getAsJsonObject().get("identification").getAsString());
     }
 
 

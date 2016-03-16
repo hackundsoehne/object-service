@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -11,7 +12,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.config.Config;
 import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
-import org.ho.yaml.Yaml;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
@@ -19,9 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.File;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Exchanger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -112,7 +110,9 @@ public class PyBossaPlatformTest {
         // get first available task
         String taskId = String.valueOf(requests.getAllTasks().optJSONObject(0).getInt("id"));
 
-        CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(new JsonPrimitive(taskId));
+        JsonObject taskJson = new JsonObject();
+        taskJson.add("identification", new JsonPrimitive(taskId));
+        CompletableFuture<Boolean> booleanCompletableFuture = pybossa.unpublishTask(taskJson);
         assertTrue(booleanCompletableFuture.get());
     }
 
@@ -156,8 +156,6 @@ public class PyBossaPlatformTest {
             requests.deleteTaskRun(taskRun.getInt("id"));
         }
     }
-
-
 
 
     private static void deleteAllTasks(String TASK_URL, String apiKey, int projectId) {
