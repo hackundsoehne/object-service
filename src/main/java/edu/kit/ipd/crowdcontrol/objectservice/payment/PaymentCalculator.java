@@ -64,7 +64,8 @@ public class PaymentCalculator {
 
         //For all good ratings of the worker, his salary get increased by the payment for a rating
         for (Map.Entry<WorkerRecord, Integer> entry : workerRatingMap.entrySet()) {
-            map.put(entry.getKey(),map.get(entry.getKey()) + (entry.getValue() * paymentRating));
+            map.put(entry.getKey(),
+                    (map.get(entry.getKey()) == null ? 0 : map.get(entry.getKey())) + (entry.getValue() * paymentRating));
         }
 
         //Now all workers participating in the experiment are present in the map and the base-payment can be added to their salary
