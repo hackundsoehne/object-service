@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.mail;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -77,7 +78,7 @@ public class CommandLineMailHandler implements MailSender, MailFetcher {
      * {@inheritDoc}
      */
     @Override
-    public void close(Message[] messages) {
-        LOGGER.info("call to close with messages{}", messages);
+    public void close(Folder folder) {
+        LOGGER.info("call to close with folder: {}", folder);
     }
 }

@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.mail;
 
+import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -47,9 +48,9 @@ public interface MailFetcher {
     Message[] fetchUnseen() throws MessagingException;
 
     /**
-     * Closes the folder and the store of the messages.
-     * @param messages the messages their resources become closed (have to be in the same folder)
+     * Closes a folder and its resources.
+     * @param folder the folder to close
      * @throws MessagingException in case of problems with closing
      */
-    void close(Message[] messages) throws MessagingException;
+    void close(Folder folder) throws MessagingException;
 }

@@ -173,17 +173,16 @@ public class MailReceiver implements MailFetcher {
      * {@inheritDoc}
      */
     @Override
-    public void close(Message[] messages) throws MessagingException {
-        LOGGER.trace("Started closing folder of " + messages.length + " messages.");
-        if (messages.length > 0) {
-            if (messages[0].getFolder().isOpen()) {
-                messages[0].getFolder().close(true);
+    public void close(Folder folder) throws MessagingException {
+        LOGGER.trace("Started closing folder " + folder.getFullName() + ".");
+            if (folder.isOpen()) {
+                folder.close(true);
             }
-            if (messages[0].getFolder().getStore().isConnected()) {
-                messages[0].getFolder().getStore().close();
+            if (folder.getStore().isConnected()) {
+                folder.getStore().close();
             }
-        }
-        LOGGER.trace("Successfully completed closing folder of " + messages.length + " messages.");
+
+        LOGGER.trace("Successfully completed closing folder " + folder.getFullName() + ".");
     }
 
     private Store connect() throws MessagingException {

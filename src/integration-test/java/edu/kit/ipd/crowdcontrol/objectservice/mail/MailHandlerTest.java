@@ -149,7 +149,7 @@ public class MailHandlerTest {
         }
 
         Message[] messages = fetcher.fetchFolder(folder);
-        fetcher.close(messages);
+        fetcher.close(messages[0].getFolder());
         messages[0].getSubject();
     }
 }
