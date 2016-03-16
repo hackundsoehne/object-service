@@ -48,7 +48,7 @@ public class InputTransformerTest {
         InputTransformer transformer = new InputTransformer(route, ErrorResponse.class);
 
         when(request.contentType()).thenReturn("application/protobuf");
-        when(request.body()).thenReturn(new String(ErrorResponse.newBuilder().build().toByteArray()));
+        when(request.bodyAsBytes()).thenReturn(ErrorResponse.newBuilder().build().toByteArray());
 
         transformer.handle(request, response);
 
@@ -63,7 +63,7 @@ public class InputTransformerTest {
         InputTransformer transformer = new InputTransformer(route, ErrorResponse.class);
 
         when(request.contentType()).thenReturn("application/protobuf");
-        when(request.body()).thenReturn("\0\0");
+        when(request.bodyAsBytes()).thenReturn(new byte[] {0, 0});
 
         transformer.handle(request, response);
     }

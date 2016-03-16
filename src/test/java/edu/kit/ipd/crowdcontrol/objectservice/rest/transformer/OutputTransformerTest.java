@@ -9,6 +9,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -43,7 +44,7 @@ public class OutputTransformerTest {
         byte[] output = (byte[]) OutputTransformer.transform(request, response, error);
 
         verify(response).type("application/protobuf");
-        assertEquals(error.toByteArray(), output);
+        assertArrayEquals(error.toByteArray(), output);
     }
 
     @Test (expected = NotAcceptableException.class)
