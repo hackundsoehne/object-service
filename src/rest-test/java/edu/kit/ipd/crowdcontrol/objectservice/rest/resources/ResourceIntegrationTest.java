@@ -7,6 +7,7 @@ import com.mashape.unirest.http.Unirest;
 import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigException;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -116,6 +117,56 @@ public class ResourceIntegrationTest {
         assertSame(0, list.getItemsCount());
 
         ErrorResponse error = httpGet("/templates/42", ErrorResponse.class);
+        assertEquals("notFound", error.getCode());
+    }
+
+    @Test
+    public void experiments() throws Exception {
+        ExperimentList list = httpGet("/experiments", ExperimentList.class);
+        assertSame(0, list.getItemsCount());
+
+        Experiment put = Experiment.newBuilder()
+                .setTitle("Awesome")
+                .setDescription("Awesome Task!")
+                .setAnswerType(AnswerType.TEXT)
+                .setWorkerQualityThreshold(Integer.newBuilder().setValue(2))
+                .setRatingsPerWorker(Integer.newBuilder().setValue(3))
+                .setAnswersPerWorker(Integer.newBuilder().setValue(4))
+                .setRatingsPerAnswer(Integer.newBuilder().setValue(5))
+                .setPaymentBase(Integer.newBuilder().setValue(6))
+                .setPaymentAnswer(Integer.newBuilder().setValue(7))
+                .setPaymentRating(Integer.newBuilder().setValue(8))
+                .setPaymentQualityThreshold(Integer.newBuilder().setValue(9))
+                .setAlgorithmQualityAnswer(AlgorithmOption.newBuilder().setName("AnswerQualityByRatings").addParameters(AlgorithmOption.AlgorithmParameter.newBuilder().setId(1).setValue("5")))
+                .setAlgorithmQualityRating(AlgorithmOption.newBuilder().setName("RatingQualityByDistribution"))
+                .setAlgorithmTaskChooser(AlgorithmOption.newBuilder().setName("anti_spoof").addParameters(AlgorithmOption.AlgorithmParameter.newBuilder().setId(1).setValue("30pc")))
+                .addConstraints(Constraint.newBuilder().setName("constraint").build())
+                .addTags(Tag.newBuilder().setName("tag").build())
+                .addRatingOptions(Experiment.RatingOption.newBuilder().setName("good").setValue(9).build())
+                .addRatingOptions(Experiment.RatingOption.newBuilder().setName("bad").setValue(0).build())
+                .build();
+
+        Experiment experiment = httpPut("/experiments", put, Experiment.class);
+
+        // ID gets ignored
+        assertTrue(experiment.getId() > 0);
+
+        // All properties except ID must be equal
+        assertEquals(put, experiment.toBuilder().clearId().build());
+
+        // Returned template must be equal to the returned version when using GET
+        Experiment received = httpGet("/experiments/" + experiment.getId(), Experiment.class);
+        assertEquals(experiment, received);
+
+        list = httpGet("/experiments", ExperimentList.class);
+        assertSame(1, list.getItemsCount());
+
+        assertNull(httpDelete("/experiments/" + experiment.getId(), Experiment.class));
+
+        list = httpGet("/experiments", ExperimentList.class);
+        assertSame(0, list.getItemsCount());
+
+        ErrorResponse error = httpGet("/experiments/42", ErrorResponse.class);
         assertEquals("notFound", error.getCode());
     }
 
