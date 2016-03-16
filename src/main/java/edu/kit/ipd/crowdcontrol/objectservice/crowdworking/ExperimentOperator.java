@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
@@ -115,13 +116,22 @@ public class ExperimentOperator {
         experimentsPlatformOperations.getExperimentsFailedDuringShutdown().forEach(
                 (exp) -> recoverExperimentShutdown(exp.getIdExperiment())
         );
+       /* experimentsPlatformOperations.getExperimentsFailedWhileRunning().forEach(
+                (exp) -> //TODO include rescheduleAnswers(exp.getID()); here! (DuplicateChecker)
+        );*/
 
     }
 
     private void recoverExperimentShutdown(int experimentID){
         Experiment experiment = experimentFetcher.fetchExperiment(experimentID);
-        ExperimentsPlatformStatusRecord experimentsPlatformStatusRecord = experimentsPlatformOperations.getExperimentsPlatformStatusRecord(experimentID);
-        long passedTime = Timestamp.valueOf(LocalDateTime.now()).getTime()-experimentsPlatformStatusRecord.getTimestamp().getTime();
+        List<ExperimentsPlatformStatusRecord> experimentsPlatformStatusRecords = experimentsPlatformOperations.getExperimentsPlatformStatusRecord(experimentID);
+        long platformTime = 0;
+        for (ExperimentsPlatformStatusRecord status: experimentsPlatformStatusRecords ) {
+            if(status.getTimestamp().getTime() > platformTime){
+                platformTime = status.getTimestamp().getTime();
+            }
+        }
+        long passedTime = Timestamp.valueOf(LocalDateTime.now()).getTime()-platformTime;
         long passedMins = TimeUnit.MILLISECONDS.toMinutes(passedTime);
 
 

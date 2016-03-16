@@ -352,4 +352,12 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                 )
                 .fetchInto(EXPERIMENT);
     }
+
+    /**
+     * Retrieves a list of all experiments which are in the state running and creative_stopped
+     */
+    public List<ExperimentRecord> getExperimentsFailedWhileRunning(){
+        //TODO
+        return null;
+    }
 }
