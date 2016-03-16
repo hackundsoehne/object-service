@@ -75,14 +75,11 @@ public class Main {
 
         PlatformManager platformManager = initPlatformManager(operationCarrier, platforms, moneyTransfer);
 
-        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager, eventManager);
-        ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.experimentsPlatformOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
-        PopulationsHelper populationsHelper = new PopulationsHelper(operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
-        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager);
-        ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
+
+        ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.experimentsPlatformOperations,operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
         ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations,eventManager);
         experimentOperator.recoverExperiments();
-        PopulationsHelper populationsHelper = new PopulationsHelper(operationCarrier.experimentOperations, operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
+        PopulationsHelper populationsHelper = new PopulationsHelper( operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
         initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager);
         initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper, eventManager);
@@ -104,6 +101,7 @@ public class Main {
                 operationCarrier.answerRatingOperations,
                 operationCarrier.experimentOperations,
                 experimentOperator,
+                operationCarrier.experimentsPlatformOperations,
                 eventManager);
 
         new PaymentDispatcher(
