@@ -363,7 +363,7 @@ public class ExperimentResource {
      *
      * @param id         the primary key of the experiment
      * @param experiment the experiment holding the new data
-     * @param old        the old experimentEventManager
+     * @param old        the old experiment
      * @return the resulting experiment with the new data
      */
     private Experiment updateExperimentState(int id, Experiment experiment, Experiment old) {

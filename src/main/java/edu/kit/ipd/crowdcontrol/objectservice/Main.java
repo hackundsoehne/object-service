@@ -113,7 +113,7 @@ public class Main {
      * @param experimentOperator experimentOperations to use
      * @param experimentFetcher
      * @param populationsHelper
-     * @param eventManager
+     * @param eventManager EventManager to use
      */
     private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, ExperimentFetcher experimentFetcher, PopulationsHelper populationsHelper, EventManager eventManager) {
         new Router(
