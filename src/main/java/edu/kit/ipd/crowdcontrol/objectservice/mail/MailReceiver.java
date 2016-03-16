@@ -175,12 +175,12 @@ public class MailReceiver implements MailFetcher {
     @Override
     public void close(Folder folder) throws MessagingException {
         LOGGER.trace("Started closing folder " + folder.getFullName() + ".");
-            if (folder.isOpen()) {
-                folder.close(true);
-            }
-            if (folder.getStore().isConnected()) {
-                folder.getStore().close();
-            }
+        if (folder.isOpen()) {
+            folder.close(true);
+        }
+        if (folder.getStore().isConnected()) {
+            folder.getStore().close();
+        }
 
         LOGGER.trace("Successfully completed closing folder " + folder.getFullName() + ".");
     }
