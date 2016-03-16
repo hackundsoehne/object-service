@@ -257,38 +257,6 @@ public class ExperimentOperations extends AbstractOperations {
     }
 
     /**
-     * stores the platforms for the passed experiment in the Experiments_Platform-Tables
-     * @param platforms the platforms to store
-     * @param experimentId the primary key of the experiment
-     */
-    public void storeExperimentsPlatforms(List<String> platforms, int experimentId) {
-        create.transaction(conf -> {
-            DSL.using(conf).deleteFrom(EXPERIMENTS_PLATFORM)
-                    .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
-                    .and(EXPERIMENTS_PLATFORM.PLATFORM.notIn(platforms))
-                    .execute();
-
-            Set<String> existing = DSL.using(conf).select(EXPERIMENTS_PLATFORM.PLATFORM)
-                    .from(EXPERIMENTS_PLATFORM)
-                    .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
-                    .fetch()
-                    .intoSet(EXPERIMENTS_PLATFORM.PLATFORM);
-
-            List<ExperimentsPlatformRecord> toInsert = platforms.stream()
-                    .filter(platform -> !existing.contains(platform))
-                    .map(platform -> {
-                        ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
-                        record.setExperiment(experimentId);
-                        record.setPlatform(platform);
-                        return record;
-                    })
-                    .collect(Collectors.toList());
-
-            DSL.using(conf).batchInsert(toInsert).execute();
-        });
-    }
-
-    /**
      * gets all the active platform for the experiment
      * @param experimentId the primary key of the experiment
      * @return a list of platforms

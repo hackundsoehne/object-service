@@ -3,14 +3,17 @@ package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 import com.google.common.collect.Sets;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -65,58 +68,69 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
     }
 
     /**
-     * Stores the ExperimentsPlatforms in the db and deletes the one not existing.
-     * All newly inserts Platforms will be inserted with the status draft.
-     * @param platforms the names of the platforms
+     * stores the platforms for the passed experiment in the Experiments_Platform-Tables
+     * @param platforms the platforms to store
      * @param experimentId the primary key of the experiment
      */
-    //TODO why is this method not called?
-    public void storePlatforms(List<String> platforms, int experimentId) {
-        Set<ExperimentsPlatformRecord> toStore = platforms.stream()
-                .map(platform -> new ExperimentsPlatformRecord(null, experimentId, platform, null, null))
-                .collect(Collectors.toSet());
-
-        List<ExperimentsPlatformRecord> inserted = create.transactionResult(conf -> {
-            Set<String> existing = DSL.using(conf).select(EXPERIMENTS_PLATFORM.PLATFORM)
-                    .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
-                    .fetchSet(EXPERIMENTS_PLATFORM.PLATFORM);
-
-            List<ExperimentsPlatformRecord> toInsert = toStore.stream()
-                    .filter(record -> !existing.contains(record.getPlatform()))
-                    .collect(Collectors.toList());
-
-            existing.removeAll(platforms);
-
-            DSL.using(conf).batchInsert(toInsert).execute();
-
+    public void storeExperimentsPlatforms(List<String> platforms, int experimentId) {
+        create.transaction(conf -> {
             DSL.using(conf).deleteFrom(EXPERIMENTS_PLATFORM)
-                    .where(EXPERIMENTS_PLATFORM.PLATFORM.in(existing))
-                    .and(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
+                    .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
+                    .and(EXPERIMENTS_PLATFORM.PLATFORM.notIn(platforms))
                     .execute();
 
-            return toInsert;
+            Set<String> existing = DSL.using(conf).select(EXPERIMENTS_PLATFORM.PLATFORM)
+                    .from(EXPERIMENTS_PLATFORM)
+                    .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
+                    .fetch()
+                    .intoSet(EXPERIMENTS_PLATFORM.PLATFORM);
+
+            List<ExperimentsPlatformRecord> toInsert = platforms.stream()
+                    .filter(platform -> !existing.contains(platform))
+                    .map(platform -> {
+                        ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
+                        record.setExperiment(experimentId);
+                        record.setPlatform(platform);
+                        return record;
+                    })
+                    .collect(Collectors.toList());
+
+            DSL.using(conf).batchInsert(toInsert).execute();
         });
+    }
 
-        List<String> platformsInserted = inserted.stream()
-                .map(ExperimentsPlatformRecord::getPlatform)
-                .collect(Collectors.toList());
+    /**
+     * stores all the modes for the platform as long as the experimentsPlatform is existing
+     * @param statuses the modes to store
+     * @param experiment the primary key of the experiment
+     */
+    public void storeExperimentsModes(Map<String, ExperimentsPlatformModeMode> statuses, int experiment) {
+        Map<String, Integer> platfromIDMap = create.select(EXPERIMENTS_PLATFORM.PLATFORM, EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experiment))
+                .fetchMap(EXPERIMENTS_PLATFORM.PLATFORM, EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS);
 
-        Result<ExperimentsPlatformRecord> inTheDatabase = create.selectFrom(EXPERIMENTS_PLATFORM)
-                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
-                .and(EXPERIMENTS_PLATFORM.PLATFORM.in(platformsInserted))
-                .fetch();
+        ExperimentsPlatformMode maxDateJoin = EXPERIMENTS_PLATFORM_MODE.as("maxDateJoin");
+        Field<Timestamp> maxDate = maxDateJoin.field(DSL.max(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP).as("maxDate"));
+        Field<Integer> maxDateJoinPlatform = maxDateJoin.field(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM);
+        Map<Integer, ExperimentsPlatformModeMode> existingModes = create
+                .select(EXPERIMENTS_PLATFORM_MODE.MODE, EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM, EXPERIMENTS_PLATFORM_MODE.TIMESTAMP)
+                .from(EXPERIMENTS_PLATFORM_MODE)
+                .innerJoin(
+                        DSL.select(maxDateJoinPlatform, maxDate)
+                                .from(maxDateJoin)
+                                .groupBy(maxDateJoinPlatform)
+                ).on(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM.eq(maxDateJoinPlatform)
+                        .and(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP.eq(maxDate)))
+                .fetchMap(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM, EXPERIMENTS_PLATFORM_MODE.MODE);
 
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
-        List<ExperimentsPlatformStatusRecord> statusesToInsert = inTheDatabase.stream()
-                .map(record -> new ExperimentsPlatformStatusRecord(
-                        null,
-                        ExperimentsPlatformStatusPlatformStatus.draft,
-                        timestamp,
-                        record.getIdexperimentsPlatforms()
-                ))
+        List<ExperimentsPlatformModeRecord> toInsert = statuses.entrySet().stream()
+                .filter(entry -> platfromIDMap.containsKey(entry.getKey()))
+                .map(entry -> new ExperimentsPlatformModeRecord(null, platfromIDMap.get(entry.getKey()), entry.getValue(), timestamp))
+                .filter(record -> !record.getMode().equals(existingModes.get(record.getExperimentsPlatform())))
                 .collect(Collectors.toList());
 
-        create.batchInsert(statusesToInsert).execute();
+        create.batchInsert(toInsert).execute();
     }
 
     /**
