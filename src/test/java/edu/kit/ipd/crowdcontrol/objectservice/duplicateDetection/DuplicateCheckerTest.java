@@ -182,7 +182,7 @@ public class DuplicateCheckerTest {
         eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2, new ArrayList<>()));
         eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2Duplicate, new ArrayList<>()));
 
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         int duplicateId = (answerQualityMap.get(answerRecord2.getIdAnswer()) != null) ? answerRecord2.getIdAnswer() : answerRecord2Duplicate.getIdAnswer();
         assertEquals((int)answerQualityMap.get(duplicateId),0);
         assertEquals((answerWithQualityAssuredList.size()),2);
