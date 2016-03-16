@@ -110,8 +110,8 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                 .fetchMap(EXPERIMENTS_PLATFORM.PLATFORM, EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS);
 
         ExperimentsPlatformMode maxDateJoin = EXPERIMENTS_PLATFORM_MODE.as("maxDateJoin");
-        Field<Timestamp> maxDate = maxDateJoin.field(DSL.max(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP).as("maxDate"));
-        Field<Integer> maxDateJoinPlatform = maxDateJoin.field(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM);
+        Field<Timestamp> maxDate = DSL.max(maxDateJoin.field(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP)).as("maxDate");
+        Field<Integer> maxDateJoinPlatform = maxDateJoin.field(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM).as("maxDatePlatform");
         Map<Integer, ExperimentsPlatformModeMode> existingModes = create
                 .select(EXPERIMENTS_PLATFORM_MODE.MODE, EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM, EXPERIMENTS_PLATFORM_MODE.TIMESTAMP)
                 .from(EXPERIMENTS_PLATFORM_MODE)
@@ -121,6 +121,11 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                                 .groupBy(maxDateJoinPlatform)
                 ).on(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM.eq(maxDateJoinPlatform)
                         .and(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP.eq(maxDate)))
+                .where(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM.in(
+                        DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                                .from(EXPERIMENTS_PLATFORM)
+                                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(1))
+                ))
                 .fetchMap(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM, EXPERIMENTS_PLATFORM_MODE.MODE);
 
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
