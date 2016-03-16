@@ -214,7 +214,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
     public Map<String, ExperimentsPlatformModeMode> getActivePlatforms(int experimentId) {
         ExperimentsPlatformMode mode2 = EXPERIMENTS_PLATFORM_MODE.as("mode2");
         ExperimentsPlatformMode mode1 = EXPERIMENTS_PLATFORM_MODE.as("mode1");
-        return create.select(EXPERIMENTS_PLATFORM.PLATFORM, EXPERIMENTS_PLATFORM_MODE.MODE)
+        return create.select(EXPERIMENTS_PLATFORM.PLATFORM, mode1.field(EXPERIMENTS_PLATFORM_MODE.MODE))
                 .from(EXPERIMENTS_PLATFORM)
                 .join(mode1).onKey()
                 .leftOuterJoin(mode2).on(
