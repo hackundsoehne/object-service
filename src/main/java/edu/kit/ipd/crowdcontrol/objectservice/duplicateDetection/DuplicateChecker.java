@@ -21,6 +21,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -39,7 +41,10 @@ public class DuplicateChecker {
     private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final BlockingQueue<AnswerRecord> queue = new LinkedBlockingQueue<>();
-    private final DuplicateWatcherThread thread;
+
+    private final int numOfThreads = 1;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
+    private final List<DuplicateWatcherThread> threads = new ArrayList<>(numOfThreads);
     private boolean threadRunning = false;
     /**
      * Constructor
@@ -51,18 +56,21 @@ public class DuplicateChecker {
 
         this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
-        this.thread = new DuplicateWatcherThread();
+        for (int i = 0; i < numOfThreads; i++) {
+            threads.add(new DuplicateWatcherThread());
+        }
 
         eventManager.ANSWER_CREATE.getObservable().subscribe(answerEvent -> {
             try {
                 queue.put(AnswerRatingTransformer.toAnswerRecord(answerEvent.getData(), answerEvent.getData().getExperimentId()));
             } catch (InterruptedException e) {
-                //TODO react
-                e.printStackTrace();
+                logger.fatal("Answer "+answerEvent.getData().getId()+" of experiment "+answerEvent.getData().getExperimentId()
+                        +" got interrupted during insertion in the duplicate-checker's queue!");
             }
         });
 
-        thread.start();
+        threads.forEach((runnable)->executorService.execute(runnable));
+
     }
 
 
@@ -71,8 +79,8 @@ public class DuplicateChecker {
      */
     public boolean terminate(){
         threadRunning = false;
-        thread.interrupt();
-        return thread.isAlive();
+        executorService.shutdownNow();
+        return executorService.isShutdown();
 
     }
 
@@ -143,8 +151,24 @@ public class DuplicateChecker {
     }
 
 
+    /**
+     * Reinserts answers, which were not checked/rated by the duplicate-checker back in the
+     * queue
+     */
+    public void rescheduleAnswersForDuplicateDetection(int expID){ //TODO add to expOperator
+        List<AnswerRecord> unratedAnswers = answerRatingOperations.getUncheckedAnswers(expID);
+        unratedAnswers.forEach((answerRecord -> {
+            try {
+                queue.put(answerRecord);
+            } catch (InterruptedException e) {
+                logger.fatal("Answer "+answerRecord.getIdAnswer()+" of experiment "+answerRecord.getExperiment()
+                        +" got interrupted during insertion in the duplicate-checker's queue!");
+            }
+        }));
+    }
 
-    private class DuplicateWatcherThread extends Thread
+
+    private class DuplicateWatcherThread implements Runnable
     {
         /**
          * While running, the DuplicateChecker hashes the answers in the queue and checks them for duplicates.
@@ -160,6 +184,7 @@ public class DuplicateChecker {
                     return;
                 }
                 if (answerRecord != null) {
+                    rescheduleAnswersForDuplicateDetection(answerRecord.getExperiment());
                     String answerType = experimentOperations.getExperiment(answerRecord.getExperiment())
                             .orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID!")).getAnswerType();
                     //trying to acquire answer-hash
@@ -177,6 +202,7 @@ public class DuplicateChecker {
                 }
             }
             logger.info("DuplicateChecker terminated!");
+
         }
     }
 
