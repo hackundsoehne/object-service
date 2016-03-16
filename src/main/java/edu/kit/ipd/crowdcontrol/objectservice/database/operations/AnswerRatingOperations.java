@@ -326,7 +326,7 @@ public class AnswerRatingOperations extends AbstractOperations {
 
             DSL.using(conf).executeUpdate(ratingRecord);
 
-            return create.insertInto(RATING)
+            return DSL.using(conf).insertInto(RATING)
                     .set(ratingRecord)
                     .returning()
                     .fetchOne();
