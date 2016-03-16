@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
@@ -354,10 +356,21 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
     }
 
     /**
-     * Retrieves a list of all experiments which are in the state running and creative_stopped
+     * Retrieves a list of all experiments which are in the state running, creative_stopped, shutdown
      */
-    public List<ExperimentRecord> getExperimentsFailedWhileRunning(){
-        //TODO
-        return null;
+    public List<ExperimentRecord> getRunningExperiments() {
+        Predicate<Integer> isRunningStoppedOrShutdown = experimentID ->  {
+            Set<ExperimentsPlatformStatusPlatformStatus> statuses = getExperimentsPlatformStatusRecord(experimentID).stream()
+                    .map(ExperimentsPlatformStatusRecord::getPlatformStatus)
+                    .collect(Collectors.toSet());
+            return statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)
+                    || statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)
+                    || statuses.contains(ExperimentsPlatformStatusPlatformStatus.creative_stopping);
+        };
+        return create.selectFrom(EXPERIMENT)
+                .fetch()
+                .stream()
+                .filter(experiment -> isRunningStoppedOrShutdown.apply(experiment.getIdExperiment()))
+                .collect(Collectors.toList());
     }
 }

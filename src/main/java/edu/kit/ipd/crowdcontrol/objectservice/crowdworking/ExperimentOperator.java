@@ -116,7 +116,7 @@ public class ExperimentOperator {
         experimentsPlatformOperations.getExperimentsFailedDuringShutdown().forEach(
                 (exp) -> recoverExperimentShutdown(exp.getIdExperiment())
         );
-       /* experimentsPlatformOperations.getExperimentsFailedWhileRunning().forEach(
+       /* experimentsPlatformOperations.getRunningExperiments().forEach(
                 (exp) -> //TODO include rescheduleAnswers(exp.getID()); here! (DuplicateChecker)
         );*/
 
