@@ -40,22 +40,21 @@ public class DuplicateCheckerTest {
     private ExperimentRecord experimentRecord;
     private DuplicateChecker duplicateChecker;
     private EventManager eventManager;
-
-
     private Map<Integer, Integer> answerQualityMap; //Maps answerID to answerQuality
     private Map<AnswerRecord,   Long> answerHashMap;
     private Map<Integer, String> answerResponseMap; //Maps answerID to answerResponse
     private List<Integer> answerWithQualityAssuredList;
+
+
     @Before
     public void setUp() throws Exception {
         eventManager = new EventManager();
         answerQualityMap = new HashMap<>();
         answerResponseMap = new HashMap<>();
         answerWithQualityAssuredList = new ArrayList<>();
-
-        DSLContext create = DSL.using(SQLDialect.MYSQL);
         answerHashMap = new HashMap<>();
 
+        DSLContext create = DSL.using(SQLDialect.MYSQL);
         experimentRecord = create.newRecord(Tables.EXPERIMENT);
         experimentRecord.setIdExperiment(1);
         experimentRecord.setAnswerType(null);
@@ -124,6 +123,7 @@ public class DuplicateCheckerTest {
         answerHashMap = null;
         answerResponseMap = null;
         answerRatingOperations = null;
+        duplicateChecker.terminate();
         duplicateChecker = null;
 
     }
@@ -173,7 +173,6 @@ public class DuplicateCheckerTest {
         assertTrue(duplicateChecker.terminate());
     }
 
-    @Ignore
     @Test
     public void testImageDuplicateDetection() throws Exception {
 
@@ -188,12 +187,13 @@ public class DuplicateCheckerTest {
         eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2, new ArrayList<>()));
         eventManager.ANSWER_CREATE.emit(AnswerRatingTransformer.toAnswerProto(answerRecord2Duplicate, new ArrayList<>()));
 
+        Thread.sleep(3000);
+        int duplicateId = (answerQualityMap.get(answerRecord2.getIdAnswer()) != null) ? answerRecord2.getIdAnswer() : answerRecord2Duplicate.getIdAnswer();
+        assertEquals((int)answerQualityMap.get(duplicateId),0);
+        assertEquals((answerWithQualityAssuredList.size()),2);
+        assertEquals((int)answerQualityMap.get(answerRecordMalformedURL.getIdAnswer()),0);
 
-        // assertEquals((int)answerQualityMap.get(answerRecordMalformedURL),0);  Cannot test that, because the AnswerRatingTransform creates a different object
-        assertEquals(answerQualityMap.get(answerRecord1.getIdAnswer()), answerRecord1.getQuality());
-        assertEquals(answerQualityMap.get(answerRecord2.getIdAnswer()), answerRecord2.getQuality());
-        //assertEquals((int)answerQualityMap.get(answerRecord2Duplicate), 0);  Cannot test that, because the AnswerRatingTransform creates a different object
-
+        assertEquals(answerHashMap.size(),3);
 
     }
 
