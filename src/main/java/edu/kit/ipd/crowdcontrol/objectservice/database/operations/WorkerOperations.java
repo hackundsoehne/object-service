@@ -255,22 +255,19 @@ public class WorkerOperations extends AbstractOperations {
      * @return A list of workerrecords
      */
     public List<WorkerRecord> getWorkerWithWork(int experimentId, String platformName) {
-        Rating rating = RATING.as("rating");
-        Answer answer = ANSWER.as("answer");
-        return create.select(WORKER.fields())
-                .select(rating.ID_RATING)
-                .select(answer.ID_ANSWER)
-                .from(ANSWER)
-                .rightJoin(rating).on(
-                        WORKER.ID_WORKER.eq(rating.WORKER_ID)
-                                .and(rating.EXPERIMENT.eq(experimentId))
-                )
-                .rightJoin(answer).on(
-                        WORKER.ID_WORKER.eq(answer.WORKER_ID)
-                        .and(answer.EXPERIMENT.eq(experimentId))
-                )
-                .where(WORKER.PLATFORM.eq(platformName))
-                .fetchInto(WORKER);
+        return create.selectFrom(WORKER)
+                .where(WORKER.ID_WORKER.in(
+                        DSL.select(ANSWER.WORKER_ID)
+                                .from(ANSWER)
+                                .where(ANSWER.EXPERIMENT.eq(experimentId))
+                ))
+                .or(WORKER.ID_WORKER.in(
+                        DSL.select(RATING.WORKER_ID)
+                                .from(RATING)
+                                .where(RATING.EXPERIMENT.eq(experimentId))
+                ))
+                .and(WORKER.PLATFORM.eq(platformName))
+                .fetch();
     }
 
     /**
