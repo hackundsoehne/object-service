@@ -10,6 +10,8 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -539,12 +541,11 @@ public class AnswerRatingOperations extends AbstractOperations {
     }
 
     /**
-     * Inserts hash-value of the specified answer in the db
+     * Updates the Answer-Record in the database
      * @param answer the answer
-     * @param hash the answers hash-value1
      */
-    public void setHashToAnswer(AnswerRecord answer, long hash){
-        //TODO
+    public void updateAnswer(AnswerRecord answer){
+        create.executeUpdate(answer);
     }
 
     /**
@@ -560,14 +561,14 @@ public class AnswerRatingOperations extends AbstractOperations {
     public List<AnswerRecord> getDuplicates(long hash, int experiment, double threshold){
         Field<Long> xor = ANSWER.HASH.bitXor(hash).as("XOR");
         //bitcount(xor) + 1
-        Field<Integer> dividend = DSL.bitCount(xor).plus(DSL.val(1));
+        Field<Integer> dividend = DSL.bitCount(xor);
         //65 - (63 - floor(log2(xor))) or 65 - numberOfLeadingZeros(xor)
-        Field<Integer> divisor = DSL.val(65).minus(DSL.val(63).minus(DSL.floor(DSL.log(xor, 2))));
+        Field<Integer> divisor = DSL.val(65).minus(DSL.val(63).minus(DSL.floor(DSL.isnull(DSL.log(xor, 2), BigDecimal.valueOf(1)))));
         return create.select(ANSWER.fields())
                 .select(xor)
                 .from(ANSWER)
                 .where(ANSWER.EXPERIMENT.eq(experiment))
-                .and(DSL.val(1.0).minus(dividend.divide(divisor)).greaterOrEqual(threshold))
+                .having(DSL.val(1.0).minus(dividend.divide(divisor)).greaterOrEqual(threshold))
                 .fetchInto(ANSWER);
     }
 }
