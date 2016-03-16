@@ -49,10 +49,12 @@ public class ExperimentResource {
     private final ExperimentOperator experimentOperator;
     private final ExperimentFetcher experimentFetcher;
     private final PopulationsHelper populationsHelper;
+    private final EventManager eventManager;
 
     public ExperimentResource(AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, CalibrationOperations calibrationOperations,
                               TagConstraintsOperations tagConstraintsOperations, AlgorithmOperations algorithmsOperations,
-                              ExperimentsPlatformOperations experimentsPlatformOperations, PlatformManager platformManager, ExperimentOperator experimentOperator, ExperimentFetcher experimentFetcher, PopulationsHelper populationsHelper) {
+                              ExperimentsPlatformOperations experimentsPlatformOperations, PlatformManager platformManager, ExperimentOperator experimentOperator,
+                              ExperimentFetcher experimentFetcher, PopulationsHelper populationsHelper, EventManager eventManager) {
         this.experimentOperator = experimentOperator;
         this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
@@ -62,7 +64,7 @@ public class ExperimentResource {
         this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.platformManager = platformManager;
         this.experimentFetcher = experimentFetcher;
-
+        this.eventManager = eventManager;
         this.populationsHelper = populationsHelper;
     }
 
@@ -158,7 +160,7 @@ public class ExperimentResource {
         response.status(201);
         response.header("Location", "/experiments/" + id);
 
-        EventManager.EXPERIMENT_CREATE.emit(exp);
+        eventManager.EXPERIMENT_CREATE.emit(exp);
 
         return exp;
     }
@@ -207,7 +209,7 @@ public class ExperimentResource {
             throw new IllegalStateException("Patch not allowed in this state");
         }
 
-        EventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(old, resulting));
+        eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(old, resulting));
 
         return resulting;
     }
@@ -437,7 +439,7 @@ public class ExperimentResource {
             throw new BadRequestException("Deleting an experiment is not allowed while it is still running.");
         }
 
-        EventManager.EXPERIMENT_DELETE.emit(experiment);
+        eventManager.EXPERIMENT_DELETE.emit(experiment);
 
         return null;
     }

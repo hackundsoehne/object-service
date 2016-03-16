@@ -17,7 +17,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import spark.Request;
 import spark.Response;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
@@ -30,10 +29,12 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.*;
 public class WorkerResource {
     private WorkerOperations operations;
     private PlatformManager manager;
+    private final EventManager eventManager;
 
-    public WorkerResource(WorkerOperations operations, PlatformManager manager) {
+    public WorkerResource(WorkerOperations operations, PlatformManager manager, EventManager eventManager) {
         this.operations = operations;
         this.manager = manager;
+        this.eventManager = eventManager;
     }
 
     /**
@@ -112,7 +113,7 @@ public class WorkerResource {
 
         worker = operations.insertWorker(worker, identity);
 
-        EventManager.WORKER_CREATE.emit(worker);
+        eventManager.WORKER_CREATE.emit(worker);
 
         response.status(201);
         response.header("Location", "/workers/" + worker.getId());
@@ -132,7 +133,7 @@ public class WorkerResource {
 
         worker = operations.updateWorker(worker, id);
 
-        EventManager.WORKER_CHANGE.emit(worker);
+        eventManager.WORKER_CHANGE.emit(worker);
 
         return worker;
     }
@@ -148,7 +149,7 @@ public class WorkerResource {
 
         try {
             Optional<Worker> worker = operations.getWorkerProto(id);
-            worker.map(EventManager.WORKER_DELETE::emit);
+            worker.map(eventManager.WORKER_DELETE::emit);
 
             operations.anonymizeWorker(id);
         } catch (IllegalArgumentException e) {

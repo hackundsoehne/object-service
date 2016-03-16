@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.NotificationTokenRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -32,8 +33,8 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
      * @param mailSender an implementation of the MailSender interface
      * @param operations  instance of the notification operations
      */
-    public SQLEmailNotificationPolicy(MailSender mailSender, NotificationOperations operations) {
-        super(operations);
+    public SQLEmailNotificationPolicy(MailSender mailSender, NotificationOperations operations, EventManager eventManager) {
+        super(operations, eventManager);
         this.mailSender = mailSender;
         this.operations = operations;
     }

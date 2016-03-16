@@ -2,6 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
+import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 
 import java.util.HashMap;
@@ -22,16 +23,16 @@ public class NotificationController {
     private final NotificationOperations operations;
     private final NotificationPolicy policy;
 
-    public NotificationController(NotificationOperations operations, NotificationPolicy policy) {
+    public NotificationController(NotificationOperations operations, NotificationPolicy policy, EventManager eventManager) {
         this.operations = operations;
         this.policy = policy;
 
         handleMap = new HashMap<>();
 
 
-        EventManager.NOTIFICATION_CREATE.getObservable().subscribe(notificationEvent -> createNotification(notificationEvent.getData()));
-        EventManager.NOTIFICATION_UPDATE.getObservable().subscribe(changeEvent -> updateNotification(changeEvent.getData()));
-        EventManager.NOTIFICATION_DELETE.getObservable().subscribe(notificationEvent -> deleteNotification(notificationEvent.getData()));
+        eventManager.NOTIFICATION_CREATE.getObservable().subscribe(notificationEvent -> createNotification(notificationEvent.getData()));
+        eventManager.NOTIFICATION_UPDATE.getObservable().subscribe(changeEvent -> updateNotification(changeEvent.getData()));
+        eventManager.NOTIFICATION_DELETE.getObservable().subscribe(notificationEvent -> deleteNotification(notificationEvent.getData()));
     }
 
     /**

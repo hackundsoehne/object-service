@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.notification;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.NotificationOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class NotificationControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        notificationController = new NotificationController(notificationOperations, policy);
+        notificationController = new NotificationController(notificationOperations, policy, new EventManager());
 
         ArrayList<String> receiverEmails = new ArrayList<>();
         receiverEmails.add("mail-a@example.com");

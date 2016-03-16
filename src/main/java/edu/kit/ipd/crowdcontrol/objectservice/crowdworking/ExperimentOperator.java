@@ -1,7 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PreActionException;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
@@ -22,13 +20,15 @@ import java.util.concurrent.TimeUnit;
 public class ExperimentOperator {
     private static final Logger log = LogManager.getLogger("ExperimentOperator");
     private final PlatformManager platformManager;
-
+    private final EventManager eventManager;
     /**
      * Create a new operator class
      * @param platformManager
+     * @param eventManager
      */
-    public ExperimentOperator(PlatformManager platformManager) {
+    public ExperimentOperator(PlatformManager platformManager, EventManager eventManager) {
         this.platformManager = platformManager;
+        this.eventManager = eventManager;
     }
 
     /**
@@ -83,6 +83,6 @@ public class ExperimentOperator {
             e.printStackTrace();
         }
 
-        EventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experiment.toBuilder().setState(Experiment.State.STOPPED).build()));
+        eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experiment.toBuilder().setState(Experiment.State.STOPPED).build()));
     }
 }

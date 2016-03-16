@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class PaymentDispatcher  {
 
     private final Logger log = LogManager.getLogger(PaymentDispatcher.class);
-    private final Observable<Event<ChangeEvent<Experiment>>> observable = EventManager.EXPERIMENT_CHANGE.getObservable();
+    private final Observable<Event<ChangeEvent<Experiment>>> observable;
     private final PlatformManager platformManager;
     private final PaymentCalculator paymentCalc;
     private final FeedbackCreator feedbackCreator;
@@ -41,7 +41,8 @@ public class PaymentDispatcher  {
      * @param manager    PlatformManager being the target of the dispatching process
      * @param operations AnswerRatingOperations-class of the database-package. Enables db-calls
      */
-    public PaymentDispatcher(FeedbackCreator feedbackCreator, PlatformManager manager, AnswerRatingOperations operations, WorkerOperations workerOperations) {
+    public PaymentDispatcher(FeedbackCreator feedbackCreator, PlatformManager manager, AnswerRatingOperations operations, WorkerOperations workerOperations, EventManager eventManager) {
+        observable = eventManager.EXPERIMENT_CHANGE.getObservable();
         observable.subscribe(expChangeEvent -> {
             if(expChangeEvent.getData().getOld().getState() != Experiment.State.STOPPED
                     && expChangeEvent.getData().getNeww().getState() == Experiment.State.STOPPED){
@@ -51,6 +52,7 @@ public class PaymentDispatcher  {
         this.platformManager = manager;
         this.paymentCalc = new PaymentCalculator(operations,workerOperations);
         this.feedbackCreator = feedbackCreator;
+
     }
 
 

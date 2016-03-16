@@ -15,9 +15,11 @@ import static edu.kit.ipd.crowdcontrol.objectservice.rest.RequestUtil.getParamIn
  */
 public class WorkerCalibrationResource {
     private WorkerCalibrationOperations operations;
+    private final EventManager eventManager;
 
-    public WorkerCalibrationResource(WorkerCalibrationOperations operations) {
+    public WorkerCalibrationResource(WorkerCalibrationOperations operations, EventManager eventManager) {
         this.operations = operations;
+        this.eventManager = eventManager;
     }
 
     /**
@@ -30,7 +32,7 @@ public class WorkerCalibrationResource {
         CalibrationAnswer answer = request.attribute("input");
         answer = operations.insertAnswer(getParamInt(request, "id"), answer.getAnswerId());
 
-        EventManager.WORKER_CALIBRATION_CREATE.emit(answer);
+        eventManager.WORKER_CALIBRATION_CREATE.emit(answer);
 
         response.status(201);
 

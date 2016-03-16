@@ -30,12 +30,14 @@ public class AnswerRatingResource {
     private final ExperimentOperations experimentOperations;
     private final AnswerRatingOperations answerRatingOperations;
     private final WorkerOperations workerOperations;
+    private final EventManager eventManager;
 
     public AnswerRatingResource(ExperimentOperations experimentOperations, AnswerRatingOperations answerRatingOperations,
-                                WorkerOperations workerOperations) {
+                                WorkerOperations workerOperations, EventManager eventManager) {
         this.experimentOperations = experimentOperations;
         this.answerRatingOperations = answerRatingOperations;
         this.workerOperations = workerOperations;
+        this.eventManager = eventManager;
     }
 
     /**
@@ -111,7 +113,7 @@ public class AnswerRatingResource {
 
         answer = AnswerRatingTransformer.toAnswerProto(record, Collections.emptyList());
 
-        EventManager.ANSWER_CREATE.emit(answer);
+        eventManager.ANSWER_CREATE.emit(answer);
 
         return answer;
     }
@@ -161,7 +163,7 @@ public class AnswerRatingResource {
         response.status(201);
         response.header("Location", "/experiments/" + experimentId + "/answers/" + answerId);
 
-        EventManager.RATINGS_CREATE.emit(result);
+        eventManager.RATINGS_CREATE.emit(result);
 
         return rating;
     }
