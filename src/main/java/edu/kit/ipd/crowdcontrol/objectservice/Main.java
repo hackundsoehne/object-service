@@ -107,6 +107,11 @@ public class Main {
                 operationCarrier.answerRatingOperations,
                 operationCarrier.workerOperations,
                 eventManager);
+
+        new DuplicateChecker(
+                operationCarrier.answerRatingOperations,
+                operationCarrier.experimentOperations,
+                eventManager);
     }
 
     /**
