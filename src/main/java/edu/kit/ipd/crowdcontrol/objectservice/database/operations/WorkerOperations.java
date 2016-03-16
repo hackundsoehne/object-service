@@ -168,21 +168,18 @@ public class WorkerOperations extends AbstractOperations {
      * @return a collection of all workers of the specified experiment
      */
     public Result<WorkerRecord> getWorkersOfExp(int expId){
-        Rating rating = RATING.as("rating");
-        Answer answer = ANSWER.as("answer");
-        return create.select(WORKER.fields())
-                .select(rating.ID_RATING)
-                .select(answer.ID_ANSWER)
-                .from(ANSWER)
-                .rightJoin(rating).on(
-                        WORKER.ID_WORKER.eq(rating.WORKER_ID)
-                                .and(rating.EXPERIMENT.eq(expId))
-                )
-                .rightJoin(answer).on(
-                        WORKER.ID_WORKER.eq(answer.WORKER_ID)
-                                .and(answer.EXPERIMENT.eq(expId))
-                )
-                .fetchInto(WORKER);
+        return create.selectFrom(WORKER)
+                .where(WORKER.ID_WORKER.in(
+                        DSL.select(ANSWER.WORKER_ID)
+                                .from(ANSWER)
+                                .where(ANSWER.EXPERIMENT.eq(expId))
+                ))
+                .or(WORKER.ID_WORKER.in(
+                        DSL.select(RATING.WORKER_ID)
+                                .from(RATING)
+                                .where(RATING.EXPERIMENT.eq(expId))
+                ))
+                .fetch();
     }
     /**
      * Returns a single worker.
