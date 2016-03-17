@@ -39,11 +39,12 @@ public class MturkPlatform implements Platform,Payment {
      * @param password password to use
      * @param url instance to connect to
      * @param workerUIUrl path where to find the workerUI
+     * @param hits list of hits published on with those credentials
      */
-    public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl, String workerUIUrl, HitExtender hitExtender) {
-        this.hitExtender = hitExtender;
-        this.workerUIUrl = workerUIUrl;
+    public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl, String workerUIUrl, List<String> hits) {
         connection = new MTurkConnection(user, password, url);
+        this.hitExtender = new HitExtender(hits, connection);
+        this.workerUIUrl = workerUIUrl;
         this.workerServiceUrl = workerServiceUrl;
         this.name = name;
     }

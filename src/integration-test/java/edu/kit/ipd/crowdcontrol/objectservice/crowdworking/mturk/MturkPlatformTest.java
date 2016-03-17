@@ -2,7 +2,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.GrantBonus;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.NotifyWorker;
@@ -43,7 +42,8 @@ public class MturkPlatformTest {
                 properties.getProperty("User"),
                 properties.getProperty("Password"),
                 "https://mechanicalturk.sandbox.amazonaws.com/",
-                "Sandbox","http://example.com/", "http://worker.example.com/");
+                "Sandbox","http://example.com/", "http://worker.example.com/",
+                new HitExtender(Collections.emptyList(), connection));
 
         connection = new MTurkConnection(
                 properties.getProperty("User"),

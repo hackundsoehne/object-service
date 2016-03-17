@@ -66,8 +66,7 @@ public class Main {
 
         OperationCarrier operationCarrier = new OperationCarrier(config, databaseManager);
 
-        List<String> hits = null;//FIXME leander I need a db op which gives me ALL identifications from the platforms with type mturk
-        List<Platform> platforms = getPlatforms(config, () -> new HitExtender(hits));
+        List<Platform> platforms = getPlatforms(config);
 
         MailSender moneyTransferSender = getMailSender(config.mail.disabled, config.mail.moneytransfer, config.mail.debug);
         MailFetcher moneyTransferFetcher = getMailFetcher(config.mail.disabled, config.mail.moneyReceiver, config.mail.debug);
@@ -254,18 +253,15 @@ public class Main {
      * @return A list of configured and initialized platforms
      * @throws ConfigException if the config contains invalid values.
      */
-    private static List<Platform> getPlatforms(Config config, Supplier<HitExtender> supplier) throws ConfigException {
+    private static List<Platform> getPlatforms(Config config) throws ConfigException {
         List<Platform> platforms = new ArrayList<>();
-        HitExtender hitExtend = null;
 
         for (ConfigPlatform platform : config.platforms) {
             platform.type = platform.type.toLowerCase();
             Platform platformInstance;
             switch (platform.type) {
                 case "mturk":
-                    if (hitExtend == null) {
-                        hitExtend = supplier.get();
-                    }
+                    List<String> hits = null;//FIXME leander I need a db op which gives me all hits published by this connection
                     //FIXME remove the sandbox url - but I am to paranoid
                     platformInstance = new MturkPlatform(platform.user,
                             platform.password,
@@ -273,7 +269,7 @@ public class Main {
                             platform.name,
                             config.deployment.workerService,
                             config.deployment.workerUIPublic,
-                            hitExtend);
+                            hits);
                     break;
                 case "pybossa":
                     if (config.deployment.workerUILocal == null) {

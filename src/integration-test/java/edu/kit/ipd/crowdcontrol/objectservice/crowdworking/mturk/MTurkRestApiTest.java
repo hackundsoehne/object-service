@@ -57,6 +57,8 @@ public class MTurkRestApiTest {
                 0.20,60,2000,"test,for,everything",
                 2,2000000,"data","").get();
 
+        new ExtendHIT(connection, id, 2, 0).join();
+
         assertNotEquals(id, null);
 
         HIT hit = new GetHIT(connection,id).get();
@@ -71,7 +73,7 @@ public class MTurkRestApiTest {
         assertEquals(hit.getAssignmentDurationInSeconds(), new Long(60));
         //FIXME check the lifetime
         assertEquals(hit.getKeywords(), "test,for,everything");
-        assertEquals(hit.getMaxAssignments(), new Integer(2));
+        assertEquals(hit.getMaxAssignments(), new Integer(4));
         assertEquals(hit.getAutoApprovalDelayInSeconds(), new Long(2000000));
         assertEquals(hit.getRequesterAnnotation(), "data");
 
