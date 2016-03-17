@@ -44,6 +44,7 @@ public class ExperimentOperator {
         this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.experimentFetcher = experimentFetcher;
         this.eventManager = eventManager;
+        recoverExperiments();
     }
 
     /**
@@ -112,7 +113,7 @@ public class ExperimentOperator {
     /**
      * Recovers experiments from shutdown-failure
      */
-    public void recoverExperiments(){
+    private void recoverExperiments(){
         experimentsPlatformOperations.getExperimentsFailedDuringShutdown().forEach(
                 (exp) -> recoverExperimentShutdown(exp.getIdExperiment())
         );
@@ -147,45 +148,15 @@ public class ExperimentOperator {
         resumeShutdownExperiment(experiment,120);
     }
 
-    private void resumeShutdownExperiment(Experiment experiment, int remainingMins){
+    private ScheduledFuture resumeShutdownExperiment(Experiment experiment, int remainingMins){
         ScheduledFuture scheduledFuture= scheduledExecutorService.schedule(new Runnable() {
             @Override
             public void run() {
-                experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.stopped);
+                experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.stopped); //TODO possibly not necessary because status is set in unpublishTask
                 eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
             }
         },remainingMins,TimeUnit.MINUTES);
+        return scheduledFuture;
     }
 
- /*   /**
-     * Private class for non-blocking shutdown-process
-
-    private class ShutdownRunner extends Thread{
-        private Experiment experiment;
-        private int minutesToShutdown = 120;
-
-        public ShutdownRunner(Experiment experiment){
-            this.experiment = experiment;
-        }
-
-        /**
-         * Waits a specified amount of time until stopping the experiment and setting its state accordingly
-
-        public void start(){
-            try {
-                TimeUnit.MINUTES.sleep(minutesToShutdown);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.stopped);
-            eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
-        }
-        /**
-        * Waits the remaining time of the shutdown process until stopping the experiment and setting its state accordingly
-
-         public void runRemaining(int minutesToShutdown){ //Used by a recover-method
-            this.minutesToShutdown = minutesToShutdown;
-            start();
-        }
-    } */
 }
