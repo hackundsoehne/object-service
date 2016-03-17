@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.feedback;
 
+import edu.kit.ipd.crowdcontrol.objectservice.Utils;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
@@ -55,10 +57,9 @@ public class FeedbackCreatorTest {
         a2.setAnswer("baz2");
         a2.setSystemResponse(null);
 
-        WorkerRecord w1 = mock(WorkerRecord.class);
+        WorkerRecord w1 = new WorkerRecord(0, null, null, "coolcrowd@42.pi", 0, "");
         Optional<WorkerRecord> o1 = Optional.of(w1);
         when(workerOperations.getWorker(0)).thenReturn(o1);
-        when(w1.getEmail()).thenReturn("coolcrowd@42.pi");
 
         RatingRecord ratingAnswer1x1 = new RatingRecord();
         ratingAnswer1x1.setFeedback("Foobar1");
@@ -99,13 +100,14 @@ public class FeedbackCreatorTest {
         when(answerIterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
         when(answerIterator.next()).thenReturn(a1).thenReturn(a2);
 
-        ExperimentRecord exp = mock(ExperimentRecord.class);
-        when(exp.getTitle()).thenReturn("foobarExperiment");
+        ExperimentRecord exp = new ExperimentRecord();
+        exp.setTitle("foobarExperiment");
         Optional<ExperimentRecord> expOpt = Optional.of(exp);
         doReturn(expOpt).when(experimentOperations).getExperiment(0);
 
-        String message2 = sender.loadMessage("src/test/resources/feedback/workermessage1.txt");
-        Assert.assertEquals(sender.getFeedback(0,0), message2);
+        String message2 = Utils.loadFile("/feedback/workermessage1.txt");
+        String feedback = sender.getFeedback(0,0);
+        Assert.assertEquals(feedback, message2);
     }
 
     @Test
