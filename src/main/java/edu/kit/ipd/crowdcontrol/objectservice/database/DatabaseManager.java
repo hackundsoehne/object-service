@@ -2,7 +2,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.DatabaseVersionRecord;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -24,7 +23,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.DATABASE_VERSION;
 
 /**
  * Initializes and holds the connection to the database and eventually the database itself.

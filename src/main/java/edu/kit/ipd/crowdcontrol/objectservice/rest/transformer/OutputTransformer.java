@@ -13,6 +13,7 @@ import spark.Response;
 import spark.Route;
 import spark.utils.MimeParse;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -52,7 +53,7 @@ public class OutputTransformer implements Route {
     }
 
     @Override
-    public String handle(Request request, Response response) throws Exception {
+    public Object handle(Request request, Response response) throws Exception {
         Object result = this.route.handle(request, response);
 
         if (result == null) {
@@ -113,7 +114,7 @@ public class OutputTransformer implements Route {
      * @param response response provided by Spark
      * @param message  protocol buffer to transform
      */
-    public static String transform(Request request, Response response, Message message) {
+    public static Object transform(Request request, Response response, Message message) {
         String bestMatch = MimeParse.bestMatch(SUPPORTED_TYPES, request.headers("accept"));
 
         LOGGER.trace("Accept header matches '" + bestMatch + "' best.");
@@ -125,7 +126,8 @@ public class OutputTransformer implements Route {
                     return PRINTER.print(message);
                 case TYPE_PROTOBUF:
                     response.type(TYPE_PROTOBUF);
-                    return new String(message.toByteArray());
+                    // https://groups.google.com/forum/#!searchin/sparkjava/binary/sparkjava/5kbwIArrfO0/ZLha9ILo458J
+                    return message.toByteArray();
                 default:
                     throw new NotAcceptableException(request.headers("accept"), TYPE_JSON, TYPE_PROTOBUF);
             }
@@ -177,5 +179,21 @@ public class OutputTransformer implements Route {
         }
 
         return link.substring(0, link.length() - 1);
+    }
+
+    public static void writeResponse(Response response, Object body) {
+        if (body instanceof String) {
+            response.body((String) body);
+        } else if (body instanceof byte[]) {
+            response.body("");
+
+            try {
+                response.raw().getOutputStream().write((byte[]) body);
+            } catch (IOException e) {
+                throw new InternalServerErrorException("Couldn't write response body.", e);
+            }
+        } else if (body != null) {
+            throw new InternalServerErrorException("Only response bodies as byte[] or String supported, got " + body.getClass());
+        }
     }
 }

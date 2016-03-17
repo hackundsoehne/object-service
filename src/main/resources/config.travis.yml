@@ -1,5 +1,5 @@
 database:
-    url: jdbc:mysql://localhost:3306/crowdcontrol
+    url: jdbc:mysql://localhost:3306/crowdcontrol?autoReconnect=true&useSSL=false
     dialect: MYSQL
     writing:
         user: root
@@ -10,6 +10,8 @@ database:
 
 deployment:
     origin: http://localhost:3000
+    workerService: http://worker.example.com
+    workerUIPublic: http://worker.example.com
 
 platforms :
     - type: dummy
