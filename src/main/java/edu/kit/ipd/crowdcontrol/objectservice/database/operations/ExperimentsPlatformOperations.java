@@ -266,24 +266,19 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @return the statuses
      */
     public Set<ExperimentsPlatformStatusPlatformStatus> getExperimentsPlatformStatusPlatformStatuses (int experiment) {
-        Field<Timestamp> maxTimestamp = DSL.max(EXPERIMENTS_PLATFORM_STATUS.TIMESTAMP).as("max");
-        Table<Record3<ExperimentsPlatformStatusPlatformStatus, Integer, Timestamp>> maxTable = DSL
-                .select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM, maxTimestamp)
-                .from(EXPERIMENTS_PLATFORM_STATUS)
-                .groupBy(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM)
-                .asTable("maxTable");
-
-        return create.select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM, maxTable.field(maxTimestamp))
-                .from(
-                        maxTable
-                ).innerJoin(EXPERIMENTS_PLATFORM_STATUS).on(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.eq(maxTable.field(EXPERIMENTS_PLATFORM_STATUS.PLATFORM))
-                        .and(EXPERIMENTS_PLATFORM_STATUS.TIMESTAMP.eq(maxTable.field(maxTimestamp))))
-                .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
-                        DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
-                                .from(EXPERIMENTS_PLATFORM)
-                                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experiment))
-                ))
-                .fetchSet(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS);
+        ExperimentsPlatformStatus status1 = EXPERIMENTS_PLATFORM_STATUS.as("mode1");
+        ExperimentsPlatformStatus status2 = EXPERIMENTS_PLATFORM_STATUS.as("mode2");
+        return create.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS, status1.PLATFORM_STATUS)
+                .from(EXPERIMENTS_PLATFORM)
+                .join(status1).onKey()
+                .leftOuterJoin(status2).on(
+                        EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.eq(status2.PLATFORM)
+                                .and(status1.TIMESTAMP.lessThan(status2.TIMESTAMP).or(status1.TIMESTAMP.eq(status2.TIMESTAMP)
+                                        .and(status1.IDEXPERIMENTS_PLATFORM_STATUS.lessThan(status2.IDEXPERIMENTS_PLATFORM_STATUS))))
+                )
+                .where(status2.IDEXPERIMENTS_PLATFORM_STATUS.isNull())
+                .and(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experiment))
+                .fetchSet(status1.PLATFORM_STATUS);
 
     }
 
@@ -327,32 +322,29 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @return list of experiments to recover
      */
     public List<ExperimentRecord> getExperimentsFailedDuringShutdown() {
-        Field<Timestamp> maxTimestamp = DSL.max(EXPERIMENTS_PLATFORM_STATUS.TIMESTAMP).as("max");
-        Table<Record3<ExperimentsPlatformStatusPlatformStatus, Integer, Timestamp>> maxTable = DSL
-                .select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM, maxTimestamp)
-                .from(EXPERIMENTS_PLATFORM_STATUS)
-                .groupBy(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM)
-                .asTable("maxTable");
-
-        Set<Integer> shutdownPlatforms = create.select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS, EXPERIMENTS_PLATFORM_STATUS.PLATFORM, maxTable.field(maxTimestamp))
-                .from(
-                        maxTable
-                ).innerJoin(EXPERIMENTS_PLATFORM_STATUS).on(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.eq(maxTable.field(EXPERIMENTS_PLATFORM_STATUS.PLATFORM))
-                        .and(EXPERIMENTS_PLATFORM_STATUS.TIMESTAMP.eq(maxTable.field(maxTimestamp))))
-                .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
-                        DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
-                                .from(EXPERIMENTS_PLATFORM)
-                ))
-                .having(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS.eq(ExperimentsPlatformStatusPlatformStatus.shutdown))
-                .fetchSet(EXPERIMENTS_PLATFORM_STATUS.PLATFORM);
-
-        return create.select(EXPERIMENT.fields())
-                .from(EXPERIMENT)
-                .innerJoin(EXPERIMENTS_PLATFORM).on(
-                        EXPERIMENT.ID_EXPERIMENT.eq(EXPERIMENTS_PLATFORM.EXPERIMENT)
-                                .and(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.in(shutdownPlatforms))
+        ExperimentsPlatformStatus status1 = EXPERIMENTS_PLATFORM_STATUS.as("mode1");
+        ExperimentsPlatformStatus status2 = EXPERIMENTS_PLATFORM_STATUS.as("mode2");
+        Set<Integer> experimentsPlatforms = create.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS, status1.PLATFORM_STATUS)
+                .from(EXPERIMENTS_PLATFORM)
+                .join(status1).onKey()
+                .leftOuterJoin(status2).on(
+                        EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.eq(status2.PLATFORM)
+                                .and(status1.TIMESTAMP.lessThan(status2.TIMESTAMP).or(status1.TIMESTAMP.eq(status2.TIMESTAMP)
+                                        .and(status1.IDEXPERIMENTS_PLATFORM_STATUS.lessThan(status2.IDEXPERIMENTS_PLATFORM_STATUS))))
                 )
-                .fetchInto(EXPERIMENT);
+                .where(status2.IDEXPERIMENTS_PLATFORM_STATUS.isNull())
+                .having(status1.PLATFORM_STATUS.eq(ExperimentsPlatformStatusPlatformStatus.shutdown))
+                .fetchSet(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS);
+
+        return create.selectFrom(EXPERIMENT)
+                .where(EXPERIMENT.ID_EXPERIMENT.in(
+                        DSL.select(EXPERIMENTS_PLATFORM.EXPERIMENT)
+                            .from(EXPERIMENTS_PLATFORM)
+                            .where(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.in(
+                                    experimentsPlatforms
+                            ))
+                ))
+                .fetch();
     }
 
     /**
