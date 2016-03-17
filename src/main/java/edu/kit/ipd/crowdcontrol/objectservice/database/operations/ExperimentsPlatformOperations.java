@@ -215,22 +215,18 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @return a list of platforms
      */
     public Map<String, ExperimentsPlatformModeMode> getActivePlatforms(int experimentId) {
-        Field<Timestamp> maxTimestamp = DSL.max(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP).as("max");
-        Table<Record3<ExperimentsPlatformModeMode, Integer, Timestamp>> maxTable = DSL
-                .select(EXPERIMENTS_PLATFORM_MODE.MODE, EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM, maxTimestamp)
-                .from(EXPERIMENTS_PLATFORM_MODE)
-                .groupBy(EXPERIMENTS_PLATFORM_MODE.MODE, EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM)
-                .asTable("maxTable");
-
-        return create.select(EXPERIMENTS_PLATFORM_MODE.MODE, EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM, maxTable.field(maxTimestamp), EXPERIMENTS_PLATFORM.PLATFORM)
-                .from(
-                        maxTable
-                ).innerJoin(EXPERIMENTS_PLATFORM_MODE).on(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM.eq(maxTable.field(EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM))
-                        .and(EXPERIMENTS_PLATFORM_MODE.TIMESTAMP.eq(maxTable.field(maxTimestamp))))
-                .innerJoin(EXPERIMENTS_PLATFORM).on(
-                        EXPERIMENTS_PLATFORM_MODE.EXPERIMENTS_PLATFORM.eq(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
-                                .and(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
+        ExperimentsPlatformMode mode1 = EXPERIMENTS_PLATFORM_MODE.as("mode1");
+        ExperimentsPlatformMode mode2 = EXPERIMENTS_PLATFORM_MODE.as("mode2");
+        return create.select(EXPERIMENTS_PLATFORM.PLATFORM, mode1.MODE)
+                .from(EXPERIMENTS_PLATFORM)
+                .join(mode1).onKey()
+                .leftOuterJoin(mode2).on(
+                        EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.eq(mode2.EXPERIMENTS_PLATFORM)
+                        .and(mode1.TIMESTAMP.lessThan(mode2.TIMESTAMP).or(mode1.TIMESTAMP.eq(mode2.TIMESTAMP)
+                                .and(mode1.IDEXPERIMENTS_PLATFORM_STOPGAP.lessThan(mode2.IDEXPERIMENTS_PLATFORM_STOPGAP))))
                 )
+                .where(mode2.IDEXPERIMENTS_PLATFORM_STOPGAP.isNull())
+                .and(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
                 .fetchMap(EXPERIMENTS_PLATFORM.PLATFORM, EXPERIMENTS_PLATFORM_MODE.MODE);
     }
 
