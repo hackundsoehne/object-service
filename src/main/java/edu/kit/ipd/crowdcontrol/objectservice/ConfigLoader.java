@@ -51,6 +51,17 @@ public class ConfigLoader {
         }
 
         config.platforms = Arrays.stream(config.platforms)
+                .map(platform -> {
+                    if (platform.name == null) {
+                        if (platform.type.equals("dummy")) {
+                            platform.name = "Dummy";
+                        } else {
+                            LOGGER.warn("Platform (type: {}) without a name will be ignored.", platform.type);
+                        }
+                    }
+
+                    return platform;
+                })
                 .filter(platform -> platform.name != null && !Boolean.getBoolean(platform.name.toLowerCase() + ".disabled"))
                 .toArray(ConfigPlatform[]::new);
 
