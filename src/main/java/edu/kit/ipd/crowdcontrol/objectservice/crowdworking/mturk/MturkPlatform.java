@@ -32,21 +32,23 @@ public class MturkPlatform implements Platform,Payment {
     private final MTurkConnection connection;
     private final String workerServiceUrl;
     private final String workerUIUrl;
-    private final HitExtender hitExtender;
+    private HitExtender hitExtender;
     /**
      * A new mturk platform instance
      * @param user user to login
      * @param password password to use
      * @param url instance to connect to
      * @param workerUIUrl path where to find the workerUI
-     * @param hits list of hits published on with those credentials
      */
-    public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl, String workerUIUrl, List<String> hits) {
+    public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl, String workerUIUrl) {
         connection = new MTurkConnection(user, password, url);
-        this.hitExtender = new HitExtender(hits, connection);
         this.workerUIUrl = workerUIUrl;
         this.workerServiceUrl = workerServiceUrl;
         this.name = name;
+    }
+
+    public void startExtenderService(List<String> hits) {
+        this.hitExtender = new HitExtender(hits, connection);
     }
 
     @Override
@@ -112,7 +114,8 @@ public class MturkPlatform implements Platform,Payment {
                 "",
                 content)
                 .thenApply(id -> {
-                    hitExtender.addHit(id);
+                    if (hitExtender != null)
+                      hitExtender.addHit(id);
                     JsonObject jsonObject = new JsonObject();
                     jsonObject.add("identification", new JsonPrimitive(id));
                     return jsonObject;
@@ -122,7 +125,8 @@ public class MturkPlatform implements Platform,Payment {
     @Override
     public CompletableFuture<Boolean> unpublishTask(JsonElement data) {
         String id = data.getAsJsonObject().get("identification").getAsString();
-        hitExtender.removeHit(id);
+        if (hitExtender != null)
+          hitExtender.removeHit(id);
         return new UnpublishHIT(connection, id);
     }
 
