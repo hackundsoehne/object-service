@@ -7,6 +7,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.local.LocalPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
@@ -279,6 +280,9 @@ public class Main {
                     break;
                 case "dummy":
                     platformInstance = new DummyPlatform(platform.name);
+                    break;
+                case "local":
+                    platformInstance = new LocalPlatform(platform.name);
                     break;
                 default:
                     throw new ConfigException("Platform type \"" + platform.type + "\" not found");
