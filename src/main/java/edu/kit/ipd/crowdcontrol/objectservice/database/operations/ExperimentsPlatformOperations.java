@@ -351,7 +351,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * Retrieves a list of all experiments which are in the state running, creative_stopped, shutdown
      */
     public List<ExperimentRecord> getRunningExperiments() {
-        Predicate<Integer> isRunningStoppedOrShutdown = experimentID ->  {
+        Predicate<Integer> isRunningStoppedOrShutdown = experimentID -> {
             Set<ExperimentsPlatformStatusPlatformStatus> statuses = getExperimentsPlatformStatusRecord(experimentID).stream()
                     .map(ExperimentsPlatformStatusRecord::getPlatformStatus)
                     .collect(Collectors.toSet());
@@ -364,5 +364,17 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
                 .stream()
                 .filter(experiment -> isRunningStoppedOrShutdown.apply(experiment.getIdExperiment()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * returns all the identifications in the Experiments_Platform table where the name is the platform
+     * @param platform the platform to search for
+     * @return a list of identifications
+     */
+    public List<String> getIdentificationsfromPlatform(String platform) {
+        return create.select(EXPERIMENTS_PLATFORM.IDENTIFICATION)
+                .where(EXPERIMENTS_PLATFORM.IDENTIFICATION.isNotNull())
+                .and(EXPERIMENTS_PLATFORM.PLATFORM.eq(platform))
+                .fetch(EXPERIMENTS_PLATFORM.IDENTIFICATION);
     }
 }
