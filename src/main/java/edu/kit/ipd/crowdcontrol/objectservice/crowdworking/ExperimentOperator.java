@@ -88,7 +88,7 @@ public class ExperimentOperator {
     public void endExperiment(Experiment experiment) {
 
         Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId());
-         if(statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)  && !statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
+         if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
 
             for (Experiment.Population population :
                     experiment.getPopulationsList()) {
@@ -149,12 +149,11 @@ public class ExperimentOperator {
     }
 
     private ScheduledFuture resumeShutdownExperiment(Experiment experiment, int remainingMins){
-        ScheduledFuture scheduledFuture= scheduledExecutorService.schedule(new Runnable() {
-            @Override
-            public void run() {
-                experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.stopped); //TODO possibly not necessary because status is set in unpublishTask
-                eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
-            }
+        log.debug("scheduling shutdown for experiment {}.", experiment);
+        ScheduledFuture scheduledFuture= scheduledExecutorService.schedule((Runnable) () -> {
+            log.info("shutting down experiment {}.", experiment);
+            experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.finished); //TODO possibly not necessary because status is set in unpublishTask
+            eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
         },remainingMins,TimeUnit.MINUTES);
         return scheduledFuture;
     }
