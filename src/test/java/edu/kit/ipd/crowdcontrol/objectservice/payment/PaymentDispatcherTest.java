@@ -95,8 +95,12 @@ public class PaymentDispatcherTest {
         workerAnswerMap.put(workerOne, 5);
         workerAnswerMap.put(workerTwo, 2);
 
+        workerRatingMap.put(workerOne,1);
+
         workerRecords.add(workerOne);
         workerRecords.add(workerTwo);
+        workerRecords.add(workerThree);
+
         paymentDone.complete(true);
         eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experiment.toBuilder().setState(Experiment.State.STOPPED).build()));
         assertTrue(reachedTargetMethod);

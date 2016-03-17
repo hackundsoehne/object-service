@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -135,6 +136,6 @@ public class RatingQualityByDistributionTest {
     public void testGetter(){
         assertEquals(identifier.getAlgorithmName(),RatingQualityByDistribution.ALGORITHM_NAME);
         assertEquals(identifier.getAlgorithmDescription(),RatingQualityByDistribution.ALGORITHM_DESCRIPTION);
-        assertTrue(identifier.getParams() != null);
+        assertNotNull(identifier.getParams());
     }
 }

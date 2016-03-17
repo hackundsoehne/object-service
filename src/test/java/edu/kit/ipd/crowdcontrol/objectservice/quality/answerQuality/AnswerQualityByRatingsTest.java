@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -141,6 +142,6 @@ public class AnswerQualityByRatingsTest {
     public void testGetterMethods(){
         assertEquals(identifier.getAlgorithmDescription(),(AnswerQualityByRatings.ALGORITHM_DESCRIPTION));
         assertEquals(identifier.getAlgorithmName(), AnswerQualityByRatings.ALGORITHM_NAME);
-        assertTrue(identifier.getParams() != null);
+        assertNotNull(identifier.getParams());
     }
 }
