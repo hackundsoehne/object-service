@@ -17,7 +17,7 @@ platforms :
     - type: dummy
 
 mail:
-    sendsMailsFrom: pseipd@gmail.com
+    disabled: true
 
 moneytransfer:
     payOffThreshold: 0
