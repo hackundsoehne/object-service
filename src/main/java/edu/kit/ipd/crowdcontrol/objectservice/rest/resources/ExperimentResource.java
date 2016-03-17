@@ -5,9 +5,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PlatformManager;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PreActionException;
 import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.database.PopulationsHelper;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ConstraintRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.TagRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.TagConstraintTransformer;
@@ -223,6 +224,14 @@ public class ExperimentResource {
                 .filter(population -> !existing.contains(population.getPlatformId()))
                 .collect(Collectors.toList());
 
+        List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream()
+                .filter(population -> existing.contains(population.getPlatformId()))
+                .collect(Collectors.toList());
+
+        if (missingPopulations.size() > 0) {
+            throw new BadRequestException("It's not possible to remove platforms which have already been published.");
+        }
+
         class PlatformPopulation {
             CompletableFuture<Boolean> job;
             String population;
@@ -231,7 +240,7 @@ public class ExperimentResource {
         newPopulations.stream()
                 .map(population -> {
                     try {
-                        //insert the population into the databae
+                        // Insert the population into the database
                         populationsHelper.insertPopulation(id, population);
 
                         PlatformPopulation platformPopulation = new PlatformPopulation();
@@ -252,21 +261,6 @@ public class ExperimentResource {
                         log.fatal("Publishing the experiment "+experiment+ " on "+ platformPopulation.population+" failed.", e.getCause());
                     }
                 });
-
-        List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream()
-                .filter(existing::contains)
-                .collect(Collectors.toList());
-
-        //FIXME this is something like negativ gapfiller, this is not implemented yet.
-        /*missingPopulations.forEach(failedPopulation -> {
-            try {
-                //platformManager.unpublishTask(failedPopulation.getPlatformId(),experiment).join();
-                //TODO remove this population
-            } catch (TaskOperationException e) {
-              //TODO  log.fatal("Error! could not unpublish experiment from platform! "+ e.getMessage());
-            }
-
-        });*/
 
         return experimentFetcher.fetchExperiment(id);
     }
