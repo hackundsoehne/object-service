@@ -60,7 +60,7 @@ public class InputTransformer implements Route {
         try {
             switch (contentType) {
                 case "application/json":
-                    String json = request.body();
+                    String json = new String(request.bodyAsBytes(), "UTF-8");
                     LOGGER.trace("Parsing request body as application/json ({} bytes).", json.length());
                     PARSER.merge(json, builder);
                     break;
