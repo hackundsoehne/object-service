@@ -91,7 +91,7 @@ public class QualityIdentificator {
     /**
      * This method is performed, if the RATINGS_CREATE-observable emits an event.
      * All ratings and answers of the experiment will be rated. Furthermore the status of the experiment is checked and
-     * if the criteria are met, it will be shut-down
+     * if the criteria are met, it will be shut-down{
      *
      * @param rating which has been created an will be processed
      */
