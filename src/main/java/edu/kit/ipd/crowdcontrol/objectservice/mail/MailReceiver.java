@@ -69,18 +69,11 @@ public class MailReceiver implements MailFetcher {
         Message[] messages;
 
         Folder folder = store.getFolder(name);
-        folder.open(Folder.READ_WRITE);
+        folder.open(Folder.READ_ONLY);
 
         Flags seen = new Flags(Flags.Flag.SEEN);
         FlagTerm unseenFlagTerm = new FlagTerm(seen, false);
         messages = folder.search(unseenFlagTerm);
-
-        for (Message msg : messages) {
-            msg.setFlag(Flags.Flag.SEEN, true);
-        }
-        folder.close(true);
-
-        folder.open(Folder.READ_ONLY);
 
         LOGGER.trace("Successfully completed fetching " + messages.length + " unseen mails from folder" + name + ".");
         return messages;
@@ -95,15 +88,9 @@ public class MailReceiver implements MailFetcher {
         Store store = connect();
 
         Folder folder = store.getFolder(name);
-        folder.open(Folder.READ_WRITE);
-        Message[] messages = folder.getMessages();
-
-        for (Message msg : messages) {
-            msg.setFlag(Flags.Flag.SEEN, true);
-        }
-        folder.close(true);
-
         folder.open(Folder.READ_ONLY);
+
+        Message[] messages = folder.getMessages();
 
         LOGGER.trace("Successfully completed fetching " + messages.length + " mails from folder" + name + ".");
         return messages;
@@ -115,23 +102,18 @@ public class MailReceiver implements MailFetcher {
     @Override
     public void markAsUnseen(Message message) throws MessagingException {
         LOGGER.trace("Started marking message with subject \"" + message.getSubject() + "\" as unseen.");
-        Folder folder = message.getFolder();
-        boolean wasOpen = false;
-        int mode = 0;
-        if (folder.isOpen()) {
-            wasOpen = true;
-            mode = folder.getMode();
-            folder.close(true);
-        }
-        folder.open(Folder.READ_WRITE);
-
-        message.setFlag(Flags.Flag.SEEN, false);
-
-        folder.close(true);
-        if (wasOpen) {
-            folder.open(mode);
-        }
+        markAs(Flags.Flag.SEEN, false, message);
         LOGGER.trace("Successfully completed marking message with subject \"" + message.getSubject() + "\" as unseen.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void markAsSeen(Message message) throws MessagingException {
+        LOGGER.trace("Started marking message with subject \"" + message.getSubject() + "\" as seen.");
+        markAs(Flags.Flag.SEEN, true, message);
+        LOGGER.trace("Successfully completed marking message with subject \"" + message.getSubject() + "\" as seen.");
     }
 
     /**
@@ -140,7 +122,35 @@ public class MailReceiver implements MailFetcher {
     @Override
     public void deleteMails(Message message) throws MessagingException {
         LOGGER.trace("Started deleting message with subject \"" + message.getSubject() + "\".");
+        markAs(Flags.Flag.DELETED, true, message);
+        LOGGER.trace("Successfully completed deleting message with subject \"" + message.getSubject() + "\".");
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Message[] fetchUnseen() throws MessagingException {
+        return fetchUnseen(defaultInbox);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void close(Folder folder) throws MessagingException {
+        LOGGER.trace("Started closing folder " + folder.getFullName() + ".");
+        if (folder.isOpen()) {
+            folder.close(true);
+        }
+        if (folder.getStore().isConnected()) {
+            folder.getStore().close();
+        }
+
+        LOGGER.trace("Successfully completed closing folder " + folder.getFullName() + ".");
+    }
+
+    private void markAs(Flags.Flag flag, boolean value, Message message) throws MessagingException {
         Folder folder = message.getFolder();
         boolean wasOpen = false;
         int mode = 0;
@@ -151,38 +161,14 @@ public class MailReceiver implements MailFetcher {
         }
         folder.open(Folder.READ_WRITE);
 
-        message.setFlag(Flags.Flag.DELETED, true);
+        message.setFlag(flag, value);
 
         folder.close(true);
-
         if (wasOpen) {
             folder.open(mode);
         }
-        LOGGER.trace("Successfully completed deleting message with subject \"" + message.getSubject() + "\".");
     }
 
-    @Override
-    public Message[] fetchUnseen() throws MessagingException {
-        return fetchUnseen(defaultInbox);
-    }
-
-    /**
-     * Closes the folder and the store of the messages.
-     * @param messages the messages their resources become closed (have to be in the same folder)
-     * @throws MessagingException in case of problems with closing
-     */
-    public void close(Message[] messages) throws MessagingException {
-        LOGGER.trace("Started closing folder of " + messages.length + " messages.");
-        if (messages.length > 0) {
-            if (messages[0].getFolder().isOpen()) {
-                messages[0].getFolder().close(true);
-            }
-            if (messages[0].getFolder().getStore().isConnected()) {
-                messages[0].getFolder().getStore().close();
-            }
-        }
-        LOGGER.trace("Successfully completed closing folder of " + messages.length + " messages.");
-    }
 
     private Store connect() throws MessagingException {
         Session session = Session.getInstance(props);
