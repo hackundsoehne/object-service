@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
@@ -9,6 +10,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPla
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityByRatings;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityStrategy;
@@ -41,6 +43,7 @@ public class QualityIdentificator {
     private final Observable<Event<Rating>> ratingObservable;
     private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final ExperimentOperator experimentOperator;
+    private final ExperimentFetcher experimentFetcher;
     private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final AlgorithmOperations algorithmOperations;
@@ -57,12 +60,13 @@ public class QualityIdentificator {
      * Might be set to allow more flexibility and more good answers
      */
 
-    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator experimentOperator,ExperimentsPlatformOperations experimentsPlatformOperations, EventManager eventManager) {
+    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator experimentOperator, ExperimentsPlatformOperations experimentsPlatformOperations, EventManager eventManager, ExperimentFetcher experimentFetcher) {
         this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.experimentOperator = experimentOperator;
         this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.algorithmOperations = algorithmOperations;
+        this.experimentFetcher = experimentFetcher;
         this.answerAlgorithms = new HashSet<>();
         this.ratingAlgorithms = new HashSet<>();
         this.ratingObservable = eventManager.RATINGS_CREATE.getObservable();
@@ -158,10 +162,21 @@ public class QualityIdentificator {
      * @param experiment to be checked
      */
     private void checkExpStatus(ExperimentRecord experiment) {
-        if (experiment.getNeededAnswers() <= answerRatingOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())){
-            Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment());
-            if(statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)  && !statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)){ //Only shut down if running and not already shutting down
-                experimentOperator.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
+        Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment());
+        boolean doShutdown = false;
+        if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.creative_stopping)) {
+            if (answerRatingOperations.allAnswersHaveMaxRatings(experiment.getIdExperiment())) {
+                doShutdown = true;
+            }
+        } else if (experiment.getNeededAnswers() <= answerRatingOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())) {
+            doShutdown = true;
+        }
+        if (doShutdown){
+            log.debug("there are enough answers to end the experiment");
+            if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)){ //Only shut down if running and not already shutting down
+                log.debug("ending experiment");
+                Experiment experimentProto = experimentFetcher.fetchExperiment(experiment.getIdExperiment());
+                experimentOperator.endExperiment(experimentProto);
             }
         }
 
