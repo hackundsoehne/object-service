@@ -10,6 +10,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by lucaskrauss at 25.01.2016
@@ -129,5 +131,11 @@ public class RatingQualityByDistributionTest {
     public void throwExceptionMissingRatings(){
         identifier.identifyRatingQuality(ratings,params,maxQuality, minQuality);
 
+    }
+    @Test
+    public void testGetter(){
+        assertEquals(identifier.getAlgorithmName(),RatingQualityByDistribution.ALGORITHM_NAME);
+        assertEquals(identifier.getAlgorithmDescription(),RatingQualityByDistribution.ALGORITHM_DESCRIPTION);
+        assertNotNull(identifier.getParams());
     }
 }

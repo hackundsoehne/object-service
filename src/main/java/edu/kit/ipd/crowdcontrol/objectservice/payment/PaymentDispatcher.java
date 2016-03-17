@@ -80,8 +80,7 @@ public class PaymentDispatcher  {
                         }, Collectors.toList())))
                 .forEach((platform, paymentJobs) -> {
                     try {
-                        platformManager.payExperiment(platform, exp, paymentJobs);
-                        //TODO props to the guy which missed the .join          ^^^^^^^^
+                        platformManager.payExperiment(platform, exp, paymentJobs).join();
                     } catch (PreActionException e) {
                         log.fatal("Payment of experiment "+exp+" on platform "+platform+" could not take place!", e.getCause());
                     }

@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
  */
 public class RatingQualityByDistribution implements RatingQualityStrategy {
 
-    private final String algorithmName = "RatingQualityByDistribution";
-    private final String algorithmDescription = "Identifies the quality of ratings depending on their distribution." +
+    static final String ALGORITHM_NAME = "RatingQualityByDistribution";
+    static final String ALGORITHM_DESCRIPTION = "Identifies the quality of ratings depending on their distribution." +
             "\nRatings with the most-chosen value will be assigned the maximum-quality. Others have a quality depending on" +
             "the deviation of their value to the most chosen one";
 
@@ -41,7 +41,7 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
                         + ", but got :" + rating.getRating());
             }
         });
-        Map<RatingRecord, Integer> map = new HashMap<>();
+        Map<RatingRecord, Integer> resultMap = new HashMap<>();
 
         // Bucket sorts given ratings
         Map<Integer, List<RatingRecord>> sortedMap = ratings.stream().collect(Collectors.groupingBy(RatingRecord::getRating));
@@ -53,21 +53,21 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
                 for (RatingRecord ratingRecord : entry.getValue()) {
                     int diffFromOptimal = Math.abs(ratingRecord.getRating() - optimalRating);
                     int rating = maximumQuality - diffFromOptimal;
-                    map.put(ratingRecord, rating);
+                    resultMap.put(ratingRecord, rating);
                 }
             }
         }
-        return map;
+        return resultMap;
     }
 
     @Override
     public String getAlgorithmName() {
-        return algorithmName;
+        return ALGORITHM_NAME;
     }
 
     @Override
     public String getAlgorithmDescription() {
-        return algorithmDescription;
+        return ALGORITHM_DESCRIPTION;
     }
 
     @Override

@@ -22,8 +22,8 @@ import java.util.Map;
 public class AnswerQualityByRatings implements AnswerQualityStrategy {
 
     private final Logger log = LogManager.getLogger(AnswerQualityByRatings.class);
-    static final String algorithmName = "AnswerQualityByRatings";
-    static final String algorithmDescription = "Identifies the quality of answers based on its ratings. " +
+    static final String ALGORITHM_NAME = "AnswerQualityByRatings";
+    static final String ALGORITHM_DESCRIPTION = "Identifies the quality of answers based on its ratings. " +
             "\nThe answer's quality is equal to the rounded average of all its ratings ";
     static final String REGEX = "[0-9]";
     static final String DB_REGEX = "^" + REGEX + "$";
@@ -92,17 +92,17 @@ public class AnswerQualityByRatings implements AnswerQualityStrategy {
 
     @Override
     public String getAlgorithmName() {
-        return algorithmName;
+        return ALGORITHM_NAME;
     }
 
     @Override
     public String getAlgorithmDescription() {
-        return algorithmDescription;
+        return ALGORITHM_DESCRIPTION;
     }
 
     @Override
     public List<AlgorithmAnswerQualityParamRecord> getParams() {
-        return Collections.singletonList(new AlgorithmAnswerQualityParamRecord(null, PARAM_DESCRIPTION, DB_REGEX, algorithmName, PARAMETER_ID));
+        return Collections.singletonList(new AlgorithmAnswerQualityParamRecord(null, PARAM_DESCRIPTION, DB_REGEX, ALGORITHM_NAME, PARAMETER_ID));
     }
 
 

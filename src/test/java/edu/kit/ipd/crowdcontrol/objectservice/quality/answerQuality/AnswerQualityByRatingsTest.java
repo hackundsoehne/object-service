@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +47,7 @@ public class AnswerQualityByRatingsTest {
         identifier = new AnswerQualityByRatings();
         answer = new AnswerRecord(1, 0, null, null, 0, -1, 0, false, "", 13L);
         params = new HashMap<>();
-        params.put(new AlgorithmAnswerQualityParamRecord(null, AnswerQualityByRatings.PARAM_DESCRIPTION, AnswerQualityByRatings.REGEX, AnswerQualityByRatings.algorithmName, AnswerQualityByRatings.PARAMETER_ID), String.valueOf(ratingThreshold));
+        params.put(new AlgorithmAnswerQualityParamRecord(null, AnswerQualityByRatings.PARAM_DESCRIPTION, AnswerQualityByRatings.REGEX, AnswerQualityByRatings.ALGORITHM_NAME, AnswerQualityByRatings.PARAMETER_ID), String.valueOf(ratingThreshold));
         ratingThreshold = 6;
         answerRatingOperations = mock(AnswerRatingOperations.class);
         when(answerRatingOperations.getGoodRatingsOfAnswer(Mockito.any(AnswerRecord.class), Mockito.anyInt())).thenReturn(ratings);
@@ -134,5 +136,12 @@ public class AnswerQualityByRatingsTest {
     public void testQualityWithoutRating() {
         assertEquals(ratings.size(), (int) identifier.identifyAnswerQuality(answerRatingOperations, answer, params, maxQuality, minQuality).get(AnswerQualityStrategy.NUM_OF_RATINGS));
         assertEquals((int) answer.getQuality(), (int) identifier.identifyAnswerQuality(answerRatingOperations, answer, params, maxQuality, minQuality).get(AnswerQualityStrategy.QUALITY));
+    }
+
+    @Test
+    public void testGetterMethods(){
+        assertEquals(identifier.getAlgorithmDescription(),(AnswerQualityByRatings.ALGORITHM_DESCRIPTION));
+        assertEquals(identifier.getAlgorithmName(), AnswerQualityByRatings.ALGORITHM_NAME);
+        assertNotNull(identifier.getParams());
     }
 }
