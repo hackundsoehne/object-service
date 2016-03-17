@@ -36,7 +36,7 @@ public class InputTransformerTest {
         InputTransformer transformer = new InputTransformer(route, ErrorResponse.class);
 
         when(request.contentType()).thenReturn("application/json");
-        when(request.body()).thenReturn("{}");
+        when(request.bodyAsBytes()).thenReturn("{}".getBytes());
 
         transformer.handle(request, response);
 
