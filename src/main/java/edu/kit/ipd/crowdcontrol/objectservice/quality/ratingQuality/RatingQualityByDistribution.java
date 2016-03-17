@@ -41,7 +41,7 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
                         + ", but got :" + rating.getRating());
             }
         });
-        Map<RatingRecord, Integer> map = new HashMap<>();
+        Map<RatingRecord, Integer> resultMap = new HashMap<>();
 
         // Bucket sorts given ratings
         Map<Integer, List<RatingRecord>> sortedMap = ratings.stream().collect(Collectors.groupingBy(RatingRecord::getRating));
@@ -53,11 +53,11 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
                 for (RatingRecord ratingRecord : entry.getValue()) {
                     int diffFromOptimal = Math.abs(ratingRecord.getRating() - optimalRating);
                     int rating = maximumQuality - diffFromOptimal;
-                    map.put(ratingRecord, rating);
+                    resultMap.put(ratingRecord, rating);
                 }
             }
         }
-        return map;
+        return resultMap;
     }
 
     @Override
