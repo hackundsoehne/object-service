@@ -32,6 +32,7 @@ public class MturkPlatform implements Platform,Payment {
     private final MTurkConnection connection;
     private final String workerServiceUrl;
     private final String workerUIUrl;
+    private final HitExtender hitExtender;
     /**
      * A new mturk platform instance
      * @param user user to login
@@ -39,7 +40,8 @@ public class MturkPlatform implements Platform,Payment {
      * @param url instance to connect to
      * @param workerUIUrl path where to find the workerUI
      */
-    public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl, String workerUIUrl) {
+    public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl, String workerUIUrl, HitExtender hitExtender) {
+        this.hitExtender = hitExtender;
         this.workerUIUrl = workerUIUrl;
         connection = new MTurkConnection(user, password, url);
         this.workerServiceUrl = workerServiceUrl;
@@ -109,6 +111,7 @@ public class MturkPlatform implements Platform,Payment {
                 "",
                 content)
                 .thenApply(id -> {
+                    hitExtender.addHit(id);
                     JsonObject jsonObject = new JsonObject();
                     jsonObject.add("identification", new JsonPrimitive(id));
                     return jsonObject;
@@ -117,7 +120,9 @@ public class MturkPlatform implements Platform,Payment {
 
     @Override
     public CompletableFuture<Boolean> unpublishTask(JsonElement data) {
-        return new UnpublishHIT(connection, data.getAsJsonObject().get("identification").getAsString());
+        String id = data.getAsJsonObject().get("identification").getAsString();
+        hitExtender.removeHit(id);
+        return new UnpublishHIT(connection, id);
     }
 
     /**

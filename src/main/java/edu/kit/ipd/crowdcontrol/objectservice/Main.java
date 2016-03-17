@@ -8,6 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.local.LocalPlatform;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.HitExtender;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
@@ -60,12 +61,13 @@ public class Main {
 
         initLogLevel(config);
 
-        List<Platform> platforms = getPlatforms(config);
-
         DatabaseManager databaseManager = initDatabase(config);
         EventManager eventManager = new EventManager();
 
         OperationCarrier operationCarrier = new OperationCarrier(config, databaseManager);
+
+        List<String> hits = null;//FIXME leander I need a db op which gives me ALL identifications from the platforms with type mturk
+        List<Platform> platforms = getPlatforms(config, () -> new HitExtender(hits));
 
         MailSender moneyTransferSender = getMailSender(config.mail.disabled, config.mail.moneytransfer, config.mail.debug);
         MailFetcher moneyTransferFetcher = getMailFetcher(config.mail.disabled, config.mail.moneyReceiver, config.mail.debug);
@@ -252,21 +254,26 @@ public class Main {
      * @return A list of configured and initialized platforms
      * @throws ConfigException if the config contains invalid values.
      */
-    private static List<Platform> getPlatforms(Config config) throws ConfigException {
+    private static List<Platform> getPlatforms(Config config, Supplier<HitExtender> supplier) throws ConfigException {
         List<Platform> platforms = new ArrayList<>();
+        HitExtender hitExtend = null;
 
         for (ConfigPlatform platform : config.platforms) {
             platform.type = platform.type.toLowerCase();
             Platform platformInstance;
             switch (platform.type) {
                 case "mturk":
+                    if (hitExtend == null) {
+                        hitExtend = supplier.get();
+                    }
                     //FIXME remove the sandbox url - but I am to paranoid
                     platformInstance = new MturkPlatform(platform.user,
                             platform.password,
                             "https://mechanicalturk.sandbox.amazonaws.com/",
                             platform.name,
                             config.deployment.workerService,
-                            config.deployment.workerUIPublic);
+                            config.deployment.workerUIPublic,
+                            hitExtend);
                     break;
                 case "pybossa":
                     if (config.deployment.workerUILocal == null) {
