@@ -73,9 +73,12 @@ public class PaymentCalculatorTest {
 
         WorkerRecord workerOne = new WorkerRecord(0, new JsonPrimitive(""), "", "", 0, "");
         WorkerRecord workerTwo = new WorkerRecord(1, new JsonPrimitive(""), "", "", 0, "");
-
+        WorkerRecord workerThree = new WorkerRecord(3,new JsonPrimitive(""),"","",0,"");
         workerAnswerMap.put(workerOne, 5);
         workerAnswerMap.put(workerTwo, 2);
+
+        workerRecordList.add(workerOne);
+        workerRecordList.add(workerTwo);
 
         Map<WorkerRecord, Integer> resultAnswers = calculator.estimatePayment(exp);
         assertNotNull(resultAnswers);
@@ -95,7 +98,7 @@ public class PaymentCalculatorTest {
 
         sortedResult = sortWorkerMap(resultRatings);
 
-
+        workerRecordList.add(workerThree);
         assertEquals((int) sortedResult.get(sortedResult.firstKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerOne) + (exp.getPaymentRating().getValue() * workerRatingMap.get(workerOne))));
         assertEquals((int) sortedResult.get(sortedResult.lastKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerTwo) + (exp.getPaymentRating().getValue() * workerRatingMap.get(workerTwo))));
 

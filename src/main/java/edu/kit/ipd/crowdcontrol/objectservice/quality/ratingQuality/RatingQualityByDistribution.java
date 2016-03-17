@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
  */
 public class RatingQualityByDistribution implements RatingQualityStrategy {
 
-    private final String algorithmName = "RatingQualityByDistribution";
-    private final String algorithmDescription = "Identifies the quality of ratings depending on their distribution." +
+    static final String ALGORITHM_NAME = "RatingQualityByDistribution";
+    static final String ALGORITHM_DESCRIPTION = "Identifies the quality of ratings depending on their distribution." +
             "\nRatings with the most-chosen value will be assigned the maximum-quality. Others have a quality depending on" +
             "the deviation of their value to the most chosen one";
 
@@ -62,12 +62,12 @@ public class RatingQualityByDistribution implements RatingQualityStrategy {
 
     @Override
     public String getAlgorithmName() {
-        return algorithmName;
+        return ALGORITHM_NAME;
     }
 
     @Override
     public String getAlgorithmDescription() {
-        return algorithmDescription;
+        return ALGORITHM_DESCRIPTION;
     }
 
     @Override
