@@ -117,7 +117,7 @@ public class ConfigLoader {
         }
 
         if (!query.isEmpty()) {
-            query = query.substring(0, -1);
+            query = query.substring(0, query.length() - 1);
         }
 
         return base + "?" + query;
