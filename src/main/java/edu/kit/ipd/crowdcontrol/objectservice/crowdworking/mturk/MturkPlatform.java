@@ -2,33 +2,21 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
 import com.amazonaws.mturk.requester.doc._2014_08_15.Assignment;
 import com.amazonaws.mturk.requester.doc._2014_08_15.AssignmentStatus;
-import com.amazonaws.mturk.requester.doc._2014_08_15.BonusPayment;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import edu.kit.ipd.crowdcontrol.objectservice.Main;
+import edu.kit.ipd.crowdcontrol.objectservice.Utils;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Tag;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 
@@ -96,23 +84,11 @@ public class MturkPlatform implements Platform,Payment {
         });
     }
 
-    private static String loadFiles(String file) {
-        try {
-            return CharStreams
-                    .toString(new InputStreamReader(
-                            Main.class.getResourceAsStream(file)
-                            , Charsets.UTF_8));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
     @Override
     public CompletableFuture<JsonElement> publishTask(Experiment experiment) {
         String tags = experiment.getTagsList().stream().map(Tag::getName).collect(Collectors.joining(","));
-        String jsContent = loadFiles("/mturk/worker-ui/mturk.js");
-        String htmlContent = loadFiles("/mturk/worker-ui/MturkContent.html");
+        String jsContent = Utils.loadFile("/mturk/worker-ui/mturk.js");
+        String htmlContent = Utils.loadFile("/mturk/worker-ui/MturkContent.html");
 
         Map<String, String> params = new HashMap<>();
         params.put("PlatformName", getID());
@@ -304,8 +280,8 @@ public class MturkPlatform implements Platform,Payment {
         int counter = 0;
         List<CompletableFuture<Boolean>> messages = new ArrayList<>();
 
-        String tooLongMessage = loadFiles("/mturk/TooLongMessage.txt");
-        String subjectLine = loadFiles("/mturk/SubjectLine.txt");
+        String tooLongMessage = Utils.loadFile("/mturk/TooLongMessage.txt");
+        String subjectLine = Utils.loadFile("/mturk/SubjectLine.txt");
         //while loop sents messages if needed message would be gibber than MAX_LENGTH
         while(length - current_location > NotifyWorker.MAX_LENGTH) {
             int old_current_location = current_location;
@@ -331,7 +307,7 @@ public class MturkPlatform implements Platform,Payment {
     }
 
     private CompletableFuture<Boolean> payBonus(PaymentJob paymentJob, Assignment assignment, int amount) {
-        String bonusMessage = loadFiles("/mturk/BonusMessage.txt");
+        String bonusMessage = Utils.loadFile("/mturk/BonusMessage.txt");
         //if there is money left pay a bonus
         if (amount >= 0) {
             return new GrantBonus(connection,assignment.getAssignmentId(),

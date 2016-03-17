@@ -1,6 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.Utils;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.Utils;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

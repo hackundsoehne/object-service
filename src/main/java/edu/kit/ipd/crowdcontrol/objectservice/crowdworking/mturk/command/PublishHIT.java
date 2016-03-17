@@ -2,19 +2,11 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command;
 
 import com.amazonaws.mturk.requester.doc._2014_08_15.CreateHITResponse;
 import com.amazonaws.mturk.requester.doc._2014_08_15.HIT;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
-import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MTurkConnection;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkRestCommand;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.Utils;
 
-import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Create a HIT
