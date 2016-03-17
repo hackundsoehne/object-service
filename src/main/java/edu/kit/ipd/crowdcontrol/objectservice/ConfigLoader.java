@@ -50,20 +50,28 @@ public class ConfigLoader {
             config.deployment.workerUILocal = System.getProperty("workeruilocal.url");
         }
 
-        config.platforms = Arrays.stream(config.platforms)
-                .map(platform -> {
-                    if (platform.name == null) {
-                        if (platform.type.equals("dummy")) {
-                            platform.name = "Dummy";
-                        } else {
-                            LOGGER.warn("Platform (type: {}) without a name will be ignored.", platform.type);
+        try {
+            config.platforms = Arrays.stream(config.platforms)
+                    .map(platform -> {
+                        if (platform.name == null) {
+                            if (platform.type.equals("dummy")) {
+                                platform.name = "Dummy";
+                            } else {
+                                throw new RuntimeException(new ConfigException("Platform (type: " + platform.type + ") without a name will be ignored."));
+                            }
                         }
-                    }
 
-                    return platform;
-                })
-                .filter(platform -> platform.name != null && !Boolean.getBoolean(platform.name.toLowerCase() + ".disabled"))
-                .toArray(ConfigPlatform[]::new);
+                        return platform;
+                    })
+                    .filter(platform -> !Boolean.getBoolean(platform.name.toLowerCase() + ".disabled"))
+                    .toArray(ConfigPlatform[]::new);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof ConfigException) {
+                throw (ConfigException) e.getCause();
+            } else {
+                throw e;
+            }
+        }
 
         configValidate(config);
     }
