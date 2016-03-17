@@ -116,6 +116,14 @@ public class ImageSimilarityTest {
     }
 
     @Test
+    public void testSimilarityImageHashFromColorDeviation() throws Exception{
+        assertTrue(HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar1b),ImageSimilarity.getImageHashFromColorDeviation(similar1a)) > .75);
+        assertTrue(HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar3b),ImageSimilarity.getImageHashFromColorDeviation(similar3a)) > .75);
+        assertTrue(HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar3b),ImageSimilarity.getImageHashFromColorDeviation(different)) < .75);
+        assertEquals(HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(different),ImageSimilarity.getImageHashFromColorDeviation(different)),1,0.0001);
+    }
+
+    @Test
     public void testSimilarityImageHashFromSignature() throws Exception{
         if (similar1a != null && similar1b != null && different != null && similar2b != null && similar2a != null) {
 
