@@ -1,15 +1,10 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command;
 
 import com.amazonaws.mturk.requester.doc._2014_08_15.NotifyWorkersResponse;
-import com.amazonaws.mturk.requester.doc._2014_08_15.NotifyWorkersResult;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MTurkConnection;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkRestCommand;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.Utils;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Created by marcel on 10.03.16.

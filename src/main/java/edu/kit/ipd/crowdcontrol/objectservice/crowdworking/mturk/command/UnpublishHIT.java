@@ -3,7 +3,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command;
 import com.amazonaws.mturk.requester.doc._2014_08_15.DisableHITResponse;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MTurkConnection;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkRestCommand;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.Utils;
 
 import java.util.HashMap;
 

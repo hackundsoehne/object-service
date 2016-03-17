@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.feedback;
 
+import edu.kit.ipd.crowdcontrol.objectservice.Utils;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
@@ -36,32 +37,13 @@ public class FeedbackCreator {
         this.workerOps = workerOps;
     }
 
-    static String loadMessage(String path) throws FeedbackException {
-        StringBuilder content = new StringBuilder();
-
-        try {
-            FileReader file = new FileReader(path);
-            BufferedReader reader = new BufferedReader(file);
-            String messageLine;
-            while ((messageLine = reader.readLine()) != null) {
-                content.append(messageLine);
-                content.append(System.getProperty("line.separator"));
-            }
-        } catch (FileNotFoundException e) {
-            throw new FeedbackException("Sending of Feedback failed: The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.", e);
-        } catch (IOException e) {
-            throw new FeedbackException("Sending of Feedback failed: The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt", e);
-        }
-        return content.toString();
-    }
-
     public String getFeedback(int expId, int workerId) throws FeedbackException {
 
         LOGGER.trace("Started creating feedback message to worker " + workerId + ".");
 
-        String feedbackMessage = loadMessage("src/main/resources/feedback/feedbackMessage.txt");
-        String feedbackAnswer = loadMessage("src/main/resources/feedback/feedbackAnswer.txt");
-        String feedbackRating = loadMessage("src/main/resources/feedback/feedbackRating.txt");
+        String feedbackMessage = Utils.loadFile("/feedback/feedbackMessage.txt");
+        String feedbackAnswer = Utils.loadFile("/feedback/feedbackAnswer.txt");
+        String feedbackRating = Utils.loadFile("/feedback/feedbackRating.txt");
 
         ExperimentRecord exp = expOps.getExperiment(expId).orElseThrow(() -> new FeedbackException("Experiment cannot be found."));
 

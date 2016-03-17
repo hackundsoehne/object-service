@@ -1,8 +1,9 @@
-package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
+package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command;
 
 import com.amazonaws.mturk.requester.doc._2014_08_15.Errors;
 import com.amazonaws.mturk.requester.doc._2014_08_15.KeyValuePair;
 import com.amazonaws.mturk.requester.doc._2014_08_15.Request;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.RequestException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
