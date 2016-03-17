@@ -80,7 +80,7 @@ public class Main {
         ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations,eventManager);
         PopulationsHelper populationsHelper = new PopulationsHelper( operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
-        initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager);
+        initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager, experimentFetcher);
         initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper, eventManager);
 
         Spark.awaitInitialization();
@@ -93,7 +93,7 @@ public class Main {
      * @param experimentOperator the operations to use for starting stopping experiments
      * @param eventManager
      */
-    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, EventManager eventManager) {
+    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, EventManager eventManager, ExperimentFetcher experimentFetcher) {
         FeedbackCreator feedbackCreator = new FeedbackCreator(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.workerOperations);
         new QualityIdentificator(
                 operationCarrier.algorithmsOperations,
@@ -101,7 +101,7 @@ public class Main {
                 operationCarrier.experimentOperations,
                 experimentOperator,
                 operationCarrier.experimentsPlatformOperations,
-                eventManager);
+                eventManager, experimentFetcher);
 
         new PaymentDispatcher(
                 feedbackCreator,
