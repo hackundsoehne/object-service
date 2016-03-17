@@ -124,7 +124,7 @@ public class ResourceIntegrationTest {
 
         Experiment put = Experiment.newBuilder()
                 .setTitle("Awesome")
-                .setDescription("Awesome Task!")
+                .setDescription("Über Task!")
                 .setAnswerType(AnswerType.TEXT)
                 .setWorkerQualityThreshold(Integer.newBuilder().setValue(2).build())
                 .setRatingsPerWorker(Integer.newBuilder().setValue(3).build())

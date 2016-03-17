@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Loads the config from desired places and validates the completeness of the config
@@ -73,7 +75,52 @@ public class ConfigLoader {
             }
         }
 
+        if (config.database.url != null) {
+            config.database.url = appendUtf8Settings(config.database.url);
+        }
+
         configValidate(config);
+    }
+
+    private String appendUtf8Settings(String url) {
+        String[] parts = url.split("\\?", 2);
+
+        String base = parts[0];
+        String query = "";
+
+        if (parts.length == 2) {
+            query = parts[1];
+        }
+
+        Map<String, String> queryParams = new HashMap<>();
+
+        for (String pair : query.split("&")) {
+            String[] keyValue = pair.split("=");
+            queryParams.put(keyValue[0], keyValue.length == 2 ? keyValue[1] : null);
+        }
+
+        queryParams.put("useUnicode", "true");
+        queryParams.put("characterEncoding", "UTF-8");
+
+        query = "";
+
+        for (String key : queryParams.keySet()) {
+            query += key;
+
+            String value = queryParams.get(key);
+
+            if (value != null) {
+                query += "=" + value;
+            }
+
+            query += "&";
+        }
+
+        if (!query.isEmpty()) {
+            query = query.substring(0, query.length() - 1);
+        }
+
+        return base + "?" + query;
     }
 
     /**
