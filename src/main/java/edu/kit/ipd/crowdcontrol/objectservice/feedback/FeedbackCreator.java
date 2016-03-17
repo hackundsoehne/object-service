@@ -62,8 +62,12 @@ public class FeedbackCreator {
             StringBuilder ratingMessage = new StringBuilder();
 
             for (RatingRecord rating : ratings) {
+                String feedback = rating.getFeedback();
+                if (rating.getFeedback() == null || rating.getFeedback().equals("")) {
+                    feedback = "Rater didn't give feedback";
+                }
                 Map<String, String> ratingMap = new HashMap<>();
-                ratingMap.put("feedback", rating.getFeedback());
+                ratingMap.put("feedback", feedback);
                 ratingMap.put("quality", rating.getQuality().toString());
                 ratingMap.put("rating", rating.getRating().toString());
 
