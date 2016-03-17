@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-@Ignore
 public class ResourceIntegrationTest {
     protected static final String ORIGIN = "http://localhost:4567";
 
