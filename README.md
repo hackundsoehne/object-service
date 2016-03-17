@@ -59,4 +59,4 @@ git clone https://github.com/coolcrowd/object-service && cd object-service
 ## Run local installation with `docker-compose`
 
 Just delete the `object-service` entry and link the `- -Dos.url=http://objectservice:4567` to the running instance.
-The database is exposed at {$DOCKER_IP}:3306`.
+The database is exposed at `{$DOCKER_IP}:3306`.

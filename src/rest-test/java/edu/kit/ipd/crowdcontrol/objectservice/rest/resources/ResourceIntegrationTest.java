@@ -10,7 +10,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Integer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import spark.Spark;
 
@@ -170,6 +169,25 @@ public class ResourceIntegrationTest {
 
         ErrorResponse error = httpGet("/experiments/42", ErrorResponse.class);
         assertEquals("notFound", error.getCode());
+    }
+
+    @Test
+    public void algorithms() throws Exception {
+        AlgorithmList list = httpGet("/algorithms", AlgorithmList.class);
+
+        // We need to ensure we have at least one algorithm per type.
+        // Don't test for concrete values to be forward compat with future algorithms.
+        assertTrue(list.getAnswerQualityAlgorithmsCount() > 0);
+        assertTrue(list.getRatingQualityAlgorithmsCount() > 0);
+        assertTrue(list.getTaskChooserAlgorithmsCount() > 0);
+    }
+
+    @Test
+    public void platforms() throws Exception {
+        PlatformList list = httpGet("/platforms", PlatformList.class);
+
+        // At least one platform should be configured for tests, might be a dummy platform.
+        assertTrue(list.getItemsCount() > 0);
     }
 
     @Test
