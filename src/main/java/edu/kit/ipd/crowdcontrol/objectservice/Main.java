@@ -330,7 +330,8 @@ public class Main {
         }
         return new MailSend(MailSend.Protocol.valueOf(sender.protocol),
                 sender.auth.credentials.user,
-                sender.auth.credentials.password, "",
+                sender.auth.credentials.password,
+                sender.from,
                 sender.auth.server,
                 sender.auth.port,
                 debug);
