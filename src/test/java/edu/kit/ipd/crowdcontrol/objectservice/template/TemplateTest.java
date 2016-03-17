@@ -43,6 +43,19 @@ public class TemplateTest {
 	}
 
 	@Test (expected = IllegalArgumentException.class)
+	public void applyNullText() {
+		Template.apply(null, new HashMap<>());
+	}
+
+	@Test (expected = IllegalArgumentException.class)
+	public void applyNullPlaceholder() {
+		Map<String, String> map = new HashMap<>();
+		map.put("foo", null);
+
+		Template.apply("{{foo}}", map);
+	}
+
+	@Test (expected = IllegalArgumentException.class)
 	public void applyIllegal() {
 		Template.apply("{{Foobar}}", new HashMap<>());
 	}

@@ -72,6 +72,16 @@ public class Template {
      * @return Rendered template.
      */
     public static String apply(String text, Map<String, String> placeholders) {
+        if (text == null) {
+            throw new IllegalArgumentException("Text must not be null!");
+        }
+
+        for (String key : placeholders.keySet()) {
+            if (placeholders.get(key) == null) {
+                throw new IllegalArgumentException("Placeholder '" + key + "' must not be null!");
+            }
+        }
+
         Map<String, Placeholder> placeholderMap = parse(text);
 
         if (!placeholderMap.keySet().equals(placeholders.keySet())) {
