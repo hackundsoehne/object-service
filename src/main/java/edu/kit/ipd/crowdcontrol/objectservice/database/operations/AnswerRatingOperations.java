@@ -462,13 +462,41 @@ public class AnswerRatingOperations extends AbstractOperations {
         return create.fetchCount(
                 DSL.selectFrom(ANSWER)
                         .where(ANSWER.EXPERIMENT.eq(idExperiment))
-                        .and(
-                                ANSWER.QUALITY_ASSURED.eq(true).and(Tables.ANSWER.QUALITY.greaterThan(
-                                DSL.select(EXPERIMENT.RESULT_QUALITY_THRESHOLD)
-                                        .from(EXPERIMENT)
-                                        .where(EXPERIMENT.ID_EXPERIMENT.eq(idExperiment)))
-                                ).or(DSL.condition(true))
+                        .and(ANSWER.QUALITY_ASSURED.eq(true))
+                        .and(ANSWER.QUALITY.greaterThan(
+                                        DSL.select(EXPERIMENT.RESULT_QUALITY_THRESHOLD)
+                                                .from(EXPERIMENT)
+                                                .where(EXPERIMENT.ID_EXPERIMENT.eq(idExperiment))
+                        ))
+        );
+    }
+
+    /**
+     * this query returns of all non-duplicate answers have max-ratings
+     * @param experiment the primary key of the experiment
+     * @return true if all answers have max ratings, false if not
+     */
+    public boolean allAnswersHaveMaxRatings(int experiment) {
+        Field<Integer> countRating = DSL.count(RATING.ID_RATING).as("countRating");
+        return !create.fetchExists(
+                DSL.select(ANSWER_RESERVATION.IDANSWER_RESERVATION, countRating)
+                        .from(ANSWER_RESERVATION)
+                        .leftJoin(ANSWER).onKey()
+                        .leftJoin(RATING).on(
+                            RATING.ANSWER_R.eq(ANSWER.ID_ANSWER)
                         )
+                        .where(
+                                ANSWER.QUALITY_ASSURED.eq(true)
+                                .and(ANSWER.QUALITY.notEqual(0))
+                                .or(DSL.condition(true))
+                        )
+                        .and(ANSWER.EXPERIMENT.eq(experiment))
+                        .groupBy(ANSWER_RESERVATION.IDANSWER_RESERVATION)
+                        .having(countRating.lessThan(
+                                DSL.select(EXPERIMENT.RATINGS_PER_ANSWER)
+                                    .from(EXPERIMENT)
+                                    .where(EXPERIMENT.ID_EXPERIMENT.eq(experiment))
+                        ))
         );
     }
 

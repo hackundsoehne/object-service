@@ -40,12 +40,12 @@ class OperationCarrier {
         platformOperations = new PlatformOperations(ctx);
         workerOperations = new WorkerOperations(ctx);
         calibrationOperations = new CalibrationOperations(ctx);
-        experimentOperations = new ExperimentOperations(ctx);
+        experimentsPlatformOperations = new ExperimentsPlatformOperations(ctx);
+        experimentOperations = new ExperimentOperations(ctx,experimentsPlatformOperations);
         tagConstraintsOperations = new TagConstraintsOperations(ctx);
         algorithmsOperations = new AlgorithmOperations(ctx);
         workerCalibrationOperations = new WorkerCalibrationOperations(ctx);
         answerRatingOperations = new AnswerRatingOperations(ctx, calibrationOperations, workerCalibrationOperations, experimentOperations);
-        experimentsPlatformOperations = new ExperimentsPlatformOperations(ctx);
         workerBalanceOperations = new WorkerBalanceOperations(ctx);
     }
 }

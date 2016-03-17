@@ -26,8 +26,10 @@ import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
  * @author Niklas Keller
  */
 public class ExperimentOperations extends AbstractOperations {
-    public ExperimentOperations(DSLContext create) {
+    private final ExperimentsPlatformOperations experimentsPlatformOperations;
+    public ExperimentOperations(DSLContext create, ExperimentsPlatformOperations experimentsPlatformOperations) {
         super(create);
+        this.experimentsPlatformOperations = experimentsPlatformOperations;
     }
     /**
      * inserts the Experiment into the database
@@ -104,14 +106,8 @@ public class ExperimentOperations extends AbstractOperations {
      * @return the state
      */
     public Experiment.State getExperimentState(int id) {
-        Set<ExperimentsPlatformStatusPlatformStatus> statuses = create.select(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS)
-                .from(EXPERIMENTS_PLATFORM_STATUS)
-                .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
-                        DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
-                                .from(EXPERIMENTS_PLATFORM)
-                                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(id))
-                ))
-                .fetchSet(EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS);
+        Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations
+                .getExperimentsPlatformStatusPlatformStatuses(id);
         //TODO: what to do if one of the platforms failed?
         if (statuses.isEmpty()) {
             return Experiment.State.DRAFT;

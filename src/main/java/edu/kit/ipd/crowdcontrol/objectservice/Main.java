@@ -75,11 +75,12 @@ public class Main {
 
         PlatformManager platformManager = initPlatformManager(operationCarrier, platforms, moneyTransfer);
 
-        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager, eventManager);
-        ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.experimentsPlatformOperations, operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
-        PopulationsHelper populationsHelper = new PopulationsHelper(operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
-        initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager);
+        ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.experimentsPlatformOperations,operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
+        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations,eventManager);
+        PopulationsHelper populationsHelper = new PopulationsHelper( operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
+
+        initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager, experimentFetcher);
         initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper, eventManager);
 
         Spark.awaitInitialization();
@@ -92,14 +93,15 @@ public class Main {
      * @param experimentOperator the operations to use for starting stopping experiments
      * @param eventManager
      */
-    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, EventManager eventManager) {
+    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, EventManager eventManager, ExperimentFetcher experimentFetcher) {
         FeedbackCreator feedbackCreator = new FeedbackCreator(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.workerOperations);
         new QualityIdentificator(
                 operationCarrier.algorithmsOperations,
                 operationCarrier.answerRatingOperations,
                 operationCarrier.experimentOperations,
                 experimentOperator,
-                eventManager);
+                operationCarrier.experimentsPlatformOperations,
+                eventManager, experimentFetcher);
 
         new PaymentDispatcher(
                 feedbackCreator,

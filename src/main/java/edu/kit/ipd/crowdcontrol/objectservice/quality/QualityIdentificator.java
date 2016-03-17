@@ -1,12 +1,16 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality;
 
+import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.transformers.ExperimentTransformer;
 import edu.kit.ipd.crowdcontrol.objectservice.event.Event;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityByRatings;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.answerQuality.AnswerQualityStrategy;
@@ -37,7 +41,9 @@ public class QualityIdentificator {
 
     private final Logger log = LogManager.getLogger(QualityIdentificator.class);
     private final Observable<Event<Rating>> ratingObservable;
+    private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final ExperimentOperator experimentOperator;
+    private final ExperimentFetcher experimentFetcher;
     private final AnswerRatingOperations answerRatingOperations;
     private final ExperimentOperations experimentOperations;
     private final AlgorithmOperations algorithmOperations;
@@ -54,12 +60,13 @@ public class QualityIdentificator {
      * Might be set to allow more flexibility and more good answers
      */
 
-    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator operator, EventManager eventManager) {
-
-        this.experimentOperator = operator;
+    public QualityIdentificator(AlgorithmOperations algorithmOperations, AnswerRatingOperations answerRatingOperations, ExperimentOperations experimentOperations, ExperimentOperator experimentOperator, ExperimentsPlatformOperations experimentsPlatformOperations, EventManager eventManager, ExperimentFetcher experimentFetcher) {
+        this.experimentsPlatformOperations = experimentsPlatformOperations;
+        this.experimentOperator = experimentOperator;
         this.answerRatingOperations = answerRatingOperations;
         this.experimentOperations = experimentOperations;
         this.algorithmOperations = algorithmOperations;
+        this.experimentFetcher = experimentFetcher;
         this.answerAlgorithms = new HashSet<>();
         this.ratingAlgorithms = new HashSet<>();
         this.ratingObservable = eventManager.RATINGS_CREATE.getObservable();
@@ -105,9 +112,7 @@ public class QualityIdentificator {
             return new AnswerQualityByRatings();
         });
 
-        AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating)
-                .orElseThrow(()->new IllegalArgumentException("Error, cant find find answer of given rating of expID: "+rating.getExperimentId()));
-
+        AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating).orElseThrow(IllegalArgumentException::new);
         rateQualityOfRatings(answerRecord, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
         rateQualityOfAnswers(answerRecord, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
 
@@ -157,8 +162,22 @@ public class QualityIdentificator {
      * @param experiment to be checked
      */
     private void checkExpStatus(ExperimentRecord experiment) {
-        if (experiment.getNeededAnswers() <= answerRatingOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())) {
-            experimentOperator.endExperiment(ExperimentTransformer.toProto(experiment, experimentOperations.getExperimentState(experiment.getIdExperiment())));
+        Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment());
+        boolean doShutdown = false;
+        if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.creative_stopping)) {
+            if (answerRatingOperations.allAnswersHaveMaxRatings(experiment.getIdExperiment())) {
+                doShutdown = true;
+            }
+        } else if (experiment.getNeededAnswers() <= answerRatingOperations.getNumberOfFinalGoodAnswers(experiment.getIdExperiment())) {
+            doShutdown = true;
+        }
+        if (doShutdown){
+            log.debug("there are enough answers to end the experiment");
+            if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)){ //Only shut down if running and not already shutting down
+                log.debug("ending experiment");
+                Experiment experimentProto = experimentFetcher.fetchExperiment(experiment.getIdExperiment());
+                experimentOperator.endExperiment(experimentProto);
+            }
         }
 
     }
@@ -181,7 +200,7 @@ public class QualityIdentificator {
     /**
      * Rates and sets quality of all answers of specified experiment.
      * Only uses ratings of a specified quality
-     * Furthermore checks if a specified amount of ratings is present for that answer
+     * Furthermore che//   assertEquals((int) sortedResult.get(sortedResult.lastKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerTwo)));cks if a specified amount of ratings is present for that answer
      * and it thus the answer's quality is unlikely to change. In that case the corresponding
      * quality-assured-bit is set in the database.
      *

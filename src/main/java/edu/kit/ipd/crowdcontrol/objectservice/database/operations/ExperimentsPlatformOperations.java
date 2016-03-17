@@ -1,12 +1,21 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformMode;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.Result;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -185,7 +194,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
         create.executeInsert(toInsert);
     }
 
-    /**
+     /**
      * Updates a ExperimentsPlatform.
      * @param platformRecord the update
      * @return whether the update was successful
@@ -249,5 +258,111 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
         return create.selectFrom(EXPERIMENTS_PLATFORM)
                 .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentId))
                 .fetch();
+    }
+
+    /**
+     * returns the latest statuses for all platforms
+     * @param experiment the experiment to get the statuses for
+     * @return the statuses
+     */
+    public Set<ExperimentsPlatformStatusPlatformStatus> getExperimentsPlatformStatusPlatformStatuses (int experiment) {
+        ExperimentsPlatformStatus status1 = EXPERIMENTS_PLATFORM_STATUS.as("mode1");
+        ExperimentsPlatformStatus status2 = EXPERIMENTS_PLATFORM_STATUS.as("mode2");
+        return create.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS, status1.PLATFORM_STATUS)
+                .from(EXPERIMENTS_PLATFORM)
+                .join(status1).onKey()
+                .leftOuterJoin(status2).on(
+                        EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.eq(status2.PLATFORM)
+                                .and(status1.TIMESTAMP.lessThan(status2.TIMESTAMP).or(status1.TIMESTAMP.eq(status2.TIMESTAMP)
+                                        .and(status1.IDEXPERIMENTS_PLATFORM_STATUS.lessThan(status2.IDEXPERIMENTS_PLATFORM_STATUS))))
+                )
+                .where(status2.IDEXPERIMENTS_PLATFORM_STATUS.isNull())
+                .and(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experiment))
+                .fetchSet(status1.PLATFORM_STATUS);
+
+    }
+
+    /**
+     * Updates the status of all platforms of specified experiment to given status
+     * @param experiment the experiment whose platforms will be updated
+     * @param globalPlatformStatus the new platform-status
+     */
+    public void setGlobalPlatformStatus(Experiment experiment, ExperimentsPlatformStatusPlatformStatus globalPlatformStatus) {
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+
+        List<ExperimentsPlatformStatusRecord> toInsert = create.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                .from(EXPERIMENTS_PLATFORM)
+                .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experiment.getId()))
+                .fetch()
+                .map(record -> new ExperimentsPlatformStatusRecord(null, globalPlatformStatus, timestamp, record.value1()));
+
+        create.batchInsert(toInsert).execute();
+    }
+
+    /**
+     * Retrieves the ExperimentsPlatformStatusRecord of specified experiment which contains information about the
+     * current status of the platforms and the timestamp of the last change
+     * @param experimentID the experiment
+     * @return ExperimentsPlatformStatusRecord, containing information about status and status-change-time
+     */
+    public List<ExperimentsPlatformStatusRecord> getExperimentsPlatformStatusRecord(int experimentID) {
+        return create.selectFrom(EXPERIMENTS_PLATFORM_STATUS)
+                .where(EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
+                        DSL.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
+                            .from(EXPERIMENTS_PLATFORM)
+                            .where(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
+                ))
+                .fetch();
+    }
+
+
+    /**
+     * Retrieves a list of all experiments containing the shutdown-state and which didn't
+     * reach the state-stopped yet.
+     * @return list of experiments to recover
+     */
+    public List<ExperimentRecord> getExperimentsFailedDuringShutdown() {
+        ExperimentsPlatformStatus status1 = EXPERIMENTS_PLATFORM_STATUS.as("mode1");
+        ExperimentsPlatformStatus status2 = EXPERIMENTS_PLATFORM_STATUS.as("mode2");
+        Set<Integer> experimentsPlatforms = create.select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS, status1.PLATFORM_STATUS)
+                .from(EXPERIMENTS_PLATFORM)
+                .join(status1).onKey()
+                .leftOuterJoin(status2).on(
+                        EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.eq(status2.PLATFORM)
+                                .and(status1.TIMESTAMP.lessThan(status2.TIMESTAMP).or(status1.TIMESTAMP.eq(status2.TIMESTAMP)
+                                        .and(status1.IDEXPERIMENTS_PLATFORM_STATUS.lessThan(status2.IDEXPERIMENTS_PLATFORM_STATUS))))
+                )
+                .where(status2.IDEXPERIMENTS_PLATFORM_STATUS.isNull())
+                .having(status1.PLATFORM_STATUS.eq(ExperimentsPlatformStatusPlatformStatus.shutdown))
+                .fetchSet(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS);
+
+        return create.selectFrom(EXPERIMENT)
+                .where(EXPERIMENT.ID_EXPERIMENT.in(
+                        DSL.select(EXPERIMENTS_PLATFORM.EXPERIMENT)
+                            .from(EXPERIMENTS_PLATFORM)
+                            .where(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.in(
+                                    experimentsPlatforms
+                            ))
+                ))
+                .fetch();
+    }
+
+    /**
+     * Retrieves a list of all experiments which are in the state running, creative_stopped, shutdown
+     */
+    public List<ExperimentRecord> getRunningExperiments() {
+        Predicate<Integer> isRunningStoppedOrShutdown = experimentID ->  {
+            Set<ExperimentsPlatformStatusPlatformStatus> statuses = getExperimentsPlatformStatusRecord(experimentID).stream()
+                    .map(ExperimentsPlatformStatusRecord::getPlatformStatus)
+                    .collect(Collectors.toSet());
+            return statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)
+                    || statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)
+                    || statuses.contains(ExperimentsPlatformStatusPlatformStatus.creative_stopping);
+        };
+        return create.selectFrom(EXPERIMENT)
+                .fetch()
+                .stream()
+                .filter(experiment -> isRunningStoppedOrShutdown.apply(experiment.getIdExperiment()))
+                .collect(Collectors.toList());
     }
 }
