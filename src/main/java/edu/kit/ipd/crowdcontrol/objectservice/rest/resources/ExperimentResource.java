@@ -203,8 +203,7 @@ public class ExperimentResource {
             resulting = updateExperimentState(id, experiment, old);
         } else if (old.getState() == Experiment.State.DRAFT) {
             resulting = updateExperimentInfoDraftState(id, experiment, old, original);
-        } else if (old.getState() == Experiment.State.PUBLISHED ||
-                old.getState() == Experiment.State.CREATIVE_STOPPED) {
+        } else if (old.getState() == Experiment.State.PUBLISHED) {
             resulting = updateExperimentStopgap(id, experiment, old, original);
         } else {
             throw new IllegalStateException("Patch not allowed in this state");
@@ -383,6 +382,13 @@ public class ExperimentResource {
             throw new IllegalStateException("Experiment lacks information needed for publishing.");
         }
 
+        //check that we are not switching from shutdown into creative-stopped
+        if (experiment.getState() == Experiment.State.CREATIVE_STOPPED
+                && experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(id)
+                .contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
+            throw new IllegalStateException("Experiment is already shutting down.");
+        }
+
         //create the calibration for this experiment
         if (experiment.getState().equals(Experiment.State.PUBLISHED)) {
             calibrationOperations.createExperimentsCalibration(id, experiment);
@@ -395,20 +401,11 @@ public class ExperimentResource {
 
         //check if we are not creative Stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED) {
-            int answersCount = answerRatingOperations.getNumberOfFinalGoodAnswers(id);
             //update db
-            //TODO: proper shutdown: wait 2 hours for ratings etc, also reserved answers once that is available
-            if (answersCount != 0) {
-                experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {
-                    experimentsPlatformOperations.setPlatformStatus(record.getIdexperimentsPlatforms(),
-                            ExperimentsPlatformStatusPlatformStatus.shutdown);
-                });
-            } else {
-                experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {
-                    experimentsPlatformOperations.setPlatformStatus(record.getIdexperimentsPlatforms(),
-                            ExperimentsPlatformStatusPlatformStatus.finished);
-                });
-            }
+            experimentsPlatformOperations.getExperimentPlatforms(id).forEach(record -> {
+                experimentsPlatformOperations.setPlatformStatus(record.getIdexperimentsPlatforms(),
+                        ExperimentsPlatformStatusPlatformStatus.creative_stopping);
+            });
         }
 
         return experimentFetcher.fetchExperiment(id);
