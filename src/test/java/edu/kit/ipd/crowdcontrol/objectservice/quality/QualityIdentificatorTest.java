@@ -1,11 +1,14 @@
 package edu.kit.ipd.crowdcontrol.objectservice.quality;
 
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.ExperimentOperator;
+import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.*;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AlgorithmOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Rating;
@@ -40,6 +43,8 @@ public class QualityIdentificatorTest {
     private ExperimentOperations experimentOperations;
     private ExperimentOperator experimentOperator;
     private EventManager eventManager;
+    private ExperimentsPlatformOperations experimentsPlatformOperations;
+    private ExperimentFetcher experimentFetcher;
 
     private AnswerRecord answerRecord;
     private ExperimentRecord experimentRecord;
@@ -52,6 +57,12 @@ public class QualityIdentificatorTest {
 
     @Before
     public void setUp() throws Exception {
+
+        this.experimentsPlatformOperations = mock(ExperimentsPlatformOperations.class);
+        this.experimentFetcher = mock(ExperimentFetcher.class);
+        Set<ExperimentsPlatformStatusPlatformStatus>statuses = new HashSet<>();
+        statuses.add(ExperimentsPlatformStatusPlatformStatus.running);
+        when(experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(anyInt())).thenReturn(statuses);
 
         this.reachedTargetMethod = false;
 
@@ -138,7 +149,7 @@ public class QualityIdentificatorTest {
             }
         }).when(algorithmOperations).storeRatingQualityAlgorithm(any(AlgorithmRatingQualityRecord.class), anyList());
 
-        this.qualityIdentificator = new QualityIdentificator(algorithmOperations, answerRatingOperations, experimentOperations, experimentOperator, eventManager);
+        this.qualityIdentificator = new QualityIdentificator(algorithmOperations, answerRatingOperations, experimentOperations, experimentOperator,experimentsPlatformOperations, eventManager,experimentFetcher);
 
     }
 
