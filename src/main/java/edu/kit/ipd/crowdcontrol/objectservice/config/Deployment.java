@@ -24,4 +24,10 @@ public class Deployment {
      * The public url of the worker-ui
      */
     public String workerUIPublic;
+    /**
+     * The time to wait before a experiment is set to finished. Given in minutes.
+     * Really only set this value if you know what you are doing.
+     * This should only be used for debugging purpose and never in a productive system
+     */
+    public int taskWaitBeforeFinish = 120;
 }
