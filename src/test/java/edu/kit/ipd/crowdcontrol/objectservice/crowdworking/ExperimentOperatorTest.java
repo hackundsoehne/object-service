@@ -3,6 +3,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.DuplicateChecker;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.junit.Before;
@@ -26,13 +27,15 @@ public class ExperimentOperatorTest {
     private Experiment experiment;
     private ExperimentFetcher experimentFetcher;
     private ExperimentsPlatformOperations experimentsPlatformOperations;
+    private DuplicateChecker duplicateChecker;
 
     @Before
     public void setUp() throws Exception {
+        this.duplicateChecker = mock(DuplicateChecker.class);
         experimentFetcher = mock(ExperimentFetcher.class);
         experimentsPlatformOperations = mock(ExperimentsPlatformOperations.class);
         platformManager = mock(PlatformManager.class);
-        experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,experimentsPlatformOperations,new EventManager(), 1);
+        experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,experimentsPlatformOperations,new EventManager(),duplicateChecker);
         experiment  = Experiment.newBuilder()
                         .addPopulations(Experiment.Population.newBuilder().setPlatformId("Good"))
                         .addPopulations(Experiment.Population.newBuilder().setPlatformId("Bad"))
@@ -51,7 +54,6 @@ public class ExperimentOperatorTest {
 
     @Test
     public void testEndExperiment() throws Exception {
-        //FIXME enable this test once the sleep is gone
         when(platformManager.unpublishTask("Good",experiment)).thenReturn(CompletableFuture.completedFuture(true));
         when(platformManager.unpublishTask("Bad",experiment)).thenReturn(CompletableFuture.completedFuture(true));
         Set<ExperimentsPlatformStatusPlatformStatus> statuses = new HashSet<>();
