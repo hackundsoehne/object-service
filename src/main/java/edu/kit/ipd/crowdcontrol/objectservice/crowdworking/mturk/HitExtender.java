@@ -52,7 +52,7 @@ public class HitExtender extends TimerTask {
      */
     public void addHit(String id) {
         synchronized (hitIds) {
-            hitIds.remove(id);
+            hitIds.add(id);
         }
     }
 
