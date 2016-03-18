@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Answer extends TableImpl<AnswerRecord> {
 
-	private static final long serialVersionUID = 2122735924;
+	private static final long serialVersionUID = 651927664;
 
 	/**
 	 * The reference instance of <code>crowdcontrol.Answer</code>
@@ -100,6 +100,11 @@ public class Answer extends TableImpl<AnswerRecord> {
 	 * The column <code>crowdcontrol.Answer.hash</code>.
 	 */
 	public final TableField<AnswerRecord, Long> HASH = createField("hash", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+	/**
+	 * The column <code>crowdcontrol.Answer.duplicate</code>.
+	 */
+	public final TableField<AnswerRecord, Boolean> DUPLICATE = createField("duplicate", org.jooq.impl.SQLDataType.BIT, this, "");
 
 	/**
 	 * Create a <code>crowdcontrol.Answer</code> table reference
