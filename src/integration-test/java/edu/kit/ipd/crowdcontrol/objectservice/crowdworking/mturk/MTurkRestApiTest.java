@@ -48,7 +48,7 @@ public class MTurkRestApiTest {
 
     @Test(expected = ExecutionException.class)
     public void testGetBonusPayments() throws Exception {
-        new GetBonusPayments(connection,"bla",1).get();
+        new GetBonusPayments(connection, "bla" , 1).get();
     }
 
     @Test

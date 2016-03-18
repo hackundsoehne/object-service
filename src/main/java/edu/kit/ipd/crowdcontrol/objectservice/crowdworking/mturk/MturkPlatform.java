@@ -109,7 +109,7 @@ public class MturkPlatform implements Platform,Payment {
                 TWO_HOURS, //you have 2 hours to do the assignment
                 THIRTY_DAYS, // the experiment is staying for 30 days
                 tags,
-                1000000000,
+                100,
                 2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
                 "",
                 content)
