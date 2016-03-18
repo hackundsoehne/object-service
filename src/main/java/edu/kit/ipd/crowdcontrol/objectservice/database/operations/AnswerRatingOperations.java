@@ -465,7 +465,7 @@ public class AnswerRatingOperations extends AbstractOperations {
                 DSL.selectFrom(ANSWER)
                         .where(ANSWER.EXPERIMENT.eq(idExperiment))
                         .and(ANSWER.QUALITY_ASSURED.eq(true))
-                        .and(ANSWER.QUALITY.greaterThan(
+                        .and(ANSWER.QUALITY.greaterOrEqual(
                                         DSL.select(EXPERIMENT.RESULT_QUALITY_THRESHOLD)
                                                 .from(EXPERIMENT)
                                                 .where(EXPERIMENT.ID_EXPERIMENT.eq(idExperiment))
