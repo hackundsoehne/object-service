@@ -183,13 +183,32 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
     }
 
     /**
-     * sets the mode for the passed status
+     * sets the platform to the passed status
      * @param experimentsPlatform the primary key of the ExperimentsPlatform
      * @param status the status to set to
      */
     public void setPlatformStatus(int experimentsPlatform, ExperimentsPlatformStatusPlatformStatus status) {
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
         ExperimentsPlatformStatusRecord toInsert = new ExperimentsPlatformStatusRecord(null, status, timestamp, experimentsPlatform);
+
+        create.executeInsert(toInsert);
+    }
+
+    /**
+     * sets the platform to the passed status
+     * @param experiment the primary key of the experiment
+     * @param platform the platform
+     * @param status the to set the platform to
+     */
+    public void setPlatformStatus(int experiment, String platform, ExperimentsPlatformStatusPlatformStatus status) {
+        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+        Integer idExperimentsPlatforms = getExperimentsPlatform(platform, experiment)
+                .orElseThrow(() -> new IllegalArgumentException(String.format(
+                        "ExperimentsPlatform is not existing for platform %s and experiment %d",
+                        platform,
+                        experiment)))
+                .getIdexperimentsPlatforms();
+        ExperimentsPlatformStatusRecord toInsert = new ExperimentsPlatformStatusRecord(null, status, timestamp, idExperimentsPlatforms);
 
         create.executeInsert(toInsert);
     }

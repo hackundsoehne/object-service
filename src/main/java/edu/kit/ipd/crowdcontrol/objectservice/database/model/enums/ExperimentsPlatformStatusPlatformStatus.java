@@ -35,7 +35,7 @@ public enum ExperimentsPlatformStatusPlatformStatus implements EnumType {
 
 	shutdown("shutdown"),
 
-	shutdown_started("shutdown_started");
+	shutdown_failed("shutdown_failed");
 
 	private final String literal;
 
