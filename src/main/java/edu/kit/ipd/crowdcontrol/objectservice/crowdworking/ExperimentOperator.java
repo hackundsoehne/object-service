@@ -41,7 +41,7 @@ public class ExperimentOperator {
      * @param eventManager
      * @param waitTimeInMin the time in minutes which is waited before the experiment is set to finished and payed;
      */
-    public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations,EventManager eventManager, int waitTimeInMin) {
+    public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations,EventManager eventManager,DuplicateChecker duplicateChecker, int waitTimeInMin) {
         this.waitTimeInMin = waitTimeInMin;
         this.platformManager = platformManager;
         this.scheduledExecutorService = Executors.newScheduledThreadPool(1);

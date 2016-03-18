@@ -79,7 +79,7 @@ public class Main {
 
         ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.experimentsPlatformOperations,operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
         DuplicateChecker duplicateChecker = new DuplicateChecker(operationCarrier.answerRatingOperations,operationCarrier.experimentOperations,eventManager);
-        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations,eventManager,duplicateChecker);
+        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations,eventManager,duplicateChecker,config.deployment.taskWaitBeforeFinish);
         PopulationsHelper populationsHelper = new PopulationsHelper( operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
         initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager, experimentFetcher);
