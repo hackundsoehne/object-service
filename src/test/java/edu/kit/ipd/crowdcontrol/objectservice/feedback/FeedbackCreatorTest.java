@@ -8,6 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Work
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.JWTHelper;
 import org.jooq.Result;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,14 +31,16 @@ public class FeedbackCreatorTest {
     private ExperimentOperations experimentOperations;
     private WorkerOperations workerOperations;
     private FeedbackCreator sender;
+    private JWTHelper jwtHelper;
 
     @Before
     public void setUp() throws Exception {
         answerRatingOperations = mock(AnswerRatingOperations.class);
         experimentOperations = mock(ExperimentOperations.class);
         workerOperations = mock(WorkerOperations.class);
+        jwtHelper = mock(JWTHelper.class);
 
-        sender = new FeedbackCreator(answerRatingOperations, experimentOperations, workerOperations);
+        sender = new FeedbackCreator(answerRatingOperations, experimentOperations, workerOperations, jwtHelper);
     }
 
     @Test
@@ -59,6 +62,8 @@ public class FeedbackCreatorTest {
         WorkerRecord w1 = new WorkerRecord(0, null, null, "coolcrowd@42.pi", 0, "");
         Optional<WorkerRecord> o1 = Optional.of(w1);
         when(workerOperations.getWorker(0)).thenReturn(o1);
+
+        doReturn("foobar").when(jwtHelper).generateJWT(0);
 
         RatingRecord ratingAnswer1x1 = new RatingRecord();
         ratingAnswer1x1.setFeedback("Foobar1");

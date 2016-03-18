@@ -1,5 +1,7 @@
 Dear worker,
 
+If you want, we can delete your data in our database and you become anonymous. To do this, pls copy this link in the address field in your web browser:
+foobar
 here we send you some feedback to the answers you gave, when you worked for us one experiment foobarExperiment:
 
 Answer:

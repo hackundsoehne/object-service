@@ -7,6 +7,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Rati
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.AnswerRatingOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.JWTHelper;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,11 +27,13 @@ public class FeedbackCreator {
     private AnswerRatingOperations answerOps;
     private ExperimentOperations expOps;
     private WorkerOperations workerOps;
+    private JWTHelper helper;
 
-    public FeedbackCreator(AnswerRatingOperations answerOps, ExperimentOperations expOps, WorkerOperations workerOps) {
+    public FeedbackCreator(AnswerRatingOperations answerOps, ExperimentOperations expOps, WorkerOperations workerOps, JWTHelper helper) {
         this.answerOps = answerOps;
         this.expOps = expOps;
         this.workerOps = workerOps;
+        this.helper = helper;
     }
 
     public String getFeedback(int expId, int workerId) throws FeedbackException {
@@ -90,6 +93,7 @@ public class FeedbackCreator {
         String message = "";
         if (!answers.isEmpty()) {
             map.put("answers", answerMessage.toString());
+            map.put("address", helper.generateJWT(workerId));
             message = Template.apply(feedbackMessage, map);
         }
         LOGGER.trace("Completed creating feedback message to worker " + workerId + ".");

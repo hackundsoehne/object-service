@@ -101,7 +101,7 @@ public class Main {
      * @param jwtHelper the jwt-helper used to generate the JWT-tokens
      */
     private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, EventManager eventManager, ExperimentFetcher experimentFetcher, JWTHelper jwtHelper) {
-        FeedbackCreator feedbackCreator = new FeedbackCreator(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.workerOperations);
+        FeedbackCreator feedbackCreator = new FeedbackCreator(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.workerOperations, jwtHelper);
         new QualityIdentificator(
                 operationCarrier.algorithmsOperations,
                 operationCarrier.answerRatingOperations,
