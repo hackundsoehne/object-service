@@ -44,7 +44,7 @@ public interface WorkerIdentification {
 
             @Override
             public Optional<WorkerRecord> findWorker(WorkerOperations workerOperations) {
-                return workerOperations.getWorker(platform, identification);
+                return workerOperations.getWorker(platform, new JsonPrimitive(identification).toString());
             }
         };
     }
