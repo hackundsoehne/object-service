@@ -157,7 +157,7 @@ public class DuplicateChecker {
      * Reinserts answers, which were not checked/rated by the duplicate-checker back in the
      * queue
      */
-    public void rescheduleAnswersForDuplicateDetection(int expID){ 
+    public void rescheduleAnswersForDuplicateDetection(int expID){
         List<AnswerRecord> unratedAnswers = answerRatingOperations.getAnswersWithoutHash(expID);
         unratedAnswers.forEach((answerRecord -> {
             try {
