@@ -30,15 +30,17 @@ public class ExperimentOperator {
     private final ExperimentFetcher experimentFetcher;
     private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final ScheduledExecutorService scheduledExecutorService;
-
+    private final int waitTimeInMin;
 
     private final EventManager eventManager;
     /**
      * Create a new operator class
      * @param platformManager
      * @param eventManager
+     * @param waitTimeInMin the time in minutes which is waited before the experiment is set to finished and payed;
      */
-    public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations,EventManager eventManager) {
+    public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations,EventManager eventManager, int waitTimeInMin) {
+        this.waitTimeInMin = waitTimeInMin;
         this.platformManager = platformManager;
         this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
         this.experimentsPlatformOperations = experimentsPlatformOperations;
@@ -135,17 +137,16 @@ public class ExperimentOperator {
         long passedTime = Timestamp.valueOf(LocalDateTime.now()).getTime()-platformTime;
         long passedMins = TimeUnit.MILLISECONDS.toMinutes(passedTime);
 
-
-        if(passedMins >= 120){
+        if(passedMins >= waitTimeInMin){
            resumeShutdownExperiment(experiment,-1);
         }else {
-           resumeShutdownExperiment(experiment,120-(int)passedMins);
+           resumeShutdownExperiment(experiment,waitTimeInMin-(int)passedMins);
         }
 
     }
 
     private void shutdownExperiment(Experiment experiment){
-        resumeShutdownExperiment(experiment,120);
+        resumeShutdownExperiment(experiment, waitTimeInMin);
     }
 
     private ScheduledFuture resumeShutdownExperiment(Experiment experiment, int remainingMins){
