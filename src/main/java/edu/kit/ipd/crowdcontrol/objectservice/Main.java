@@ -20,6 +20,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.mail.*;
 import edu.kit.ipd.crowdcontrol.objectservice.moneytransfer.MoneyTransferManager;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.NotificationController;
 import edu.kit.ipd.crowdcontrol.objectservice.notification.SQLEmailNotificationPolicy;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.DuplicateChecker;
 import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
@@ -77,7 +78,8 @@ public class Main {
 
 
         ExperimentFetcher experimentFetcher = new ExperimentFetcher(operationCarrier.experimentOperations, operationCarrier.experimentsPlatformOperations,operationCarrier.tagConstraintsOperations, operationCarrier.algorithmsOperations, operationCarrier.calibrationOperations);
-        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations,eventManager, config.deployment.taskWaitBeforeFinish);
+        DuplicateChecker duplicateChecker = new DuplicateChecker(operationCarrier.answerRatingOperations,operationCarrier.experimentOperations,eventManager);
+        ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations,eventManager,duplicateChecker,config.deployment.taskWaitBeforeFinish);
         PopulationsHelper populationsHelper = new PopulationsHelper( operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
         initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager, experimentFetcher);
@@ -88,7 +90,7 @@ public class Main {
 
     /**
      * Load all modules which are subscribing on events
-     * @param operationCarrier Databaseoperations to use
+     * @param operationCarrier DatabaseOperations to use
      * @param platformManager PlatformManager to use
      * @param experimentOperator the operations to use for starting stopping experiments
      * @param eventManager
@@ -109,13 +111,14 @@ public class Main {
                 operationCarrier.answerRatingOperations,
                 operationCarrier.workerOperations,
                 eventManager);
+
     }
 
     /**
      * Load and run the Router
      * @param config config to use
      * @param operationCarrier database operations to use
-     * @param platformManager the platforManager to run the platformoperations on
+     * @param platformManager the platformManager to run the platformOperations on
      * @param experimentOperator experimentOperations to use
      * @param experimentFetcher
      * @param populationsHelper
