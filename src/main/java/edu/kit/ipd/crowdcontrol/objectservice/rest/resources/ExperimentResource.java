@@ -227,8 +227,10 @@ public class ExperimentResource {
                 .filter(population -> !existing.contains(population.getPlatformId()))
                 .collect(Collectors.toList());
 
-        List<Experiment.Population> missingPopulations = experiment.getPopulationsList().stream()
-                .filter(population -> existing.contains(population.getPlatformId()))
+        List<String> populations = experiment.getPopulationsList().stream().map(Experiment.Population::getPlatformId).collect(Collectors.toList());
+
+        List<String> missingPopulations = existing.stream()
+                .filter(populations::contains)
                 .collect(Collectors.toList());
 
         if (missingPopulations.size() > 0) {
