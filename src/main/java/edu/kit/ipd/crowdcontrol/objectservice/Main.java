@@ -25,6 +25,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.DuplicateChecke
 import edu.kit.ipd.crowdcontrol.objectservice.payment.PaymentDispatcher;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.quality.QualityIdentificator;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.JWTHelper;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Router;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.resources.*;
 import org.apache.logging.log4j.Level;
@@ -83,7 +84,9 @@ public class Main {
         ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations,eventManager,duplicateChecker,config.deployment.taskWaitBeforeFinish);
         PopulationsHelper populationsHelper = new PopulationsHelper( operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
-        initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager, experimentFetcher);
+        JWTHelper jwtHelper = new JWTHelper(config.jwtsecret);
+
+        initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager, experimentFetcher, jwtHelper);
         initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper, eventManager);
 
         Spark.awaitInitialization();
@@ -94,9 +97,10 @@ public class Main {
      * @param operationCarrier DatabaseOperations to use
      * @param platformManager PlatformManager to use
      * @param experimentOperator the operations to use for starting stopping experiments
-     * @param eventManager
+     * @param eventManager the EventManager to use
+     * @param jwtHelper the jwt-helper used to generate the JWT-tokens
      */
-    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, EventManager eventManager, ExperimentFetcher experimentFetcher) {
+    private static void initEventHandler(OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, EventManager eventManager, ExperimentFetcher experimentFetcher, JWTHelper jwtHelper) {
         FeedbackCreator feedbackCreator = new FeedbackCreator(operationCarrier.answerRatingOperations, operationCarrier.experimentOperations, operationCarrier.workerOperations);
         new QualityIdentificator(
                 operationCarrier.algorithmsOperations,
