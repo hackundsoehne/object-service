@@ -59,6 +59,8 @@ moneytransfer:
     # Interval in days, when the workers get paid off
     scheduleInterval: 7
 
+jwtsecret: bGFtYWJhZGExMzY3OPxpbw==
+
 # Map of packages to log levels, e.g.
 # log:
 #    org.package.name: WARN

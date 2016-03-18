@@ -25,6 +25,8 @@ moneytransfer:
     notificationMailAddress: pseipd@gmail.com
     scheduleInterval: 7
 
+jwtsecret: bGFtYWJhZGExMzY3OPxpbw==
+
 log:
     com.zaxxer.hikari: WARN
     org.eclipse.jetty: WARN

@@ -51,6 +51,10 @@ public class ConfigLoader {
         if (System.getProperty("workeruilocal.url") != null) {
             config.deployment.workerUILocal = System.getProperty("workeruilocal.url");
         }
+        if (System.getProperty("jwt.secret") != null) {
+            config.deployment.workerUILocal = System.getProperty("jwt.secret");
+        }
+
 
         try {
             config.platforms = Arrays.stream(config.platforms)
@@ -154,6 +158,9 @@ public class ConfigLoader {
             throw new ConfigException("WorkerUi urls are not found!");
         if (NullOrEmpty(config.moneytransfer.notificationMailAddress))
             throw new ConfigException("Notification mail adress is empty");
+        if (NullOrEmpty(config.jwtsecret)) {
+            throw new ConfigException("JWT-jwtsecret is not set");
+        }
     }
 
     public Config getConfig() {
