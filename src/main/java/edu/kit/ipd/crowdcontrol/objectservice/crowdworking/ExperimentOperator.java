@@ -107,6 +107,8 @@ public class ExperimentOperator {
             statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId());
             if (!statuses.stream().allMatch(state -> state == ExperimentsPlatformStatusPlatformStatus.shutdown)) {
                shutdownExperiment(experiment);
+            } else {
+                log.error("Ending experiment "+experiment.getId()+" failed");
             }
         }else if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)){
             log.info("Experiment "+experiment.getId()+" is not running ");
