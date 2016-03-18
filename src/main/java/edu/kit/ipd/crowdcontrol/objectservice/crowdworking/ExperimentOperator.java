@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.function.Predicate;
 
 /**
  * Presents starting and stopping experiment operations on populations
@@ -94,7 +95,6 @@ public class ExperimentOperator {
 
         Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId());
          if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
-
             for (Experiment.Population population :
                     experiment.getPopulationsList()) {
                 try {
@@ -104,8 +104,12 @@ public class ExperimentOperator {
                 }
             }
 
-            experimentsPlatformOperations.setGlobalPlatformStatus(experiment, ExperimentsPlatformStatusPlatformStatus.shutdown);
-            shutdownExperiment(experiment);
+            statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId());
+            if (!statuses.stream().allMatch(state -> state == ExperimentsPlatformStatusPlatformStatus.shutdown)) {
+               shutdownExperiment(experiment);
+            } else {
+                log.error("Ending experiment "+experiment.getId()+" failed");
+            }
         }else if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)){
             log.info("Experiment "+experiment.getId()+" is not running ");
         }else {

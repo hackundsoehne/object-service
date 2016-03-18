@@ -35,6 +35,7 @@ public enum ExperimentsPlatformStatusPlatformStatus implements EnumType {
 
 	shutdown("shutdown"),
 
+	@Deprecated
 	stopped("stopped");
 
 	private final String literal;

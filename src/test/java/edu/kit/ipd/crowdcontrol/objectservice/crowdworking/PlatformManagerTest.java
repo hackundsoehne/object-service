@@ -119,7 +119,7 @@ public class PlatformManagerTest {
             }
             //record.setStatus(TaskStatus.finished);
             verify(experimentsPlatformOperations).setPlatformStatus(record.getIdexperimentsPlatforms(),
-                    ExperimentsPlatformStatusPlatformStatus.finished);
+                    ExperimentsPlatformStatusPlatformStatus.shutdown);
         });
     }
 
