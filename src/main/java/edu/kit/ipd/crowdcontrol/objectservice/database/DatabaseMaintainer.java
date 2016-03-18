@@ -10,7 +10,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.ANSWER_RESERVATION;
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATING;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.RATING_RESERVATION;
 
 /**
  * this class periodically performs cleanup-tasks.
@@ -52,9 +54,14 @@ public class DatabaseMaintainer {
         LocalDateTime limit = LocalDateTime.now().minus(2, ChronoUnit.HOURS);
         Timestamp timestamp = Timestamp.valueOf(limit);
 
-        create.deleteFrom(RATING)
-                .where(RATING.RATING_.isNull())
+        create.deleteFrom(RATING_RESERVATION)
+                .where(RATING_RESERVATION.USED.eq(false))
                 .and(RATING.TIMESTAMP.lessThan(timestamp))
+                .execute();
+
+        create.deleteFrom(ANSWER_RESERVATION)
+                .where(ANSWER_RESERVATION.USED.eq(false))
+                .and(ANSWER_RESERVATION.TIMESTAMP.lessThan(timestamp))
                 .execute();
     }
 
