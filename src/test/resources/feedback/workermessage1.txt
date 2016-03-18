@@ -16,6 +16,7 @@ Feedback: Foobar2
 Quality: 2
 Rating: 2
 Additional feedback: awes0me Message
+
 Answer:
 baz2
 
@@ -29,6 +30,7 @@ Rating:
 Feedback: Foobar4
 Quality: 4
 Rating: 4
+
 Yours sincerely
 
 The CrowdControl-Team

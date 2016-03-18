@@ -1,7 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.feedback;
 
 import edu.kit.ipd.crowdcontrol.objectservice.Utils;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.Worker;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.AnswerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;

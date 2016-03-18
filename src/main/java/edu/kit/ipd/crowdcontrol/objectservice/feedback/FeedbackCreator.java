@@ -11,10 +11,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,8 +58,12 @@ public class FeedbackCreator {
             StringBuilder ratingMessage = new StringBuilder();
 
             for (RatingRecord rating : ratings) {
+                String feedback = rating.getFeedback();
+                if (rating.getFeedback() == null || rating.getFeedback().equals("")) {
+                    feedback = "Rater didn't give feedback";
+                }
                 Map<String, String> ratingMap = new HashMap<>();
-                ratingMap.put("feedback", rating.getFeedback());
+                ratingMap.put("feedback", feedback);
                 ratingMap.put("quality", rating.getQuality().toString());
                 ratingMap.put("rating", rating.getRating().toString());
 
@@ -83,7 +83,7 @@ public class FeedbackCreator {
             answerMap.put("ratings", ratingMessage.toString());
             answerMap.put("systemResponse", systemFeedback);
 
-            answerMessage.append(Template.apply(feedbackAnswer, answerMap));
+            answerMessage.append(Template.apply(feedbackAnswer, answerMap)).append(System.getProperty("line.separator"));
         }
 
         //Send feedback to the last worker
