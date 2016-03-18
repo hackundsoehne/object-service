@@ -196,7 +196,7 @@ public class PlatformManager {
 
                     if (success) {
                         experimentsPlatformOps.setPlatformStatus(record.getIdexperimentsPlatforms(),
-                                ExperimentsPlatformStatusPlatformStatus.finished);
+                                ExperimentsPlatformStatusPlatformStatus.shutdown);
                     }
                     return success;
                 });
