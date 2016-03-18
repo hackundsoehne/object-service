@@ -4,6 +4,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.MessageOrBuilder;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableRecordImpl;
@@ -12,6 +13,10 @@ import java.util.*;
 import java.util.Comparator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.EXPERIMENTS_PLATFORM;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.EXPERIMENTS_PLATFORM_STATUS;
+import static edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus.running;
 
 /**
  * superclass of all database operations. Contains abstractions and helper-methods.
@@ -99,25 +104,25 @@ public abstract class AbstractOperations {
      */
     protected <R> R doIfNotRunning(int experimentID, Function<Configuration, R> function) throws IllegalStateException {
         return create.transactionResult(trans -> {
-            boolean running = DSL.using(trans).fetchExists(
-                    DSL.selectFrom(Tables.EXPERIMENTS_PLATFORM_STATUS)
-                            .where(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM.in(
-                                    DSL.select(Tables.EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS)
-                                            .from(Tables.EXPERIMENTS_PLATFORM)
-                                            .where(Tables.EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
-                            ))
-                            .and(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
-                                    .eq(ExperimentsPlatformStatusPlatformStatus.running)
-                                    .or(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
-                                            .eq(ExperimentsPlatformStatusPlatformStatus.creative_stopping))
-                                    .or(Tables.EXPERIMENTS_PLATFORM_STATUS.PLATFORM_STATUS
-                                            .eq(ExperimentsPlatformStatusPlatformStatus.shutdown))
-                            )
-            );
-            if (!running) {
-                return function.apply(trans);
-            } else {
+            ExperimentsPlatformStatus status1 = EXPERIMENTS_PLATFORM_STATUS.as("mode1");
+            ExperimentsPlatformStatus status2 = EXPERIMENTS_PLATFORM_STATUS.as("mode2");
+            Set<ExperimentsPlatformStatusPlatformStatus> statuses = DSL.using(trans).select(EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS, status1.PLATFORM_STATUS)
+                    .from(EXPERIMENTS_PLATFORM)
+                    .join(status1).onKey()
+                    .leftOuterJoin(status2).on(
+                            EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.eq(status2.PLATFORM)
+                                    .and(status1.TIMESTAMP.lessThan(status2.TIMESTAMP).or(status1.TIMESTAMP.eq(status2.TIMESTAMP)
+                                            .and(status1.IDEXPERIMENTS_PLATFORM_STATUS.lessThan(status2.IDEXPERIMENTS_PLATFORM_STATUS))))
+                    )
+                    .where(status2.IDEXPERIMENTS_PLATFORM_STATUS.isNull())
+                    .and(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
+                    .fetchSet(status1.PLATFORM_STATUS);
+            if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)
+                    || statuses.contains(ExperimentsPlatformStatusPlatformStatus.creative_stopping)
+                    || statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
                 throw new IllegalStateException("Experiment is running: " + experimentID);
+            } else {
+                return function.apply(trans);
             }
         });
     }
