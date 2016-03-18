@@ -5,6 +5,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPl
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
+import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.DuplicateChecker;
 import edu.kit.ipd.crowdcontrol.objectservice.event.ChangeEvent;
 import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
@@ -30,7 +31,7 @@ public class ExperimentOperator {
     private final ExperimentFetcher experimentFetcher;
     private final ExperimentsPlatformOperations experimentsPlatformOperations;
     private final ScheduledExecutorService scheduledExecutorService;
-
+    private final DuplicateChecker duplicateChecker;
 
     private final EventManager eventManager;
     /**
@@ -38,11 +39,12 @@ public class ExperimentOperator {
      * @param platformManager
      * @param eventManager
      */
-    public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations,EventManager eventManager) {
+    public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations,EventManager eventManager,DuplicateChecker duplicateChecker) {
         this.platformManager = platformManager;
         this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
         this.experimentsPlatformOperations = experimentsPlatformOperations;
         this.experimentFetcher = experimentFetcher;
+        this.duplicateChecker = duplicateChecker;
         this.eventManager = eventManager;
         recoverExperiments();
     }
@@ -117,9 +119,9 @@ public class ExperimentOperator {
         experimentsPlatformOperations.getExperimentsFailedDuringShutdown().forEach(
                 (exp) -> recoverExperimentShutdown(exp.getIdExperiment())
         );
-       /* experimentsPlatformOperations.getRunningExperiments().forEach(
-                (exp) -> //TODO include rescheduleAnswers(exp.getID()); here! (DuplicateChecker)
-        );*/
+        experimentsPlatformOperations.getRunningExperiments().forEach(
+                (exp) -> duplicateChecker.rescheduleAnswersForDuplicateDetection(exp.getIdExperiment())
+        );
 
     }
 
