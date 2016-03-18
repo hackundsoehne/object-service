@@ -287,7 +287,7 @@ public abstract class AbstractOperations {
         int toSkip = 0;
 
         if (results.isNotEmpty() && results.get(0).getValue(primaryKey).equals(start)) {
-            toSkip++;
+            toSkip = 1;
         }
 
         List<R> sortedResults = results.stream()
@@ -304,8 +304,18 @@ public abstract class AbstractOperations {
             right = sortedResults.get(sortedResults.size() - 1).getValue(primaryKey);
         }
 
-        boolean hasPredecessors = !results.isEmpty() && results.get(0).getValue(primaryKey).equals(start);
-        boolean hasSuccessors = results.size() == (limit + 2);
+        boolean hasPredecessors = toSkip == 1;
+        boolean hasSuccessors = results.size() > limit + toSkip;
+
+        if (toSkip == 0) {
+            primaryKeyCondition = next
+                    ? primaryKey.lessThan(start)
+                    : primaryKey.greaterThan(start);
+
+            // FIXME: Ugly hack, otherwise we end up with id >= ? and id < ?
+            Optional<R> before = query.and(false).or(primaryKeyCondition).limit(1).fetchOptional();
+            hasPredecessors = before.isPresent();
+        }
 
         if (next) {
             return Range.of(sortedResults, left, right, hasPredecessors, hasSuccessors);
