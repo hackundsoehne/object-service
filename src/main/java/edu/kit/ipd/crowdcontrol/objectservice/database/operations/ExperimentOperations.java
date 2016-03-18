@@ -111,16 +111,19 @@ public class ExperimentOperations extends AbstractOperations {
         //TODO: what to do if one of the platforms failed?
         if (statuses.isEmpty()) {
             return Experiment.State.DRAFT;
+        } else if (statuses.size() != 1) {
+            //we have a inhomogeneous state, BAD!
+            return Experiment.State.INVALID;
         } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)) {
             return Experiment.State.PUBLISHED;
         } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
-            return Experiment.State.PUBLISHED; //TODO: maybe more options?
+            return Experiment.State.PUBLISHED;
         } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.creative_stopping)) {
             return Experiment.State.CREATIVE_STOPPED;
-        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.stopped)) {
+        } else if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.finished)) {
             return Experiment.State.STOPPED;
         } else {
-            return Experiment.State.STOPPED; //TODO: finished
+            return Experiment.State.INVALID;
         }
     }
 
