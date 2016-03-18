@@ -42,8 +42,8 @@ public class MturkPlatformTest {
                 properties.getProperty("User"),
                 properties.getProperty("Password"),
                 "https://mechanicalturk.sandbox.amazonaws.com/",
-                "Sandbox","http://example.com/", "http://worker.example.com/",
-                new HitExtender(Collections.emptyList(), connection));
+                "Sandbox","http://example.com/", "http://worker.example.com/");
+        platform.startExtenderService(Collections.emptyList());
 
         connection = new MTurkConnection(
                 properties.getProperty("User"),
