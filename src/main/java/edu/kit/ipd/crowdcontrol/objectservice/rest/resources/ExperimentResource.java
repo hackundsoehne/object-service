@@ -197,10 +197,14 @@ public class ExperimentResource {
             int size = experiment.getAllFields().size();
 
             if (size > 1) {
-                throw new IllegalStateException("if you change the state nothing else can be changed");
+                throw new BadRequestException("if you change the state nothing else can be changed");
             }
 
-            resulting = updateExperimentState(id, experiment, old);
+            try {
+                resulting = updateExperimentState(id, experiment, old);
+            } catch (IllegalStateException e) {
+                throw new BadRequestException(e.getMessage());
+            }
         } else if (old.getState() == Experiment.State.DRAFT) {
             resulting = updateExperimentInfoDraftState(id, experiment, old, original);
         } else if (old.getState() == Experiment.State.PUBLISHED) {
