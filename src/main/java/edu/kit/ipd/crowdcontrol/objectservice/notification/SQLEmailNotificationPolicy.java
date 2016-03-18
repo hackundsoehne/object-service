@@ -71,13 +71,17 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
 
                 // the records have the required columns, so we can bring them in a handier format
                 Map<Integer, NotificationTokenRecord> tokenRecords;
-                try (Stream<Record> recordStream = operations.runReadOnlySQL(notification.getQuery())) {
-                    tokenRecords = recordStream.map(record -> new NotificationTokenRecord(
-                            null,
-                            record.getValue("id", Integer.class),
-                            record.getValue("token", String.class),
-                            notification.getId()))
-                            .collect(Collectors.toMap(NotificationTokenRecord::getResultId, Function.identity()));
+                try {
+                    try (Stream<Record> recordStream = operations.runReadOnlySQL(notification.getQuery())) {
+                        tokenRecords = recordStream.map(record -> new NotificationTokenRecord(
+                                null,
+                                record.getValue("id", Integer.class),
+                                record.getValue("token", String.class),
+                                notification.getId()))
+                                .collect(Collectors.toMap(NotificationTokenRecord::getResultId, Function.identity()));
+                    }
+                } catch (java.lang.IllegalStateException e) {
+                    throw new IllegalStateException("Invalid SQL-query, ech id has to be unique!", e);
                 }
                 List<String> newTokenList = operations.diffTokenRecords(tokenRecords, notification.getId()).stream()
                         .map(NotificationTokenRecord::getResultToken)
