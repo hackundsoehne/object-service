@@ -101,6 +101,7 @@ public class ExperimentOperator {
                     platformManager.unpublishTask(population.getPlatformId(), experiment).join();
                 } catch (PreActionException | CompletionException e) {
                     log.fatal("Failed to unpublish experiment " + experiment + " on platform " + population.getPlatformId(), e);
+                    experimentsPlatformOperations.setPlatformStatus(experiment.getId(), population.getPlatformId(), ExperimentsPlatformStatusPlatformStatus.shutdown_failed);
                 }
             }
 
@@ -156,9 +157,22 @@ public class ExperimentOperator {
         resumeShutdownExperiment(experiment, waitTimeInMin);
     }
 
+    private ScheduledFuture retryUnpublishing(Experiment experiment, List<String> platform) {
+        ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate((Runnable) () -> {
+            log.info("trying to unpublish platform {} for experiment {}.", platform, experiment);
+            platform.it
+            try {
+                platformManager.unpublishTask(platform, experiment).join();
+            } catch (PreActionException | CompletionException e) {
+                log.fatal("Failed to unpublish experiment " + experiment + " on platform " + platform, e);
+
+            }
+        }, 5, 5, TimeUnit.MINUTES);
+    }
+
     private ScheduledFuture resumeShutdownExperiment(Experiment experiment, int remainingMins){
         log.debug("scheduling shutdown for experiment {}.", experiment);
-        ScheduledFuture scheduledFuture= scheduledExecutorService.schedule((Runnable) () -> {
+        ScheduledFuture scheduledFuture = scheduledExecutorService.schedule((Runnable) () -> {
             log.info("shutting down experiment {}.", experiment);
             experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.finished); //TODO possibly not necessary because status is set in unpublishTask
             eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
