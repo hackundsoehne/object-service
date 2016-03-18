@@ -8,6 +8,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.fallback.FallbackWorker;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.local.LocalPlatform;
+import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.HitExtender;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.MturkPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa.PyBossaPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.DatabaseMaintainer;
@@ -60,12 +61,12 @@ public class Main {
 
         initLogLevel(config);
 
-        List<Platform> platforms = getPlatforms(config);
-
         DatabaseManager databaseManager = initDatabase(config);
         EventManager eventManager = new EventManager();
 
         OperationCarrier operationCarrier = new OperationCarrier(config, databaseManager);
+
+        List<Platform> platforms = getPlatforms(config, operationCarrier);
 
         MailSender moneyTransferSender = getMailSender(config.mail.disabled, config.mail.moneytransfer, config.mail.debug);
         MailFetcher moneyTransferFetcher = getMailFetcher(config.mail.disabled, config.mail.moneyReceiver, config.mail.debug);
@@ -252,7 +253,7 @@ public class Main {
      * @return A list of configured and initialized platforms
      * @throws ConfigException if the config contains invalid values.
      */
-    private static List<Platform> getPlatforms(Config config) throws ConfigException {
+    private static List<Platform> getPlatforms(Config config, OperationCarrier carrier) throws ConfigException {
         List<Platform> platforms = new ArrayList<>();
 
         for (ConfigPlatform platform : config.platforms) {
@@ -260,13 +261,17 @@ public class Main {
             Platform platformInstance;
             switch (platform.type) {
                 case "mturk":
+                    MturkPlatform mturkPlatform;
                     //FIXME remove the sandbox url - but I am to paranoid
-                    platformInstance = new MturkPlatform(platform.user,
+                    platformInstance = mturkPlatform = new MturkPlatform(platform.user,
                             platform.password,
                             "https://mechanicalturk.sandbox.amazonaws.com/",
                             platform.name,
                             config.deployment.workerService,
                             config.deployment.workerUIPublic);
+                    List<String> hits = carrier.experimentsPlatformOperations.getIdentificationsfromPlatform(mturkPlatform.getID());
+                    mturkPlatform.startExtenderService(hits);
+
                     break;
                 case "pybossa":
                     if (config.deployment.workerUILocal == null) {

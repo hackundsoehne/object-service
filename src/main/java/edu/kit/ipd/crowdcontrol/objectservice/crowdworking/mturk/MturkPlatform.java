@@ -32,6 +32,7 @@ public class MturkPlatform implements Platform,Payment {
     private final MTurkConnection connection;
     private final String workerServiceUrl;
     private final String workerUIUrl;
+    private HitExtender hitExtender;
     /**
      * A new mturk platform instance
      * @param user user to login
@@ -40,10 +41,14 @@ public class MturkPlatform implements Platform,Payment {
      * @param workerUIUrl path where to find the workerUI
      */
     public MturkPlatform(String user, String password, String url, String name, String workerServiceUrl, String workerUIUrl) {
-        this.workerUIUrl = workerUIUrl;
         connection = new MTurkConnection(user, password, url);
+        this.workerUIUrl = workerUIUrl;
         this.workerServiceUrl = workerServiceUrl;
         this.name = name;
+    }
+
+    public void startExtenderService(List<String> hits) {
+        this.hitExtender = new HitExtender(hits, connection);
     }
 
     @Override
@@ -104,11 +109,13 @@ public class MturkPlatform implements Platform,Payment {
                 TWO_HOURS, //you have 2 hours to do the assignment
                 THIRTY_DAYS, // the experiment is staying for 30 days
                 tags,
-                experiment.getNeededAnswers().getValue()*experiment.getRatingsPerAnswer().getValue(),
+                100,
                 2592000, //this is a little problem we have to specify when autoapproval is kicking in this is happening after 2592000s
                 "",
                 content)
                 .thenApply(id -> {
+                    if (hitExtender != null)
+                      hitExtender.addHit(id);
                     JsonObject jsonObject = new JsonObject();
                     jsonObject.add("identification", new JsonPrimitive(id));
                     return jsonObject;
@@ -117,7 +124,10 @@ public class MturkPlatform implements Platform,Payment {
 
     @Override
     public CompletableFuture<Boolean> unpublishTask(JsonElement data) {
-        return new UnpublishHIT(connection, data.getAsJsonObject().get("identification").getAsString());
+        String id = data.getAsJsonObject().get("identification").getAsString();
+        if (hitExtender != null)
+          hitExtender.removeHit(id);
+        return new UnpublishHIT(connection, id);
     }
 
     /**

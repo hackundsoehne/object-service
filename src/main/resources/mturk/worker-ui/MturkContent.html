@@ -5,7 +5,7 @@
       <script type='text/javascript' src='https://code.jquery.com/jquery-2.0.0.js'></script>
  </head>
  <body onload="initMturk('{{PlatformName}}','{{WorkerServiceUrl}}', '{{ExperimentId}}');">
-    <script type='text/javascript' src='{{WorkerUIUrl}}/worker_ui.js'></script>
+    <script id="worker_ui" type='text/javascript' src='{{WorkerUIUrl}}/worker_ui.js'></script>
     <script type='text/javascript'>{{JsEmbed}}</script>
     <div id="ractive-container"></div>
  </body>

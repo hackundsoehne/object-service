@@ -48,7 +48,7 @@ public class MTurkRestApiTest {
 
     @Test(expected = ExecutionException.class)
     public void testGetBonusPayments() throws Exception {
-        new GetBonusPayments(connection,"bla",1).get();
+        new GetBonusPayments(connection, "bla" , 1).get();
     }
 
     @Test
@@ -56,6 +56,8 @@ public class MTurkRestApiTest {
         String id = new PublishHIT(connection,"Title1", "Description2",
                 0.20,60,2000,"test,for,everything",
                 2,2000000,"data","").get();
+
+        new ExtendHIT(connection, id, 2, 0).join();
 
         assertNotEquals(id, null);
 
@@ -71,7 +73,7 @@ public class MTurkRestApiTest {
         assertEquals(hit.getAssignmentDurationInSeconds(), new Long(60));
         //FIXME check the lifetime
         assertEquals(hit.getKeywords(), "test,for,everything");
-        assertEquals(hit.getMaxAssignments(), new Integer(2));
+        assertEquals(hit.getMaxAssignments(), new Integer(4));
         assertEquals(hit.getAutoApprovalDelayInSeconds(), new Long(2000000));
         assertEquals(hit.getRequesterAnnotation(), "data");
 
