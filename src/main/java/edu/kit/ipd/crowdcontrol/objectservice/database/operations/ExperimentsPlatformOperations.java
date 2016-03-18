@@ -373,6 +373,7 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      */
     public List<String> getIdentificationsfromPlatform(String platform) {
         return create.select(EXPERIMENTS_PLATFORM.IDENTIFICATION)
+                .from(EXPERIMENTS_PLATFORM)
                 .where(EXPERIMENTS_PLATFORM.IDENTIFICATION.isNotNull())
                 .and(EXPERIMENTS_PLATFORM.PLATFORM.eq(platform))
                 .fetch(EXPERIMENTS_PLATFORM.IDENTIFICATION);
