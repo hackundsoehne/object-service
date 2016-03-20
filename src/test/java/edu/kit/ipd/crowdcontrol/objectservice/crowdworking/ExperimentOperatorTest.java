@@ -9,7 +9,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -56,8 +58,8 @@ public class ExperimentOperatorTest {
     public void testEndExperiment() throws Exception {
         when(platformManager.unpublishTask("Good",experiment)).thenReturn(CompletableFuture.completedFuture(true));
         when(platformManager.unpublishTask("Bad",experiment)).thenReturn(CompletableFuture.completedFuture(true));
-        Set<ExperimentsPlatformStatusPlatformStatus> statuses = new HashSet<>();
-        statuses.add(ExperimentsPlatformStatusPlatformStatus.running);
+        Map<Integer, ExperimentsPlatformStatusPlatformStatus> statuses = new HashMap<>();
+        statuses.put(1, ExperimentsPlatformStatusPlatformStatus.running);
         when(experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId())).thenReturn(statuses);
         experimentOperator.endExperiment(experiment);
 
