@@ -5,8 +5,9 @@ import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigException;
 import edu.kit.ipd.crowdcontrol.objectservice.config.ConfigPlatform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.ho.yaml.Yaml;
 import org.jooq.SQLDialect;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,7 +39,8 @@ public class ConfigLoader {
             configStream = Main.class.getResourceAsStream("/config.yml");
         }
 
-        config = Yaml.loadType(configStream, Config.class);
+        Yaml yaml = new Yaml(new Constructor(Config.class));
+        config = (Config) yaml.load(configStream);
         if (System.getProperty("workerservice.url") != null) {
             config.deployment.workerService = System.getProperty("workerservice.url");
         }
