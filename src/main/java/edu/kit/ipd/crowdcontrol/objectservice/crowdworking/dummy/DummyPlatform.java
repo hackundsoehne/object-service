@@ -120,7 +120,8 @@ public class DummyPlatform implements Platform, Payment {
      * @param id         id which was returned by publishTask
      * @param experiment experiment which is to be payed
      * @param paymentJob a list of tuples which maps each worker to a value
-     * @return
+     * @return A Completable future which completes when the payment of the experiment is finished.
+     *         The returned value describes if the operation was successful or not
      */
     @Override
     public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {

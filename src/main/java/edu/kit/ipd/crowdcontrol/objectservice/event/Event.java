@@ -30,7 +30,7 @@ public class Event<T> {
 
     /**
      * Get the data which is emitted by the event
-     * @return
+     * @return Get the data which is published by the event
      */
     public T getData() {
         return data;
