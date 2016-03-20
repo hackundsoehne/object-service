@@ -345,8 +345,8 @@ public class MoneyTransferManager {
 
     /**
      * Sends a notification about new added giftcodes to the administrator.
-     * @param message
-     * @throws MoneyTransferException
+     * @param message the message to send
+     * @throws MoneyTransferException gets thrown if an error occurred
      */
     private void sendGiftCodesAddedConfirmation(String message) throws MoneyTransferException {
         String subject = "Succesfully added giftcodes!";
