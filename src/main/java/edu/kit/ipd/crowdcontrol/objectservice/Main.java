@@ -84,7 +84,7 @@ public class Main {
         ExperimentOperator experimentOperator = new ExperimentOperator(platformManager,experimentFetcher,operationCarrier.experimentsPlatformOperations,eventManager,duplicateChecker,config.deployment.taskWaitBeforeFinish);
         PopulationsHelper populationsHelper = new PopulationsHelper( operationCarrier.calibrationOperations, operationCarrier.experimentsPlatformOperations);
 
-        JWTHelper jwtHelper = new JWTHelper(config.jwtsecret);
+        JWTHelper jwtHelper = new JWTHelper(config.deployment.jwtsecret);
 
         initEventHandler(operationCarrier, platformManager, experimentOperator, eventManager, experimentFetcher, jwtHelper);
         initRouter(config, operationCarrier, platformManager, experimentOperator, experimentFetcher, populationsHelper, eventManager);

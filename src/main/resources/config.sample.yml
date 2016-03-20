@@ -37,6 +37,8 @@ deployment:
     # Can be ommitted if not using Docker
     workerUILocal: http://localhost:8080
 
+    # the secret to crypt with jwt webtokens
+    jwtsecret: samplesecret
 # Defined platforms to run
 platforms:
     # Type to use:

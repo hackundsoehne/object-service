@@ -41,9 +41,4 @@ public class Config {
      * Maps package to log constant, e.g. 'org.eclipse.jetty: WARN'.
      */
     public Map<String, String> log = new HashMap<>();
-
-    /**
-     * the jwtsecret for the jwt-token.
-     */
-    public String jwtsecret;
 }

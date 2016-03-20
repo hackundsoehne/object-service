@@ -58,34 +58,9 @@ public class ConfigLoader {
         }
 
 
-        try {
-            config.platforms = Arrays.stream(config.platforms)
-                    .map(platform -> {
-                        if (platform.name == null) {
-                            if (platform.type.equals("dummy")) {
-                                platform.name = "Dummy";
-                            } else {
-                                throw new RuntimeException(new ConfigException("Platform (type: " + platform.type + ") without a name will be ignored."));
-                            }
-                        }
-
-                        return platform;
-                    })
-                    .filter(platform -> !Boolean.getBoolean(platform.name.toLowerCase() + ".disabled"))
-                    .toArray(ConfigPlatform[]::new);
-        } catch (RuntimeException e) {
-            if (e.getCause() instanceof ConfigException) {
-                throw (ConfigException) e.getCause();
-            } else {
-                throw e;
-            }
-        }
-
-        if (config.database.url != null) {
-            config.database.url = appendUtf8Settings(config.database.url);
-        }
-
         configValidate(config);
+
+        config.database.url = appendUtf8Settings(config.database.url);
     }
 
     private String appendUtf8Settings(String url) {
@@ -138,6 +113,65 @@ public class ConfigLoader {
         return !(val != null && !val.isEmpty());
     }
 
+    private void configPlatformTypeValidate(ConfigPlatform platform, boolean apiKey, boolean projectId, boolean user, boolean password) throws ConfigException {
+        if (!apiKey && platform.apiKey != null)
+            throw new ConfigException("ApiKey is not used at "+platform.type);
+        if (apiKey && platform.apiKey == null)
+            throw new ConfigException("ApiKey is needed at "+platform.type);
+
+        if (!projectId && platform.projectId != null)
+            throw new ConfigException("ProjectId is not used at "+platform.type);
+        if (projectId && platform.projectId == null)
+            throw new ConfigException("ProjectId is needed at "+platform.type);
+
+        if (!user && platform.user != null)
+            throw new ConfigException("User is not used at "+platform.type);
+        if (user && platform.user == null)
+            throw new ConfigException("User is needed at "+platform.type);
+
+        if (!password && platform.password != null)
+            throw new ConfigException("Password is  not used at "+platform.type);
+        if (password && platform.password == null)
+            throw new ConfigException("Password is needed at "+platform.type);
+    }
+
+    private void configPlatformsValidate() throws ConfigException {
+        for (int i = 0; i < config.platforms.length; i++) {
+            ConfigPlatform platform = config.platforms[i];
+
+            switch (platform.type.toLowerCase()) {
+                case "mturk":
+                    configPlatformTypeValidate(platform, false, false, true, true);
+                    break;
+                case "pybossa":
+                    configPlatformTypeValidate(platform, true, true, false, false);
+                    break;
+                case "dummy":
+                    configPlatformTypeValidate(platform, false, false, false, false);
+                    break;
+                case "local":
+                    configPlatformTypeValidate(platform, false, false, false, false);
+                    break;
+                default:
+                    throw new ConfigException("Type "+platform.type+" is not found");
+            }
+
+            if (platform.name == null)
+                throw new ConfigException("platform name must be set for platforms!  (At platform with type: "+platform.type+ ")");
+
+            if (platform.url == null)
+                throw new ConfigException("a url must be set for platforms! (At platform with name: "+platform.name+ ")");
+
+            if (Boolean.getBoolean(platform.name.toLowerCase() + ".disabled")) {
+                config.platforms[i] = null;
+            }
+        }
+
+        config.platforms = Arrays.stream(config.platforms)
+                .filter(configPlatform -> configPlatform != null)
+                .toArray(ConfigPlatform[]::new);
+    }
+
     /**
      * Validate the given config
      * @param config config to validate
@@ -151,18 +185,18 @@ public class ConfigLoader {
         if ((config.database.writing == null ||
                 config.database.readonly == null) &&
                 NullOrEmpty(config.database.databasepool))
-            throw new ConfigException("Database users have to be set!");
+            throw new ConfigException("database.writing and database.readonly or database.databasepool have to be set correctly");
         if (NullOrEmpty(config.database.url))
-            throw new ConfigException("Database url is not present!");
+            throw new ConfigException("database.url is not present!");
+        if (NullOrEmpty(config.deployment.jwtsecret))
+            throw new ConfigException("deployment.jwtsecret not set");
         if (NullOrEmpty(config.deployment.workerService))
-            throw new ConfigException("WorkerService is not found");
+            throw new ConfigException("deployment.workerService is not found");
         if (NullOrEmpty(config.deployment.workerUILocal) && config.deployment.workerUIPublic == null)
-            throw new ConfigException("WorkerUi urls are not found!");
+            throw new ConfigException("deployment.workerUILocal urls are not found!");
         if (NullOrEmpty(config.moneytransfer.notificationMailAddress))
-            throw new ConfigException("Notification mail adress is empty");
-        if (NullOrEmpty(config.jwtsecret)) {
-            throw new ConfigException("JWT-jwtsecret is not set");
-        }
+            throw new ConfigException("moneytransfer.notificationMailAddress mail adress is empty");
+        configPlatformsValidate();
     }
 
     public Config getConfig() {
