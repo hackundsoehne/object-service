@@ -106,6 +106,7 @@ public class DuplicateChecker {
         final AnswerRecord finalOriginalAnswer = originalAnswer;
         listOfDuplicates.removeIf(record -> record.getIdAnswer().equals(finalOriginalAnswer.getIdAnswer()));
         listOfDuplicates.forEach((duplicate)-> {
+            answerRatingOperations.setDuplicateBitToAnswer(duplicate);
             answerRatingOperations.setSystemResponseField(duplicate,DUPLICATE_RESPONSE);
             answerRatingOperations.setQualityToAnswer(duplicate,0);
             answerRatingOperations.setAnswerQualityAssured(duplicate);
@@ -200,6 +201,7 @@ public class DuplicateChecker {
                         // The reason for the failure is described in the response-field and set in the getHashFromAnswer-method
                         answerRatingOperations.setQualityToAnswer(answerRecord,0);
                         answerRatingOperations.setAnswerQualityAssured(answerRecord);
+                        
                     }
                 }
             }
