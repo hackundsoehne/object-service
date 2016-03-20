@@ -82,6 +82,7 @@ public class QualityIdentificatorTest {
         this.answerRecord = new AnswerRecord();
         answerRecord.setIdAnswer(1);
         answerRecord.setExperiment(1);
+        answerRecord.setDuplicate(false);
 
         this.eventManager = new EventManager();
         this.algorithmOperations = mock(AlgorithmOperations.class);
