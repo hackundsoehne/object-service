@@ -584,11 +584,4 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .fetch();
     }
 
-    /**
-     * Sets duplicateBit to given answer marking it as a duplicate
-     * @param answerRecord to be marked as a duplicate
-     */
-    public void setDuplicateBitToAnswer(AnswerRecord answerRecord){
-        //TODO
-    }
 }

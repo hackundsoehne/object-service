@@ -106,10 +106,13 @@ public class DuplicateChecker {
         final AnswerRecord finalOriginalAnswer = originalAnswer;
         listOfDuplicates.removeIf(record -> record.getIdAnswer().equals(finalOriginalAnswer.getIdAnswer()));
         listOfDuplicates.forEach((duplicate)-> {
-            answerRatingOperations.setDuplicateBitToAnswer(duplicate);
-            answerRatingOperations.setSystemResponseField(duplicate,DUPLICATE_RESPONSE);
-            answerRatingOperations.setQualityToAnswer(duplicate,0);
-            answerRatingOperations.setAnswerQualityAssured(duplicate);
+
+            duplicate.setDuplicate(true);
+            duplicate.setSystemResponse(DUPLICATE_RESPONSE);
+            duplicate.setQualityAssured(true);
+            duplicate.setQuality(0);
+            answerRatingOperations.updateAnswer(duplicate);
+
         });
     }
 
