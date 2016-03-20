@@ -87,8 +87,16 @@ public class ExperimentOperations extends AbstractOperations {
                     .where(CHOSEN_RATING_QUALITY_PARAM.EXPERIMENT.eq(id))
                     .execute();
 
+            DSL.using(trans).delete(RATING)
+                    .where(RATING.EXPERIMENT.eq(id))
+                    .execute();
+
             DSL.using(trans).delete(RATING_RESERVATION)
                     .where(RATING_RESERVATION.EXPERIMENT.eq(id))
+                    .execute();
+
+            DSL.using(trans).delete(ANSWER)
+                    .where(ANSWER.EXPERIMENT.eq(id))
                     .execute();
 
             DSL.using(trans).delete(ANSWER_RESERVATION)
