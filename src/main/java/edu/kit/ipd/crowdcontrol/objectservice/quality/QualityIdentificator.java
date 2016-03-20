@@ -201,10 +201,11 @@ public class QualityIdentificator {
     /**
      * Rates and sets quality of all answers of specified experiment.
      * Only uses ratings of a specified quality
-     * Furthermore che//   assertEquals((int) sortedResult.get(sortedResult.lastKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerTwo)));cks if a specified amount of ratings is present for that answer
+     * Furthermore checks if a specified amount of ratings is present for that answer
      * and it thus the answer's quality is unlikely to change. In that case the corresponding
      * quality-assured-bit is set in the database.
      *
+     * @param experimentRecord the experiment the answer is related to
      * @param answerRecord  which is going to be rated
      * @param params Mapping of parameter-records to the user specified parameters represented as a string
      */
