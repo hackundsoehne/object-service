@@ -80,6 +80,12 @@ public class MailParserTest {
         MimeBodyPart body = new MimeBodyPart();
         part.addBodyPart(body);
 
+        MimeMultipart innerPart = new MimeMultipart();
+        body.setContent(innerPart);
+
+        MimeBodyPart innerBody = new MimeBodyPart();
+
+
         FileReader file = new FileReader("src/test/resources/moneytransfer/parserTestMessage.txt");
         BufferedReader reader = new BufferedReader(file);
 
@@ -90,7 +96,7 @@ public class MailParserTest {
             content.append(System.getProperty("line.separator"));
         }
 
-        body.setContent(content, "text/plain");
+        innerBody.setContent(content, "text/plain");
 
         Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(mail, "test");
     }
@@ -107,12 +113,6 @@ public class MailParserTest {
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
         part.addBodyPart(mimeBodyPart);
 
-        MimeMultipart innerPart = new MimeMultipart();
-        mimeBodyPart.setContent(innerPart);
-
-        MimeBodyPart innerBody = new MimeBodyPart();
-        innerPart.addBodyPart(innerBody);
-
         FileReader file = new FileReader("src/test/resources/moneytransfer/parserTestMessage.txt");
         BufferedReader reader = new BufferedReader(file);
 
@@ -123,7 +123,7 @@ public class MailParserTest {
             content.append(System.getProperty("line.separator"));
         }
 
-        innerBody.setContent(content, "text/plain");
+        mimeBodyPart.setContent(content, "text/plain");
 
         return mail;
     }
