@@ -2,7 +2,7 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
 import edu.kit.ipd.crowdcontrol.objectservice.database.ExperimentFetcher;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformStatus;
+import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.duplicateDetection.DuplicateChecker;
@@ -14,11 +14,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Predicate;
 
 /**
  * Presents starting and stopping experiment operations on populations
@@ -36,13 +33,19 @@ public class ExperimentOperator {
     private final int waitTimeInMin;
 
     private final EventManager eventManager;
+
+    private final BlockingQueue<Experiment> unpublishingFailedQueue = new LinkedBlockingDeque<>();
+    private final Thread retryShutdown = new Thread(this::retryShutdown);
+    private boolean shutdown = false;
+
     /**
      * Create a new operator class
-     * @param platformManager
-     * @param eventManager
+     * @param platformManager the platformManager to use
+     * @param eventManager the eventManager to use
      * @param waitTimeInMin the time in minutes which is waited before the experiment is set to finished and payed;
      */
-    public ExperimentOperator(PlatformManager platformManager,ExperimentFetcher experimentFetcher,ExperimentsPlatformOperations experimentsPlatformOperations,EventManager eventManager,DuplicateChecker duplicateChecker, int waitTimeInMin) {
+    public ExperimentOperator(PlatformManager platformManager, ExperimentFetcher experimentFetcher, ExperimentsPlatformOperations experimentsPlatformOperations,
+                              EventManager eventManager, DuplicateChecker duplicateChecker, int waitTimeInMin) {
         this.waitTimeInMin = waitTimeInMin;
         this.platformManager = platformManager;
         this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
@@ -51,6 +54,7 @@ public class ExperimentOperator {
         this.duplicateChecker = duplicateChecker;
         this.eventManager = eventManager;
         recoverExperiments();
+        retryShutdown.start();
     }
 
     /**
@@ -84,38 +88,85 @@ public class ExperimentOperator {
         }
     }
 
+    /**
+     * End a given experiment
+     *
+     * @param experiment the experiment to end
+     */
+    public void endExperiment(Experiment experiment) {
+        endExperiment(experiment, waitTimeInMin);
+    }
+
 
     /**
      * End a given experiment
      *
      * @param experiment the experiment to end
-
+     * @param waitingTime the duration of the shutdown-phase in minutes
      */
-    public void endExperiment(Experiment experiment) {
+    private void endExperiment(Experiment experiment, int waitingTime) {
+        Map<Integer, ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId());
 
-        Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId());
-         if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
-            for (Experiment.Population population :
-                    experiment.getPopulationsList()) {
-                try {
-                    platformManager.unpublishTask(population.getPlatformId(), experiment).join();
-                } catch (PreActionException | CompletionException e) {
-                    log.fatal("Failed to unpublish experiment " + experiment + " on platform " + population.getPlatformId(), e);
-                    experimentsPlatformOperations.setPlatformStatus(experiment.getId(), population.getPlatformId(), ExperimentsPlatformStatusPlatformStatus.shutdown_failed);
-                }
+        Boolean shutdownInitiated = statuses.entrySet().stream()
+                .filter(entry -> {
+                    if (!entry.getValue().equals(ExperimentsPlatformStatusPlatformStatus.running)
+                            || !entry.getValue().equals(ExperimentsPlatformStatusPlatformStatus.creative_stopping)) {
+                        log.info(String.format("Can not shut down platform %s in state %s", entry.getKey(), entry.getValue().toString()));
+                        return false;
+                    }
+                    return true;
+                })
+                .map(entry -> {
+                    if (entry.getValue().equals(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
+                        return true;
+                    }
+
+                    Optional<ExperimentsPlatformRecord> opt = experimentsPlatformOperations.getExperimentsPlatform(entry.getKey());
+                    if (!opt.isPresent()) {
+                        log.error(String.format("unable to retrieve experimentsPlatform %s", entry.getKey()));
+                        return true;
+                    }
+                    ExperimentsPlatformRecord experimentsPlatformRecord = opt.get();
+                    boolean success = false;
+                    try {
+                        log.debug(String.format("unpublishing platform %s for experiment %s", entry.getKey(), experiment.getId()));
+                        success = platformManager.unpublishTask(experimentsPlatformRecord.getPlatform(), experiment).join();
+                    } catch (PreActionException | CompletionException e) {
+                        experimentsPlatformOperations.setPlatformStatus(experiment.getId(), experimentsPlatformRecord.getPlatform(), ExperimentsPlatformStatusPlatformStatus.shutdown_failed);
+                        log.error(String.format("unable to shut down platform %s for experiment %s", entry.getKey(), experiment.getId()));
+                    }
+                    if (success) {
+                        log.debug(String.format("successfully unpublished platform %s for experiment %s", entry.getKey(), experiment.getId()));
+                    }
+                    return success;
+                })
+                .reduce(false, (b1, b2) -> b1 || b2);
+
+        if (shutdownInitiated) {
+            log.debug(String.format("shutdown successfully initiated for experiment %s", experiment.getId()));
+            invokeShutdownPhase(experiment, waitingTime);
+        } else {
+            log.debug(String.format("shutdown was not successfully initiated for experiment %s, trying again later", experiment.getId()));
+            unpublishingFailedQueue.add(experiment);
+        }
+    }
+
+    /**
+     * retries endExperiment for each item in unpublishingFailedQueue
+     */
+    private void retryShutdown() {
+        while (!shutdown) {
+            try {
+                Experiment experiment = unpublishingFailedQueue.take();
+                List<Experiment> retry = new ArrayList<>();
+                retry.add(experiment);
+                unpublishingFailedQueue.drainTo(retry);
+                retry.forEach(this::endExperiment);
+                //sleep for one minute before trying again
+                Thread.sleep(60000);
+            } catch (InterruptedException e) {
+                log.debug("interrupted", e);
             }
-
-            statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getId());
-            if (!statuses.stream().allMatch(state -> state == ExperimentsPlatformStatusPlatformStatus.shutdown)) {
-               shutdownExperiment(experiment);
-            } else {
-                log.error("Ending experiment "+experiment.getId()+" failed");
-            }
-        }else if(!statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)){
-            log.info("Experiment "+experiment.getId()+" is not running ");
-        }else {
-            log.info("Experiment "+experiment.getId()+" is already shutting down");
-
         }
     }
 
@@ -133,6 +184,10 @@ public class ExperimentOperator {
 
     }
 
+    /**
+     * recovers the experiment by calculating the remaining wait time and invoking endExperiment
+     * @param experimentID the primary key of the experiment
+     */
     private void recoverExperimentShutdown(int experimentID){
         Experiment experiment = experimentFetcher.fetchExperiment(experimentID);
         List<ExperimentsPlatformStatusRecord> experimentsPlatformStatusRecords = experimentsPlatformOperations.getExperimentsPlatformStatusRecord(experimentID);
@@ -146,38 +201,35 @@ public class ExperimentOperator {
         long passedMins = TimeUnit.MILLISECONDS.toMinutes(passedTime);
 
         if(passedMins >= waitTimeInMin){
-           resumeShutdownExperiment(experiment,-1);
+            endExperiment(experiment,-1);
         }else {
-           resumeShutdownExperiment(experiment,waitTimeInMin-(int)passedMins);
+            endExperiment(experiment,waitTimeInMin-(int)passedMins);
         }
 
     }
 
-    private void shutdownExperiment(Experiment experiment){
-        resumeShutdownExperiment(experiment, waitTimeInMin);
-    }
-
-    private ScheduledFuture retryUnpublishing(Experiment experiment, List<String> platform) {
-        ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate((Runnable) () -> {
-            log.info("trying to unpublish platform {} for experiment {}.", platform, experiment);
-            platform.it
-            try {
-                platformManager.unpublishTask(platform, experiment).join();
-            } catch (PreActionException | CompletionException e) {
-                log.fatal("Failed to unpublish experiment " + experiment + " on platform " + platform, e);
-
-            }
-        }, 5, 5, TimeUnit.MINUTES);
-    }
-
-    private ScheduledFuture resumeShutdownExperiment(Experiment experiment, int remainingMins){
+    /**
+     * starts the shutdown-phase
+     * @param experiment the primary key of the experiment
+     * @param waitTime the minutes to wait
+     * @return the generated {@link ScheduledFuture} waiting the waitTime to end finish the experiment
+     */
+    private ScheduledFuture invokeShutdownPhase(Experiment experiment, int waitTime){
         log.debug("scheduling shutdown for experiment {}.", experiment);
         ScheduledFuture scheduledFuture = scheduledExecutorService.schedule((Runnable) () -> {
             log.info("shutting down experiment {}.", experiment);
-            experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.finished); //TODO possibly not necessary because status is set in unpublishTask
+            experimentsPlatformOperations.setGlobalPlatformStatus(experiment,ExperimentsPlatformStatusPlatformStatus.finished);
             eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(experiment,experimentFetcher.fetchExperiment(experiment.getId())));
-        },remainingMins,TimeUnit.MINUTES);
+        },waitTime,TimeUnit.MINUTES);
         return scheduledFuture;
+    }
+
+    /**
+     * stops the associated thread
+     */
+    public void stop() {
+        shutdown = true;
+        retryShutdown.interrupt();
     }
 
 }
