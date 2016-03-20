@@ -288,7 +288,7 @@ public class Main {
                             platform.url,
                             platform.name,
                             platform.projectId,
-                            platform.calibrationsAllowed);
+                            true);
                     pyBossa.init();
                     platformInstance = pyBossa;
                     break;
