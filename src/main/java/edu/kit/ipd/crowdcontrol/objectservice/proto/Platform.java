@@ -17,6 +17,7 @@ public  final class Platform extends
   private Platform() {
     id_ = "";
     name_ = "";
+    url_ = "";
     hasCalibrations_ = false;
     isInactive_ = false;
   }
@@ -57,12 +58,18 @@ public  final class Platform extends
             name_ = s;
             break;
           }
-          case 24: {
+          case 26: {
+            String s = input.readStringRequireUtf8();
+
+            url_ = s;
+            break;
+          }
+          case 32: {
 
             hasCalibrations_ = input.readBool();
             break;
           }
-          case 32: {
+          case 40: {
 
             isInactive_ = input.readBool();
             break;
@@ -159,19 +166,53 @@ public  final class Platform extends
     }
   }
 
-  public static final int HAS_CALIBRATIONS_FIELD_NUMBER = 3;
+  public static final int URL_FIELD_NUMBER = 3;
+  private volatile java.lang.Object url_;
+  /**
+   * <code>optional string url = 3;</code>
+   */
+  public java.lang.String getUrl() {
+    java.lang.Object ref = url_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      url_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>optional string url = 3;</code>
+   */
+  public com.google.protobuf.ByteString
+      getUrlBytes() {
+    java.lang.Object ref = url_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      url_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int HAS_CALIBRATIONS_FIELD_NUMBER = 4;
   private boolean hasCalibrations_;
   /**
-   * <code>optional bool has_calibrations = 3;</code>
+   * <code>optional bool has_calibrations = 4;</code>
    */
   public boolean getHasCalibrations() {
     return hasCalibrations_;
   }
 
-  public static final int IS_INACTIVE_FIELD_NUMBER = 4;
+  public static final int IS_INACTIVE_FIELD_NUMBER = 5;
   private boolean isInactive_;
   /**
-   * <code>optional bool is_inactive = 4;</code>
+   * <code>optional bool is_inactive = 5;</code>
    */
   public boolean getIsInactive() {
     return isInactive_;
@@ -195,11 +236,14 @@ public  final class Platform extends
     if (!getNameBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessage.writeString(output, 2, name_);
     }
+    if (!getUrlBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 3, url_);
+    }
     if (hasCalibrations_ != false) {
-      output.writeBool(3, hasCalibrations_);
+      output.writeBool(4, hasCalibrations_);
     }
     if (isInactive_ != false) {
-      output.writeBool(4, isInactive_);
+      output.writeBool(5, isInactive_);
     }
   }
 
@@ -214,13 +258,16 @@ public  final class Platform extends
     if (!getNameBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(2, name_);
     }
+    if (!getUrlBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(3, url_);
+    }
     if (hasCalibrations_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(3, hasCalibrations_);
+        .computeBoolSize(4, hasCalibrations_);
     }
     if (isInactive_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(4, isInactive_);
+        .computeBoolSize(5, isInactive_);
     }
     memoizedSize = size;
     return size;
@@ -337,6 +384,8 @@ public  final class Platform extends
 
       name_ = "";
 
+      url_ = "";
+
       hasCalibrations_ = false;
 
       isInactive_ = false;
@@ -365,6 +414,7 @@ public  final class Platform extends
       edu.kit.ipd.crowdcontrol.objectservice.proto.Platform result = new edu.kit.ipd.crowdcontrol.objectservice.proto.Platform(this);
       result.id_ = id_;
       result.name_ = name_;
+      result.url_ = url_;
       result.hasCalibrations_ = hasCalibrations_;
       result.isInactive_ = isInactive_;
       onBuilt();
@@ -388,6 +438,10 @@ public  final class Platform extends
       }
       if (!other.getName().isEmpty()) {
         name_ = other.name_;
+        onChanged();
+      }
+      if (!other.getUrl().isEmpty()) {
+        url_ = other.url_;
         onChanged();
       }
       if (other.getHasCalibrations() != false) {
@@ -560,15 +614,84 @@ public  final class Platform extends
       return this;
     }
 
+    private java.lang.Object url_ = "";
+    /**
+     * <code>optional string url = 3;</code>
+     */
+    public java.lang.String getUrl() {
+      java.lang.Object ref = url_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        url_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>optional string url = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUrlBytes() {
+      java.lang.Object ref = url_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        url_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>optional string url = 3;</code>
+     */
+    public Builder setUrl(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      url_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string url = 3;</code>
+     */
+    public Builder clearUrl() {
+      
+      url_ = getDefaultInstance().getUrl();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string url = 3;</code>
+     */
+    public Builder setUrlBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      url_ = value;
+      onChanged();
+      return this;
+    }
+
     private boolean hasCalibrations_ ;
     /**
-     * <code>optional bool has_calibrations = 3;</code>
+     * <code>optional bool has_calibrations = 4;</code>
      */
     public boolean getHasCalibrations() {
       return hasCalibrations_;
     }
     /**
-     * <code>optional bool has_calibrations = 3;</code>
+     * <code>optional bool has_calibrations = 4;</code>
      */
     public Builder setHasCalibrations(boolean value) {
       
@@ -577,7 +700,7 @@ public  final class Platform extends
       return this;
     }
     /**
-     * <code>optional bool has_calibrations = 3;</code>
+     * <code>optional bool has_calibrations = 4;</code>
      */
     public Builder clearHasCalibrations() {
       
@@ -588,13 +711,13 @@ public  final class Platform extends
 
     private boolean isInactive_ ;
     /**
-     * <code>optional bool is_inactive = 4;</code>
+     * <code>optional bool is_inactive = 5;</code>
      */
     public boolean getIsInactive() {
       return isInactive_;
     }
     /**
-     * <code>optional bool is_inactive = 4;</code>
+     * <code>optional bool is_inactive = 5;</code>
      */
     public Builder setIsInactive(boolean value) {
       
@@ -603,7 +726,7 @@ public  final class Platform extends
       return this;
     }
     /**
-     * <code>optional bool is_inactive = 4;</code>
+     * <code>optional bool is_inactive = 5;</code>
      */
     public Builder clearIsInactive() {
       
