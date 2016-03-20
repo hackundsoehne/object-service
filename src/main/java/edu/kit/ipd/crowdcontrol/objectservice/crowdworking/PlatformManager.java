@@ -68,6 +68,7 @@ public class PlatformManager {
                 .map(platform -> new PlatformRecord(
                         platform.getID(),
                         platform.getName(),
+                        "",  //TODO add link
                         platform.isCalibrationAllowed(),
                         isNeedemail(platform),
                         false,

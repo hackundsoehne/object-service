@@ -225,7 +225,7 @@ public class AnswerRatingOperations extends AbstractOperations {
 
         AnswerRecord result = doIfRunning(answerRecord.getExperiment(), conf -> {
             AnswerReservationRecord reservation = DSL.using(conf).selectFrom(ANSWER_RESERVATION)
-                    .where(ANSWER_RESERVATION.IDANSWER_RESERVATION.eq(answerRecord.getReservation()))
+                    .where(ANSWER_RESERVATION.ID_ANSWER_RESERVATION.eq(answerRecord.getReservation()))
                     .fetchOne();
 
             if (reservation.getUsed()) {
@@ -303,7 +303,7 @@ public class AnswerRatingOperations extends AbstractOperations {
 
         RatingRecord result = doIfRunning(rating.getExperimentId(), conf -> {
             RatingReservationRecord reservation = DSL.using(conf).selectFrom(RATING_RESERVATION)
-                    .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
+                    .where(RATING_RESERVATION.ID_RESERVERD_RATING.eq(rating.getReservation()))
                     .fetchOptional()
                     .orElseThrow(() -> new IllegalArgumentException(String.format("Reservation %d is not existing", rating.getReservation())));
 
@@ -481,7 +481,7 @@ public class AnswerRatingOperations extends AbstractOperations {
     public boolean allAnswersHaveMaxRatings(int experiment) {
         Field<Integer> countRating = DSL.count(RATING.ID_RATING).as("countRating");
         return !create.fetchExists(
-                DSL.select(ANSWER_RESERVATION.IDANSWER_RESERVATION, countRating)
+                DSL.select(ANSWER_RESERVATION.ID_ANSWER_RESERVATION, countRating)
                         .from(ANSWER_RESERVATION)
                         .leftJoin(ANSWER).onKey()
                         .leftJoin(RATING).on(
@@ -493,7 +493,7 @@ public class AnswerRatingOperations extends AbstractOperations {
                                 .or(DSL.condition(true))
                         )
                         .and(ANSWER.EXPERIMENT.eq(experiment))
-                        .groupBy(ANSWER_RESERVATION.IDANSWER_RESERVATION)
+                        .groupBy(ANSWER_RESERVATION.ID_ANSWER_RESERVATION)
                         .having(countRating.lessThan(
                                 DSL.select(EXPERIMENT.RATINGS_PER_ANSWER)
                                     .from(EXPERIMENT)
@@ -524,7 +524,7 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .where(ANSWER.ID_ANSWER.eq(
                         DSL.select(RATING_RESERVATION.ANSWER)
                                 .from(RATING_RESERVATION)
-                                .where(RATING_RESERVATION.IDRESERVERD_RATING.eq(rating.getReservation()))
+                                .where(RATING_RESERVATION.ID_RESERVERD_RATING.eq(rating.getReservation()))
                 ))
                 .fetchOptional();
     }

@@ -390,7 +390,7 @@ public class ExperimentResource {
 
         //check that we are not switching from shutdown into creative-stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED
-                && experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(id)
+                && experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(id).values()
                 .contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
             throw new IllegalStateException("Experiment is already shutting down.");
         }

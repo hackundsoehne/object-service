@@ -112,9 +112,9 @@ public abstract class AbstractOperations {
                     .leftOuterJoin(status2).on(
                             EXPERIMENTS_PLATFORM.IDEXPERIMENTS_PLATFORMS.eq(status2.PLATFORM)
                                     .and(status1.TIMESTAMP.lessThan(status2.TIMESTAMP).or(status1.TIMESTAMP.eq(status2.TIMESTAMP)
-                                            .and(status1.IDEXPERIMENTS_PLATFORM_STATUS.lessThan(status2.IDEXPERIMENTS_PLATFORM_STATUS))))
+                                            .and(status1.ID_EXPERIMENTS_PLATFORM_STATUS.lessThan(status2.ID_EXPERIMENTS_PLATFORM_STATUS))))
                     )
-                    .where(status2.IDEXPERIMENTS_PLATFORM_STATUS.isNull())
+                    .where(status2.ID_EXPERIMENTS_PLATFORM_STATUS.isNull())
                     .and(EXPERIMENTS_PLATFORM.EXPERIMENT.eq(experimentID))
                     .fetchSet(status1.PLATFORM_STATUS);
             if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.running)

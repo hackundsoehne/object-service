@@ -12,10 +12,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
@@ -120,8 +117,8 @@ public class ExperimentOperations extends AbstractOperations {
      * @return the state
      */
     public Experiment.State getExperimentState(int id) {
-        Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations
-                .getExperimentsPlatformStatusPlatformStatuses(id);
+        Collection<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations
+                .getExperimentsPlatformStatusPlatformStatuses(id).values();
         //TODO: what to do if one of the platforms failed?
         if (statuses.isEmpty()) {
             return Experiment.State.DRAFT;

@@ -162,7 +162,8 @@ public class QualityIdentificator {
      * @param experiment to be checked
      */
     private void checkExpStatus(ExperimentRecord experiment) {
-        Set<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment());
+        Collection<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(experiment.getIdExperiment())
+                .values();
         boolean doShutdown = false;
         if (statuses.contains(ExperimentsPlatformStatusPlatformStatus.creative_stopping)) {
             if (answerRatingOperations.allAnswersHaveMaxRatings(experiment.getIdExperiment())) {
