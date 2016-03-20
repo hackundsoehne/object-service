@@ -24,6 +24,7 @@ public  final class Answer extends
     quality_ = 0;
     systemresponse_ = "";
     ratings_ = java.util.Collections.emptyList();
+    duplicate_ = false;
   }
 
   @java.lang.Override
@@ -98,6 +99,11 @@ public  final class Answer extends
               mutable_bitField0_ |= 0x00000100;
             }
             ratings_.add(input.readMessage(edu.kit.ipd.crowdcontrol.objectservice.proto.Rating.parser(), extensionRegistry));
+            break;
+          }
+          case 80: {
+
+            duplicate_ = input.readBool();
             break;
           }
         }
@@ -285,6 +291,15 @@ public  final class Answer extends
     return ratings_.get(index);
   }
 
+  public static final int DUPLICATE_FIELD_NUMBER = 10;
+  private boolean duplicate_;
+  /**
+   * <code>optional bool duplicate = 10;</code>
+   */
+  public boolean getDuplicate() {
+    return duplicate_;
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -323,6 +338,9 @@ public  final class Answer extends
     }
     for (int i = 0; i < ratings_.size(); i++) {
       output.writeMessage(9, ratings_.get(i));
+    }
+    if (duplicate_ != false) {
+      output.writeBool(10, duplicate_);
     }
   }
 
@@ -364,6 +382,10 @@ public  final class Answer extends
     for (int i = 0; i < ratings_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(9, ratings_.get(i));
+    }
+    if (duplicate_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(10, duplicate_);
     }
     memoizedSize = size;
     return size;
@@ -499,6 +521,8 @@ public  final class Answer extends
       } else {
         ratingsBuilder_.clear();
       }
+      duplicate_ = false;
+
       return this;
     }
 
@@ -540,6 +564,7 @@ public  final class Answer extends
       } else {
         result.ratings_ = ratingsBuilder_.build();
       }
+      result.duplicate_ = duplicate_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -607,6 +632,9 @@ public  final class Answer extends
             ratingsBuilder_.addAllMessages(other.ratings_);
           }
         }
+      }
+      if (other.getDuplicate() != false) {
+        setDuplicate(other.getDuplicate());
       }
       onChanged();
       return this;
@@ -1167,6 +1195,32 @@ public  final class Answer extends
         ratings_ = null;
       }
       return ratingsBuilder_;
+    }
+
+    private boolean duplicate_ ;
+    /**
+     * <code>optional bool duplicate = 10;</code>
+     */
+    public boolean getDuplicate() {
+      return duplicate_;
+    }
+    /**
+     * <code>optional bool duplicate = 10;</code>
+     */
+    public Builder setDuplicate(boolean value) {
+      
+      duplicate_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional bool duplicate = 10;</code>
+     */
+    public Builder clearDuplicate() {
+      
+      duplicate_ = false;
+      onChanged();
+      return this;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {

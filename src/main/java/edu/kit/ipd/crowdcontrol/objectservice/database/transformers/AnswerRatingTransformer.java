@@ -42,6 +42,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                 .setWorker(answerRecord.getWorkerId())
                 .setReservation(answerRecord.getReservation())
                 .addAllRatings(ratings)
+                .setDuplicate(answerRecord.getDuplicate())
                 .build();
     }
 
