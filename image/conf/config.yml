@@ -28,22 +28,22 @@ deployment:
     # the local url of the worker-ui, for cases where the public url cannot be accessed (docker image)
     # can be ommitted
     workerUILocal: http://workerui:80
+    jwtsecret: bGFtYWJhZGExMzY3OPxpbw==
 
 # the defined platforms to run
 platforms :
     # type to use (mturk/pybossa/dummy)
     - type: dummy
-
       # name which is used to display
       name: dummy
+      url: http://workerui:80/
 
     - type: pybossa
-          #apiKey: f66b69d3-467b-48ce-9822-e4e9a34403a2
-          apiKey: 777d203a-e067-4fe4-aa8c-f9d88307d894
-          url: http://pybossa:5000/api
-          name: pybossa
-          projectId: 2
-          calibrationsAllowed: true
+      #apiKey: f66b69d3-467b-48ce-9822-e4e9a34403a2
+      apiKey: 777d203a-e067-4fe4-aa8c-f9d88307d894
+      url: http://pybossa:5000/api
+      name: pybossa
+      projectId: 2
 
 moneytransfer:
     # Minimum amount of money in US cent a worker has to earn before he gets paid off
@@ -59,7 +59,7 @@ moneytransfer:
     # Interval in days, when the workers get paid off
     scheduleInterval: 7
 
-jwtsecret: bGFtYWJhZGExMzY3OPxpbw==
+
 
 # Map of packages to log levels, e.g.
 # log:
