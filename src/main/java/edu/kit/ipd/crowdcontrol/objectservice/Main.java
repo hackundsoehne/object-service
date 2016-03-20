@@ -207,7 +207,7 @@ public class Main {
                 operationCarrier.workerBalanceOperations,
                 operationCarrier.workerOperations,
                 operationCarrier.platformOperations,
-                config.moneytransfer.notificationMailAddress,
+                config.mail.admin,
                 config.moneytransfer.parsingPassword,
                 config.moneytransfer.scheduleInterval,
                 config.moneytransfer.payOffThreshold);
