@@ -28,12 +28,22 @@ public interface PlatformOrBuilder extends
       getNameBytes();
 
   /**
-   * <code>optional bool has_calibrations = 3;</code>
+   * <code>optional string url = 3;</code>
+   */
+  java.lang.String getUrl();
+  /**
+   * <code>optional string url = 3;</code>
+   */
+  com.google.protobuf.ByteString
+      getUrlBytes();
+
+  /**
+   * <code>optional bool has_calibrations = 4;</code>
    */
   boolean getHasCalibrations();
 
   /**
-   * <code>optional bool is_inactive = 4;</code>
+   * <code>optional bool is_inactive = 5;</code>
    */
   boolean getIsInactive();
 }
