@@ -583,4 +583,12 @@ public class AnswerRatingOperations extends AbstractOperations {
                 .and(ANSWER.EXPERIMENT.eq(expID))
                 .fetch();
     }
+
+    /**
+     * Sets duplicateBit to given answer marking it as a duplicate
+     * @param answerRecord to be marked as a duplicate
+     */
+    public void setDuplicateBitToAnswer(AnswerRecord answerRecord){
+        //TODO
+    }
 }
