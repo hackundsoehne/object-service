@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
+import edu.kit.ipd.crowdcontrol.objectservice.Utils;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
@@ -232,17 +233,9 @@ public class MoneyTransferManagerTest {
 
         mng.submitGiftCodes();
 
-        StringBuilder message = new StringBuilder();
+        FileReader file = new FileReader("src/test/resources/moneytransfer/notificationTestMessage.txt");
+        String message = Utils.loadFile("/moneytransfer/notificationTestMessage.txt");
 
-        FileReader file = new FileReader("src/main/resources/moneytransfer/notificationIssueMessage.txt");
-        BufferedReader reader = new BufferedReader(file);
-        String messageLine;
-        while ((messageLine = reader.readLine()) != null) {
-            message.append(messageLine);
-            message.append(System.getProperty("line.separator"));
-        }
-
-        message = message.append("A worker has pending Payments in the amount of 25ct. Please add giftcodes, so the payment of the worker can be continued.").append(System.getProperty("line.separator"));
-        verify(sender).sendMail(null, "Payment Notification", message.toString());
+        verify(sender).sendMail(null, "Issue during payment occurred!",message.toString());
     }
 }

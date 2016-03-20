@@ -80,7 +80,7 @@ public class MailParserTest {
         MimeBodyPart body = new MimeBodyPart();
         part.addBodyPart(body);
 
-        FileReader file = new FileReader("src/test/resources/parserTestMessage.txt");
+        FileReader file = new FileReader("src/test/resources/moneytransfer/parserTestMessage.txt");
         BufferedReader reader = new BufferedReader(file);
 
         StringBuilder content = new StringBuilder();
@@ -113,7 +113,7 @@ public class MailParserTest {
         MimeBodyPart innerBody = new MimeBodyPart();
         innerPart.addBodyPart(innerBody);
 
-        FileReader file = new FileReader("src/test/resources/parserTestMessage.txt");
+        FileReader file = new FileReader("src/test/resources/moneytransfer/parserTestMessage.txt");
         BufferedReader reader = new BufferedReader(file);
 
         StringBuilder content = new StringBuilder();
