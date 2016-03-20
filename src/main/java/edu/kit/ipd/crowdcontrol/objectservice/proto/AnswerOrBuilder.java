@@ -80,4 +80,9 @@ public interface AnswerOrBuilder extends
    */
   edu.kit.ipd.crowdcontrol.objectservice.proto.RatingOrBuilder getRatingsOrBuilder(
       int index);
+
+  /**
+   * <code>optional bool duplicate = 10;</code>
+   */
+  boolean getDuplicate();
 }
