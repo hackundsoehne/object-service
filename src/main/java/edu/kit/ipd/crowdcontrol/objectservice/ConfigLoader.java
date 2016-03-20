@@ -135,7 +135,7 @@ public class ConfigLoader {
             throw new ConfigException("Password is needed at "+platform.type);
     }
 
-    private void configPlatformsValidate() throws ConfigException {
+    private void configPlatformsValidate(Config config) throws ConfigException {
         for (int i = 0; i < config.platforms.length; i++) {
             ConfigPlatform platform = config.platforms[i];
 
@@ -196,7 +196,7 @@ public class ConfigLoader {
             throw new ConfigException("deployment.workerUILocal urls are not found!");
         if (NullOrEmpty(config.moneytransfer.notificationMailAddress))
             throw new ConfigException("moneytransfer.notificationMailAddress mail adress is empty");
-        configPlatformsValidate();
+        configPlatformsValidate(config);
     }
 
     public Config getConfig() {
