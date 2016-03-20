@@ -12,10 +12,12 @@ deployment:
     origin: http://localhost:3000
     workerService: http://worker.example.com
     workerUIPublic: http://worker.example.com
+    jwtsecret: bGFtYWJhZGExMzY3OPxpbw==
 
 platforms :
     - type: dummy
-
+      name: playground
+      url: example.com
 mail:
     disabled: true
 
@@ -24,8 +26,6 @@ moneytransfer:
     parsingPassword: test
     notificationMailAddress: pseipd@gmail.com
     scheduleInterval: 7
-
-jwtsecret: bGFtYWJhZGExMzY3OPxpbw==
 
 log:
     com.zaxxer.hikari: WARN
