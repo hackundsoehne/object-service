@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
+import edu.kit.ipd.crowdcontrol.objectservice.Main;
 import edu.kit.ipd.crowdcontrol.objectservice.Utils;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
@@ -93,7 +94,7 @@ public class MoneyTransferManager {
                 submitGiftCodes();
             } catch (MoneyTransferException e) {
                 try {
-                    sendCriticalNotification(e.toString());
+                    sendNotification(NotificationLevel.ERROR,e.toString());
                 } catch (MoneyTransferException f) {
                     LOGGER.error("", f);
                 }
@@ -155,7 +156,7 @@ public class MoneyTransferManager {
         }
 
         //sends a notification about problems with submission of giftcodes
-        sendIssueNotification(notificationText.toString());
+        sendNotification(NotificationLevel.ISSUE,notificationText.toString());
         LOGGER.trace("Completed submission of giftcodes to workers.");
     }
 
@@ -208,7 +209,7 @@ public class MoneyTransferManager {
         }
 
         if (!message.toString().equals("")) {
-            sendGiftCodesAddedConfirmation(message.toString());
+            sendNotification(NotificationLevel.GIFTCODES_ADDED, message.toString());
         }
 
         LOGGER.trace("Completed fetching " + giftCodesCount + " new giftcodes.");
@@ -318,79 +319,48 @@ public class MoneyTransferManager {
     }
 
     /**
-     * Sends a notification about problems during payment to the administrator.
+     * Sends a notification with information about payment to the administrator.
      *
      * @param message the message to send
      * @throws MoneyTransferException gets thrown, if an error occurred
      */
-    private void sendIssueNotification(String message) throws MoneyTransferException {
-        String subject = "Payment Notification";
-        StringBuilder mail;
-
-        mail = new StringBuilder(Utils.loadFile("/moneytransfer/notificationIssueMessage.txt"));
-
-        mail = mail.append(message);
+    private void sendNotification(NotificationLevel level, String message) throws MoneyTransferException {
+        Properties properties = new Properties();
         try {
-            if (notificationText.length() != 0) {
-                LOGGER.trace("Started sending a notification about problems with submission of giftcodes.");
-                mailSender.sendMail(notificationMailAddress, subject, mail.toString());
-                LOGGER.trace("Completed sending a notification about problems with submission of giftcodes.");
+            InputStreamReader reader;
+            switch (level) {
+                case ERROR:
+                    reader = new InputStreamReader(Main.class.getResourceAsStream("/moneytransfer/errorNotification.properties"));
+                    break;
+                case ISSUE:
+                    reader = new InputStreamReader(Main.class.getResourceAsStream("/moneytransfer/issueNotification.properties"));
+                    break;
+                case GIFTCODES_ADDED:
+                    reader  = new InputStreamReader(Main.class.getResourceAsStream("/moneytransfer/giftcodesAddedNotification.properties"));
+                default:
+                    //cannot happen
+                    reader = null;
             }
-        } catch (MessagingException e) {
-            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE, e);
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("", e);
+            properties.load(reader);
+        } catch (IOException e) {
+            throw new MoneyTransferException("Error while loading properties for a notification.", e);
         }
-    }
-
-    /**
-     * Sends a notification about new added giftcodes to the administrator.
-     * @param message the message to send
-     * @throws MoneyTransferException gets thrown if an error occurred
-     */
-    private void sendGiftCodesAddedConfirmation(String message) throws MoneyTransferException {
-        String subject = "Succesfully added giftcodes!";
-        StringBuilder mail;
-
-        mail = new StringBuilder(Utils.loadFile("/moneytransfer/giftcodesAddedNotification.txt"));
+        String subject = properties.getProperty("subject");
+        String mail = Utils.loadFile(properties.getProperty("pathToMessage"));
 
         Map<String, String> map = new HashMap<>();
-        map.put("giftcodes", message);
-        String finalMessage = Template.apply(mail.toString(), map);
+        map.put("content", message);
+        mail = Template.apply(mail, map);
+        System.out.println(mail);
         try {
-            if (notificationText.length() != 0) {
-                LOGGER.trace("Started sending a notification about new added giftcodes.");
-                mailSender.sendMail(notificationMailAddress, subject, finalMessage);
-                LOGGER.trace("Completed sending a notification about new added giftcodes.");
+            if (mail.length() != 0) {
+                LOGGER.trace("Started sending a notification about " + properties.getProperty("loggerMessage") + ".");
+                mailSender.sendMail(notificationMailAddress, subject, mail);
+                LOGGER.trace("Completed sending a notification about " + properties.getProperty("loggerMessage") + ".");
             }
         } catch (MessagingException e) {
             throw new MoneyTransferException(MAIL_FAILURE_MESSAGE, e);
         } catch (UnsupportedEncodingException e) {
-            LOGGER.error("", e);
-        }
-    }
-
-    /**
-     * Sends a notification about errors during payment to the administrator.
-     *
-     * @param message the message to send
-     * @throws MoneyTransferException gets thrown, if an error occurred
-     */
-    private void sendCriticalNotification(String message) throws MoneyTransferException {
-        String subject = "Payment Error occurred";
-        StringBuilder mail;
-
-        mail = new StringBuilder(Utils.loadFile("src/main/resources/moneytransfer/errorMessage.txt"));
-
-        mail = mail.append(message);
-
-        try {
-            if (notificationText.length() != 0) {
-                LOGGER.trace("Started sending a notification about errors with submission of giftcodes.");
-                mailSender.sendMail(notificationMailAddress, subject, mail.toString());
-                LOGGER.trace("Completed sending a notification about errors with submission of giftcodes.");
-            }
-        } catch (MessagingException | UnsupportedEncodingException e) {
             LOGGER.error("", e);
         }
     }
@@ -445,6 +415,10 @@ public class MoneyTransferManager {
         }
         Money converted = money.convertedTo(destCurr, exchangeRate, RoundingMode.HALF_UP);
         return converted.getAmountMinorInt();
+    }
+
+    private enum NotificationLevel {
+        ERROR, ISSUE, GIFTCODES_ADDED
     }
 
 }

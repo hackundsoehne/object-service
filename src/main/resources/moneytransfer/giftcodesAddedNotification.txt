@@ -1,7 +1,7 @@
 Dear administrator,
 
 These amounts of giftcodes were successfully added to the database:
-{{giftcodes}}
+{{content}}
 
 Yours sincerely
 
