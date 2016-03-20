@@ -50,7 +50,16 @@ public class AnswerQualityByRatings implements AnswerQualityStrategy {
     public Map<String, Integer> identifyAnswerQuality(AnswerRatingOperations ops, AnswerRecord answer, Map<AlgorithmAnswerQualityParamRecord, String> passedParameters, int maximumQuality, int minimumQuality) throws IllegalArgumentException {
 
         Map<String, Integer> map = new HashMap<>();
-
+        if (answer.getDuplicate()){
+            map.put(QUALITY,0);
+            /*
+             NUM_OF_RATINGS is used to estimate whether the quality of the answer can be assured or not,
+             because a duplicate's answer won't change anymore and is already marked assured, it is
+             save to return zero here.
+            */
+            map.put(NUM_OF_RATINGS,0);
+            return map;
+        }
         //Fetch parameter
         passedParameters.entrySet().forEach(entry -> {
             if (entry.getKey().getData().equals(PARAMETER_ID)) {
@@ -69,9 +78,11 @@ public class AnswerQualityByRatings implements AnswerQualityStrategy {
             map.put(NUM_OF_RATINGS,0);
             return map;
         }
-        if (ratings.size() == 1 && ratings.get(0).getRating() >= 0 && ratings.get(0).getRating() < 10) {
-            map.put(QUALITY, ratings.get(0).getRating());
-            map.put(NUM_OF_RATINGS, 1);
+        if (ratings.size() == 1 && ratings.get(0).getRating() >= 0 && ratings.get(0).getRating() < 10 ) {
+
+            map.put(QUALITY,ratings.get(0).getRating());
+            map.put(NUM_OF_RATINGS,0);
+
             return map;
         }
 

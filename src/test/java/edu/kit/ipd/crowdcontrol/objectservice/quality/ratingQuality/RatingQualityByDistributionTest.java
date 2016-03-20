@@ -4,6 +4,7 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Algo
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingRecord;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -93,7 +94,7 @@ public class RatingQualityByDistributionTest {
 
 
     }
-   
+    @Ignore
     @Test
     public void testRndRatings(){
         Random rand = new Random();

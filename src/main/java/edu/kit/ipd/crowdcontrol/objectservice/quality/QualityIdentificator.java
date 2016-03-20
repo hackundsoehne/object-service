@@ -114,7 +114,7 @@ public class QualityIdentificator {
 
         AnswerRecord answerRecord = answerRatingOperations.getAnswerFromRating(rating).orElseThrow(IllegalArgumentException::new);
         rateQualityOfRatings(answerRecord, algorithmOperations.getRatingQualityParams(ratingIdentifier.getAlgorithmName(), exp.getIdExperiment()));
-        rateQualityOfAnswers(answerRecord, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
+        rateQualityOfAnswers(exp,answerRecord, algorithmOperations.getAnswerQualityParams(answerIdentifier.getAlgorithmName(), exp.getIdExperiment()));
 
         checkExpStatus(exp);
 
@@ -201,24 +201,53 @@ public class QualityIdentificator {
     /**
      * Rates and sets quality of all answers of specified experiment.
      * Only uses ratings of a specified quality
-     * Furthermore che//   assertEquals((int) sortedResult.get(sortedResult.lastKey()), exp.getPaymentBase().getValue() + (exp.getPaymentAnswer().getValue() * workerAnswerMap.get(workerTwo)));cks if a specified amount of ratings is present for that answer
+     * Furthermore checks if a specified amount of ratings is present for that answer
      * and it thus the answer's quality is unlikely to change. In that case the corresponding
      * quality-assured-bit is set in the database.
      *
+     * @param experimentRecord the experiment the answer is related to
      * @param answerRecord  which is going to be rated
      * @param params Mapping of parameter-records to the user specified parameters represented as a string
      */
-    private void rateQualityOfAnswers(AnswerRecord answerRecord, Map<AlgorithmAnswerQualityParamRecord, String> params) {
+    private void rateQualityOfAnswers(ExperimentRecord experimentRecord,AnswerRecord answerRecord, Map<AlgorithmAnswerQualityParamRecord, String> params) {
         Map<String, Integer> result;
         result = answerIdentifier.identifyAnswerQuality(answerRatingOperations, answerRecord, params, MAXIMUM_QUALITY, MINIMUM_QUALITY);
         answerRatingOperations.setQualityToAnswer(answerRecord, result.get(AnswerQualityStrategy.QUALITY));
 
         // Checks if quality_assured bit can be set.
-        if ((((double) result.get(AnswerQualityStrategy.NUM_OF_RATINGS) / (double) experimentOperations.getExperiment(answerRecord.getExperiment())
-                .orElseThrow(() -> new IllegalArgumentException("Error, can't find experiment of given experiment-ID: "+answerRecord.getExperiment())).getRatingsPerAnswer()) >= 0.8)) {
+        if(hasQualityAssured(experimentRecord,answerRecord,result.get(AnswerQualityStrategy.NUM_OF_RATINGS))){
             answerRatingOperations.setAnswerQualityAssured(answerRecord);
         }
 
+    }
+
+
+    /**
+     * Checks if the quality of the given answer cannot change anymore, even if it receives more ratings
+     * @param experimentRecord the answers experiment
+     * @param answerRecord the answer
+     * @param numberOfRatings number of good ratings for the answer
+     * @return true if quality of the answer cannot change anymore
+     */
+    private boolean hasQualityAssured(ExperimentRecord experimentRecord,AnswerRecord answerRecord, int numberOfRatings) {
+        int desiredRatingsPerAnswerOfExperiment = experimentOperations.getExperiment(answerRecord.getExperiment())
+                .orElseThrow(() -> new IllegalArgumentException("Error, can't find experiment of given experiment-ID: " + answerRecord.getExperiment())).getRatingsPerAnswer();
+    if(numberOfRatings >= desiredRatingsPerAnswerOfExperiment){
+        return true;
+    }else if((double) numberOfRatings / (double)desiredRatingsPerAnswerOfExperiment >= 0.8){
+            int qualityOfAnswer = answerRatingOperations.getAnswer(answerRecord.getIdAnswer()).orElseThrow(() -> new IllegalArgumentException("Error, can't find answer of given answer-ID :"+answerRecord.getIdAnswer())).getQuality();
+            int qualityThreshold = experimentRecord.getResultQualityThreshold();
+            if(qualityOfAnswer < qualityThreshold){
+                if( (Math.round(qualityOfAnswer*numberOfRatings + (desiredRatingsPerAnswerOfExperiment - numberOfRatings)*MAXIMUM_QUALITY )/ (double) desiredRatingsPerAnswerOfExperiment) < qualityThreshold){ //Checks if given answer with below-qualityThreshold-quality
+                    return true;                                                                                                                                                                                //stays below the threshold, even if it would receive only
+                }                                                                                                                                                                                               //maximum ratings from now.
+            }else {
+                if( (Math.round(qualityOfAnswer*numberOfRatings + (desiredRatingsPerAnswerOfExperiment - numberOfRatings)*MINIMUM_QUALITY )/ (double) desiredRatingsPerAnswerOfExperiment) >= qualityThreshold){//Checks if given answer with over-qualityThreshold-quality
+                    return true;                                                                                                                                                                                //stays above the threshold, even if it would receive only
+                }                                                                                                                                                                                               //ratings with MINIMUM_QUALITY from now on.
+            }
+        }
+        return false;
     }
 }
 
