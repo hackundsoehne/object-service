@@ -20,11 +20,11 @@ platforms :
       url: example.com
 mail:
     disabled: true
+    admin: pseipd@gmail.com
 
 moneytransfer:
     payOffThreshold: 0
     parsingPassword: test
-    notificationMailAddress: pseipd@gmail.com
     scheduleInterval: 7
 
 log:
