@@ -38,9 +38,10 @@ public class MailParser {
         try {
             Multipart parts = (Multipart) msg.getContent();
             BodyPart body = parts.getBodyPart(0);
-            Multipart innerMsg = (Multipart) body.getContent();
-            BodyPart textBody = innerMsg.getBodyPart(0);
-            message = textBody.getContent().toString();
+            if (body.getContent().getClass() != StringBuilder.class && body.getContent().getClass() != String.class) {
+                throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.");
+            }
+            message = body.getContent().toString();
         } catch (ClassCastException | MessagingException | IOException e) {
             throw new MoneyTransferException("The Parser cannot extract the giftcode from the mails, because the mail format changed. You need to adjust the parser to the new mail format.", e);
         }
