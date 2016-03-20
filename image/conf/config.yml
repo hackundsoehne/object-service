@@ -24,7 +24,7 @@ mail :
 deployment:
     # Origin of the control ui
     # port has to match the url of the ui and no / at the end
-    origin: *
+    origin: "*"
     # the local url of the worker-ui, for cases where the public url cannot be accessed (docker image)
     # can be ommitted
     workerUILocal: http://workerui:80
