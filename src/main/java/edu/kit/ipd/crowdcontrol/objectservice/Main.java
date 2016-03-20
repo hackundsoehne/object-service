@@ -125,8 +125,8 @@ public class Main {
      * @param operationCarrier database operations to use
      * @param platformManager the platformManager to run the platformOperations on
      * @param experimentOperator experimentOperations to use
-     * @param experimentFetcher
-     * @param populationsHelper
+     * @param experimentFetcher the experiment fetcher utility to use
+     * @param populationsHelper the populations helper to use
      * @param eventManager EventManager to use
      */
     private static void initRouter(Config config, OperationCarrier operationCarrier, PlatformManager platformManager, ExperimentOperator experimentOperator, ExperimentFetcher experimentFetcher, PopulationsHelper populationsHelper, EventManager eventManager) {

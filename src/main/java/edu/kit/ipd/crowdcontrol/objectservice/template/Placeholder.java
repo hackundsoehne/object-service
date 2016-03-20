@@ -114,7 +114,6 @@ public class Placeholder {
             if (object == null) {
                 return false;
             }
-
             return object instanceof Position && this.compareTo((Position) object) == 0;
         }
 

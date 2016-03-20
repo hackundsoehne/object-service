@@ -136,17 +136,19 @@ public class ImageSimilarity {
     /**
      * Scales Image to BASE_SIZE * BASE_SIZE
      *
-     * @param oldImage
-     * @return
+     * @param oldImage The old image to scale
+     * @param height the new height of the image
+     * @param width the new width of image
+     * @return resulting image with the passed width and height
      */
-    private static BufferedImage rescale(BufferedImage oldImage,int width,int heigth) {
+    private static BufferedImage rescale(BufferedImage oldImage,int width,int height) {
 
-        BufferedImage newImage = new BufferedImage(width, heigth, BufferedImage.TYPE_INT_RGB);
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = newImage.createGraphics();
         RenderingHints renderingHints = graphics.getRenderingHints();
         renderingHints.put(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         graphics.setRenderingHints(renderingHints);
-        graphics.drawImage(oldImage,0,0,width,heigth,null);
+        graphics.drawImage(oldImage,0,0,width,height,null);
         graphics.dispose();
 
         return newImage;
