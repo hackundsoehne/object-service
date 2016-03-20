@@ -30,4 +30,9 @@ public class Deployment {
      * This should only be used for debugging purpose and never in a productive system
      */
     public int taskWaitBeforeFinish = 120;
+
+    /**
+     * the jwtsecret for the jwt-token.
+     */
+    public String jwtsecret;
 }
