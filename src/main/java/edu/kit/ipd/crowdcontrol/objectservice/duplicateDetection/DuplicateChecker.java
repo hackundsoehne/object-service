@@ -139,17 +139,17 @@ public class DuplicateChecker {
             try {
                 url = new URL(answerRecord.getAnswer());
             } catch (MalformedURLException e) {
-                answerRatingOperations.setSystemResponseField(answerRecord,URL_MALFORMED_RESPONSE);
+                answerRecord.setSystemResponse(URL_MALFORMED_RESPONSE);
                 return Optional.empty();
             }
             try {
                 image = ImageIO.read(url);
             } catch (IOException e) {
-                answerRatingOperations.setSystemResponseField(answerRecord,IMAGE_NOT_READABLE_RESPONSE);
+                answerRecord.setSystemResponse(IMAGE_NOT_READABLE_RESPONSE);
                 return Optional.empty();
             }
             if (image == null) {
-                answerRatingOperations.setSystemResponseField(answerRecord,IMAGE_NOT_READABLE_RESPONSE);
+                answerRecord.setSystemResponse(IMAGE_NOT_READABLE_RESPONSE);
                 return Optional.empty();
             }
             return Optional.of(ImageSimilarity.getImageHashFromSignature(image));
@@ -191,19 +191,23 @@ public class DuplicateChecker {
                 }
                 if (answerRecord != null) {
                     rescheduleAnswersForDuplicateDetection(answerRecord.getExperiment());
+                    answerRecord = answerRatingOperations.getAnswer(answerRecord.getIdAnswer()).orElseThrow(IllegalArgumentException::new);
                     String answerType = experimentOperations.getExperiment(answerRecord.getExperiment())
                             .orElseThrow(() -> new IllegalArgumentException("Error! Can't retrieve the experiment matching to ID!")).getAnswerType();
                     //trying to acquire answer-hash
                     Optional<Long> answerHash = getHashFromAnswer(answerRecord,answerType);
                     if (answerHash.isPresent()) {
+
                         answerRecord.setHash(answerHash.get());
                         answerRatingOperations.updateAnswer(answerRecord);
                         processDuplicatesOfExperiment(answerType,answerRecord, answerHash.get());
                     } else {
+
                         // If optional is empty and thus the hashing failed, the answers quality will be set to zero.
                         // The reason for the failure is described in the response-field and set in the getHashFromAnswer-method
-                        answerRatingOperations.setQualityToAnswer(answerRecord,0);
-                        answerRatingOperations.setAnswerQualityAssured(answerRecord);
+                        answerRecord.setQuality(0);
+                        answerRecord.setQualityAssured(true);
+                        answerRatingOperations.updateAnswer(answerRecord);
                         
                     }
                 }
