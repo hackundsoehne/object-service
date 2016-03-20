@@ -60,8 +60,8 @@ public class QualityIdentificatorTest {
 
         this.experimentsPlatformOperations = mock(ExperimentsPlatformOperations.class);
         this.experimentFetcher = mock(ExperimentFetcher.class);
-        Set<ExperimentsPlatformStatusPlatformStatus>statuses = new HashSet<>();
-        statuses.add(ExperimentsPlatformStatusPlatformStatus.running);
+        Map<Integer,ExperimentsPlatformStatusPlatformStatus>statuses = new HashMap<>();
+        statuses.put(1,ExperimentsPlatformStatusPlatformStatus.running);
         when(experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(anyInt())).thenReturn(statuses);
 
         this.reachedTargetMethod = false;
