@@ -109,8 +109,8 @@ public class ExperimentOperator {
 
         Boolean shutdownInitiated = statuses.entrySet().stream()
                 .filter(entry -> {
-                    if (!entry.getValue().equals(ExperimentsPlatformStatusPlatformStatus.running)
-                            || !entry.getValue().equals(ExperimentsPlatformStatusPlatformStatus.creative_stopping)) {
+                    if (entry.getValue() == null
+                            || entry.getValue().equals(ExperimentsPlatformStatusPlatformStatus.draft)) {
                         log.info(String.format("Can not shut down platform %s in state %s", entry.getKey(), entry.getValue().toString()));
                         return false;
                     }
