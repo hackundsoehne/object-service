@@ -234,7 +234,7 @@ public class MoneyTransferManagerTest {
 
         StringBuilder message = new StringBuilder();
 
-        FileReader file = new FileReader("src/main/resources/moneytransfer/notificationMessage.txt");
+        FileReader file = new FileReader("src/main/resources/moneytransfer/notificationIssueMessage.txt");
         BufferedReader reader = new BufferedReader(file);
         String messageLine;
         while ((messageLine = reader.readLine()) != null) {

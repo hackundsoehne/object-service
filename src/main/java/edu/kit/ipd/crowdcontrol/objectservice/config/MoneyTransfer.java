@@ -16,11 +16,6 @@ public class MoneyTransfer {
     public String parsingPassword;
 
     /**
-     * The mail address to send notification mails to.
-     */
-    public String notificationMailAddress;
-
-    /**
      * The interval in days, when the workers get paid off.
      */
     public int scheduleInterval;

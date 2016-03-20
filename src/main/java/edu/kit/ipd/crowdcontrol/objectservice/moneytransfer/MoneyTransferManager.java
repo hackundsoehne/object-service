@@ -1,5 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.moneytransfer;
 
+import edu.kit.ipd.crowdcontrol.objectservice.Utils;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.GiftCodeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
@@ -154,7 +155,7 @@ public class MoneyTransferManager {
         }
 
         //sends a notification about problems with submission of giftcodes
-        sendNotification(notificationText.toString());
+        sendIssueNotification(notificationText.toString());
         LOGGER.trace("Completed submission of giftcodes to workers.");
     }
 
@@ -178,10 +179,19 @@ public class MoneyTransferManager {
 
         int giftCodesCount = 0;
         //extract giftcodes and save them to the database
+        Map<Integer, Integer> countKeys = new HashMap<>();
+        Stack<Integer> amountList = new Stack<>();
         for (Message message : messages) {
             Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(message, parsingPassword);
             if (rec.isPresent()) {
-                workerBalanceOperations.addGiftCode(rec.get().getCode(), rec.get().getAmount());
+                GiftCodeRecord giftCode = rec.get();
+                workerBalanceOperations.addGiftCode(giftCode.getCode(), giftCode.getAmount());
+                if (!countKeys.containsKey(giftCode.getAmount())) {
+                    amountList.push(giftCode.getAmount());
+                    countKeys.put(giftCode.getAmount(), 1);
+                } else {
+                    countKeys.put(giftCode.getAmount(), countKeys.get(giftCode.getAmount()) + 1);
+                }
                 giftCodesCount++;
             }
             try {
@@ -190,6 +200,17 @@ public class MoneyTransferManager {
                 throw new MoneyTransferException("The mail fetcher could not mark a mail as seen after extracting giftcode and addition to database", e);
             }
         }
+
+        //Create notification
+        StringBuilder message = new StringBuilder();
+        for (Integer amount : amountList) {
+            message.append("Count of keys: ").append(countKeys.get(amount)).append(" Value of giftcodes: ").append(amount).append(System.getProperty("line.separator"));
+        }
+
+        if (!message.toString().equals("")) {
+            sendGiftCodesAddedConfirmation(message.toString());
+        }
+
         LOGGER.trace("Completed fetching " + giftCodesCount + " new giftcodes.");
     }
 
@@ -270,7 +291,7 @@ public class MoneyTransferManager {
         if (giftCodes.isEmpty()) {
             return;
         }
-        String paymentMessage = loadMessage("src/main/resources/moneytransfer/PaymentMessage.txt");
+        String paymentMessage = Utils.loadFile("/moneytransfer/PaymentMessage.txt");
         StringBuilder giftCodeMessage = new StringBuilder();
 
         for (GiftCodeRecord rec : giftCodes) {
@@ -302,14 +323,11 @@ public class MoneyTransferManager {
      * @param message the message to send
      * @throws MoneyTransferException gets thrown, if an error occurred
      */
-    private void sendNotification(String message) throws MoneyTransferException {
+    private void sendIssueNotification(String message) throws MoneyTransferException {
         String subject = "Payment Notification";
         StringBuilder mail;
-        try {
-            mail = new StringBuilder(loadMessage("src/main/resources/moneytransfer/notificationMessage.txt"));
-        } catch (MoneyTransferException e) {
-            mail = new StringBuilder(e.toString());
-        }
+
+        mail = new StringBuilder(Utils.loadFile("/moneytransfer/notificationIssueMessage.txt"));
 
         mail = mail.append(message);
         try {
@@ -317,6 +335,33 @@ public class MoneyTransferManager {
                 LOGGER.trace("Started sending a notification about problems with submission of giftcodes.");
                 mailSender.sendMail(notificationMailAddress, subject, mail.toString());
                 LOGGER.trace("Completed sending a notification about problems with submission of giftcodes.");
+            }
+        } catch (MessagingException e) {
+            throw new MoneyTransferException(MAIL_FAILURE_MESSAGE, e);
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("", e);
+        }
+    }
+
+    /**
+     * Sends a notification about new added giftcodes to the administrator.
+     * @param message
+     * @throws MoneyTransferException
+     */
+    private void sendGiftCodesAddedConfirmation(String message) throws MoneyTransferException {
+        String subject = "Succesfully added giftcodes!";
+        StringBuilder mail;
+
+        mail = new StringBuilder(Utils.loadFile("/moneytransfer/giftcodesAddedNotification.txt"));
+
+        Map<String, String> map = new HashMap<>();
+        map.put("giftcodes", message);
+        String finalMessage = Template.apply(mail.toString(), map);
+        try {
+            if (notificationText.length() != 0) {
+                LOGGER.trace("Started sending a notification about new added giftcodes.");
+                mailSender.sendMail(notificationMailAddress, subject, finalMessage);
+                LOGGER.trace("Completed sending a notification about new added giftcodes.");
             }
         } catch (MessagingException e) {
             throw new MoneyTransferException(MAIL_FAILURE_MESSAGE, e);
@@ -334,11 +379,8 @@ public class MoneyTransferManager {
     private void sendCriticalNotification(String message) throws MoneyTransferException {
         String subject = "Payment Error occurred";
         StringBuilder mail;
-        try {
-            mail = new StringBuilder(loadMessage("src/main/resources/moneytransfer/errorMessage.txt"));
-        } catch (MoneyTransferException e) {
-            mail = new StringBuilder(e.toString());
-        }
+
+        mail = new StringBuilder(Utils.loadFile("src/main/resources/moneytransfer/errorMessage.txt"));
 
         mail = mail.append(message);
 
@@ -352,34 +394,6 @@ public class MoneyTransferManager {
             LOGGER.error("", e);
         }
     }
-
-    /**
-     * Loads a string from a file.
-     *
-     * @param path the path to the file
-     * @return the StringBuilder to return
-     * @throws MoneyTransferException gets thrown, if an error occurred
-     */
-    private String loadMessage(String path) throws MoneyTransferException {
-        StringBuilder content = new StringBuilder();
-
-        try {
-            FileReader file = new FileReader(path);
-            BufferedReader reader = new BufferedReader(file);
-            String messageLine;
-            while ((messageLine = reader.readLine()) != null) {
-                content.append(messageLine);
-                content.append(System.getProperty("line.separator"));
-            }
-        } catch (FileNotFoundException e) {
-            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be found. Please secure, that there is a file.", e);
-        } catch (IOException e) {
-            throw new MoneyTransferException("The file at \"" + path + "\" couldn't be read. Please secure, that the file isn't corrupt", e);
-        }
-
-        return content.toString();
-    }
-
 
     protected static BigDecimal getExchangeRate(String sourceCurrency, String destinationCurrency) throws MoneyTransferException {
         LOGGER.trace("Started fetching currency exchange rates from " + sourceCurrency + " to " + destinationCurrency + ".");
