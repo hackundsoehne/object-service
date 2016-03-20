@@ -194,8 +194,8 @@ public class ConfigLoader {
             throw new ConfigException("deployment.workerService is not found");
         if (NullOrEmpty(config.deployment.workerUILocal) && config.deployment.workerUIPublic == null)
             throw new ConfigException("deployment.workerUILocal urls are not found!");
-        if (NullOrEmpty(config.moneytransfer.notificationMailAddress))
-            throw new ConfigException("moneytransfer.notificationMailAddress mail adress is empty");
+        if (NullOrEmpty(config.mail.admin))
+            throw new ConfigException("mail.admin mail adress is empty");
         configPlatformsValidate(config);
     }
 
