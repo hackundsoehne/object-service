@@ -35,7 +35,7 @@ public class DatabaseManager {
     private final DSLContext context;
     private final String url;
     private final DataSource ds;
-    private final int currentVersion = 2;
+    private final int currentVersion = 3;
 
     /**
      * creates new DatabaseManager.
