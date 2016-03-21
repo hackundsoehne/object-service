@@ -154,7 +154,7 @@ public class ExperimentResource {
                         .filter(constraintRecord -> !constraintRecord.getConstraint().isEmpty())
                         .forEach(tagConstraintsOperations::insertConstraint);
             } catch (DataAccessException e) {
-                throw new InternalServerErrorException("Couldn't persist tags.", e);
+                throw new InternalServerErrorException("Couldn't persist constraints.", e);
             }
 
             try {
@@ -171,28 +171,28 @@ public class ExperimentResource {
 
             try {
                 experiment.getAlgorithmTaskChooser()
-                .getParametersList()
-                .stream()
-                .filter(param -> !param.getValue().isEmpty())
-                .forEach(param ->
-                                algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue())
-                );
+                        .getParametersList()
+                        .stream()
+                        .filter(param -> !param.getValue().isEmpty())
+                        .forEach(param ->
+                                        algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue())
+                        );
 
                 experiment.getAlgorithmQualityAnswer()
-                .getParametersList()
-                .stream()
-                .filter(param -> !param.getValue().isEmpty())
-                .forEach(param ->
-                                algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue())
-                );
+                        .getParametersList()
+                        .stream()
+                        .filter(param -> !param.getValue().isEmpty())
+                        .forEach(param ->
+                                        algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue())
+                        );
 
                 experiment.getAlgorithmQualityRating()
-                .getParametersList()
-                .stream()
-                .filter(param -> !param.getValue().isEmpty())
-                .forEach(param ->
-                                algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue())
-                );
+                        .getParametersList()
+                        .stream()
+                        .filter(param -> !param.getValue().isEmpty())
+                        .forEach(param ->
+                                        algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue())
+                        );
             } catch (DataAccessException e) {
                 throw new InternalServerErrorException("Couldn't persist algorithms, maybe invalid parameters?", e);
             }
