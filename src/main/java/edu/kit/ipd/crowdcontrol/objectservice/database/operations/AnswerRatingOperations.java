@@ -490,7 +490,7 @@ public class AnswerRatingOperations extends AbstractOperations {
                         .where(
                                 ANSWER.QUALITY_ASSURED.eq(true)
                                 .and(ANSWER.QUALITY.notEqual(0))
-                                .or(DSL.condition(true))
+                                .or(ANSWER.QUALITY_ASSURED.eq(false))
                         )
                         .and(ANSWER.EXPERIMENT.eq(experiment))
                         .groupBy(ANSWER_RESERVATION.ID_ANSWER_RESERVATION)
