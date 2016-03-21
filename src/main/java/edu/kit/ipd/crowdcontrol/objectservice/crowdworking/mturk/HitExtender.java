@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
-
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.ExtendHIT;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.GetHIT;
 import org.apache.logging.log4j.Level;
@@ -9,10 +8,14 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Class which extends all Hits added to the object.
@@ -39,10 +42,9 @@ public class HitExtender extends TimerTask {
         this.connection = connection;
         this.hitIds = new ArrayList<>();
         this.hitIds.addAll(hitIds);
-        Timer timer = new Timer();
 
-        long l = TimeUnit.MILLISECONDS.convert(INTERVAL_RUN_HOURS, TimeUnit.HOURS);
-        timer.schedule(this, new Date(), l);
+        Timer timer = new Timer();
+        timer.schedule(this, 0, TimeUnit.MILLISECONDS.convert(INTERVAL_RUN_HOURS, TimeUnit.HOURS));
     }
 
     /**
@@ -95,10 +97,22 @@ public class HitExtender extends TimerTask {
                     return true;
                 });
 
-        if (!workCopy.parallelStream().map(stringCompletableFutureFunction)
-                .map(CompletableFuture::join)
-                .allMatch(Boolean::booleanValue)) {
-            LOGGER.log(Level.ERROR, "Failed to extend hits");
+        if (!workCopy.isEmpty()) {
+            // Warm up Mashape to workaround thread state bug
+            // see https://github.com/Mashape/unirest-java/issues/92
+            String first = workCopy.remove(0);
+            CompletableFuture<Boolean> future = stringCompletableFutureFunction.apply(first);
+            Boolean firstResult = future.join();
+
+            List<Boolean> results = workCopy.parallelStream().map(stringCompletableFutureFunction)
+                    .map(CompletableFuture::join)
+                    .collect(Collectors.toList());
+
+            results.add(0, firstResult);
+
+            if (!results.stream().allMatch(Boolean::booleanValue)) {
+                LOGGER.log(Level.ERROR, "Failed to extend hits");
+            }
         }
 
         LOGGER.trace("Finished updating hits");
