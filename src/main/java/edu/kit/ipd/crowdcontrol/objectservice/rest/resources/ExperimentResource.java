@@ -144,16 +144,25 @@ public class ExperimentResource {
         populationsHelper.storePopulations(id, experiment.getPopulationsList());
 
         experiment.getAlgorithmTaskChooser()
-                .getParametersList().forEach(param ->
+                .getParametersList()
+                .stream()
+                .filter(param -> !param.getValue().isEmpty())
+                .forEach(param ->
                 algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue())
         );
 
         experiment.getAlgorithmQualityAnswer()
-                .getParametersList().forEach(param ->
+                .getParametersList()
+                .stream()
+                .filter(param -> !param.getValue().isEmpty())
+                .forEach(param ->
                 algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue())
         );
         experiment.getAlgorithmQualityRating()
-                .getParametersList().forEach(param ->
+                .getParametersList()
+                .stream()
+                .filter(param -> !param.getValue().isEmpty())
+                .forEach(param ->
                 algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue())
         );
         Experiment exp = experimentFetcher.fetchExperiment(id);
