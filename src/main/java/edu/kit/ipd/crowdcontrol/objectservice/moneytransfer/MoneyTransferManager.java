@@ -321,42 +321,22 @@ public class MoneyTransferManager {
     /**
      * Sends a notification with information about payment to the administrator.
      *
+     * @param level the level of the notification (critical error, issue or regular notificaton)
      * @param message the message to send
      * @throws MoneyTransferException gets thrown, if an error occurred
      */
     private void sendNotification(NotificationLevel level, String message) throws MoneyTransferException {
-        Properties properties = new Properties();
-        try {
-            InputStreamReader reader;
-            switch (level) {
-                case ERROR:
-                    reader = new InputStreamReader(Main.class.getResourceAsStream("/moneytransfer/errorNotification.properties"));
-                    break;
-                case ISSUE:
-                    reader = new InputStreamReader(Main.class.getResourceAsStream("/moneytransfer/issueNotification.properties"));
-                    break;
-                case GIFTCODES_ADDED:
-                    reader  = new InputStreamReader(Main.class.getResourceAsStream("/moneytransfer/giftcodesAddedNotification.properties"));
-                    break;
-                default:
-                    //cannot happen
-                    reader = null;
-            }
-            properties.load(reader);
-        } catch (IOException e) {
-            throw new MoneyTransferException("Error while loading properties for a notification.", e);
-        }
-        String subject = properties.getProperty("subject");
-        String mail = Utils.loadFile(properties.getProperty("pathToMessage"));
+        String subject = level.subject;
+        String mail = Utils.loadFile(level.pathToMessage);
 
         Map<String, String> map = new HashMap<>();
         map.put("content", message);
         mail = Template.apply(mail, map);
         try {
             if (mail.length() != 0) {
-                LOGGER.trace("Started sending a notification about " + properties.getProperty("loggerMessage") + ".");
+                LOGGER.trace("Started sending a notification about " + level.logMessage + ".");
                 mailSender.sendMail(notificationMailAddress, subject, mail);
-                LOGGER.trace("Completed sending a notification about " + properties.getProperty("loggerMessage") + ".");
+                LOGGER.trace("Completed sending a notification about " + level.logMessage + ".");
             }
         } catch (MessagingException e) {
             throw new MoneyTransferException(MAIL_FAILURE_MESSAGE, e);
@@ -418,7 +398,21 @@ public class MoneyTransferManager {
     }
 
     private enum NotificationLevel {
-        ERROR, ISSUE, GIFTCODES_ADDED
+
+        ERROR("Payment Error occurred!","/moneytransfer/errorMessage.txt","errors with submission of giftcodes."),
+        ISSUE("Issue during payment occurred!","/moneytransfer/notificationIssueMessage.txt","issues with submission of giftcodes."),
+        GIFTCODES_ADDED("Succesfully added giftcodes!","/moneytransfer/giftcodesAddedNotification.txt","new added giftcodes.");
+
+        private final String subject;
+        private final String pathToMessage;
+        private final String logMessage;
+
+
+        private NotificationLevel(String subject, String pathToMessage, String logMessage) {
+            this.subject = subject;
+            this.pathToMessage = pathToMessage;
+            this.logMessage = logMessage;
+        }
     }
 
 }
