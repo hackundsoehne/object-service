@@ -38,7 +38,7 @@ services:
         - "8080:80"
       environment:
        - WS_URL=http://${DOCKERIP}:3333/
-       - PLATFORM=dummydummy
+       - PLATFORM=dummy_dummy
 
   db:
     image: mysql:latest
