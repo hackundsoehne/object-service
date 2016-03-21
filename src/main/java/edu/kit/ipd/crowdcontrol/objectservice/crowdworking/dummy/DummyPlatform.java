@@ -6,7 +6,6 @@ import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.*;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -22,13 +21,16 @@ public class DummyPlatform implements Platform, Payment {
     public static final String ID = "dummy";
     private final static String NAME = "Dummy Platform";
     private final String name;
+    private final String url;
 
     /**
      * Create a new dummy platform with the given name
      * @param name the name is added as part of the id and to the name
+     * @param url the url where the web view for the dummy is located
      */
-    public DummyPlatform(String name) {
+    public DummyPlatform(String name, String url) {
         this.name = name;
+        this.url = url;
     }
 
 
@@ -110,6 +112,11 @@ public class DummyPlatform implements Platform, Payment {
     @Override
     public Boolean isCalibrationAllowed() {
         return true;
+    }
+
+    @Override
+    public String getLink() {
+        return url;
     }
 
     /**

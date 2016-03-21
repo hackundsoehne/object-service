@@ -33,6 +33,9 @@ public class MturkPlatform implements Platform,Payment {
     private final String workerServiceUrl;
     private final String workerUIUrl;
     private HitExtender hitExtender;
+
+    protected final static String PRODUCTION = "https://www.mturk.com";
+    protected final static String SANDBOX = "https://workersandbox.mturk.com";
     /**
      * A new mturk platform instance
      * @param user user to login
@@ -64,6 +67,17 @@ public class MturkPlatform implements Platform,Payment {
     @Override
     public Boolean isCalibrationAllowed() {
         return false;
+    }
+
+    @Override
+    public String getLink() {
+        String website = "";
+        if (connection.url.contains("sandbox")) {
+            website = SANDBOX;
+        } else {
+            website = PRODUCTION;
+        }
+        return website+"/mturk/searchbar?selectedSearchType=hitgroups&searchWords={{experiment.tags}}&minReward=0.00&x=0&y=0";
     }
 
     @Override

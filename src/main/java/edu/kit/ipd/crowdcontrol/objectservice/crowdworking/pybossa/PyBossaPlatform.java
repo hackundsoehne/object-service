@@ -130,6 +130,11 @@ public class PyBossaPlatform implements Platform {
     }
 
     @Override
+    public String getLink() {
+        return "";
+    }
+
+    @Override
     public CompletableFuture<JsonElement> publishTask(Experiment experiment) {
         return CompletableFuture.supplyAsync(() -> {
             int task = requests.postTask(new JSONObject()

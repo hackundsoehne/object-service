@@ -3,12 +3,10 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.local;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Payment;
-import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.PaymentJob;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.Platform;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.WorkerIdentificationComputation;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,13 +19,15 @@ public class LocalPlatform implements Platform {
     public static final String ID = "local";
     private final static String NAME = "CrowdControl Platform";
     private final String name;
-
+    private final String url;
     /**
      * Create a new dummy platform with the given name
      * @param name the name is added as part of the id and to the name
+     * @param url the url where the web view for the local-platform is located
      */
-    public LocalPlatform(String name) {
+    public LocalPlatform(String name, String url) {
         this.name = name;
+        this.url = url;
     }
 
 
@@ -109,5 +109,10 @@ public class LocalPlatform implements Platform {
     @Override
     public Boolean isCalibrationAllowed() {
         return true;
+    }
+
+    @Override
+    public String getLink() {
+        return url;
     }
 }

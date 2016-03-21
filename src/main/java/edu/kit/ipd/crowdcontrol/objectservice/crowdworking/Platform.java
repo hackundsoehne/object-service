@@ -60,4 +60,15 @@ public interface Platform {
      * @return true or false
      */
     Boolean isCalibrationAllowed();
+
+    /**
+     * Returns a link which points to a place where the experiment can be used.
+     *
+     * The link can use placeholders like {{experiment.xyz}} where xyz are properties of a experiment.
+     * Each property can be looked up in the spec protobuf specification.
+     *
+     * @return A link to point to a website which displays a experiment
+     *
+     */
+    String getLink();
 }
