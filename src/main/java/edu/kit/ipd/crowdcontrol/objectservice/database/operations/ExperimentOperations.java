@@ -1,15 +1,12 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsCalibrationRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.RatingOptionExperimentRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
 import org.jooq.impl.DSL;
 
 import java.util.*;
@@ -125,8 +122,8 @@ public class ExperimentOperations extends AbstractOperations {
      * @return the state
      */
     public Experiment.State getExperimentState(int id) {
-        Collection<ExperimentsPlatformStatusPlatformStatus> statuses = experimentsPlatformOperations
-                .getExperimentsPlatformStatusPlatformStatuses(id).values();
+        Set<ExperimentsPlatformStatusPlatformStatus> statuses = new HashSet<>(experimentsPlatformOperations
+                .getExperimentsPlatformStatusPlatformStatuses(id).values());
         //TODO: what to do if one of the platforms failed?
         if (statuses.isEmpty()) {
             return Experiment.State.DRAFT;
