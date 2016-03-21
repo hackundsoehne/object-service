@@ -8,10 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -44,7 +41,7 @@ public class HitExtender extends TimerTask {
         this.hitIds.addAll(hitIds);
 
         Timer timer = new Timer();
-        timer.schedule(this, 0, TimeUnit.MILLISECONDS.convert(INTERVAL_RUN_HOURS, TimeUnit.HOURS));
+        timer.schedule(this, new Date(), TimeUnit.MILLISECONDS.convert(INTERVAL_RUN_HOURS, TimeUnit.HOURS));
     }
 
     /**
