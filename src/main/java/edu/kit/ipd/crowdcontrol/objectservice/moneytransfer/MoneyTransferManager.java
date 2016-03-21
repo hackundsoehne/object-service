@@ -337,6 +337,7 @@ public class MoneyTransferManager {
                     break;
                 case GIFTCODES_ADDED:
                     reader  = new InputStreamReader(Main.class.getResourceAsStream("/moneytransfer/giftcodesAddedNotification.properties"));
+                    break;
                 default:
                     //cannot happen
                     reader = null;
@@ -351,7 +352,6 @@ public class MoneyTransferManager {
         Map<String, String> map = new HashMap<>();
         map.put("content", message);
         mail = Template.apply(mail, map);
-        System.out.println(mail);
         try {
             if (mail.length() != 0) {
                 LOGGER.trace("Started sending a notification about " + properties.getProperty("loggerMessage") + ".");
