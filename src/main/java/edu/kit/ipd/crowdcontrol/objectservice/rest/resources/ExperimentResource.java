@@ -18,10 +18,12 @@ import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.ExperimentList;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.Paginated;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.BadRequestException;
+import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.InternalServerErrorException;
 import edu.kit.ipd.crowdcontrol.objectservice.rest.exceptions.NotFoundException;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jooq.exception.DataAccessException;
 import spark.Request;
 import spark.Response;
 
@@ -126,45 +128,80 @@ public class ExperimentResource {
 
         record.setDescription(Template.apply(rawDescription, placeholders));
 
-        int id = experimentOperations.insertNewExperiment(record);
+        int id;
 
-        List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);
-        List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment, id);
+        try {
+            id = experimentOperations.insertNewExperiment(record);
+        } catch (DataAccessException e) {
+            throw new InternalServerErrorException("Experiment could not be stored.", e);
+        }
 
-        tags.stream()
-                .filter(tagRecord -> !tagRecord.getTag().isEmpty())
-                .forEach(tagConstraintsOperations::insertTag);
+        try {
+            try {
+                List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);
 
-        constraints.stream()
-                .filter(constraintRecord -> !constraintRecord.getConstraint().isEmpty())
-                .forEach(tagConstraintsOperations::insertConstraint);
+                tags.stream()
+                        .filter(tagRecord -> !tagRecord.getTag().isEmpty())
+                        .forEach(tagConstraintsOperations::insertTag);
+            } catch (DataAccessException e) {
+                throw new InternalServerErrorException("Couldn't persist tags.", e);
+            }
 
-        experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
+            try {
+                List<ConstraintRecord> constraints = TagConstraintTransformer.getConstraints(experiment, id);
 
-        populationsHelper.storePopulations(id, experiment.getPopulationsList());
+                constraints.stream()
+                        .filter(constraintRecord -> !constraintRecord.getConstraint().isEmpty())
+                        .forEach(tagConstraintsOperations::insertConstraint);
+            } catch (DataAccessException e) {
+                throw new InternalServerErrorException("Couldn't persist tags.", e);
+            }
 
-        experiment.getAlgorithmTaskChooser()
+            try {
+                experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
+            } catch (DataAccessException e) {
+                throw new InternalServerErrorException("Couldn't persist rating options.", e);
+            }
+
+            try {
+                populationsHelper.storePopulations(id, experiment.getPopulationsList());
+            } catch (DataAccessException e) {
+                throw new InternalServerErrorException("Couldn't persist populations.", e);
+            }
+
+            try {
+                experiment.getAlgorithmTaskChooser()
                 .getParametersList()
                 .stream()
                 .filter(param -> !param.getValue().isEmpty())
                 .forEach(param ->
-                algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue())
-        );
+                                algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue())
+                );
 
-        experiment.getAlgorithmQualityAnswer()
+                experiment.getAlgorithmQualityAnswer()
                 .getParametersList()
                 .stream()
                 .filter(param -> !param.getValue().isEmpty())
                 .forEach(param ->
-                algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue())
-        );
-        experiment.getAlgorithmQualityRating()
+                                algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue())
+                );
+
+                experiment.getAlgorithmQualityRating()
                 .getParametersList()
                 .stream()
                 .filter(param -> !param.getValue().isEmpty())
                 .forEach(param ->
-                algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue())
-        );
+                                algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue())
+                );
+            } catch (DataAccessException e) {
+                throw new InternalServerErrorException("Couldn't persist algorithms, maybe invalid parameters?", e);
+            }
+        } catch (InternalServerErrorException e) {
+            experimentOperations.deleteExperiment(id);
+
+            throw e;
+        }
+
         Experiment exp = experimentFetcher.fetchExperiment(id);
 
         response.status(201);
@@ -219,7 +256,7 @@ public class ExperimentResource {
         } else if (old.getState() == Experiment.State.PUBLISHED) {
             resulting = updateExperimentStopgap(id, experiment, old, original);
         } else {
-            throw new IllegalStateException("Patch not allowed in this state");
+            throw new BadRequestException("Patch not allowed in this state");
         }
 
         eventManager.EXPERIMENT_CHANGE.emit(new ChangeEvent<>(old, resulting));
@@ -290,7 +327,7 @@ public class ExperimentResource {
      */
     private Experiment updateExperimentInfoDraftState(int id, Experiment experiment, Experiment old, ExperimentRecord oldRecord) {
         if (!old.getState().equals(Experiment.State.DRAFT)) {
-            throw new IllegalStateException("When an experiment is running, only the state is allowed to be changed.");
+            throw new BadRequestException("When an experiment is running, only the state is allowed to be changed.");
         }
 
         if (!experiment.getRatingOptionsList().isEmpty()) {
@@ -387,7 +424,7 @@ public class ExperimentResource {
         //validate the only two possible changes
         if (!experiment.getState().equals(Experiment.State.PUBLISHED)
                 && !experiment.getState().equals(Experiment.State.CREATIVE_STOPPED))
-            throw new IllegalArgumentException("Only " + Experiment.State.PUBLISHED.name() +
+            throw new BadRequestException("Only " + Experiment.State.PUBLISHED.name() +
                     " and " + Experiment.State.CREATIVE_STOPPED.name() +
                     " is allowed as state change");
 
