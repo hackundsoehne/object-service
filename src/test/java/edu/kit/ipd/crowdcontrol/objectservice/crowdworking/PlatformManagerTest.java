@@ -174,7 +174,7 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public String getId() {
+        public String getRawId() {
             return type;
         }
 
