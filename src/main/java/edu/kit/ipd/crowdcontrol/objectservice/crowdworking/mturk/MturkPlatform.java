@@ -77,7 +77,7 @@ public class MturkPlatform implements Platform,Payment {
         } else {
             website = PRODUCTION;
         }
-        return website+"/mturk/searchbar?selectedSearchType=hitgroups&searchWords={{experiment.tags}}&minReward=0.00&x=0&y=0";
+        return website+"/mturk/searchbar?selectedSearchType=hitgroups&searchWords={{tags}}&minReward=0.00&x=0&y=0";
     }
 
     @Override
