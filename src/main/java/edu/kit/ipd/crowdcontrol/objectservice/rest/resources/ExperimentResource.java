@@ -342,19 +342,28 @@ public class ExperimentResource {
             algorithmsOperations.deleteChosenTaskChooserParams(id);
         }
 
-        experiment.getAlgorithmTaskChooser().getParametersList().forEach(param -> algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue()));
+        experiment.getAlgorithmTaskChooser().getParametersList()
+                .stream()
+                .filter(param -> !param.getValue().isEmpty())
+                .forEach(param -> algorithmsOperations.storeTaskChooserParam(id, param.getId(), param.getValue()));
 
         if (!Objects.equals(old.getAlgorithmQualityAnswer().getName(), experimentRecord.getAlgorithmQualityAnswer())) {
             algorithmsOperations.deleteChosenAnswerQualityParams(id);
         }
 
-        experiment.getAlgorithmQualityAnswer().getParametersList().forEach(param -> algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue()));
+        experiment.getAlgorithmQualityAnswer().getParametersList()
+                .stream()
+                .filter(param -> !param.getValue().isEmpty())
+                .forEach(param -> algorithmsOperations.storeAnswerQualityParam(id, param.getId(), param.getValue()));
 
         if (!Objects.equals(old.getAlgorithmQualityRating().getName(), experimentRecord.getAlgorithmQualityRating())) {
             algorithmsOperations.deleteChosenRatingQualityParams(id);
         }
 
-        experiment.getAlgorithmQualityRating().getParametersList().forEach(param -> algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue()));
+        experiment.getAlgorithmQualityRating().getParametersList()
+                .stream()
+                .filter(param -> !param.getValue().isEmpty())
+                .forEach(param -> algorithmsOperations.storeRatingQualityParam(id, param.getId(), param.getValue()));
 
         if (!experiment.getRatingOptionsList().isEmpty()) {
             experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
