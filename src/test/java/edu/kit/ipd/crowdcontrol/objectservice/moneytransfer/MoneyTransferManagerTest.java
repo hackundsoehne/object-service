@@ -36,6 +36,7 @@ public class MoneyTransferManagerTest {
     WorkerBalanceOperations payops;
     WorkerOperations workerops;
     PlatformOperations platformOperations;
+    final String password = "test";
 
     @Before
     public void setUp() throws Exception {
@@ -44,7 +45,7 @@ public class MoneyTransferManagerTest {
         payops = mock(WorkerBalanceOperations.class);
         workerops = mock(WorkerOperations.class);
         platformOperations = mock(PlatformOperations.class);
-        mng = new MoneyTransferManager(fetcher, sender, payops, workerops, platformOperations, null, null, 7, 0);
+        mng = new MoneyTransferManager(fetcher, sender, payops, workerops, platformOperations, null, password, 7, 0);
     }
 
     @Test
@@ -237,5 +238,27 @@ public class MoneyTransferManagerTest {
         String message = Utils.loadFile("/moneytransfer/notificationTestMessage.txt");
 
         verify(sender).sendMail(null, "Issue during payment occurred!",message.toString());
+    }
+
+    @Test
+    public void testFetch() throws Exception {
+        Result<WorkerRecord> workers = mock(Result.class);
+        Iterator<WorkerRecord> it = mock(Iterator.class);
+        when(it.hasNext()).thenReturn(false);
+        when(workers.iterator()).thenReturn(it);
+
+        doReturn(workers).when(workerops).getWorkerWithCreditBalanceGreaterOrEqual(anyInt());
+
+        MailParserTest test = new MailParserTest();
+        test.setUp();
+        Message msg = test.createValidMail();
+
+        Message[] msgs = {msg};
+        doReturn(msgs).when(fetcher).fetchUnseen();
+
+        GiftCodeRecord rec = MailParser.parseAmazonGiftCode(msg, password).orElseThrow(() -> new Exception(""));
+        mng.submitGiftCodes();
+
+        verify(payops).addGiftCode(rec.getCode(), rec.getAmount());
     }
 }

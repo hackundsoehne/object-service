@@ -101,7 +101,7 @@ public class MailParserTest {
         Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(mail, "test");
     }
 
-    private MimeMessage createValidMail() throws Exception {
+    protected MimeMessage createValidMail() throws Exception {
         Session session = Session.getInstance(props,auth );
 
         MimeMessage mail = new MimeMessage(session);
