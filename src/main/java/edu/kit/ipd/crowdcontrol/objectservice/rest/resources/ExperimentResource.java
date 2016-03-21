@@ -309,7 +309,7 @@ public class ExperimentResource {
                     try {
                         platformPopulation.job.join();
                     } catch (CompletionException e) {
-                        log.fatal("Publishing the experiment "+experiment+ " on "+ platformPopulation.population+" failed.", e.getCause());
+                        log.fatal("Publishing the experiment " + experiment + " on " + platformPopulation.population + " failed.", e.getCause());
                     }
                 });
 
@@ -355,6 +355,29 @@ public class ExperimentResource {
 
         experimentRecord.setDescription(Template.apply(descriptionRaw, placeholders));
 
+        try {
+            updateLinkedExperimentInfo(id, experiment, old, experimentRecord);
+        } catch (DataAccessException e) {
+            // restore old state
+            updateLinkedExperimentInfo(id, old, experiment, oldRecord);
+
+            throw new InternalServerErrorException("Updating the experiment info failed, restored old state.", e);
+        }
+
+        try {
+            //update the experiment itself
+            experimentOperations.updateExperiment(experimentRecord);
+        } catch (DataAccessException e) {
+            // restore old state
+            updateLinkedExperimentInfo(id, old, experiment, oldRecord);
+
+            throw new InternalServerErrorException("Updating the experiment failed, restored old state.", e);
+        }
+
+        return experimentFetcher.fetchExperiment(id);
+    }
+
+    private void updateLinkedExperimentInfo(int id, Experiment experiment, Experiment old, ExperimentRecord experimentRecord) {
         //update tags if they were updated
         List<TagRecord> tags = TagConstraintTransformer.getTags(experiment, id);
         if (!tags.isEmpty()) {
@@ -405,11 +428,6 @@ public class ExperimentResource {
         if (!experiment.getRatingOptionsList().isEmpty()) {
             experimentOperations.storeRatingOptions(experiment.getRatingOptionsList(), id);
         }
-
-        //update the experiment itself
-        experimentOperations.updateExperiment(experimentRecord);
-
-        return experimentFetcher.fetchExperiment(id);
     }
 
     /**
