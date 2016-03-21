@@ -82,7 +82,7 @@ public class QualityIdentificatorTest {
         this.answerRecord = new AnswerRecord();
         answerRecord.setIdAnswer(1);
         answerRecord.setExperiment(1);
-        answerRecord.setDuplicate(false);
+        answerRecord.setDuplicate(true);
 
         this.eventManager = new EventManager();
         this.algorithmOperations = mock(AlgorithmOperations.class);
@@ -92,6 +92,7 @@ public class QualityIdentificatorTest {
 
         answerAlgorithms = new ArrayList<>();
         ratingAlgorithms = new ArrayList<>();
+        when(answerRatingOperations.getAnswer(anyInt())).thenReturn(Optional.of(answerRecord));
         when(answerRatingOperations.getNumberOfFinalGoodAnswers(anyInt())).thenReturn(1);
         when(answerRatingOperations.getAnswerFromRating(rating)).thenReturn(Optional.of(answerRecord));
         List<RatingRecord> ratingRecordList = new ArrayList<>();
@@ -149,6 +150,7 @@ public class QualityIdentificatorTest {
                 return null;
             }
         }).when(algorithmOperations).storeRatingQualityAlgorithm(any(AlgorithmRatingQualityRecord.class), anyList());
+
 
         this.qualityIdentificator = new QualityIdentificator(algorithmOperations, answerRatingOperations, experimentOperations, experimentOperator,experimentsPlatformOperations, eventManager,experimentFetcher);
 
