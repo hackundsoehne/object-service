@@ -62,8 +62,8 @@ platforms:
       # Key to access the PyBossa API
       apiKey: 8ec92fa1-1bd1-42ad-8524-3d2bab4588b1
 
-      # URL to the PyBossa API
-      url: http://localhost:5000/api
+      # URL to the PyBossa Platform
+      url: http://localhost:5000
 
       # Name which is used to display
       name: Pybossa
