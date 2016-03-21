@@ -16,7 +16,6 @@ import org.junit.Test;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -82,7 +81,7 @@ public class PlatformManagerTest {
             ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
             record.setExperiment(42);
             record.setIdexperimentsPlatforms(platform.hashCode());
-            record.setPlatform(platform.getID());
+            record.setPlatform(platform.getId());
             record.setPlatformData(new JsonPrimitive(42));
 
             when(experimentsPlatformOperations.getExperimentsPlatform(record.getPlatform(), experiment.getId()))
@@ -107,13 +106,13 @@ public class PlatformManagerTest {
         platforms.forEach(platform -> {
             ExperimentsPlatformRecord record = new ExperimentsPlatformRecord();
             record.setExperiment(42);
-            record.setPlatform(platform.getID());
+            record.setPlatform(platform.getId());
             record.setIdexperimentsPlatforms(platform.hashCode());
             record.setPlatformData(new JsonPrimitive(42));
 
-            when(experimentsPlatformOperations.getExperimentsPlatform(platform.getID(),experiment.getId())).thenReturn(Optional.of(record));
+            when(experimentsPlatformOperations.getExperimentsPlatform(platform.getId(),experiment.getId())).thenReturn(Optional.of(record));
             try {
-                manager.unpublishTask(platform.getID(), experiment).join();
+                manager.unpublishTask(platform.getId(), experiment).join();
             } catch (PreActionException e) {
                 e.printStackTrace();
             }
@@ -166,7 +165,7 @@ public class PlatformManagerTest {
             if (!handleWorker)
                 return Optional.empty();
             else
-                return Optional.of(params -> WorkerIdentification.findByIdentification(getID(), "50"));
+                return Optional.of(params -> WorkerIdentification.findByIdentification(getId(), "50"));
         }
 
         @Override
@@ -175,7 +174,7 @@ public class PlatformManagerTest {
         }
 
         @Override
-        public String getID() {
+        public String getRawId() {
             return type;
         }
 

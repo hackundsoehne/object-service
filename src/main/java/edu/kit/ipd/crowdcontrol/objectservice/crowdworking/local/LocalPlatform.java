@@ -57,11 +57,7 @@ public class LocalPlatform implements Platform {
      */
     @Override
     public String getName() {
-        String appendix = "";
-        if (name != null) {
-            appendix = " " + name;
-        }
-        return NAME+appendix;
+        return NAME + " " + name;
     }
 
     /**
@@ -71,12 +67,8 @@ public class LocalPlatform implements Platform {
      * @see #ID
      */
     @Override
-    public String getID() {
-        String appendix = "";
-        if (name != null) {
-            appendix = name.toLowerCase();
-        }
-        return ID+appendix;
+    public String getRawId() {
+        return (ID + " " + name);
     }
 
     /**

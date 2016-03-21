@@ -56,12 +56,12 @@ public class MturkPlatform implements Platform,Payment {
 
     @Override
     public String getName() {
-        return "Mturk "+name;
+        return "Amazon Mechanical Turk " + name;
     }
 
     @Override
-    public String getID() {
-        return "mturk"+name.toLowerCase();
+    public String getRawId() {
+        return ("mturk_" + name);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class MturkPlatform implements Platform,Payment {
         } else {
             website = PRODUCTION;
         }
-        return website+"/mturk/searchbar?selectedSearchType=hitgroups&searchWords={{experiment.tags}}&minReward=0.00&x=0&y=0";
+        return website+"/mturk/searchbar?selectedSearchType=hitgroups&searchWords={{title}}%20{{tags.name}}&minReward=0.00&x=0&y=0";
     }
 
     @Override
@@ -99,7 +99,7 @@ public class MturkPlatform implements Platform,Payment {
                 }
             }
 
-            return WorkerIdentification.findByIdentification(getID(),workerId);
+            return WorkerIdentification.findByIdentification(getId(),workerId);
         });
     }
 
@@ -110,7 +110,7 @@ public class MturkPlatform implements Platform,Payment {
         String htmlContent = Utils.loadFile("/mturk/worker-ui/MturkContent.html");
 
         Map<String, String> params = new HashMap<>();
-        params.put("PlatformName", getID());
+        params.put("PlatformName", getId());
         params.put("WorkerServiceUrl", workerServiceUrl);
         params.put("WorkerUIUrl", workerUIUrl);
         params.put("ExperimentId", experiment.getId()+"");

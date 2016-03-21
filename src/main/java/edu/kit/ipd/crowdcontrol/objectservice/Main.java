@@ -272,7 +272,7 @@ public class Main {
                             platform.name,
                             config.deployment.workerService,
                             config.deployment.workerUIPublic);
-                    List<String> hits = carrier.experimentsPlatformOperations.getIdentificationsfromPlatform(mturkPlatform.getID());
+                    List<String> hits = carrier.experimentsPlatformOperations.getIdentificationsfromPlatform(mturkPlatform.getId());
                     mturkPlatform.startExtenderService(hits);
 
                     break;

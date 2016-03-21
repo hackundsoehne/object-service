@@ -60,11 +60,7 @@ public class DummyPlatform implements Platform, Payment {
      */
     @Override
     public String getName() {
-        String appendix = "";
-        if (name != null) {
-            appendix = " " + name;
-        }
-        return NAME+appendix;
+        return NAME + " " + name;
     }
 
     /**
@@ -74,12 +70,8 @@ public class DummyPlatform implements Platform, Payment {
      * @see #ID
      */
     @Override
-    public String getID() {
-        String appendix = "";
-        if (name != null) {
-            appendix = name.toLowerCase();
-        }
-        return ID+appendix;
+    public String getRawId() {
+        return (ID + " " + name);
     }
 
     /**
