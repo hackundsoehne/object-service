@@ -195,6 +195,11 @@ public class PlatformManagerTest {
         }
 
         @Override
+        public String getLink() {
+            return "sample link";
+        }
+
+        @Override
         public CompletableFuture<Boolean> payExperiment(int id, JsonElement data, Experiment experiment, List<PaymentJob> paymentJob) {
             return CompletableFuture.completedFuture(true);
         }
