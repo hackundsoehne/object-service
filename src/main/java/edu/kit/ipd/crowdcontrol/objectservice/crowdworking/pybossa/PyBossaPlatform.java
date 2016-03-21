@@ -1,6 +1,5 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.pybossa;
 
-import com.google.common.base.Supplier;
 import com.google.common.primitives.Ints;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,10 +29,12 @@ public class PyBossaPlatform implements Platform {
     private static final int IDTASK_COUNT = 3;
     private final String workerServiceUrl;
     private final String workerUiPublicUrl;
-    private String workerUiLocalUrl;
+    private final String baseUrl;
     private final String name;
     private final int projectID;
     private final Boolean calibsAllowed;
+    private String workerUiLocalUrl;
+    private String projectShortName;
     private int[] idTasks = new int[IDTASK_COUNT];
     private PyBossaRequests requests;
     private MessageDigest messageDigest;
@@ -43,24 +44,24 @@ public class PyBossaPlatform implements Platform {
      * Call init after instantiation.
      * You need to setup a project on the specified pybossa platform before you can use this.
      *
-     * @param workerServiceUrl  the url of the worker-service
-     * @param workerUiUrl       the url of the worker-ui
-     * @param apiKey            the api key to access the pyboss api
-     * @param apiUrl            the api of the url
-     * @param name              the name of the platform
-     * @param projectID         the project id
-     * @param calibsAllowed     true if calibrations are allowed
+     * @param workerServiceUrl the url of the worker-service
+     * @param workerUiUrl      the url of the worker-ui
+     * @param apiKey           the api key to access the pyboss api
+     * @param baseUrl          the platform base url
+     * @param name             the name of the platform
+     * @param projectID        the project id
+     * @param calibsAllowed    true if calibrations are allowed
      */
-    public PyBossaPlatform(String workerServiceUrl, String workerUiUrl, String apiKey, String apiUrl,
+    public PyBossaPlatform(String workerServiceUrl, String workerUiUrl, String apiKey, String baseUrl,
                            String name, String projectID, Boolean calibsAllowed) {
         this.workerServiceUrl = workerServiceUrl;
         this.workerUiPublicUrl = workerUiUrl;
         this.workerUiLocalUrl = workerUiUrl;
+        this.baseUrl = baseUrl;
         this.name = name;
         this.projectID = java.lang.Integer.parseInt(projectID);
         this.calibsAllowed = calibsAllowed;
-
-        this.requests = new PyBossaRequests(apiUrl, this.projectID, apiKey);
+        this.requests = new PyBossaRequests(baseUrl + "/api", this.projectID, apiKey);
 
         try {
             this.messageDigest = MessageDigest.getInstance("SHA-256");
@@ -79,19 +80,20 @@ public class PyBossaPlatform implements Platform {
      * @param workerUiPublicUrl the public url of the worker-ui
      * @param workerUiLocalUrl  the local url of the worker-ui
      * @param apiKey            the api key to access the pyboss api
-     * @param apiUrl            the api of the url
+     * @param baseUrl           the platform base url
      * @param name              the name of the platform
      * @param projectID         the project id
      * @param calibsAllowed     true if calibrations are allowed
      */
-    public PyBossaPlatform(String workerServiceUrl, String workerUiPublicUrl, String workerUiLocalUrl, String apiKey, String apiUrl,
+    public PyBossaPlatform(String workerServiceUrl, String workerUiPublicUrl, String workerUiLocalUrl, String apiKey, String baseUrl,
                            String name, String projectID, Boolean calibsAllowed) {
-        this(workerServiceUrl, workerUiPublicUrl, apiKey, apiUrl, name, projectID, calibsAllowed);
+        this(workerServiceUrl, workerUiPublicUrl, apiKey, baseUrl, name, projectID, calibsAllowed);
         this.workerUiLocalUrl = workerUiLocalUrl;
     }
 
     /**
      * Initializes the pybossa idTasks and taskPresenter. This makes requests to the pybossa platform.
+     *
      * @throws PyBossaRequestException if the requests to the platform fail (e.g. the platform cannot be reached).
      */
     public void init() {
@@ -131,27 +133,27 @@ public class PyBossaPlatform implements Platform {
 
     @Override
     public String getLink() {
-        return "";
+        return baseUrl + "/project/" + projectShortName + "/newtask";
     }
 
     @Override
     public CompletableFuture<JsonElement> publishTask(Experiment experiment) {
         return CompletableFuture.supplyAsync(() -> {
             int task = requests.postTask(new JSONObject()
-                            .put("project_id", projectID)
-                            .put("info", new JSONObject()
-                                            .put("url", workerServiceUrl)
-                                            .put("expID", experiment.getId())
-                                            .put("platform", getID())
-                                            .put("idTasks", new JSONArray(idTasks))
-                                            .put("type", "experiment")
-                                            .put("paymentBase", experiment.getPaymentBase().getValue())
-                                            .put("paymentRating", experiment.getPaymentRating().getValue())
-                                            .put("paymentAnswer", experiment.getPaymentAnswer().getValue())
-                                    //pybossa doesn't support tags
-                            )
-                            .put("priority_0", 1)
-                            .put("n_answers", experiment.getNeededAnswers().getValue()));
+                    .put("project_id", projectID)
+                    .put("info", new JSONObject()
+                                    .put("url", workerServiceUrl)
+                                    .put("expID", experiment.getId())
+                                    .put("platform", getID())
+                                    .put("idTasks", new JSONArray(idTasks))
+                                    .put("type", "experiment")
+                                    .put("paymentBase", experiment.getPaymentBase().getValue())
+                                    .put("paymentRating", experiment.getPaymentRating().getValue())
+                                    .put("paymentAnswer", experiment.getPaymentAnswer().getValue())
+                            //pybossa doesn't support tags
+                    )
+                    .put("priority_0", 1)
+                    .put("n_answers", experiment.getNeededAnswers().getValue()));
             JsonObject json = new JsonObject();
             json.add("identification", new JsonPrimitive(task));
             return json;
@@ -220,7 +222,7 @@ public class PyBossaPlatform implements Platform {
     private void initializeTaskPresenter() {
         String html = requests.getStringFromUrl(workerUiLocalUrl + "/platform/pybossa.html");
         String workerUiLibraryUrl = workerUiLocalUrl + "/worker_ui.js";
-        String projectShortName = requests.getProject().getString("short_name");
+        projectShortName = requests.getProject().getString("short_name");
         if (requests.existsUrl(workerUiLibraryUrl)) {
             // replace worker-ui url
             html = html.replaceFirst("(<script id=\"worker_ui\" src=\")(.+)(\"></script>)", "$1" + workerUiPublicUrl + "/worker_ui.js$3");
