@@ -1,6 +1,6 @@
 Dear administrator,
 
-it seems, that a critical error during payment occured:
+These amounts of giftcodes were successfully added to the database:
 {{content}}
 
 Yours sincerely

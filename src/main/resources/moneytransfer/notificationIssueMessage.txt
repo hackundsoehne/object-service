@@ -1,6 +1,6 @@
 Dear administrator,
 
-it seems, that a critical error during payment occured:
+during payment of the workers, the following issues occurred:
 {{content}}
 
 Yours sincerely

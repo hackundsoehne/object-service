@@ -13,6 +13,11 @@ public class Mail {
      */
     public boolean disabled;
 
+    /**
+     * Mail address of the admin.
+     */
+    public String admin;
+
     public boolean debug;
 
     public MailSender notifications, moneytransfer;
