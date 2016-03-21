@@ -91,6 +91,7 @@ public class AnswerRatingTransformer extends AbstractTransformer {
                 .set(ratingRecord.getExperiment(), Rating.Builder::setExperimentId)
                 .set(ratingRecord.getRating(), Rating.Builder::setRating)
                 .set(ratingRecord.getFeedback(), Rating.Builder::setFeedback)
+                .set(ratingRecord.getQuality(),Rating.Builder::setQuality)
                 .getBuilder()
                 //divide by 1000 because java uses milliseconds and proto expects seconds
                 .setTime(ratingRecord.getTimestamp().getTime() / 1000L)
