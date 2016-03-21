@@ -71,7 +71,7 @@ public class DummyPlatform implements Platform, Payment {
      */
     @Override
     public String getID() {
-        return (ID + " " + name).replaceAll("[^a-z0-9]", "_");
+        return (ID + " " + name).toLowerCase().replaceAll("[^a-z0-9]", "_");
     }
 
     /**

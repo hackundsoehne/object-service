@@ -123,7 +123,7 @@ public class PyBossaPlatform implements Platform {
 
     @Override
     public String getID() {
-        return ("pybossa " + name).replaceAll("[^a-z0-9]", "_");
+        return ("pybossa " + name).toLowerCase().replaceAll("[^a-z0-9]", "_");
     }
 
     @Override

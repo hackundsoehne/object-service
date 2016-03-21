@@ -61,7 +61,7 @@ public class MturkPlatform implements Platform,Payment {
 
     @Override
     public String getID() {
-        return ("mturk_" + name).replaceAll("[^a-z0-9]", "_");
+        return ("mturk_" + name).toLowerCase().replaceAll("[^a-z0-9]", "_");
     }
 
     @Override
