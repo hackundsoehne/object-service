@@ -78,6 +78,7 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
                                 record.getValue("id", Integer.class),
                                 record.getValue("token", String.class),
                                 notification.getId()))
+                                .filter(record -> record.getResultId() != null)
                                 .collect(Collectors.toMap(NotificationTokenRecord::getResultId, Function.identity()));
                     }
                 } catch (java.lang.IllegalStateException e) {
