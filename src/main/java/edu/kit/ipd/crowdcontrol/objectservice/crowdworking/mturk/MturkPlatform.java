@@ -60,8 +60,8 @@ public class MturkPlatform implements Platform,Payment {
     }
 
     @Override
-    public String getID() {
-        return ("mturk_" + name).toLowerCase().replaceAll("[^a-z0-9]", "_");
+    public String getRawId() {
+        return ("mturk_" + name);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class MturkPlatform implements Platform,Payment {
                 }
             }
 
-            return WorkerIdentification.findByIdentification(getID(),workerId);
+            return WorkerIdentification.findByIdentification(getId(),workerId);
         });
     }
 
@@ -110,7 +110,7 @@ public class MturkPlatform implements Platform,Payment {
         String htmlContent = Utils.loadFile("/mturk/worker-ui/MturkContent.html");
 
         Map<String, String> params = new HashMap<>();
-        params.put("PlatformName", getID());
+        params.put("PlatformName", getId());
         params.put("WorkerServiceUrl", workerServiceUrl);
         params.put("WorkerUIUrl", workerUIUrl);
         params.put("ExperimentId", experiment.getId()+"");

@@ -70,8 +70,8 @@ public class DummyPlatform implements Platform, Payment {
      * @see #ID
      */
     @Override
-    public String getID() {
-        return (ID + " " + name).toLowerCase().replaceAll("[^a-z0-9]", "_");
+    public String getRawId() {
+        return (ID + " " + name);
     }
 
     /**

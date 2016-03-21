@@ -3,7 +3,6 @@ package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 import com.google.gson.JsonElement;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,9 +33,22 @@ public interface Platform {
      * <p>
      * The String must be unique, must match {@code [a-z0-9_]+} and not change since it is the only way other services can
      * communicate with the platform.
-     * @return a String
+     * <p>
+     * The default implementation just replaces all characters from getRawId() with underscores that don't match the pattern.
+     * @return a string
      */
-    String getID();
+    default String getId() {
+        return this.getRawId().toLowerCase().replaceAll("[^a-z0-9]", "_");
+    }
+
+    /**
+     * Returns the ID of the platform.
+     * <p>
+     * The String must be unique and not change since it is the only way other services can
+     * communicate with the platform.
+     * @return a string
+     */
+    String getRawId();
 
     /**
      * Publish a passed experiment on the platform.

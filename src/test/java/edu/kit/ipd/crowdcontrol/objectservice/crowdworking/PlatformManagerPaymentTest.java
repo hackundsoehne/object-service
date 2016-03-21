@@ -1,21 +1,17 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.dummy.DummyPlatform;
-import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatform;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.WorkerRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.ExperimentsPlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.PlatformOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.database.operations.WorkerOperations;
 import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +20,6 @@ import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -42,7 +37,7 @@ public class PlatformManagerPaymentTest {
     @Before
     public void setUp() throws Exception {
         dummyPlatform = mock(DummyPlatform.class);
-        when(dummyPlatform.getID()).thenReturn("bla");
+        when(dummyPlatform.getId()).thenReturn("bla");
         when(dummyPlatform.getPayment()).thenReturn(Optional.of(dummyPlatform));
         when(dummyPlatform.getWorker()).thenReturn(Optional.empty());
         when(dummyPlatform.getName()).thenReturn("Platform");
@@ -59,13 +54,13 @@ public class PlatformManagerPaymentTest {
                 workerOperations);
 
         workerRecordList = new ArrayList<>();
-        workerRecordList.add(new WorkerRecord(0, new JsonPrimitive(""), dummyPlatform.getID(), "olaf@example.com", 20, "olaf"));
-        workerRecordList.add(new WorkerRecord(1, new JsonPrimitive(""), dummyPlatform.getID(), "gunther@example.com", 20, "günther"));
+        workerRecordList.add(new WorkerRecord(0, new JsonPrimitive(""), dummyPlatform.getId(), "olaf@example.com", 20, "olaf"));
+        workerRecordList.add(new WorkerRecord(1, new JsonPrimitive(""), dummyPlatform.getId(), "gunther@example.com", 20, "günther"));
         experiment = Experiment.newBuilder().setId(0).build();
 
-        when(workerOperations.getWorkerWithWork(experiment.getId(), dummyPlatform.getID())).thenReturn(workerRecordList);
-        ExperimentsPlatformRecord experimentsPlatformRecord = new ExperimentsPlatformRecord(0, 1, dummyPlatform.getID(), null, "");
-        when(experimentsPlatformOperations.getExperimentsPlatform(dummyPlatform.getID(),experiment.getId())).thenReturn(Optional.of(experimentsPlatformRecord));
+        when(workerOperations.getWorkerWithWork(experiment.getId(), dummyPlatform.getId())).thenReturn(workerRecordList);
+        ExperimentsPlatformRecord experimentsPlatformRecord = new ExperimentsPlatformRecord(0, 1, dummyPlatform.getId(), null, "");
+        when(experimentsPlatformOperations.getExperimentsPlatform(dummyPlatform.getId(),experiment.getId())).thenReturn(Optional.of(experimentsPlatformRecord));
 
     }
 
@@ -75,7 +70,7 @@ public class PlatformManagerPaymentTest {
         paymentJobs.add(new PaymentJob(workerRecordList.get(0), 20, ""));
         paymentJobs.add(new PaymentJob(workerRecordList.get(1), 20, ""));
 
-        platformManager.payExperiment(dummyPlatform.getID(),experiment, paymentJobs);
+        platformManager.payExperiment(dummyPlatform.getId(),experiment, paymentJobs);
 
         verify(dummyPlatform).payExperiment(eq(0), anyObject(), eq(experiment), eq(paymentJobs));
     }
@@ -95,7 +90,7 @@ public class PlatformManagerPaymentTest {
         List<PaymentJob> paymentJobs = new ArrayList<>();
         paymentJobs.add(new PaymentJob(workerRecordList.get(0), 20, ""));
 
-        platformManager.payExperiment(dummyPlatform.getID(),experiment, paymentJobs);
+        platformManager.payExperiment(dummyPlatform.getId(),experiment, paymentJobs);
 
         verify(dummyPlatform).payExperiment(eq(0), anyObject(), eq(experiment), eq(paymentJobs));
     }

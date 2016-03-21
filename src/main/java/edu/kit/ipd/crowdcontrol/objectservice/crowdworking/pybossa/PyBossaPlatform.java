@@ -113,7 +113,7 @@ public class PyBossaPlatform implements Platform {
      */
     @Override
     public Optional<WorkerIdentificationComputation> getWorker() {
-        return Optional.of(params -> WorkerIdentification.findByIdentification(getID(), identifyWorker(params)));
+        return Optional.of(params -> WorkerIdentification.findByIdentification(getId(), identifyWorker(params)));
     }
 
     @Override
@@ -122,8 +122,8 @@ public class PyBossaPlatform implements Platform {
     }
 
     @Override
-    public String getID() {
-        return ("pybossa " + name).toLowerCase().replaceAll("[^a-z0-9]", "_");
+    public String getRawId() {
+        return ("pybossa " + name);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class PyBossaPlatform implements Platform {
                     .put("info", new JSONObject()
                                     .put("url", workerServiceUrl)
                                     .put("expID", experiment.getId())
-                                    .put("platform", getID())
+                                    .put("platform", getId())
                                     .put("idTasks", new JSONArray(idTasks))
                                     .put("type", "experiment")
                                     .put("paymentBase", experiment.getPaymentBase().getValue())

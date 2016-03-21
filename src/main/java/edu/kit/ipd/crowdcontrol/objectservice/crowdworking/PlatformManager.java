@@ -1,9 +1,6 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.PlatformRecord;
@@ -20,7 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -61,12 +57,12 @@ public class PlatformManager {
 
         //create hashmap of platforms
         platforms = crowdPlatforms.stream()
-                .collect(Collectors.toMap(Platform::getID, Function.identity()));
+                .collect(Collectors.toMap(Platform::getId, Function.identity()));
 
         //update database
         List<PlatformRecord> records = platforms.values().stream()
                 .map(platform -> new PlatformRecord(
-                        platform.getID(),
+                        platform.getId(),
                         platform.getName(),
                         platform.getLink(),
                         platform.isCalibrationAllowed(),
