@@ -118,12 +118,12 @@ public class PyBossaPlatform implements Platform {
 
     @Override
     public String getName() {
-        return "Pybossa " + name;
+        return "PyBossa " + name;
     }
 
     @Override
     public String getID() {
-        return "pybossa" + name.toLowerCase();
+        return ("pybossa " + name).replaceAll("[^a-z0-9]", "_");
     }
 
     @Override

@@ -56,12 +56,12 @@ public class MturkPlatform implements Platform,Payment {
 
     @Override
     public String getName() {
-        return "Mturk "+name;
+        return "Amazon Mechanical Turk " + name;
     }
 
     @Override
     public String getID() {
-        return "mturk"+name.toLowerCase();
+        return ("mturk_" + name).replaceAll("[^a-z0-9]", "_");
     }
 
     @Override
