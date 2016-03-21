@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.database.operations;
 
 import com.google.common.base.Predicate;
+import com.google.gson.Gson;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformModeMode;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.enums.ExperimentsPlatformStatusPlatformStatus;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.ExperimentsPlatformMode;
@@ -9,10 +10,10 @@ import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.Expe
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformModeRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformRecord;
 import edu.kit.ipd.crowdcontrol.objectservice.database.model.tables.records.ExperimentsPlatformStatusRecord;
+import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
-import edu.kit.ipd.crowdcontrol.objectservice.proto.Experiment;
 import org.jooq.impl.DSL;
 
 import java.sql.Timestamp;
@@ -399,11 +400,20 @@ public class ExperimentsPlatformOperations extends AbstractOperations {
      * @param platform the platform to search for
      * @return a list of identifications
      */
-    public List<String> getIdentificationsfromPlatform(String platform) {
+    public List<String> getIdentificationsFromPlatform(String platform) {
         return create.select(EXPERIMENTS_PLATFORM.IDENTIFICATION)
                 .from(EXPERIMENTS_PLATFORM)
                 .where(EXPERIMENTS_PLATFORM.IDENTIFICATION.isNotNull())
                 .and(EXPERIMENTS_PLATFORM.PLATFORM.eq(platform))
-                .fetch(EXPERIMENTS_PLATFORM.IDENTIFICATION);
+                .fetch(EXPERIMENTS_PLATFORM.IDENTIFICATION)
+                .stream()
+                .map(identification -> {
+                    if (identification == null) {
+                        return null;
+                    }
+
+                    return new Gson().fromJson(identification, String.class);
+                })
+                .collect(Collectors.toList());
     }
 }
