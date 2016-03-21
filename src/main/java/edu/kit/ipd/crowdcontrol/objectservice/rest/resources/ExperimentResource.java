@@ -393,24 +393,24 @@ public class ExperimentResource {
 
         //validate its draft -> published
         if (experiment.getState() == Experiment.State.PUBLISHED && old.getState() != Experiment.State.DRAFT) {
-            throw new IllegalArgumentException("Publish is only allowed for experiments in draft state.");
+            throw new BadRequestException("Publish is only allowed for experiments in draft state.");
         }
 
         //validate its published -> creative_stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED && old.getState() != Experiment.State.PUBLISHED) {
-            throw new IllegalArgumentException("Creative stop is only allowed for published experiments.");
+            throw new BadRequestException("Creative stop is only allowed for published experiments.");
         }
 
         //check that there are enough datas for publish
         if (experiment.getState() == Experiment.State.PUBLISHED && experimentOperations.verifyExperimentForPublishing(id)) {
-            throw new IllegalStateException("Experiment lacks information needed for publishing.");
+            throw new BadRequestException("Experiment lacks information needed for publishing.");
         }
 
         //check that we are not switching from shutdown into creative-stopped
         if (experiment.getState() == Experiment.State.CREATIVE_STOPPED
                 && experimentsPlatformOperations.getExperimentsPlatformStatusPlatformStatuses(id).values()
                 .contains(ExperimentsPlatformStatusPlatformStatus.shutdown)) {
-            throw new IllegalStateException("Experiment is already shutting down.");
+            throw new BadRequestException("Experiment is already shutting down.");
         }
 
         //create the calibration for this experiment
