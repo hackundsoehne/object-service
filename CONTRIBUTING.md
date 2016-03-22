@@ -16,7 +16,7 @@ also how to reproduce the bug.
  * Make sure your commit messages are readable and understandable.
  * Make sure you have added the necessary tests for your changes.
  * Run all the tests to assure nothing else was accidentally broken.
- * If a commit fixed a bug, include `fixes #IUSSUE` in the message (more information can be found [here](https://help.github.com/articles/closing-issues-via-commit-messages/))
+ * If a commit fixed a bug, include `fixes #ISSUE` in the message (more information can be found [here](https://help.github.com/articles/closing-issues-via-commit-messages/))
  
 # Submitting Changes  
  * Submit a pull request to the object-service.
