@@ -86,9 +86,13 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
                                 .filter(record -> record.getResultId() != null)
                                 .collect(Collectors.toMap(NotificationTokenRecord::getResultId, Function.identity()));
                 } catch (java.lang.IllegalStateException e) {
-                    throw new IllegalStateException("Invalid query, the id has to be unique!", e);
+                    // TODO: Send mail to admin
+                    LOGGER.warn("Invalid query for notification {}, the id has to be unique: ", notification.getId(), e.getMessage());
+                    return Collections.emptyList();
                 } catch (DataAccessException dae) {
+                    // TODO: Send mail to admin
                     LOGGER.warn("The query for notification {} failed.", notification.getId(), dae);
+                    return Collections.emptyList();
                 }
                 List<String> newTokenList = operations.diffTokenRecords(tokenRecords, notification.getId()).stream()
                         .map(NotificationTokenRecord::getResultToken)
