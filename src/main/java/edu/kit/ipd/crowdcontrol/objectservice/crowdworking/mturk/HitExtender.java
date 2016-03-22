@@ -1,5 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
+
+import com.amazonaws.mturk.requester.doc._2014_08_15.HIT;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.ExtendHIT;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.GetHIT;
 import org.apache.logging.log4j.Level;
@@ -8,11 +10,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Class which extends all Hits added to the object.
@@ -39,9 +42,10 @@ public class HitExtender extends TimerTask {
         this.connection = connection;
         this.hitIds = new ArrayList<>();
         this.hitIds.addAll(hitIds);
-
         Timer timer = new Timer();
-        timer.schedule(this, new Date(), TimeUnit.MILLISECONDS.convert(INTERVAL_RUN_HOURS, TimeUnit.HOURS));
+
+        long l = TimeUnit.MILLISECONDS.convert(INTERVAL_RUN_HOURS, TimeUnit.HOURS);
+        timer.schedule(this, new Date(), l);
     }
 
     /**
@@ -79,37 +83,25 @@ public class HitExtender extends TimerTask {
             workCopy.addAll(hitIds);
         }
 
-        Function<String, CompletableFuture<Boolean>> stringCompletableFutureFunction = id -> new GetHIT(connection, id)
-                .thenApply(hit -> {
-                    LocalDate expire = hit.getExpiration().toGregorianCalendar().toZonedDateTime().toLocalDate();
-                    LocalDate minExpire = LocalDate.now().plusDays(MINIMUM_TIME_DAYS);
-                    long addition = TimeUnit.SECONDS.toMillis(Duration.between(expire, minExpire).getSeconds());
-                    if (addition < 0) {
-                        LOGGER.trace("Update "+id+" with up to addition milliseconds");
-                        return new ExtendHIT(connection, id, 0, addition).handle((aBoolean, throwable) -> {
-                            if (throwable != null) return false;
-                            return aBoolean;
-                        }).join();
-                    }
-                    return true;
-                });
-
-        if (!workCopy.isEmpty()) {
-            // Warm up Mashape to workaround thread state bug
-            // see https://github.com/Mashape/unirest-java/issues/92
-            String first = workCopy.remove(0);
-            CompletableFuture<Boolean> future = stringCompletableFutureFunction.apply(first);
-            Boolean firstResult = future.join();
-
-            List<Boolean> results = workCopy.parallelStream().map(stringCompletableFutureFunction)
-                    .map(CompletableFuture::join)
-                    .collect(Collectors.toList());
-
-            results.add(0, firstResult);
-
-            if (!results.stream().allMatch(Boolean::booleanValue)) {
-                LOGGER.log(Level.ERROR, "Failed to extend hits");
+        Function<HIT, CompletableFuture<Boolean>> hitExtend = (hit -> {
+            LocalDate expire = hit.getExpiration().toGregorianCalendar().toZonedDateTime().toLocalDate();
+            LocalDate minExpire = LocalDate.now().plusDays(MINIMUM_TIME_DAYS);
+            long days = ChronoUnit.DAYS.between(expire, minExpire);
+            if (days > 0) {
+                LOGGER.trace("Update "+hit.getHITId()+" with up to "+days+" minutes");
+                return new ExtendHIT(connection, hit.getHITId(), 0, Duration.ofDays(2));
             }
+            return CompletableFuture.completedFuture(true);
+        });
+
+
+        if (!workCopy.stream()
+                .map(id -> new GetHIT(connection, id))
+                .map(CompletableFuture::join)
+                .map(hitExtend)
+                .map(CompletableFuture::join)
+                .allMatch(Boolean::booleanValue)) {
+            LOGGER.log(Level.ERROR, "Failed to extend hits");
         }
 
         LOGGER.trace("Finished updating hits");

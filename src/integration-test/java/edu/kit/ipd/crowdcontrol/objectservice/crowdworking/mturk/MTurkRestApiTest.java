@@ -57,7 +57,7 @@ public class MTurkRestApiTest {
                 0.20,60,2000,"test,for,everything",
                 2,2000000,"data","").get();
 
-        new ExtendHIT(connection, id, 2, 0).join();
+        new ExtendHIT(connection, id, 2, null).join();
 
         assertNotEquals(id, null);
 
