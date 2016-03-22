@@ -71,7 +71,7 @@ public class MailSend implements MailSender {
         msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientMail, recipientMail));
         msg.setFrom(new InternetAddress(from, "CrowdControl"));
         msg.setHeader("Content-Transfer-Encoding", "quoted-printable");
-        msg.setHeader("Content-Type","text/plain; charset=\"utf-8\"");
+        msg.setHeader("Content-Type","text/html; charset=\"utf-8\"");
         msg.setContent(message, "text/html; charset=utf-8");
         msg.setSubject(subject, "utf-8");
         msg.setText(message, "utf-8");
