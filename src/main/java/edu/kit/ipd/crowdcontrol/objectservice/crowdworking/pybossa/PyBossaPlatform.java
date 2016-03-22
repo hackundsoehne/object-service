@@ -142,17 +142,18 @@ public class PyBossaPlatform implements Platform {
             int task = requests.postTask(new JSONObject()
                     .put("project_id", projectID)
                     .put("info", new JSONObject()
-                                    .put("url", workerServiceUrl)
-                                    .put("expID", experiment.getId())
-                                    .put("platform", getId())
-                                    .put("idTasks", new JSONArray(idTasks))
                                     .put("type", "experiment")
+                                    .put("url", workerServiceUrl)
+                                    .put("platform", getId())
+                                    .put("expID", experiment.getId())
+                                    .put("idTasks", new JSONArray(idTasks))
                                     .put("paymentBase", experiment.getPaymentBase().getValue())
                                     .put("paymentRating", experiment.getPaymentRating().getValue())
                                     .put("paymentAnswer", experiment.getPaymentAnswer().getValue())
                             //pybossa doesn't support tags
                     )
-                    .put("priority_0", 1)
+                    // will have lowest priority, so idTasks will be visited first
+                    .put("priority_0", 0)
                     .put("n_answers", experiment.getNeededAnswers().getValue()));
             JsonObject json = new JsonObject();
             json.add("identification", new JsonPrimitive(task));
@@ -227,7 +228,7 @@ public class PyBossaPlatform implements Platform {
             // replace worker-ui url
             html = html.replaceFirst("(<script id=\"worker_ui\" src=\")(.+)(\"></script>)", "$1" + workerUiPublicUrl + "/worker_ui.js$3");
             // replace project short name
-            html = html.replaceFirst("(pybossa\\.run\\(')(.+)('\\);)", "$1" + projectShortName + "$3");
+            html = html.replaceFirst("(var projectName = \")(.+)(\";)", "$1" + projectShortName + "$3");
             requests.setTaskPresenter(html);
         } else {
             throw new PyBossaRequestException(String.format("Could not find the worker ui library under the url \"%s\".",
@@ -265,9 +266,13 @@ public class PyBossaPlatform implements Platform {
     private int createIdTask() {
         JSONObject jsonTask = new JSONObject()
                 .put("project_id", projectID)
-                .put("priority_0", 0)
+                // will have the highest priority
+                .put("priority_0", 1)
                 .put("info", new JSONObject()
-                        .put("type", "idTask"))
+                        .put("type", "idTask")
+                        .put("url", workerServiceUrl)
+                        .put("platform", getId())
+                )
                 //max int
                 .put("n_answers", 2147483647);
         return requests.postTask(jsonTask);
