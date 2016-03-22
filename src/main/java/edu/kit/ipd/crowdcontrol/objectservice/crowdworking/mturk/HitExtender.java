@@ -1,6 +1,7 @@
 package edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk;
 
 
+import com.amazonaws.mturk.requester.doc._2014_08_15.HIT;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.ExtendHIT;
 import edu.kit.ipd.crowdcontrol.objectservice.crowdworking.mturk.command.GetHIT;
 import org.apache.logging.log4j.Level;
@@ -9,8 +10,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -80,23 +83,22 @@ public class HitExtender extends TimerTask {
             workCopy.addAll(hitIds);
         }
 
-        Function<String, CompletableFuture<Boolean>> stringCompletableFutureFunction = id -> new GetHIT(connection, id)
-                .thenApply(hit -> {
-                    LocalDate expire = hit.getExpiration().toGregorianCalendar().toZonedDateTime().toLocalDate();
-                    LocalDate minExpire = LocalDate.now().plusDays(MINIMUM_TIME_DAYS);
-                    long addition = TimeUnit.SECONDS.toMillis(Duration.between(expire, minExpire).getSeconds());
-                    if (addition < 0) {
-                        LOGGER.trace("Update "+id+" with up to addition milliseconds");
-                        return new ExtendHIT(connection, id, 0, addition).handle((aBoolean, throwable) -> {
-                            if (throwable != null) return false;
-                            return aBoolean;
-                        }).join();
-                    }
-                    return true;
-                });
+        Function<HIT, CompletableFuture<Boolean>> hitExtend = (hit -> {
+            LocalDate expire = hit.getExpiration().toGregorianCalendar().toZonedDateTime().toLocalDate();
+            LocalDate minExpire = LocalDate.now().plusDays(MINIMUM_TIME_DAYS);
+            long minutes = ChronoUnit.DAYS.between(expire, minExpire);
+            if (minutes < 0) { //FIXME
+                LOGGER.trace("Update "+hit.getHITId()+" with up to "+minutes+" minutes");
+                return new ExtendHIT(connection, hit.getHITId(), 0, Duration.ofDays(2));
+            }
+            return CompletableFuture.completedFuture(true);
+        });
+
 
         if (!workCopy.stream()
-                .map(stringCompletableFutureFunction)
+                .map(id -> new GetHIT(connection, id))
+                .map(CompletableFuture::join)
+                .map(hitExtend)
                 .map(CompletableFuture::join)
                 .allMatch(Boolean::booleanValue)) {
             LOGGER.log(Level.ERROR, "Failed to extend hits");
