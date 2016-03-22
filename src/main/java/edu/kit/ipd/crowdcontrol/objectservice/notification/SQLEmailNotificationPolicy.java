@@ -6,8 +6,11 @@ import edu.kit.ipd.crowdcontrol.objectservice.event.EventManager;
 import edu.kit.ipd.crowdcontrol.objectservice.mail.MailSender;
 import edu.kit.ipd.crowdcontrol.objectservice.template.Template;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
 import java.util.Collections;
@@ -25,6 +28,7 @@ import java.util.stream.Stream;
  * @version 1.0
  */
 public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>> {
+    private static final Logger LOGGER = LogManager.getLogger(Notification.class);
     private final MailSender mailSender;
     private final NotificationOperations operations;
 
@@ -59,9 +63,11 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
     @Override
     protected List<String> check(Notification notification) {
         // peek on first record
-        Record firstRecord;
+        Record firstRecord = null;
         try (Stream<Record> recordStream = operations.runReadOnlySQL(notification.getQuery())) {
             firstRecord = recordStream.findFirst().orElse(null);
+        } catch (DataAccessException dae) {
+            LOGGER.warn("The query for notification {} failed.", notification.getId(), dae);
         }
         if (firstRecord != null) {
             if (recordHasIdAndTokenField(firstRecord)) {
@@ -70,9 +76,8 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
                 // a query is specified but that's too much work for now.
 
                 // the records have the required columns, so we can bring them in a handier format
-                Map<Integer, NotificationTokenRecord> tokenRecords;
-                try {
-                    try (Stream<Record> recordStream = operations.runReadOnlySQL(notification.getQuery())) {
+                Map<Integer, NotificationTokenRecord> tokenRecords = null;
+                try (Stream<Record> recordStream = operations.runReadOnlySQL(notification.getQuery())) {
                         tokenRecords = recordStream.map(record -> new NotificationTokenRecord(
                                 null,
                                 record.getValue("id", Integer.class),
@@ -80,9 +85,10 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
                                 notification.getId()))
                                 .filter(record -> record.getResultId() != null)
                                 .collect(Collectors.toMap(NotificationTokenRecord::getResultId, Function.identity()));
-                    }
                 } catch (java.lang.IllegalStateException e) {
-                    throw new IllegalStateException("Invalid SQL-query, ech id has to be unique!", e);
+                    throw new IllegalStateException("Invalid query, the id has to be unique!", e);
+                } catch (DataAccessException dae) {
+                    LOGGER.warn("The query for notification {} failed.", notification.getId(), dae);
                 }
                 List<String> newTokenList = operations.diffTokenRecords(tokenRecords, notification.getId()).stream()
                         .map(NotificationTokenRecord::getResultToken)
@@ -135,7 +141,7 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
                 concatedTokens.append(tokens.get(i));
                 concatedTokens.append(", ");
             }
-            concatedTokens.append("und ");
+            concatedTokens.append("and ");
             concatedTokens.append(tokens.get(i));
         } else {
             concatedTokens.append(tokens.get(0));
