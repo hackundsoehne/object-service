@@ -228,7 +228,7 @@ public class PyBossaPlatform implements Platform {
             // replace worker-ui url
             html = html.replaceFirst("(<script id=\"worker_ui\" src=\")(.+)(\"></script>)", "$1" + workerUiPublicUrl + "/worker_ui.js$3");
             // replace project short name
-            html = html.replaceFirst("(pybossa\\.run\\(')(.+)('\\);)", "$1" + projectShortName + "$3");
+            html = html.replaceFirst("(var projectName = \")(.+)(\";)", "$1" + projectShortName + "$3");
             requests.setTaskPresenter(html);
         } else {
             throw new PyBossaRequestException(String.format("Could not find the worker ui library under the url \"%s\".",
