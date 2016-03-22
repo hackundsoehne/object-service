@@ -86,9 +86,9 @@ public class HitExtender extends TimerTask {
         Function<HIT, CompletableFuture<Boolean>> hitExtend = (hit -> {
             LocalDate expire = hit.getExpiration().toGregorianCalendar().toZonedDateTime().toLocalDate();
             LocalDate minExpire = LocalDate.now().plusDays(MINIMUM_TIME_DAYS);
-            long minutes = ChronoUnit.DAYS.between(expire, minExpire);
-            if (minutes < 0) { //FIXME
-                LOGGER.trace("Update "+hit.getHITId()+" with up to "+minutes+" minutes");
+            long days = ChronoUnit.DAYS.between(expire, minExpire);
+            if (days > 0) {
+                LOGGER.trace("Update "+hit.getHITId()+" with up to "+days+" minutes");
                 return new ExtendHIT(connection, hit.getHITId(), 0, Duration.ofDays(2));
             }
             return CompletableFuture.completedFuture(true);
