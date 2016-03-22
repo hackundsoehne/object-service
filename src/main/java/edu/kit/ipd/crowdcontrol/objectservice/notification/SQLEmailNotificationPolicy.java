@@ -141,7 +141,7 @@ public class SQLEmailNotificationPolicy extends NotificationPolicy<List<String>>
                 concatedTokens.append(tokens.get(i));
                 concatedTokens.append(", ");
             }
-            concatedTokens.append("und ");
+            concatedTokens.append("and ");
             concatedTokens.append(tokens.get(i));
         } else {
             concatedTokens.append(tokens.get(0));
