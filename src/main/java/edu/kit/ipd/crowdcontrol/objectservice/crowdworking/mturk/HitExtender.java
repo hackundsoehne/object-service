@@ -95,7 +95,8 @@ public class HitExtender extends TimerTask {
                     return true;
                 });
 
-        if (!workCopy.parallelStream().map(stringCompletableFutureFunction)
+        if (!workCopy.stream()
+                .map(stringCompletableFutureFunction)
                 .map(CompletableFuture::join)
                 .allMatch(Boolean::booleanValue)) {
             LOGGER.log(Level.ERROR, "Failed to extend hits");
