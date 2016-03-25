@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static edu.kit.ipd.crowdcontrol.objectservice.database.model.Tables.*;
+import static org.jooq.impl.DSL.orderBy;
 
 /**
  * Responsible for the operations involving the worker-table.
@@ -74,10 +75,11 @@ public class WorkerOperations extends AbstractOperations {
         Field<BigDecimal> sum = DSL.sum(WORKER_BALANCE.TRANSACTION_VALUE).as("sum");
         AggregateFunction<Timestamp> latestTransaction = DSL.max(WORKER_BALANCE.TIMESTAMP);
         return create.select(sum)
+                .select(WORKER.fields())
                 .from(WORKER_BALANCE)
                 .join(WORKER).onKey()
-                .where(sum.greaterOrEqual(new BigDecimal(balance)))
                 .groupBy(WORKER.fields())
+                .having(sum.greaterOrEqual(new BigDecimal(balance)))
                 .orderBy(latestTransaction.asc())
                 .fetchInto(WORKER);
     }
