@@ -1,5 +1,5 @@
 database:
-    url: jdbc:mysql://localhost:3306/crowdcontrol?autoReconnect=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/crowdcontrol?useSSL=false
     dialect: MYSQL
     writing:
         user: root
