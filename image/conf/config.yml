@@ -1,6 +1,6 @@
 database:
     # the url where to find the database
-    url: jdbc:mysql://db:3306/crowdcontrol?autoReconnect=true&useSSL=false
+    url: jdbc:mysql://db:3306/crowdcontrol?useSSL=false
 
     # dialekt to use for communication
     dialect: MYSQL

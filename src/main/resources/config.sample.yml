@@ -1,7 +1,7 @@
 # Database configuration
 database:
     # URL where to find the database
-    url: jdbc:mysql://localhost:3306/crowdcontrol?autoReconnect=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/crowdcontrol?useSSL=false
 
     # Dialekt to use for communication
     dialect: MYSQL
@@ -81,17 +81,7 @@ mail:
     admin: pseipd@gmail.com
 
     # disabled = true will ignore the mail configuration and print to the command line
-    disabled : false
-
-    moneytransfer:
-        protocol: smtp
-        from: max.example.com
-        auth:
-            server: smtp.example.com
-            port: 456
-            credentials:
-                user: maxMustermann
-                password: SuperSecret
+    disabled : true
 
     notifications:
         protocol: smtps
