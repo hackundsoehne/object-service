@@ -39,12 +39,14 @@ public class WorkerBalanceOperations extends AbstractOperations {
      * persists the giftCode in the database
      * @param code the code of the giftCode
      * @param amount the amount its worth
+     * @param currency the numeric currency code of the currency, the giftcode uses
      * @return true if successful
      */
-    public boolean addGiftCode(String code, int amount) {
+    public boolean addGiftCode(String code, int amount, int currency) {
         GiftCodeRecord giftCodeRecord = create.newRecord(GIFT_CODE);
         giftCodeRecord.setCode(code);
         giftCodeRecord.setAmount(amount);
+        giftCodeRecord.setCurrency(currency);
         return giftCodeRecord.store() == 1;
     }
 
