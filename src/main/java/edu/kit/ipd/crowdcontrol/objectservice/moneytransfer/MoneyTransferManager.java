@@ -92,10 +92,10 @@ public class MoneyTransferManager {
             notificationText = new StringBuilder();
             try {
                 submitGiftCodes();
-            } catch (MoneyTransferException e) {
+            } catch (Exception e) {
                 try {
                     sendNotification(NotificationLevel.ERROR,e.toString());
-                } catch (MoneyTransferException f) {
+                } catch (Exception f) {
                     LOGGER.error("", f);
                 }
                 LOGGER.error("", e);
