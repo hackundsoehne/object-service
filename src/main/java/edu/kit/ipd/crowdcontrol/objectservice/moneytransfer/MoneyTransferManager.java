@@ -92,10 +92,10 @@ public class MoneyTransferManager {
             notificationText = new StringBuilder();
             try {
                 submitGiftCodes();
-            } catch (MoneyTransferException e) {
+            } catch (Exception e) {
                 try {
                     sendNotification(NotificationLevel.ERROR,e.toString());
-                } catch (MoneyTransferException f) {
+                } catch (Exception f) {
                     LOGGER.error("", f);
                 }
                 LOGGER.error("", e);
@@ -186,7 +186,7 @@ public class MoneyTransferManager {
             Optional<GiftCodeRecord> rec = MailParser.parseAmazonGiftCode(message, parsingPassword);
             if (rec.isPresent()) {
                 GiftCodeRecord giftCode = rec.get();
-                workerBalanceOperations.addGiftCode(giftCode.getCode(), giftCode.getAmount());
+                workerBalanceOperations.addGiftCode(giftCode.getCode(), giftCode.getAmount(), giftCode.getCurrency());
                 if (!countKeys.containsKey(giftCode.getAmount())) {
                     amountList.push(giftCode.getAmount());
                     countKeys.put(giftCode.getAmount(), 1);

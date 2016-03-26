@@ -259,6 +259,6 @@ public class MoneyTransferManagerTest {
         GiftCodeRecord rec = MailParser.parseAmazonGiftCode(msg, password).orElseThrow(() -> new Exception(""));
         mng.submitGiftCodes();
 
-        verify(payops).addGiftCode(rec.getCode(), rec.getAmount());
+        verify(payops).addGiftCode(rec.getCode(), rec.getAmount(), rec.getCurrency());
     }
 }
