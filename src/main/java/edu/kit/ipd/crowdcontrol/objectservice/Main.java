@@ -268,7 +268,7 @@ public class Main {
                     //FIXME remove the sandbox url - but I am to paranoid
                     platformInstance = mturkPlatform = new MturkPlatform(platform.user,
                             platform.password,
-                            "https://mechanicalturk.sandbox.amazonaws.com/",
+                            "https://mechanicalturk.amazonaws.com/",
                             platform.name,
                             config.deployment.workerService,
                             config.deployment.workerUIPublic);
