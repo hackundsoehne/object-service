@@ -17,6 +17,10 @@ database:
 
 # basic configurations for the mail-module
 mail :
+
+    #The mail address of the admin to send notifications to
+    admin: pseipd@gmail.com
+
     # disabled = true will ignore the mail configuration and print to the command-line
     disabled : true
 
@@ -52,9 +56,6 @@ moneytransfer:
     # Password used to verify a valid Amazon GiftCode e-mail
     # enter password as message on the Amazon homepage when buying GiftCodes
     parsingPassword: test
-
-    # E-mail address to send notification mails to
-    notificationMailAddress: pseipd@gmail.com
 
     # Interval in days, when the workers get paid off
     scheduleInterval: 7
