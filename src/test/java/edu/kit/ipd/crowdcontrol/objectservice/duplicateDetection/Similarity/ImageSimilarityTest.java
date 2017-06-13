@@ -116,6 +116,7 @@ public class ImageSimilarityTest {
     }
 
     @Test
+    @Ignore
     public void testSimilarityImageHashFromColorDeviation() throws Exception{
         assertTrue(HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar1b),ImageSimilarity.getImageHashFromColorDeviation(similar1a)) > .75);
         assertTrue(HashSimilarity.getSimilarityFromHash(ImageSimilarity.getImageHashFromColorDeviation(similar3b),ImageSimilarity.getImageHashFromColorDeviation(similar3a)) > .75);
